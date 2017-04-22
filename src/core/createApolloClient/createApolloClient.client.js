@@ -12,6 +12,7 @@ const client = new ApolloClient({
   dataIdFromObject: o => o._id,
   queryDeduplication: true,
   reduxRootSelector: state => state.apollo,
+  ssrMode: true,
 });
 
 export default function createApolloClient() {
