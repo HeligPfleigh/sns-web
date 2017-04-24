@@ -23,6 +23,11 @@ export const analytics = {
 
 };
 
+export const server = {
+  ip: process.env.SERVER_IP || 'http://localhost:3006',
+  graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://localhost:3006/graphql',
+};
+
 export const auth = {
 
   jwt: { secret: process.env.JWT_SECRET || 'React Starter Kit' },
