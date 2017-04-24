@@ -4,7 +4,7 @@ import {
   specifiedRules,
 } from 'graphql';
 
-import ApolloClient from 'apollo-client';
+import ApolloClient, { createNetworkInterface } from 'apollo-client';
 
 // Execute all GraphQL requests directly without
 class ServerInterface {
@@ -34,7 +34,7 @@ class ServerInterface {
         variables,
         operationName,
       );
-
+      console.log(result, result);
       return result;
     } catch (contextError) {
       return { errors: [contextError] };
@@ -43,10 +43,33 @@ class ServerInterface {
 }
 
 export default function createApolloClient(options) {
+  const networkInterface = createNetworkInterface({
+    uri: 'http://localhost:3006/graphql',
+    opts: {
+      // credentials: 'same-origin',
+      credentials: 'include',
+    },
+  });
+
+  networkInterface.use([{
+    applyMiddleware(req, next) {
+      if (!req.options.headers) {
+        req.options.headers = {};  // Create the header object if needed.
+      }
+      // // get the authentication token from local storage if it exists
+      // const token = localStorage.getItem('token');
+      const token = options.rootValue.request.cookies.id_token;
+      req.options.headers.authorization = token ? `${token}` : null;
+      next();
+    },
+  }]);
+
   return new ApolloClient({
     reduxRootSelector: state => state.apollo,
-    networkInterface: new ServerInterface(options),
+    // networkInterface: new ServerInterface(options),
+    networkInterface,
     dataIdFromObject: o => o._id,
     queryDeduplication: true,
+    ssrMode: true,
   });
 }
