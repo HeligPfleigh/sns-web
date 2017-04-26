@@ -26,6 +26,8 @@ export const analytics = {
 export const server = {
   ip: process.env.SERVER_IP || 'http://server:3005',
   graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://server:3005/graphql',
+  ipBrowser: process.env.SERVER_IP_BROWSER || 'http://localhost:3005',
+  graphqlBrowser: process.env.SERVER_IP_BROWSER ? `${process.env.SERVER_IP_BROWSER}/graphql` : 'http://localhost:3005/graphql',
 };
 
 export const auth = {
