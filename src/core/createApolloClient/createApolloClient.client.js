@@ -3,7 +3,7 @@ import { server } from '../../config';
 
 const client = new ApolloClient({
   networkInterface: createNetworkInterface({
-    uri: server.graphql,
+    uri: server.graphqlBrowser,
     opts: {
       // credentials: 'same-origin',
       credentials: 'include',

@@ -12,7 +12,7 @@
 export const port = process.env.PORT || 3004;
 export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-export const databaseUrl = process.env.DATABASE_URL || 'mongodb://localhost/sns_test';
+export const databaseUrl = process.env.DATABASE_URL || 'mongodb://mongo:27017/sns_test';
 
 export const analytics = {
 
@@ -24,8 +24,10 @@ export const analytics = {
 };
 
 export const server = {
-  ip: process.env.SERVER_IP || 'http://localhost:3006',
-  graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://localhost:3006/graphql',
+  ip: process.env.SERVER_IP || 'http://server:3005',
+  graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://server:3005/graphql',
+  ipBrowser: process.env.SERVER_IP_BROWSER || 'http://localhost:3005',
+  graphqlBrowser: process.env.SERVER_IP_BROWSER ? `${process.env.SERVER_IP_BROWSER}/graphql` : 'http://localhost:3005/graphql',
 };
 
 export const auth = {
