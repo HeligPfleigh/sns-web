@@ -8,3 +8,5 @@ ncp-debug.log
 npm-debug.log
 .idea
 logs
+yarn*
+.yarnclean
