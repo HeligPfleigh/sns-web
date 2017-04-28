@@ -23,6 +23,7 @@ class Post extends React.Component {
     likePostEvent: PropTypes.func.isRequired,
     unlikePostEvent: PropTypes.func.isRequired,
     userInfo: PropTypes.object.isRequired,
+    isTimeLineMe: PropTypes.bool,
   };
 
   constructor(props) {
@@ -36,6 +37,7 @@ class Post extends React.Component {
     e.preventDefault();
     this.setState({
       isFocus: !this.state.isFocus,
+
     });
     const { data: { _id } } = this.props;
     goToAnchor(`#add-comment-${_id}`);
@@ -55,10 +57,12 @@ class Post extends React.Component {
       likePostEvent,
       unlikePostEvent,
       userInfo,
+      isTimeLineMe,
     } = this.props;
 
     return (
       <div className={s.postPanel}>
+        {isTimeLineMe === false &&
         <Col className={s.postHeaderLeft}>
           <div className={s.avarta}>
             <span className="hide">{_id}</span>
@@ -74,9 +78,11 @@ class Post extends React.Component {
             <TimeAgo date={createdAt} formatter={formatter} className={s.time} />
           </div>
         </Col>
+        &&
         <Col className={s.postHeaderRight}>
           <span><i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i></span>
         </Col>
+        }
         <Clearfix />
         <Col
           className={s.postContent}
