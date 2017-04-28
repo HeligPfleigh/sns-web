@@ -42,7 +42,7 @@ class CommentItem extends React.Component {
             }}
           />
           <Col className={s.commentControl}>
-            <a href="#">Thích</a> - <a href="#" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
+            <a href="#" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
               <TimeAgo date={comment.updatedAt} formatter={formatter} />
             </a>
           </Col>

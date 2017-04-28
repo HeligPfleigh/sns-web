@@ -49,18 +49,12 @@ const createNewPost = gql`mutation createNewPost ($message: String!) {
 ${postFragment}`;
 
 
-const homePageQuery = gql`query homePageQuery ($cursor: String) {
-  feeds (cursor: $cursor) {
-    edges {
-      ...PostView
-    }
-    pageInfo {
-      endCursor,
-      hasNextPage
-    }
-  }
+const profilePageQuery = gql`query profilePageQuery {
   me {
     ...UserView,
+    posts {
+      ...PostView
+    }
   },
 }
 ${userFragment}
@@ -107,8 +101,8 @@ class Me extends React.Component {
     });
   }
   render() {
-    const { data: { me, feeds } } = this.props;
-    const edges = feeds ? feeds.edges : [];
+    const { data: { me } } = this.props;
+    const edges = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
 
@@ -174,13 +168,12 @@ class Me extends React.Component {
 
 export default compose(
   withStyles(s),
-  // graphql(mePageQuery),
    graphql(createNewPost, {
      props: ({ mutate }) => ({
        createNewPost: message => mutate({
          variables: { message },
          updateQueries: {
-           homePageQuery: (previousResult, { mutationResult }) => {
+           profilePageQuery: (previousResult, { mutationResult }) => {
              const newPost = mutationResult.data.createNewPost;
              return update(previousResult, {
                feeds: {
@@ -194,7 +187,7 @@ export default compose(
        }),
      }),
    }),
-   graphql(homePageQuery, {
+   graphql(profilePageQuery, {
      options: () => ({
        variables: {},
      }),
@@ -244,7 +237,7 @@ export default compose(
            },
          },
          updateQueries: {
-           homePageQuery: (previousResult, { mutationResult }) => {
+           profilePageQuery: (previousResult, { mutationResult }) => {
              const updatedPost = mutationResult.data.likePost;
              const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
              return update(previousResult, {
@@ -281,7 +274,7 @@ export default compose(
           },
         },
         updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
+          profilePageQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
