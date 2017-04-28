@@ -109,7 +109,7 @@ class CommentList extends React.Component {
     const { initContent, commentId, isSubForm } = this.state;
     return (
       <div>
-        {loading && <h1 style={{ textAlign: 'center' }}>LOADING</h1>}
+        { /* loading && <h1 style={{ textAlign: 'center' }}>LOADING</h1> */ }
         {post && post.comments.map(item => (
           <span key={item._id}>
             <CommentItem comment={item} showCommentForm={this.showCommentForm} />
@@ -154,11 +154,29 @@ export default compose(
   }),
   graphql(createNewComment, {
     props: ({ mutate }) => ({
-      createNewComment: (postId, message, commentId) => mutate({
+      createNewComment: (postId, message, commentId, user) => mutate({
         variables: { postId, message, commentId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewComment: {
+            __typename: 'CommentSchemas',
+            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            parent: commentId || null,
+            reply: [],
+            updatedAt: new Date(),
+          },
+        },
         updateQueries: {
           loadCommentsQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
+            console.log(newComment);
             if (previousResult.post._id === postId) {
               if (commentId) {
                 const index = previousResult.post.comments.findIndex(item => item._id === commentId);

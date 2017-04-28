@@ -99,9 +99,9 @@ class NewPost extends React.Component {
   }
 
   onSubmit = () => {
-    const { postId, commentId } = this.props;
+    const { postId, commentId, user } = this.props;
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    this.props.createNewComment(postId, data, commentId);
+    this.props.createNewComment(postId, data, commentId, user);
 
     // reset editor
     this.editor.blur();

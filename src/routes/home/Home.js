@@ -194,9 +194,27 @@ export default compose(
     },
   }),
   graphql(createNewPost, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       createNewPost: message => mutate({
         variables: { message },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewPost: {
+            __typename: 'PostSchemas',
+            _id: 'TENPORARY_ID_OF_THE_POST_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+            },
+            createdAt: new Date(),
+            totalLikes: 0,
+            totalComments: 0,
+            isLiked: false,
+          },
+        },
         updateQueries: {
           homePageQuery: (previousResult, { mutationResult }) => {
             const newPost = mutationResult.data.createNewPost;
