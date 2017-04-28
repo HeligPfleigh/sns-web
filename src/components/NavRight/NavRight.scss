@@ -1,0 +1,112 @@
+/**
+ * React Starter Kit (https://www.reactstarterkit.com/)
+ *
+ * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
+
+/***********Style Navbar Right*************/
+.navRight {
+  color:  #c7d1d8;
+  padding-top: 10px;
+  float: right;
+  padding-left: 15px;
+  .userDropdown {
+    margin: 0;
+    float: left;
+    border-right: 1px solid #e1e9ee;
+    padding-right: 10px;
+    margin-right: 10px;
+    .userToggleBtn {
+      padding: 0;
+      cursor: pointer;
+      >i {
+        margin: 3px;
+      }
+    }
+
+    .userDropdownMenu {
+      min-width: 280px;
+      top:50px;
+      border-radius: 0px;
+      border: 1px solid #dedede;
+      li {
+        float: left;
+        width: 100%;
+        .pullLeft {
+          float: left;
+          margin-bottom: 10px;
+        }
+      }
+      >li.headerItem {
+        padding-top: 7px !important;
+        padding-left: 5px !important;
+        font-weight: bold;
+        background-color: #e1e9ee;
+        border-top: 1px solid #c7d1d8;
+      }
+      .name {
+        margin-left: 55px;
+        padding-top: 8px;
+        p{
+          font-weight: bold;
+          color: #0084bf;
+        }
+        h2 {
+          font-size: 100%;
+          margin: 0px;
+          width: 100%;
+          display: inline-block;
+          font-weight: normal;
+        }
+      }
+      &:before, &:after{
+        content: '';
+        display: block;
+        position: absolute;
+        top: -20px;
+        right: 14px;
+        border: 10px solid transparent;
+        border-bottom-color: #fff;
+      }
+    }
+
+    .boxUserItem {
+    }
+  }
+
+  .menuDropdown {
+    float: left;
+    .menuToggleBtn {
+      cursor: pointer;
+      >i {
+        font-size: 29px;
+      }
+    }
+
+    .itemDropdownMenu {
+      min-width: 280px;
+      top:50px;
+      border-radius: 0px;
+       &:before, &:after{
+        content: '';
+        display: block;
+        position: absolute;
+        top: -20px;
+        right: 10px;
+        border: 10px solid transparent;
+        border-bottom-color: #fff;
+       
+      }
+    }
+   
+  }
+}
+
+@media (max-width: 992px) {
+  .navRight {
+    padding-top: 8px;
+  }
+}

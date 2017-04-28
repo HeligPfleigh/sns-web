@@ -4,6 +4,7 @@
   display: flex;
   width: 100%;
   margin: 10px 0px 0px;
+  font-size: 12px;
 }
 
 .commentAvarta {
@@ -22,6 +23,9 @@
       // font-weight: bold;
       color: black;
     }
+    &:first-child {
+      font-size: 13px;
+    }
     &:first-child, &:first-child + p {
       display: inline;
       margin: 0 0 10px;
@@ -37,7 +41,6 @@
   .commentControl {
     display: flex;
     justify-content: flex-start;
-    font-size: 0.9em;
     color: #bdbdbd;
     a {
       color: #bdbdbd;

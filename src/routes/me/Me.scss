@@ -70,7 +70,17 @@
         line-height: 100px;
     }
 }
-
+.parent {
+  div:first-child {
+    border:0px; 
+ 
+     
+  }
+  
+}
+.parent div {
+ margin: 0px;
+}
 
 
 .container {

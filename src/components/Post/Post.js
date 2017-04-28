@@ -4,11 +4,11 @@ import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import TimeAgo from 'react-timeago';
-import vnStrings from 'react-timeago/lib/language-strings/en';
+import vnStrings from 'react-timeago/lib/language-strings/vi';
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
 import { goToAnchor } from 'react-scrollable-anchor';
 
-import s from './Post.css';
+import s from './Post.scss';
 import CommentList from '../Comments/CommentList';
 
 const formatter = buildFormatter(vnStrings);
@@ -23,6 +23,7 @@ class Post extends React.Component {
     likePostEvent: PropTypes.func.isRequired,
     unlikePostEvent: PropTypes.func.isRequired,
     userInfo: PropTypes.object.isRequired,
+    isTimeLineMe: PropTypes.bool,
   };
 
   constructor(props) {
@@ -36,6 +37,7 @@ class Post extends React.Component {
     e.preventDefault();
     this.setState({
       isFocus: !this.state.isFocus,
+
     });
     const { data: { _id } } = this.props;
     goToAnchor(`#add-comment-${_id}`);
@@ -55,28 +57,33 @@ class Post extends React.Component {
       likePostEvent,
       unlikePostEvent,
       userInfo,
+      isTimeLineMe,
     } = this.props;
 
     return (
       <div className={s.postPanel}>
-        <Col className={s.postHeaderLeft}>
-          <div>
-            <span className="hide">{_id}</span>
-            <a href="#">
-              <Image src={user.profile.picture} circle />
-            </a>
-          </div>
-          <div>
-            <a href="#">
-              <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
-            </a>
-            <br />
-            <TimeAgo date={createdAt} formatter={formatter} />
-          </div>
-        </Col>
-        <Col className={s.postHeaderRight}>
-          <i className="fa fa-angle-down fa-lg" aria-hidden="true"></i>
-        </Col>
+        {isTimeLineMe === false &&
+          <span>
+            <Col className={s.postHeaderLeft}>
+              <div className={s.avarta}>
+                <span className="hide">{_id}</span>
+                <a href="#">
+                  <Image src={user.profile.picture} circle />
+                </a>
+              </div>
+              <div className={s.userInfo}>
+                <a href="#">
+                  <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+                </a>
+                <br />
+                <TimeAgo date={createdAt} formatter={formatter} className={s.time} />
+              </div>
+            </Col>
+            <Col className={s.postHeaderRight}>
+              <span><i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i></span>
+            </Col>
+          </span>
+        }
         <Clearfix />
         <Col
           className={s.postContent}
@@ -102,7 +109,7 @@ class Post extends React.Component {
             <span>Thích</span>
           </a>
           <a href="#" onClick={this.onClickCommentBtn}>
-            <i className="fa fa-comments-o fa-lg" aria-hidden="true"></i>&nbsp;
+            <i className="fa fa-comment-o fa-lg" aria-hidden="true"></i>&nbsp;
             <span>Bình luận</span>
           </a>
 

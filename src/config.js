@@ -12,7 +12,7 @@
 export const port = process.env.PORT || 3004;
 export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-export const databaseUrl = process.env.DATABASE_URL || 'mongodb://mongo:27017/sns_test';
+export const databaseUrl = process.env.DATABASE_URL || 'mongodb://admin:admin123@ds133290.mlab.com:33290/sns';
 
 export const analytics = {
 
@@ -24,10 +24,10 @@ export const analytics = {
 };
 
 export const server = {
-  ip: process.env.SERVER_IP || 'http://server:3005',
-  graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://server:3005/graphql',
-  ipBrowser: process.env.SERVER_IP_BROWSER || 'http://localhost:3005',
-  graphqlBrowser: process.env.SERVER_IP_BROWSER ? `${process.env.SERVER_IP_BROWSER}/graphql` : 'http://localhost:3005/graphql',
+  ip: process.env.SERVER_IP || 'https://sns-app-server.herokuapp.com',
+  graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'https://sns-app-server.herokuapp.com/graphql',
+  ipBrowser: process.env.SERVER_IP_BROWSER || 'https://sns-app-server.herokuapp.com',
+  graphqlBrowser: process.env.SERVER_IP_BROWSER ? `${process.env.SERVER_IP_BROWSER}/graphql` : 'https://sns-app-server.herokuapp.com/graphql',
 };
 
 export const auth = {

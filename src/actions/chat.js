@@ -8,6 +8,7 @@ import {
   CHAT_ACTIVE_CONVERSATION,
   CHAT_ON_CONVERSATION_CHILD_ADD,
   CHAT_ON_MESSAGE_CHILD_ADD,
+  CHAT_LOAD_MESSAGE_HISTORY_SUCCESS,
   CHAT_ON_CHANGE_ONLINE_STATE,
   CHAT_ON_FAIL,
  } from '../constants';
@@ -61,7 +62,7 @@ export function activeConversation({ conversation }) {
           payload: conversationId,
         });
         if (isLoad(getState(), conversationId)) return;
-        chat.onMessage(conversationId, (error, data) => {
+        chat.onMessage({ conversationId }, (error, data) => {
           if (error) makeError(error);
           else {
             dispatch({
@@ -79,6 +80,36 @@ export function activeConversation({ conversation }) {
     }
   };
 }
+
+export function loadMessageHistory({ conversationId }) {
+  return async (dispatch, getState, { chat }) => {
+    try {
+      if (conversationId) {
+        const state = getState();
+        const messages = state.chat.messages[conversationId];
+        const lastMessage = messages && messages[0];
+        if (lastMessage) {
+          const endAt = Object.values(lastMessage)[0].timestamp;
+          chat.onMessage({ conversationId, endAt: endAt - 1 }, (error, data) => {
+            if (error) makeError(error);
+            else {
+              dispatch({
+                type: CHAT_LOAD_MESSAGE_HISTORY_SUCCESS,
+                payload: {
+                  conversationId,
+                  messages: data,
+                },
+              });
+            }
+          });
+        }
+      }
+    } catch (error) {
+      makeError(error);
+    }
+  };
+}
+
 export function addNewUserToConversation({ chatId }) {
   return async (dispatch, getState, { chat }) => {
     if (!chatId) return;

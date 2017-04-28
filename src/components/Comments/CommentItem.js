@@ -2,16 +2,16 @@ import React, { PropTypes } from 'react';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-// import TimeAgo from 'react-timeago';
-// import vnStrings from 'react-timeago/lib/language-strings/en';
-// import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
+import TimeAgo from 'react-timeago';
+import vnStrings from 'react-timeago/lib/language-strings/vi';
+import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
 import {
   Image,
   Col,
 } from 'react-bootstrap';
 import s from './CommentStyle.scss';
 
-// const formatter = buildFormatter(vnStrings);
+const formatter = buildFormatter(vnStrings);
 
 class CommentItem extends React.Component {
   static propTypes = {
@@ -43,7 +43,7 @@ class CommentItem extends React.Component {
           />
           <Col className={s.commentControl}>
             <a href="#">Thích</a> - <a href="#" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
-              { /** <TimeAgo date={comment.updatedAt} formatter={formatter} /> */ }
+              <TimeAgo date={comment.updatedAt} formatter={formatter} />
             </a>
           </Col>
         </Col>

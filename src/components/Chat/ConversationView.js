@@ -7,23 +7,34 @@ import s from './Conversation.scss';
 import ChatEditor from './ChatEditor';
 import Message from './Message';
 import NewMessage from './NewMessage';
-import { sendMessage } from '../../actions/chat';
+import { sendMessage, loadMessageHistory } from '../../actions/chat';
 import { formatStatus } from '../../utils/time';
 
 @connect(
   state => ({
     chatState: state.chat,
   }),
-  { sendMessage },
+  { sendMessage, loadMessageHistory },
 )
 class ConversationView extends React.Component {
   static propTypes = {
     chatState: PropTypes.object,
     sendMessage: PropTypes.func.isRequired,
+    loadMessageHistory: PropTypes.func.isRequired,
     handleToggleChatView: PropTypes.func.isRequired,
   };
+  constructor() {
+    super();
+    this.state = {
+      distyScroll: false,
+    };
+  }
+
   componentDidUpdate() {
-    this.scrollMessages.scrollTop(this.scrollMessages.getScrollHeight());
+    const { distyScroll } = this.state;
+    if (!distyScroll) {
+      this.scrollMessages.scrollTop(this.scrollMessages.getScrollHeight());
+    }
   }
   handleSend = (message) => {
     const { chatState } = this.props;
@@ -32,6 +43,18 @@ class ConversationView extends React.Component {
       this.props.sendMessage({ to: newChat.receiver, message });
     } else if (current) {
       this.props.sendMessage({ message, conversationId: current });
+    }
+  }
+  handleScrollFrame = ({ top }) => {
+    const { chatState: { current } } = this.props;
+    const { distyScroll } = this.state;
+    if (!distyScroll) {
+      this.setState({
+        distyScroll: true,
+      });
+    }
+    if (current && top === 0) {
+      this.props.loadMessageHistory({ conversationId: current });
     }
   }
   render() {
@@ -94,6 +117,7 @@ class ConversationView extends React.Component {
             style={{ height: '100vh' }}
             universal
             autoHide
+            onScrollFrame={this.handleScrollFrame}
             ref={(node) => { this.scrollMessages = node; }}
           >
             {

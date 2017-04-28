@@ -7,12 +7,14 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from 'react';
+import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Button } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
+import gql from 'graphql-tag';
+import { graphql, compose } from 'react-apollo';
 
-import s from './Header.css';
+import s from './Header.scss';
 import SearchBox from '../SearchBox';
 import Navigation from '../Navigation';
 import NavRight from '../NavRight';
@@ -20,41 +22,63 @@ import history from '../../core/history';
 // import logoUrl from './logo-small.png';
 // import logoUrl2x from './logo-small@2x.png';
 
+const userInfoQuery = gql`query userInfoQuery {
+  me {
+    _id
+    profile {
+      firstName
+      lastName
+      picture
+    }
+  }
+}
+`;
+
 class Header extends React.Component {
+  static propTypes = {
+    data: PropTypes.shape({
+      loading: PropTypes.bool.isRequired,
+    }).isRequired,
+  };
 
   gotoHomePage =() => {
     history.push('/');
   }
+
   render() {
+    const { data: { me } } = this.props;
     return (
-      <Grid bsClass="navbar" className={s.root}>
-        <Row className={s.container}>
-          <Col lg={6} md={6} sm={7} xs={7} className={s.nowrap}>
-            <Button onClick={this.gotoHomePage} bsStyle="danger" className={s.brand}>HX</Button>
-            <MediaQuery query="(min-width: 992px)">
-              <SearchBox />
-            </MediaQuery>
-            <MediaQuery query="(max-width: 992px)">
-              <SearchBox isMobile />
-            </MediaQuery>
-          </Col>
-          <MediaQuery query="(min-width: 992px)">
-            <Col lg={4} md={4} className={s.navControl}>
-              <Navigation />
+      <div className={s.root} >
+        <Grid>
+          <Row>
+            <Col md={6} sm={6} xs={6}>
+              <Button onClick={this.gotoHomePage} bsStyle="danger">HX</Button>
+              <MediaQuery query="(min-width: 992px)">
+                <SearchBox />
+              </MediaQuery>
+              <MediaQuery query="(max-width: 992px)">
+                <SearchBox isMobile />
+              </MediaQuery>
             </Col>
-          </MediaQuery>
-          <Col lg={2} md={2} sm={5} xs={5} className={s.navRightWrap}>
-            <NavRight />
-          </Col>
-        </Row>
-        <MediaQuery query="(max-width: 992px)">
-          <Row className={`${s.container} ${s.navControl}`}>
-            <Navigation isMobile />
+            <Col md={6} sm={6} xs={6} >
+              <NavRight user={me} />
+              <MediaQuery query="(min-width: 992px)">
+                <Navigation />
+              </MediaQuery>
+            </Col>
           </Row>
-        </MediaQuery>
-      </Grid>
+          <MediaQuery query="(max-width: 992px)">
+            <div className={s.boxMobileHeader}>
+              <Navigation user={me} isMobile />
+            </div>
+          </MediaQuery>
+        </Grid>
+      </div>
     );
   }
 }
 
-export default withStyles(s)(Header);
+export default compose(
+  withStyles(s),
+  graphql(userInfoQuery, {}),
+)(Header);

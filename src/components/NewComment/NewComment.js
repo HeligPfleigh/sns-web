@@ -15,8 +15,8 @@ import {
 } from 'react-bootstrap';
 
 import s from './NewComment.css';
-import HandleSpan from '../Commons/HandleSpan';
-import HashtagSpan from '../Commons/HashtagSpan';
+import HandleSpan from '../Common/Editor/HandleSpan';
+import HashtagSpan from '../Common/Editor/HashtagSpan';
 
 /**
        * Super simple decorators for handles and hashtags, for demonstration

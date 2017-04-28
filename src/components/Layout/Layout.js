@@ -10,7 +10,7 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { StickyContainer, Sticky } from 'react-sticky';
-import s from './Layout.css';
+import s from './Layout.scss';
 import Header from '../Header';
 
 class Layout extends React.Component {

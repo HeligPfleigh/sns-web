@@ -57,7 +57,7 @@
 
 .friendList {
     font-family: 'Roboto';
-    margin-top: 3em;
+    // margin-top: 3em;
     background: white;
     border: 1px solid #dedede;
     >h4 {
@@ -69,7 +69,8 @@
         padding: 0;
         list-style: none;
         li {
-            border-bottom: 1px solid #dedede;
+            // border-bottom: 1px solid #dedede;
+            border: none;
         }
         li:last-child {
             border-bottom: none;

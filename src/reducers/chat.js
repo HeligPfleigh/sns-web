@@ -7,6 +7,7 @@ import {
   CHAT_LOAD_CONVERSATION_HISTORY_SUCCESS,
   CHAT_ON_CONVERSATION_CHILD_ADD,
   CHAT_ON_MESSAGE_CHILD_ADD,
+  CHAT_LOAD_MESSAGE_HISTORY_SUCCESS,
   CHAT_ON_CHANGE_ONLINE_STATE,
   CHAT_ON_FAIL,
 } from '../constants';
@@ -84,6 +85,18 @@ export default function chat(state = initialState, action) {
         messages: {
           ...state.messages,
           [action.payload.conversationId]: newMoc,
+        },
+      };
+    }
+    case CHAT_LOAD_MESSAGE_HISTORY_SUCCESS: {
+      const moc = (state.messages && state.messages[action.payload.conversationId]) || [];
+      const historys = action.payload.messages || {};
+      const newMoc = _.map(Object.keys(historys), key => ({ [key]: historys[key] }));
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [action.payload.conversationId]: newMoc.concat(moc),
         },
       };
     }
