@@ -168,90 +168,86 @@ class Me extends React.Component {
 
 export default compose(
   withStyles(s),
-   graphql(createNewPost, {
-     props: ({ mutate }) => ({
-       createNewPost: message => mutate({
-         variables: { message },
-         updateQueries: {
-           profilePageQuery: (previousResult, { mutationResult }) => {
-             const newPost = mutationResult.data.createNewPost;
-             return update(previousResult, {
-               feeds: {
-                 edges: {
-                   $unshift: [newPost],
-                 },
-               },
-             });
-           },
-         },
-       }),
-     }),
-   }),
-   graphql(profilePageQuery, {
-     options: () => ({
-       variables: {},
-     }),
-     props: ({ data }) => {
-       const { fetchMore } = data;
-
-       const loadMoreRows = () => fetchMore({
-         variables: {
-           cursor: data.feeds.pageInfo.endCursor,
-         },
-         updateQuery: (previousResult, { fetchMoreResult }) => {
-           const newEdges = fetchMoreResult.feeds.edges;
-           const pageInfo = fetchMoreResult.feeds.pageInfo;
-           return {
-             feeds: {
-               edges: [...previousResult.feeds.edges, ...newEdges],
-               pageInfo,
-             },
-           };
-         },
-       });
-       return {
-         data,
-         loadMoreRows,
-       };
-     },
-   }),
-   graphql(likePost, {
-     props: ({ mutate }) => ({
-       likePost: (postId, message, totalLikes, totalComments, user) => mutate({
-         variables: { postId },
-         optimisticResponse: {
-           __typename: 'Mutation',
-           likePost: {
-             __typename: 'PostSchemas',
-             _id: postId,
-             message,
-             user: {
-               __typename: 'UserSchemas',
-               _id: user._id,
-               username: user.username,
-               profile: user.profile,
-             },
-             totalLikes: totalLikes + 1,
-             totalComments,
-             isLiked: true,
-           },
-         },
-         updateQueries: {
-           profilePageQuery: (previousResult, { mutationResult }) => {
-             const updatedPost = mutationResult.data.likePost;
-             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
-             return update(previousResult, {
-               feeds: {
-                 edges: {
-                   $splice: [[index, 1, updatedPost]],
-                 },
-               },
-             });
-           },
-         },
-       }),
-     }),
-   }),
+  graphql(profilePageQuery, {
+    options: () => ({
+      variables: {},
+    }),
+  }),
+  graphql(createNewPost, {
+    props: ({ ownProps, mutate }) => ({
+      createNewPost: message => mutate({
+        variables: { message },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewPost: {
+            __typename: 'PostSchemas',
+            _id: 'TENPORARY_ID_OF_THE_POST_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+            },
+            createdAt: new Date(),
+            totalLikes: 0,
+            totalComments: 0,
+            isLiked: false,
+          },
+        },
+        updateQueries: {
+          profilePageQuery: (previousResult, { mutationResult }) => {
+            console.log(ownProps);
+            const newPost = mutationResult.data.createNewPost;
+            return update(previousResult, {
+              me: {
+                posts: {
+                  $unshift: [newPost],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(likePost, {
+    props: ({ mutate }) => ({
+      likePost: (postId, message, totalLikes, totalComments, user) => mutate({
+        variables: { postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          likePost: {
+            __typename: 'PostSchemas',
+            _id: postId,
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            totalLikes: totalLikes + 1,
+            totalComments,
+            isLiked: true,
+          },
+        },
+        updateQueries: {
+          profilePageQuery: (previousResult, { mutationResult }) => {
+            const updatedPost = mutationResult.data.likePost;
+            const index = previousResult.me.posts.findIndex(item => item._id === updatedPost._id);
+            return update(previousResult, {
+              me: {
+                posts: {
+                  $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
   graphql(unlikePost, {
     props: ({ mutate }) => ({
       unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
@@ -276,10 +272,10 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.unlikePost;
-            const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
+            const index = previousResult.me.posts.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
-              feeds: {
-                edges: {
+              me: {
+                posts: {
                   $splice: [[index, 1, updatedPost]],
                 },
               },
