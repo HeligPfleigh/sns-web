@@ -10,7 +10,7 @@
 import React, { PropTypes } from 'react';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
@@ -20,7 +20,7 @@ import Post from '../../components/Post';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
-import s from './Home.css';
+import s from './Home.scss';
 
 const userFragment = gql`
   fragment UserView on UserSchemas {
@@ -127,44 +127,38 @@ class Home extends React.Component {
 
   render() {
     // Pre-fetch data
-    if (this.props.data.loading) return null;
     const { data: { loading, feeds, me }, loadMoreRows } = this.props;
     let hasNextPage = false;
-    if (feeds && feeds.pageInfo) {
+    if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
     return (
-      <span>
+      <Grid>
         <Loading show={loading} full>Loading ...</Loading>
-        <div className={s.root}>
-          <Row className={s.container}>
-            <Col>
-              <h1>My feeds</h1>
-              <a href="/logout"> logout </a>
-            </Col>
-            <Col className={s.feedsContent}>
-              {loading && <h1 style={{ textAlign: 'center' }}>LOADING</h1>}
-              <NewPost createNewPost={this.props.createNewPost} />
-              <InfiniteScroll
-                loadMore={loadMoreRows}
-                hasMore={hasNextPage}
-                loader={<div className="loader">Loading ...</div>}
-              >
-                <FeedList
-                  feeds={feeds.edges}
-                  likePostEvent={this.props.likePost}
-                  unlikePostEvent={this.props.unlikePost}
-                  userInfo={me}
-                />
-              </InfiniteScroll>
-            </Col>
+        <Row className={s.containerTop30}>
+          <Col sm={8} xs={12}>
+            <NewPost createNewPost={this.props.createNewPost} />
+            <InfiniteScroll
+              loadMore={loadMoreRows}
+              hasMore={hasNextPage}
+              loader={<div className="loader">Loading ...</div>}
+            >
+              { feeds && feeds.edges && <FeedList
+                feeds={feeds ? feeds.edges : []}
+                likePostEvent={this.props.likePost}
+                unlikePostEvent={this.props.unlikePost}
+                userInfo={me}
+              />}
+            </InfiniteScroll>
+          </Col>
 
-            <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+            <Col sm={4} xs={12}>
               <FriendSuggestions />
-            </MediaQuery>
-          </Row>
-        </div>
-      </span>
+            </Col>
+          </MediaQuery>
+        </Row>
+      </Grid>
     );
   }
 }
@@ -172,11 +166,8 @@ class Home extends React.Component {
 export default compose(
   withStyles(s),
   graphql(homePageQuery, {
-    options: props => ({
-      variables: {
-        ...props,
-        cursor: null,
-      },
+    options: () => ({
+      variables: {},
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -185,8 +176,8 @@ export default compose(
           cursor: data.feeds.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.data.feeds.edges;
-          const pageInfo = fetchMoreResult.data.feeds.pageInfo;
+          const newEdges = fetchMoreResult.feeds.edges;
+          const pageInfo = fetchMoreResult.feeds.pageInfo;
           return {
             feeds: {
               edges: [...previousResult.feeds.edges, ...newEdges],

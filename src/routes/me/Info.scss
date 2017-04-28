@@ -1,0 +1,50 @@
+@import '../../components/variables.css';
+
+.root {
+  margin-top: 15px;
+  margin-bottom: 100px;
+}
+.profile{
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  display: inline-block;
+  li.fixfont {
+      
+      i {
+          font-size: 30px;
+      }
+    }
+  li{
+    float:left;
+    width: 100%;
+    padding: 10px 0px;
+    list-style: none;
+    font-size: 14px;
+    color: #283e4a;
+    i{
+      color: #e1e9ee;
+      width: 40px;
+      font-size: 24px;
+      display: inline-block;
+    }
+    
+    span {
+      width:100px;
+      color: #737373;
+      display: inline-block;
+    }
+    .button {
+      background-color: #263E49;
+      border: 0px;
+      padding: 10px 15px;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    
+  }
+}
+
+

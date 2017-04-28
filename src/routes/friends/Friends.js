@@ -98,7 +98,7 @@ class Friends extends React.Component {
 
       <Grid>
         <Loading show={loading} full />
-        <Row className={s.container}>
+        <Row className={s.containerTop30}>
           <Col md={8} xs={12}>
             {
               me && me.friendRequests &&

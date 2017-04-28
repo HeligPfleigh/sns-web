@@ -11,35 +11,9 @@ import React, { PropTypes } from 'react';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
-import { Button, Image, Col, Clearfix } from 'react-bootstrap';
+import FriendList from '../../components/Friend/FriendList';
+import { NONE } from '../../constants';
 import s from './FriendSuggestions.css';
-
-const UsersList = ({ users, addFriend }) => (
-  <div>
-    {users.map(user => (
-      <Col className={s.suggestFriendItem} key={user._id}>
-        <div className={s.friendItemLeft}>
-          <a href="#"><Image src={user.profile.picture} circle /></a>
-        </div>
-        <div className={s.friendItemRight}>
-          <a href="#"><strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong></a>
-          <br />
-          <Button bsSize="xsmall" onClick={addFriend(user._id)}>
-            <i className="fa fa-user-plus" aria-hidden="true"></i>&nbsp; Kết bạn
-          </Button>
-        </div>
-        <Clearfix />
-      </Col>
-    ))}
-  </div>
-);
-
-UsersList.propTypes = {
-  users: PropTypes.arrayOf(PropTypes.shape({
-    _id: PropTypes.string,
-  })).isRequired,
-  addFriend: PropTypes.func.isRequired,
-};
 
 const friendSuggestionsQuery = gql`query friendSuggestionsQuery {
   me {
@@ -73,19 +47,14 @@ class FriendSuggestions extends React.Component {
     sendFriendRequest: PropTypes.func.isRequired,
   };
 
-  addFriend = id => (evt) => {
-    evt.preventDefault();
-    this.props.sendFriendRequest(id);
-  }
-
   render() {
     const { data: { loading, me } } = this.props;
     const hasFriendSuggest = me && me.friendSuggestions && me.friendSuggestions.length > 0;
     return (
-      <Col className={hasFriendSuggest ? s.friendSuggestion : s.friendSuggestionHide}>
+      <div className={hasFriendSuggest ? '' : s.friendSuggestionHide}>
         {loading && <h1 style={{ textAlign: 'center' }}>LOADING</h1>}
-        {!loading && me && <UsersList addFriend={this.addFriend} users={me.friendSuggestions} />}
-      </Col>
+        {!loading && <FriendList friends={me.friendSuggestions} friendType={NONE} handleFriendAction={this.props.sendFriendRequest} />}
+      </div>
     );
   }
 }

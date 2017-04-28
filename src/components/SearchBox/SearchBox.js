@@ -9,7 +9,7 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './SearchBox.css';
+import s from './SearchBox.scss';
 
 class SearchBox extends React.Component {
   static defaultProps = {
@@ -50,7 +50,7 @@ class SearchBox extends React.Component {
               autoFocus
               type="text"
               className={`form-control ${s.searchQuery}`}
-              placeholder="Search..."
+              placeholder="Tìm kiếm"
               ref={(input) => { this.nameInput = input; }}
             />
           </form>

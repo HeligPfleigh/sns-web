@@ -14,9 +14,9 @@ import {
   Button,
 } from 'react-bootstrap';
 
-import s from './NewPost.css';
-import HandleSpan from './HandleSpan';
-import HashtagSpan from './HashtagSpan';
+import s from './NewPost.scss';
+import HandleSpan from '../Common/Editor/HandleSpan';
+import HashtagSpan from '../Common/Editor/HashtagSpan';
 
 /**
        * Super simple decorators for handles and hashtags, for demonstration
@@ -24,10 +24,10 @@ import HashtagSpan from './HashtagSpan';
        */
 const styles = {
   editor: {
-    border: '1px solid #ddd',
+    // border: '1px solid #ddd',
     cursor: 'text',
     minHeight: 40,
-    padding: 10,
+    padding: '10px 0px',
   },
 };
 
@@ -114,7 +114,7 @@ class NewPost extends React.Component {
           <Col className="pull-left">
             <Button bsStyle="link" className={s.addPhoto}>
               <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
-              <span>Photo</span>
+              <strong>Photo</strong>
             </Button>
           </Col>
 
