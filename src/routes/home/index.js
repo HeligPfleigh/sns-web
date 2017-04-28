@@ -24,7 +24,7 @@ export default {
     }
 
     return {
-      title: 'React Starter Kit',
+      title: 'SNS',
       component: <Layout><Home /></Layout>,
     };
   },
