@@ -97,6 +97,7 @@ const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
         likePostEvent={likePostEvent}
         unlikePostEvent={unlikePostEvent}
         userInfo={userInfo}
+        isTimeLineMe={false}
       />
     ))}
   </div>

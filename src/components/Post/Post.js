@@ -63,25 +63,26 @@ class Post extends React.Component {
     return (
       <div className={s.postPanel}>
         {isTimeLineMe === false &&
-        <Col className={s.postHeaderLeft}>
-          <div className={s.avarta}>
-            <span className="hide">{_id}</span>
-            <a href="#">
-              <Image src={user.profile.picture} circle />
-            </a>
-          </div>
-          <div className={s.userInfo}>
-            <a href="#">
-              <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
-            </a>
-            <br />
-            <TimeAgo date={createdAt} formatter={formatter} className={s.time} />
-          </div>
-        </Col>
-        &&
-        <Col className={s.postHeaderRight}>
-          <span><i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i></span>
-        </Col>
+          <span>
+            <Col className={s.postHeaderLeft}>
+              <div className={s.avarta}>
+                <span className="hide">{_id}</span>
+                <a href="#">
+                  <Image src={user.profile.picture} circle />
+                </a>
+              </div>
+              <div className={s.userInfo}>
+                <a href="#">
+                  <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+                </a>
+                <br />
+                <TimeAgo date={createdAt} formatter={formatter} className={s.time} />
+              </div>
+            </Col>
+            <Col className={s.postHeaderRight}>
+              <span><i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i> <i className="fa fa-circle-o" aria-hidden="true"></i></span>
+            </Col>
+          </span>
         }
         <Clearfix />
         <Col

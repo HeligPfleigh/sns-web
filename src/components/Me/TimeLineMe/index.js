@@ -35,7 +35,7 @@ class TimeLineMe extends React.Component {
                   <PostMe
                     isTimeLineMe
                     data={data && data}
-                    userInfo={userInfo && userInfo} likePostEvent={likePostEvent && likePostEvent}
+                    userInfo={userInfo} likePostEvent={likePostEvent && likePostEvent}
                     unlikePostEvent={unlikePostEvent && unlikePostEvent}
                   />
                 </div>
