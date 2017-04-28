@@ -199,6 +199,7 @@ const clientConfig = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       'process.env.BROWSER': true,
+      'process.env.SERVER_IP_BROWSER': process.env.SERVER_IP_BROWSER,
       __DEV__: isDebug,
     }),
 

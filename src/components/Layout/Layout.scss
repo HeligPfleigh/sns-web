@@ -7,28 +7,27 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-@import '../variables.css';
-
-@global-import 'normalize.css' ;
+@import "../../theme/resources.scss";
 
 /*
  * Base styles
  * ========================================================================== */
 
 html {
-  color: #222;
-  font-weight: 100;
-  font-size: 1em; /* ~16px; */
-  font-family: var(--font-family-base);
+  color: $text-color;
+  font-weight: 300;
+  font-size: 14px; /* ~16px; */
+  font-family: $theme-font;
   line-height: 1.375; /* ~22px */
 }
 
 body {
+  font-family: $theme-font;
   background-color: #f5f5f5;
 }
 
 a {
-  color: #0074c2;
+  color: $color-theme;
 }
 
 /*
