@@ -2,18 +2,14 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import Me from './Me';
 
-
 const title = 'Me - SNS';
 
 export default {
-
   path: '/me',
-
-  async action() {
+  async action(context) {
     return {
       title,
-      component: <Layout><Me /></Layout>,
+      component: <Layout><Me query={context.query} /></Layout>,
     };
   },
-
 };

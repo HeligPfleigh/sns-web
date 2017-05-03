@@ -9,9 +9,9 @@ import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
-import { MY_TIME_LINE, MY_INFO } from '../../constants';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import Post from '../../components/Post';
+import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
 const userFragment = gql`
   fragment UserView on UserSchemas {
@@ -81,29 +81,19 @@ class Me extends React.Component {
     createNewPost: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
-
+    query: PropTypes.object.isRequired,
   };
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      stateChildShow: MY_TIME_LINE,
-      isTimeLineMe: true,
-    };
-  }
-
-
-  buttonClicked = (state) => {
-    this.setState({
-      stateChildShow: state,
-    });
-  }
   render() {
-    const { data: { me } } = this.props;
+    const { data: { me }, query } = this.props;
     const edges = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
     const numbers = 100;
+    let tab = MY_TIME_LINE;
+    if (query.tab) {
+      tab = MY_INFO;
+    }
 
     return (
       <Grid className={s.margintop30}>
@@ -118,17 +108,13 @@ class Me extends React.Component {
                 </div>
               </div>
               <div className={s.infors}>
-                <Tab numbers={numbers} stateChildShow={this.state.stateChildShow} onclicks={this.buttonClicked} />
+                <Tab numbers={numbers} stateChildShow={tab} />
               </div>
               <Grid fluid>
-                {this.state.stateChildShow === MY_TIME_LINE && <div className={s.parent}><NewPost createNewPost={this.props.createNewPost} /> </div> }
-                {/** this.state.stateChildShow === MY_TIME_LINE && <TimeLineMe
-                  events={edges}
-                  userInfo={me}
-                  likePostEvent={this.props.likePost}
-                  unlikePostEvent={this.props.unlikePost}
-                />*/}
-                {this.state.stateChildShow === MY_TIME_LINE && edges.map(data => (
+                {tab === MY_TIME_LINE && <div className={s.parent}>
+                  <NewPost createNewPost={this.props.createNewPost} />
+                </div>}
+                {tab === MY_TIME_LINE && edges.map(data => (
                   <Post
                     key={data._id}
                     data={data}
@@ -137,7 +123,7 @@ class Me extends React.Component {
                     unlikePostEvent={this.props.unlikePost}
                   />
                 ))}
-                {this.state.stateChildShow === MY_INFO && <Info profile={profile} />}
+                {tab === MY_INFO && <Info profile={profile} />}
               </Grid>
             </div>
           </Col>
