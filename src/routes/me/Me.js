@@ -12,8 +12,8 @@ import TimeLine from '../../components/Me/TimeLine';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
 import { MY_TIME_LINE, MY_PHOTO, MY_INFO } from '../../constants';
-import TimeLineMe from '../../components/Me/TimeLineMe';
-
+import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
+import Post from '../../components/Post';
 
 const userFragment = gql`
   fragment UserView on UserSchemas {
@@ -105,9 +105,6 @@ class Me extends React.Component {
     const edges = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
-
-    const imageSrc = 'http://hdwallpaperfun.com/wp-content/uploads/2015/07/Awesome-Art-Landscape-Wallpaper.jpg';
-
     const numbers = 100;
     const createdAt = '20-04-2017';
 
@@ -118,48 +115,43 @@ class Me extends React.Component {
     ];
     return (
       <Grid className={s.margintop30}>
-        <Row >
+        <Row>
           <Col sm={8} xs={12}>
             <div className={s.feedsContent}>
               <div className={s.topLayout}>
                 <Image className={s.image} src={imageSrc} />
-
-
                 <div className={s.userName} >
-
                   <Image className={s.avartar} src={avatar} />
-
-                  { profile && (<h1 > {profile.lastName} {profile.firstName}</h1>) }
+                  { profile && (<h1> {profile.lastName} {profile.firstName}</h1>) }
                 </div>
-
-
               </div>
               <div className={s.infors}>
-
-
                 <Tab numbers={numbers} stateChildShow={this.state.stateChildShow} onclicks={this.buttonClicked} />
-
-
               </div>
               <Grid fluid>
                 {this.state.stateChildShow === MY_TIME_LINE && <div className={s.parent}><NewPost createNewPost={this.props.createNewPost} /> </div> }
-                {this.state.stateChildShow === MY_TIME_LINE && <TimeLineMe
+                {/** this.state.stateChildShow === MY_TIME_LINE && <TimeLineMe
                   events={edges}
                   userInfo={me}
                   likePostEvent={this.props.likePost}
                   unlikePostEvent={this.props.unlikePost}
-
-                /> }
+                />*/}
+                {this.state.stateChildShow === MY_TIME_LINE && edges.map(data => (
+                  <Post
+                    key={data._id}
+                    data={data}
+                    userInfo={me}
+                    likePostEvent={this.props.likePost}
+                    unlikePostEvent={this.props.unlikePost}
+                  />
+                ))}
                 {this.state.stateChildShow === MY_PHOTO && <TimeLine events={events} /> }
                 {this.state.stateChildShow === MY_INFO && <Info profile={profile} />}
               </Grid>
             </div>
           </Col>
-          <Col sm={4} xs={12}>
-
-          </Col>
+          <Col sm={4} xs={12}>123</Col>
         </Row >
-
       </Grid>
 
     );
