@@ -6,12 +6,10 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import s from './Me.scss';
-
 import Tab from '../../components/Me/TabComponent/Tab';
-import TimeLine from '../../components/Me/TimeLine';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
-import { MY_TIME_LINE, MY_PHOTO, MY_INFO } from '../../constants';
+import { MY_TIME_LINE, MY_INFO } from '../../constants';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import Post from '../../components/Post';
 
@@ -106,13 +104,7 @@ class Me extends React.Component {
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
     const numbers = 100;
-    const createdAt = '20-04-2017';
 
-    const events = [
-      { time: createdAt,
-        images: [imageSrc, imageSrc, imageSrc, imageSrc, imageSrc, imageSrc, imageSrc, imageSrc, imageSrc, imageSrc],
-      },
-    ];
     return (
       <Grid className={s.margintop30}>
         <Row>
@@ -145,7 +137,6 @@ class Me extends React.Component {
                     unlikePostEvent={this.props.unlikePost}
                   />
                 ))}
-                {this.state.stateChildShow === MY_PHOTO && <TimeLine events={events} /> }
                 {this.state.stateChildShow === MY_INFO && <Info profile={profile} />}
               </Grid>
             </div>
