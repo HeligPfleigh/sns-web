@@ -84,7 +84,7 @@ let onRenderComplete = function initialRenderComplete() {
     // or scroll to the given #hash anchor
     // or scroll to top of the page
     window.scrollTo(scrollX, scrollY);
-    console.log('window.scrollTo(scrollX, scrollY)', scrollX, scrollY, location.key);
+
     // Google Analytics tracking. Don't send 'pageview' event after
     // the initial rendering, as it was already sent
     if (window.ga) {
@@ -114,8 +114,6 @@ async function onLocationChange(location, action) {
     delete scrollPositionsHistory[location[key]];
   }
   currentLocation = location;
-
-  console.log('onLocationChange', location, action);
 
   try {
     // Traverses the list of routes in the order they are defined until
