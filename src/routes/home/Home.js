@@ -15,10 +15,10 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
-import Post from '../../components/Post';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
+import FeedList from './FeedList';
 import s from './Home.scss';
 
 const userFragment = gql`
@@ -44,6 +44,9 @@ const postFragment = gql`
     totalComments,
     isLiked,
     createdAt,
+    comments (limit: 5) {
+      _id
+    }
   }
   ${userFragment}
 `;
@@ -87,31 +90,7 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
 }
 ${postFragment}`;
 
-const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
-  <div>
-    {feeds.map(item => (
-      item.user && item.user.profile && <Post
-        key={item._id}
-        data={item}
-        likePostEvent={likePostEvent}
-        unlikePostEvent={unlikePostEvent}
-        userInfo={userInfo}
-        isTimeLineMe={false}
-      />
-    ))}
-  </div>
-);
 
-FeedList.propTypes = {
-  feeds: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-  likePostEvent: PropTypes.func.isRequired,
-  unlikePostEvent: PropTypes.func.isRequired,
-  userInfo: PropTypes.object.isRequired,
-};
 
 class Home extends Component {
   static propTypes = {
@@ -132,6 +111,7 @@ class Home extends Component {
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
         <Loading show={loading} full>Loading ...</Loading>
