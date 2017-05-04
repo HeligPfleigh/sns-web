@@ -5,14 +5,22 @@
 .margintop30 {
    border-width: 0px;
   // border: 
+ 
 }
+
 .feedsContent {
     float: left;
     width: 100%;
    // border: 1px solid #cfcfcf;
-    background-color: #fff;
+    background-color: transparent;
     margin-bottom: 15px;
      position: relative;
+   
+}
+.feedsContent>div:nth-child(3){
+ padding: 0;
+
+     
 }
 .topLayout {
     width: 100%;
@@ -44,9 +52,12 @@
 }
 
 .infors {    
-    border-width: 1px;
+  //  border-width: 1px;
     width: 100%;
     display: inline-block;
+    background-color: #fff;
+     margin-top: -5px;
+    border-bottom: 2px solid #f5f5f5; 
 }
 .infor {
     margin-left : 1px;
@@ -71,24 +82,27 @@
     }
 }
 .parent {
+     
   div:first-child {
-    border:0px; 
- 
+     
+    margin-top: 2px;
      
   }
   
 }
-.parent div {
- margin: 0px;
+.parent  {
+    // margin-top: 15px;
 }
 
 
 .container {
    
      margin: 0 auto ;
-     padding: 0 0 10px;
+     padding: 0 0 0px;
     max-width: var(--max-content-width);
+   
 }
+
 @media(max-width:767px) {
    .userName{    
         h1{
