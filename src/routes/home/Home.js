@@ -7,7 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
@@ -15,7 +15,6 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
-
 import Post from '../../components/Post';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
@@ -114,7 +113,7 @@ FeedList.propTypes = {
   userInfo: PropTypes.object.isRequired,
 };
 
-class Home extends React.Component {
+class Home extends Component {
   static propTypes = {
     data: PropTypes.shape({
       feeds: PropTypes.object,

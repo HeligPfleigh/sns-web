@@ -47,6 +47,8 @@ const scrollPositionsHistory = {};
 if (window.history && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
 }
+const key = 'pathname';
+// const key = 'key';
 
 let onRenderComplete = function initialRenderComplete() {
   const elem = document.getElementById('css');
@@ -64,7 +66,7 @@ let onRenderComplete = function initialRenderComplete() {
 
     let scrollX = 0;
     let scrollY = 0;
-    const pos = scrollPositionsHistory[location.key];
+    const pos = scrollPositionsHistory[location[key]];
     if (pos) {
       scrollX = pos.scrollX;
       scrollY = pos.scrollY;
@@ -102,13 +104,14 @@ let routes = require('./routes').default;
 // Re-render the app when window.location changes
 async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
-  scrollPositionsHistory[currentLocation.key] = {
+  scrollPositionsHistory[currentLocation[key]] = {
     scrollX: window.pageXOffset,
     scrollY: window.pageYOffset,
   };
+
   // Delete stored scroll position for next page if any
-  if (action === 'PUSH') {
-    delete scrollPositionsHistory[location.key];
+  if (action === 'PUSH' && currentLocation[key] !== location[key]) {
+    delete scrollPositionsHistory[location[key]];
   }
   currentLocation = location;
 
@@ -123,7 +126,7 @@ async function onLocationChange(location, action) {
     });
 
     // Prevent multiple page renders during the routing process
-    if (currentLocation.key !== location.key) {
+    if (currentLocation[key] !== location[key]) {
       return;
     }
 
@@ -149,7 +152,7 @@ async function onLocationChange(location, action) {
     console.error(error); // eslint-disable-line no-console
 
     // Do a full page reload if error occurs during client-side navigation
-    if (action && currentLocation.key === location.key) {
+    if (action && currentLocation[key] === location[key]) {
       window.location.reload();
     }
   }
@@ -189,4 +192,8 @@ if (module.hot) {
 
     onLocationChange(currentLocation);
   });
+}
+
+if (process.env.NODE_ENV === 'production') {
+  require('offline-plugin/runtime').install(); // eslint-disable-line global-require
 }
