@@ -76,7 +76,7 @@ export async function verifiedChatToken(req, res) {
       req.user = { ...user, chatToken, chatExp: moment().add(0, 'hours').unix() };
       const expiresIn = 60 * 60 * 24 * 180;
       const token = jwt.sign(_.omit(req.user, ['exp', 'iat']), config.jwt.secret, { expiresIn });
-      res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: false });
+      res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
       return req.user;
     }
   } catch (error) {
@@ -134,7 +134,7 @@ passport.use(new FacebookStrategy({
         services: {
           facebook: longlivedToken,
         },
-        chatId: chatToken.chatId,
+        chatId: chatToken && chatToken.chatId,
       });
       ApartmentsModel.create({
         number: '27',
@@ -142,17 +142,17 @@ passport.use(new FacebookStrategy({
         user: user._id,
         isOwner: true,
       });
-    } else if (!user.chatId) {
+    } else if (!(user && user.chatId)) {
       chatToken = await getChatToken({ accessToken });
       await UsersModel.update({
         _id: user._id,
       }, {
         $set: {
-          chatId: chatToken.chatId,
+          chatId: chatToken && chatToken.chatId,
         },
       });
     } else {
-      chatToken = await getChatToken({ chatId: user.chatId });
+      chatToken = await getChatToken({ chatId: user && user.chatId });
     }
     createChatUserIfNotExits(user);
     done(null, {
@@ -162,7 +162,7 @@ passport.use(new FacebookStrategy({
       roles: user.roles,
       chatToken: chatToken && chatToken.token,
       chatExp: moment().add(1, 'hours').unix(),
-      chatId: user.chatId,
+      chatId: user && user.chatId,
     });
   };
 
