@@ -1,7 +1,7 @@
 import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 import Link from '../../src/components/Link';
-import Friend from '../../src/components/Friend/Friend';
+import CommentContent from '../../src/components/CommentContent/CommentContent';
 
 storiesOf('Button', module)
 .add('with text', () => (
@@ -13,6 +13,6 @@ storiesOf('Button', module)
 .add('<Link />', () => (
     <Link to="/" onClick={action('clicked')}>Link</Link>
 ))
-.add('<Friend />', () => (
-    <Friend />
+.add('<CommentContent />', () => (
+    <CommentContent />
 ));
