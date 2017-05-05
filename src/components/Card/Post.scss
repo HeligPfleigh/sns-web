@@ -1,0 +1,10 @@
+@import "../../theme/resources.scss";
+
+.PostPanel {
+  border: 1px solid #cdcdcd;;
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  box-shadow: 0 1px 0 rgba(12,13,14,0.1), 0 1px 3px rgba(12,13,14,0.1), 0 4px 20px rgba(12,13,14,0.035), 0 1px 1px rgba(12,13,14,0.025);
+}

@@ -22,6 +22,8 @@ import CommentContent from '../../components/CommentContent';
 import FeedList from './FeedList';
 import s from './Home.scss';
 
+import Feed from './Feed';
+
 const userFragment = gql`
   fragment UserView on UserSchemas {
     _id,
@@ -118,7 +120,10 @@ class Home extends Component {
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
           <Col sm={8} xs={12}>
+
             <CommentContent name="ABC" />
+            <Feed />
+            
             <NewPost createNewPost={this.props.createNewPost} />
             <InfiniteScroll
               loadMore={loadMoreRows}
