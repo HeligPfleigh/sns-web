@@ -1,0 +1,20 @@
+@import "../../theme/resources.scss";
+
+.postControl {
+  margin: 0px;
+  padding: 10px 0;
+  border-top: 2px solid #e6e9ec;
+  a {
+    padding-right: 5%;
+    font-size: 13px;
+    span {
+      display: inline-block;
+      vertical-align: -webkit-baseline-middle;
+    }
+  }
+
+  i {
+    color: $text-color-grey;
+    font-size: 18px;
+  }
+}

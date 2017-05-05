@@ -85,7 +85,6 @@ class NewPost extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { isFocus } = this.props;
-    // console.log(nextProps.isFocus);
     if (nextProps.isFocus !== isFocus) {
       this.editor.focus();
     }
