@@ -111,19 +111,23 @@ class Me extends React.Component {
                 <Tab numbers={numbers} stateChildShow={tab} />
               </div>
               <Grid fluid>
-                {tab === MY_TIME_LINE && <div className={s.parent}>
-                  <NewPost createNewPost={this.props.createNewPost} />
-                </div>}
-                {tab === MY_TIME_LINE && edges.map(data => (
-                  <Post
-                    key={data._id}
-                    data={data}
-                    userInfo={me}
-                    likePostEvent={this.props.likePost}
-                    unlikePostEvent={this.props.unlikePost}
-                  />
+                <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
+                  <div className={s.parent}>
+                    <NewPost createNewPost={this.props.createNewPost} />
+                  </div>
+                  { edges.map(data => (
+                    <Post
+                      key={data._id}
+                      data={data}
+                      userInfo={me}
+                      likePostEvent={this.props.likePost}
+                      unlikePostEvent={this.props.unlikePost}
+                    />
                 ))}
-                {tab === MY_INFO && <Info profile={profile} />}
+                </div>
+                <div className={tab === MY_INFO ? s.active : s.inactive}>
+                  <Info profile={profile} />
+                </div>
               </Grid>
             </div>
           </Col>
