@@ -35,24 +35,30 @@ class Info extends React.Component {
   static propTypes = {
     profile: PropTypes.object.isRequired,
     updateProfile: PropTypes.func.isRequired,
-  };
+  }
   constructor(props) {
     super(props);
     this.state = {
       isEdit: false,
-      profile: this.props.profile,
+      profile: {},
     };
   }
+  componentWillReceiveProps(nextProps) {
+    const { profile } = nextProps;
+    if (profile && profile !== this.props.profile) {
+      this.setState({ profile });
+    }
+  }
   editProfile = () => {
+    const { isEdit, profile } = this.state;
     this.setState({
-      isEdit: !this.state.isEdit,
-
+      isEdit: !isEdit,
     });
 
     if (this.state.isEdit === true) {
-      this.props.updateProfile(this.state.profile);
+      this.props.updateProfile(profile);
     }
-  };
+  }
   genderChange =(e) => {
     const { profile: { picture, firstName, lastName } } = this.state;
     this.setState({
@@ -63,7 +69,7 @@ class Info extends React.Component {
         gender: e.target.value,
       },
     });
-  };
+  }
   render() {
     const { address, email, gender, birthday, phone } = this.state.profile;
 

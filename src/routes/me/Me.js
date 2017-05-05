@@ -87,8 +87,8 @@ class Me extends React.Component {
   render() {
     const { data: { me }, query } = this.props;
     const edges = me ? me.posts : [];
-    const avatar = me && me.profile && me.profile.picture;
-    const profile = me && me.profile;
+    const avatar = (me && me.profile && me.profile.picture) || '';
+    const profile = (me && me.profile) || {};
     const numbers = 100;
     let tab = MY_TIME_LINE;
     if (query.tab) {
@@ -207,6 +207,7 @@ export default compose(
         },
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
+            debugger;
             const updatedPost = mutationResult.data.likePost;
             const index = previousResult.me.posts.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
