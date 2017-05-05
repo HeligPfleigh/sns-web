@@ -18,6 +18,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
+import CommentContent from '../../components/CommentContent';
 import FeedList from './FeedList';
 import s from './Home.scss';
 
@@ -117,6 +118,7 @@ class Home extends Component {
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
           <Col sm={8} xs={12}>
+            <CommentContent name="ABC" />
             <NewPost createNewPost={this.props.createNewPost} />
             <InfiniteScroll
               loadMore={loadMoreRows}
@@ -131,7 +133,6 @@ class Home extends Component {
               />}
             </InfiniteScroll>
           </Col>
-
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col sm={4} xs={12}>
               <FriendSuggestions />

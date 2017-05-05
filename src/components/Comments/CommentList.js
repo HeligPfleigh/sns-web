@@ -56,7 +56,6 @@ const loadCommentsQuery = gql`query loadCommentsQuery ($postId: String) {
 ${userFragment}
 ${commentFragment}`;
 
-
 const createNewComment = gql`
   mutation createNewComment (
     $postId: String!,
@@ -109,7 +108,6 @@ class CommentList extends React.Component {
     const { initContent, commentId, isSubForm } = this.state;
     return (
       <div>
-        { /* loading && <h1 style={{ textAlign: 'center' }}>LOADING</h1> */ }
         {post && post.comments.map(item => (
           <span key={item._id}>
             <CommentItem comment={item} showCommentForm={this.showCommentForm} />

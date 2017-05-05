@@ -1,0 +1,11 @@
+@import "../../theme/resources.scss";
+
+.subComment {
+  width: 93%;
+  float: right;
+  img {
+    width: 32px;
+    height: 32px;
+  }
+  font-size: 0.9em;
+}
