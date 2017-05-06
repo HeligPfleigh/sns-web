@@ -1,6 +1,0 @@
-{
-  "name": "CommentContent",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./CommentContent.js"
-}

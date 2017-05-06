@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { graphql, compose } from 'react-apollo';
+import { graphql, compose, withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { Clearfix } from 'react-bootstrap';
@@ -36,10 +36,10 @@ const commentFragment = gql`fragment CommentView on CommentSchemas {
   ${userFragment}
 `;
 
-const loadCommentsQuery = gql`query loadCommentsQuery ($postId: String) {
+const loadCommentsQuery = gql`query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
   post (_id: $postId) {
     _id
-    comments {
+    comments (_id: $commentId, limit: $limit) {
       _id
       message
       user {
@@ -102,13 +102,39 @@ class CommentList extends React.Component {
       isSubForm: !this.setState.isSubForm,
     });
   }
+  /**
+  loadMoreComments = (e) => {
+    e.preventDefault();
+    
+    this.props.client.query({
+      query: loadMoreCommentsQuery,
+      variables: {
+        postId: this.props.postId,
+        commentId,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        console.log(previousResult, fetchMoreResult);
+        // const newEdges = fetchMoreResult.feeds.edges;
+        // const pageInfo = fetchMoreResult.feeds.pageInfo;
+        // return {
+        //   feeds: {
+        //     edges: [...previousResult.feeds.edges, ...newEdges],
+        //     pageInfo,
+        //   },
+        // };
+      },
+    });
+  }
+  */
 
   render() {
-    const { data: { loading, post }, postId, isFocus, user } = this.props;
+    const { data: { post }, postId, isFocus, user, comments } = this.props;
     const { initContent, commentId, isSubForm } = this.state;
+
     return (
       <div>
-        {post && post.comments.map(item => (
+        <button onClick={this.props.loadMoreComments}>LOAD MORE</button>
+        {comments.map(item => (
           <span key={item._id}>
             <CommentItem comment={item} showCommentForm={this.showCommentForm} />
             {item && item.reply && item.reply.map(_item => (
@@ -144,11 +170,41 @@ export default compose(
   graphql(loadCommentsQuery, {
     options: props => ({
       variables: {
-        ...props,
         postId: props.postId,
       },
       // fetchPolicy: 'cache-only',
     }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const comments = data.post.comments;
+      let commentId = null;
+      if (comments.length !== 0) {
+        commentId = comments[comments.length - 1]._id;
+      }
+
+      const loadMoreComments = () => fetchMore({
+        variables: {
+          postId: data.post._id,
+          commentId,
+          limit: 5,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) { return previousResult; }
+          return update(previousResult, {
+            post: {
+              comments: {
+                $push: fetchMoreResult.post.comments,
+              },
+            },
+          });
+        },
+      });
+      return {
+        data,
+        comments: comments.slice().reverse(),
+        loadMoreComments,
+      };
+    },
   }),
   graphql(createNewComment, {
     props: ({ mutate }) => ({
@@ -174,7 +230,6 @@ export default compose(
         updateQueries: {
           loadCommentsQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            console.log(newComment);
             if (previousResult.post._id === postId) {
               if (commentId) {
                 const index = previousResult.post.comments.findIndex(item => item._id === commentId);

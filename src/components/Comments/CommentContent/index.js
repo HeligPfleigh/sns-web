@@ -16,20 +16,20 @@ const formatter = buildFormatter(vnStrings);
 const CommentContent = ({ comment }) => (
   <div className={s.commentPanel}>
     <Col className={s.commentAvarta}>
-      <a href="#">
+      <a href="#link-to-profile">
         <Image src={comment.user.profile.picture} circle />
       </a>
     </Col>
     <Col className={s.commentContent}>
       <Col
         dangerouslySetInnerHTML={{
-          __html: `<p><a href='#'>${comment.user.profile.firstName}
+          __html: `<p><a href='#link-to-profile'>${comment.user.profile.firstName}
           ${comment.user.profile.lastName}</a></p>
           ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}`,
         }}
       />
       <Col className={s.commentControl}>
-        <a href="#" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
+        <a href="#show-comment-form-handle">Trả lời</a> - <a href="#">
           <TimeAgo date={comment.updatedAt} formatter={formatter} />
         </a>
       </Col>
@@ -38,7 +38,19 @@ const CommentContent = ({ comment }) => (
 );
 
 CommentContent.propTypes = {
-  comment: PropTypes.object.isRequired,
+  comment: PropTypes.shape({
+    _id: PropTypes.string,
+    message: PropTypes.string,
+    user: PropTypes.shape({
+      _id: PropTypes.string,
+      profile: PropTypes.shape({
+        picture: PropTypes.string,
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
+      }),
+    }),
+    updatedAt: PropTypes.string,
+  }),
 };
 
 export default withStyles(s)(CommentContent);
