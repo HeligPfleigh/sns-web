@@ -1,15 +1,13 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Image, Col } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import s from './PostHeader.scss';
 
-const PostHeader = ({ title, subtitle }) => (
+const PostHeader = ({ avatar, title, subtitle }) => (
   <div>
     <Col className={s.postHeaderLeft}>
       <div className={s.avarta}>
-        <a href="#">
-          <Image src="https://graph.facebook.com/596825810516199/picture?type=large" circle />
-        </a>
+        { avatar }
       </div>
       <div className={s.userInfo}>
         { title }
@@ -29,6 +27,7 @@ const PostHeader = ({ title, subtitle }) => (
 );
 
 PostHeader.propTypes = {
+  avatar: PropTypes.node,
   title: PropTypes.node,
   subtitle: PropTypes.node,
 };
