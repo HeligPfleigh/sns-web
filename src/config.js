@@ -52,11 +52,11 @@ export const auth = {
     secret: process.env.TWITTER_CONSUMER_SECRET || 'KTZ6cxoKnEakQCeSpZlaUCJWGAlTEBJj0y2EMkUBujA7zWSvaQ',
   },
   firebase: {
-    apiKey: 'AIzaSyDgbPU5DuXmvxWprMwc-HxTMae05c6rCPc',
-    authDomain: 'snschat-fb64b.firebaseapp.com',
-    databaseURL: 'https://snschat-fb64b.firebaseio.com',
-    projectId: 'snschat-fb64b',
-    storageBucket: 'snschat-fb64b.appspot.com',
-    messagingSenderId: '1034925992768',
+    apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyC-AodKtlF-jqrHwVZ5SfxAYlWBHEbC6Xc',
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'sns-chat-dev.firebaseapp.com',
+    databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://sns-chat-dev.firebaseio.com',
+    projectId: process.env.FIREBASE_PROJECT_ID || 'sns-chat-dev',
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'sns-chat-dev.appspot.com',
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '755931811387',
   },
 };
