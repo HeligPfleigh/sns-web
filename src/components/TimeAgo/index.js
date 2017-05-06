@@ -12,7 +12,7 @@ const TimeAgoWraper = ({ time }) => (
 );
 
 TimeAgoWraper.propTypes = {
-  time: PropTypes.instanceOf(Date).isRequired,
+  time: PropTypes.string.isRequired,
 };
 
 export default withStyles(s)(TimeAgoWraper);
