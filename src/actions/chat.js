@@ -52,6 +52,7 @@ export function activeConversation({ conversation }) {
           type: CHAT_ACTIVE_CONVERSATION,
           payload: conversationId,
         });
+        chat.makeNotificationRead({ conversationId });
         if (isLoad(getState(), conversationId)) return;
         chat.onMessage({ conversationId }, (error, data) => {
           if (error) makeError(error);
