@@ -23,7 +23,7 @@ import jwt from 'jsonwebtoken';
 import * as admin from 'firebase-admin';
 import * as firebase from 'firebase';
 import _ from 'lodash';
-import serviceAccount from './private/firebase-admin.json';
+import serviceAccount from './private/configAdminFirebase';
 import { auth as config } from '../config';
 import {
   UsersModel,

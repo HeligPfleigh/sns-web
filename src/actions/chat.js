@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import _ from 'lodash';
-import * as firebase from 'firebase';
 import {
   CHAT_SET_USER,
   CONTROL_NEW_CONVERSATION,
@@ -26,14 +25,6 @@ export function auth(token) {
       dispatch({
         type: CHAT_SET_USER,
         payload: user,
-      });
-      const amOnline = chat.service.database().ref('/.info/connected');
-      const userRef = chat.service.database().ref(`/online/${user.uid}`);
-      amOnline.on('value', (snapshot) => {
-        if (snapshot.val()) {
-          userRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
-          userRef.set(true);
-        }
       });
     }
   };
