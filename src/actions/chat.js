@@ -9,6 +9,7 @@ import {
   CHAT_ON_MESSAGE_CHILD_ADD,
   CHAT_LOAD_MESSAGE_HISTORY_SUCCESS,
   CHAT_ON_CHANGE_ONLINE_STATE,
+  CHAT_ON_NOTIFICATION,
   CHAT_ON_FAIL,
  } from '../constants';
 
@@ -18,6 +19,29 @@ export function isLoad(state, conversationId) {
   }
   return !_.isEmpty(state.chat && (state.chat.conversations || state.chat.messages));
 }
+export function makeError(error) {
+  return {
+    type: CHAT_ON_FAIL,
+    error,
+  };
+}
+export function listeningNotification() {
+  return async (dispatch, getState, { chat }) => {
+    try {
+      chat.onNotification((error, payload) => {
+        if (error) makeError(error);
+        else {
+          dispatch({
+            type: CHAT_ON_NOTIFICATION,
+            payload,
+          });
+        }
+      });
+    } catch (error) {
+      makeError(error);
+    }
+  };
+}
 export function auth(token) {
   return async (dispatch, getState, { chat }) => {
     const user = await chat.auth(token);
@@ -26,13 +50,8 @@ export function auth(token) {
         type: CHAT_SET_USER,
         payload: user,
       });
+      dispatch(listeningNotification());
     }
-  };
-}
-export function makeError(error) {
-  return {
-    type: CHAT_ON_FAIL,
-    error,
   };
 }
 export function activeNewChat(status) {
@@ -149,6 +168,16 @@ export function sendMessage({ message, to, conversationId }) {
   };
 }
 
+export function makeNotificationRead({ conversationId }) {
+  return async (dispatch, getState, { chat }) => {
+    try {
+      chat.makeNotificationRead({ conversationId });
+    } catch (error) {
+      makeError(error);
+    }
+  };
+}
+
 export function getFriendStatus(friend) {
   return async (dispatch, getState, { chat }) => {
     try {
@@ -188,6 +217,7 @@ export function getConversations() {
             type: CHAT_ON_CONVERSATION_CHILD_ADD,
             payload: { [key]: value },
           });
+          if (isLoad(getState(), key)) return;
           dispatch(getFriendStatus(value.receiver));
         }
       });
