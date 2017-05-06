@@ -9,9 +9,19 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { connect } from 'react-redux';
+import _ from 'lodash';
 import s from './Navigation.scss';
 import Link from '../Link';
+import { makeNotificationRead } from '../../actions/chat';
 
+@connect(
+  state => ({
+    chatNotification: state.chat.notifications,
+    current: state.chat.current,
+  }),
+  { makeNotificationRead },
+)
 class Navigation extends React.Component {
   static defaultProps = {
     isMobile: false,
@@ -19,10 +29,29 @@ class Navigation extends React.Component {
 
   static propTypes = {
     isMobile: React.PropTypes.bool,
+    chatNotification: React.PropTypes.object,
+    current: React.PropTypes.string,
+    makeNotificationRead: React.PropTypes.func.isRequired,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { chatNotification, current } = this.props;
+    if (current && chatNotification !== nextProps.chatNotification) {
+      this.props.makeNotificationRead({ conversationId: current });
+    }
   }
 
   render() {
-    const { isMobile } = this.props;
+    const { isMobile, chatNotification, current } = this.props;
+    let copyObjectNotification;
+    if (current && chatNotification && chatNotification[current]) {
+      copyObjectNotification = Object.assign({}, chatNotification);
+      delete copyObjectNotification[current];
+    }
+    const countChatNotification = !_.isEmpty(copyObjectNotification) && Object.keys(copyObjectNotification).length;
+    if (document && document.title && countChatNotification > 0) {
+      document.title = `(${countChatNotification}) ${document.title}`;
+    }
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
         <Link className={s.link} to="/">
@@ -36,6 +65,12 @@ class Navigation extends React.Component {
         </Link>
 
         <Link className={s.link} to="/messages">
+          {
+            countChatNotification > 0 &&
+            <span className={s.jewelCount}>
+              <span>{countChatNotification}</span>
+            </span>
+          }
           <i className="fa fa-comment"></i>
           {isMobile ? '' : <span>Tinh nhắn</span>}
         </Link>

@@ -52,12 +52,19 @@ export class FirebaseProvider {
     }
     return this.user;
   }
-  async onMessage({ conversationId }, cb) {
+  async onMessage({ conversationId, endAt }, cb) {
     if (this.user) {
       const messengerRef = this.service.database().ref(`messages/${conversationId}`);
-      messengerRef.limitToLast(20).on('child_added', (snapshot) => {
-        cb(null, { [snapshot.key]: snapshot.val() });
-      });
+      if (endAt) {
+        messengerRef.orderByChild('timestamp').endAt(endAt).limitToLast(30).on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) cb(null, snapshot.val());
+        });
+      } else {
+        messengerRef.orderByChild('timestamp').limitToLast(30).on('child_added', (snapshot) => {
+          cb(null, { [snapshot.key]: snapshot.val() });
+        });
+      }
     }
   }
   async sendMessage(data) {
@@ -129,7 +136,13 @@ export class FirebaseProvider {
       refNotification.on('value', (chatSnap) => {
         const value = chatSnap.val();
         if (value) {
-          cb(null, value);
+          cb(null, { value });
+        }
+      });
+      refNotification.on('child_removed', (chatSnap) => {
+        if (chatSnap.key) {
+          const removed = chatSnap.key;
+          cb(null, { removed });
         }
       });
     }

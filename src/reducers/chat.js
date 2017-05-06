@@ -9,6 +9,7 @@ import {
   CHAT_ON_MESSAGE_CHILD_ADD,
   CHAT_LOAD_MESSAGE_HISTORY_SUCCESS,
   CHAT_ON_CHANGE_ONLINE_STATE,
+  CHAT_ON_NOTIFICATION,
   CHAT_ON_FAIL,
 } from '../constants';
 
@@ -108,6 +109,17 @@ export default function chat(state = initialState, action) {
           ...action.payload,
         },
       };
+    case CHAT_ON_NOTIFICATION: {
+      const { value, removed } = action.payload;
+      const currentNotification = value || state.notifications;
+      if (removed && currentNotification && currentNotification[removed]) {
+        delete currentNotification[removed];
+      }
+      return {
+        ...state,
+        notifications: Object.assign({}, currentNotification),
+      };
+    }
     case CHAT_ON_FAIL:
       return {
         ...state,
