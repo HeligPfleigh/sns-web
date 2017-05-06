@@ -12,7 +12,7 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt }, likePostEvent, unlikePostEvent, userInfo }) => (
+const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt }, likePostEvent, unlikePostEvent, loadMoreComment, userInfo }) => (
   <Post>
     <PostHeader
       avatar={
@@ -48,7 +48,7 @@ const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, 
       <Icon onClick={(e) => { e.preventDefault(); }} title="Chia sẻ" icons="fa fa-share fa-lg" />
     </PostActions>
     <PostContent className={s.commentPanel}>
-      <CommentList isFocus={false} postId={_id} user={userInfo} />
+      <CommentList isFocus={false} postId={_id} user={userInfo} loadMoreComment={loadMoreComment}/>
     </PostContent>
   </Post>
 );
@@ -79,6 +79,7 @@ Feed.propTypes = {
       lastName: PropTypes.string,
     }),
   }),
+  loadMoreComment: PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(Feed);

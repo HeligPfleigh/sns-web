@@ -118,8 +118,6 @@ class Home extends Component {
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
           <Col sm={8} xs={12}>
-
-            <CommentContent name="ABC" />            
             <NewPost createNewPost={this.props.createNewPost} />
             <InfiniteScroll
               loadMore={loadMoreRows}
@@ -130,6 +128,7 @@ class Home extends Component {
                 feeds={feeds ? feeds.edges : []}
                 likePostEvent={this.props.likePost}
                 unlikePostEvent={this.props.unlikePost}
+                loadMoreComment={(e) => { e.preventDefault(); alert(123); }}
                 userInfo={me}
               />}
             </InfiniteScroll>

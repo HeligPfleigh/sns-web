@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './CommentItem.scss';
-import CommentContent from './CommentContent';
+import s from './Comment.scss';
+import CommentContent from '../CommentContent';
 
-const CommentItem = ({ comment }) => (
+const Comment = ({ comment }) => (
   <div>
     <CommentContent comment={comment} showCommentForm={this.showCommentForm} />
     {comment && comment.reply && comment.reply.map(_item => (
@@ -14,8 +14,8 @@ const CommentItem = ({ comment }) => (
   </div>
 );
 
-CommentItem.propTypes = {
+Comment.propTypes = {
   comment: PropTypes.object.isRequired,
 };
 
-export default withStyles(s)(CommentItem);
+export default withStyles(s)(Comment);
