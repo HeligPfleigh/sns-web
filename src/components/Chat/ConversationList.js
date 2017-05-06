@@ -45,6 +45,9 @@ class ConversationList extends React.Component {
       activeConversation({ conversation: conversations[0] });
     }
   }
+  componentWillUnmount() {
+    this.props.activeConversation({});
+  }
   handleActiveConversation = conversation => () => {
     this.props.handleToggleChatView();
     this.props.activeConversation(conversation);

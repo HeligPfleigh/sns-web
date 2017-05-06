@@ -36,16 +36,15 @@ class Navigation extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { chatNotification, current } = this.props;
-    if (current && chatNotification !== nextProps.chatNotification) {
+    if (current && chatNotification !== nextProps.chatNotification && nextProps.chatNotification && nextProps.chatNotification[current]) {
       this.props.makeNotificationRead({ conversationId: current });
     }
   }
 
   render() {
     const { isMobile, chatNotification, current } = this.props;
-    let copyObjectNotification;
+    const copyObjectNotification = chatNotification && Object.assign({}, chatNotification);
     if (current && chatNotification && chatNotification[current]) {
-      copyObjectNotification = Object.assign({}, chatNotification);
       delete copyObjectNotification[current];
     }
     const countChatNotification = !_.isEmpty(copyObjectNotification) && Object.keys(copyObjectNotification).length;

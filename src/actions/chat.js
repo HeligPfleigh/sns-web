@@ -85,6 +85,11 @@ export function activeConversation({ conversation }) {
             });
           }
         });
+      } else {
+        dispatch({
+          type: CHAT_ACTIVE_CONVERSATION,
+          payload: null,
+        });
       }
     } catch (error) {
       makeError(error);
