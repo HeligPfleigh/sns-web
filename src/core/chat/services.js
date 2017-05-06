@@ -52,7 +52,7 @@ export class FirebaseProvider {
     }
     return this.user;
   }
-  async onMessage(conversationId, cb) {
+  async onMessage({ conversationId }, cb) {
     if (this.user) {
       const messengerRef = this.service.database().ref(`messages/${conversationId}`);
       messengerRef.limitToLast(20).on('child_added', (snapshot) => {
@@ -91,7 +91,7 @@ export class FirebaseProvider {
       };
 
       await this.service.database().ref().update(updates);
-      this.makeNotification(data);
+      this.makeNotification(data, messageId);
       return data.conversationId;
     }
     return null;
@@ -134,7 +134,7 @@ export class FirebaseProvider {
       });
     }
   }
-  async makeNotification(data) {
+  async makeNotification(data, messageId) {
     if (this.user) {
       const { conversationId } = data;
       let { to } = data;
@@ -147,7 +147,7 @@ export class FirebaseProvider {
           }
         }
       }
-      this.service.database().ref(`notifications/${to.uid}/${conversationId}`).set(firebase.database.ServerValue.TIMESTAMP);
+      this.service.database().ref(`notifications/${to.uid}/${conversationId}`).set(messageId);
     }
   }
   makeNotificationRead(data) {
