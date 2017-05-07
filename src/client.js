@@ -20,9 +20,10 @@ import { updateMeta } from './core/DOMUtils';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 import createApolloClient from './core/createApolloClient';
 import chat from './core/chat';
+import { setRuntimeVariable } from './actions/runtime';
 
 const apolloClient = createApolloClient();
-
+const store = configureStore(window.APP_STATE, { history, apolloClient, chat });
 // Global (context) variables that can be easily accessed from any React component
 // https://facebook.github.io/react/docs/context.html
 const context = {
@@ -37,7 +38,7 @@ const context = {
   client: apolloClient,
   // Initialize a new Redux store
   // http://redux.js.org/docs/basics/UsageWithReact.html
-  store: configureStore(window.APP_STATE, { history, apolloClient, chat }),
+  store,
   chat,
 };
 
@@ -90,6 +91,7 @@ let onRenderComplete = function initialRenderComplete() {
     if (window.ga) {
       window.ga('send', 'pageview', createPath(location));
     }
+    store.dispatch(setRuntimeVariable({ name: 'location', value: location }));
   };
 };
 
@@ -134,7 +136,6 @@ async function onLocationChange(location, action) {
       history.replace(route.redirect);
       return;
     }
-
     appInstance = ReactDOM.render(
       <App context={context}>{route.component}</App>,
       container,
