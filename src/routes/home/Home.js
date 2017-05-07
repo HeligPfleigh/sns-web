@@ -1,12 +1,3 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import React, { Component, PropTypes } from 'react';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -18,7 +9,6 @@ import InfiniteScroll from 'react-infinite-scroller';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
-import CommentContent from '../../components/CommentContent';
 import FeedList from './FeedList';
 import s from './Home.scss';
 
@@ -128,7 +118,6 @@ class Home extends Component {
                 feeds={feeds ? feeds.edges : []}
                 likePostEvent={this.props.likePost}
                 unlikePostEvent={this.props.unlikePost}
-                loadMoreComment={(e) => { e.preventDefault(); alert(123); }}
                 userInfo={me}
               />}
             </InfiniteScroll>
