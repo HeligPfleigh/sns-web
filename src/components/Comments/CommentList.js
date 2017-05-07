@@ -1,11 +1,10 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { graphql, compose, withApollo } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { Clearfix } from 'react-bootstrap';
 import ScrollableAnchor, { configureAnchors } from 'react-scrollable-anchor';
-
 import s from './CommentStyle.scss';
 import CommentItem from './CommentItem';
 import NewComment from '../NewComment/NewComment';
@@ -77,13 +76,15 @@ ${commentFragment}`;
 
 class CommentList extends React.Component {
   static propTypes = {
-    data: PropTypes.shape({
+    comments: PropTypes.shape({
       loading: PropTypes.bool.isRequired,
     }).isRequired,
     postId: PropTypes.string.isRequired,
     isFocus: PropTypes.bool.isRequired,
     user: PropTypes.object.isRequired,
     createNewComment: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    totalComments: PropTypes.number.isRequired,
   };
 
   constructor(props) {
@@ -102,38 +103,23 @@ class CommentList extends React.Component {
       isSubForm: !this.setState.isSubForm,
     });
   }
-  /**
-  loadMoreComments = (e) => {
-    e.preventDefault();
-    
-    this.props.client.query({
-      query: loadMoreCommentsQuery,
-      variables: {
-        postId: this.props.postId,
-        commentId,
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        console.log(previousResult, fetchMoreResult);
-        // const newEdges = fetchMoreResult.feeds.edges;
-        // const pageInfo = fetchMoreResult.feeds.pageInfo;
-        // return {
-        //   feeds: {
-        //     edges: [...previousResult.feeds.edges, ...newEdges],
-        //     pageInfo,
-        //   },
-        // };
-      },
-    });
+
+  hasMore = () => {
+    const { totalComments, comments } = this.props;
+    return totalComments > comments.length;
   }
-  */
 
   render() {
-    const { data: { post }, postId, isFocus, user, comments } = this.props;
+    const { postId, isFocus, user, comments } = this.props;
     const { initContent, commentId, isSubForm } = this.state;
 
     return (
       <div>
-        <button onClick={this.props.loadMoreComments}>LOAD MORE</button>
+        {this.hasMore() && <a
+          onClick={this.props.loadMoreComments} style={{
+            fontSize: 12,
+          }}>Xem thêm</a>
+        }
         {comments.map(item => (
           <span key={item._id}>
             <CommentItem comment={item} showCommentForm={this.showCommentForm} />
