@@ -5,6 +5,7 @@ import Post, { PostHeader, PostText, PostActions, PostContent } from '../../comp
 import Icon from '../../components/Icon';
 import TimeAgo from '../../components/TimeAgo';
 import Divider from '../../components/Divider';
+import Link from '../../components/Link';
 import CommentList from '../../components/Comments/CommentList';
 import s from './Feed.scss';
 
@@ -16,16 +17,16 @@ const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, 
   <Post>
     <PostHeader
       avatar={
-        <a href={`/user/${user._id}`}>
+        <Link to={`/user/${user._id}`}>
           <Image src={user.profile.picture} circle />
-        </a>
+        </Link>
       }
       title={
-        <a href={`/user/${user._id}`}>
+        <Link to={`/user/${user._id}`}>
           <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
-        </a>
+        </Link>
       }
-      subtitle={<a href={`/post/${_id}`}><TimeAgo time={createdAt} /></a>}
+      subtitle={<Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>}
     />
     <PostText html={message} />
     <PostText className={s.postStatistic}>
