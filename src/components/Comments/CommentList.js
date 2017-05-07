@@ -240,7 +240,7 @@ export default compose(
               return update(previousResult, {
                 post: {
                   comments: {
-                    $push: [newComment],
+                    $unshift: [newComment],
                   },
                 },
               });
