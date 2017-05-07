@@ -16,16 +16,16 @@ const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, 
   <Post>
     <PostHeader
       avatar={
-        <a href="#link-to-profile">
+        <a href={`/user/${user._id}`}>
           <Image src={user.profile.picture} circle />
         </a>
       }
       title={
-        <a href="#link-to-profile">
+        <a href={`/user/${user._id}`}>
           <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
         </a>
       }
-      subtitle={<TimeAgo time={createdAt} />}
+      subtitle={<a href={`/post/${_id}`}><TimeAgo time={createdAt} /></a>}
     />
     <PostText html={message} />
     <PostText className={s.postStatistic}>
