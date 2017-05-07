@@ -160,9 +160,9 @@ export default compose(
       },
       // fetchPolicy: 'cache-only',
     }),
-    props: ({ data }) => {
+    props: ({ data, ownProps }) => {
       const { fetchMore } = data;
-      const comments = data.post.comments;
+      const comments = data.post ? data.post.comments : [];
       let commentId = null;
       if (comments.length !== 0) {
         commentId = comments[comments.length - 1]._id;
@@ -170,7 +170,7 @@ export default compose(
 
       const loadMoreComments = () => fetchMore({
         variables: {
-          postId: data.post._id,
+          postId: ownProps.postId,
           commentId,
           limit: 5,
         },

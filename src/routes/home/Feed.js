@@ -13,7 +13,7 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt }, likePostEvent, unlikePostEvent, loadMoreComment, userInfo }) => (
+const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt }, likePostEvent, unlikePostEvent, userInfo }) => (
   <Post>
     <PostHeader
       avatar={
@@ -45,11 +45,11 @@ const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, 
           }
         }} title="Thích" icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
       />
-      <Icon onClick={(e) => { e.preventDefault(); }} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-      <Icon onClick={(e) => { e.preventDefault(); }} title="Chia sẻ" icons="fa fa-share fa-lg" />
+      <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
+      <Icon onClick={doNothing} title="Chia sẻ" icons="fa fa-share fa-lg" />
     </PostActions>
     <PostContent className={s.commentPanel}>
-      <CommentList isFocus={false} postId={_id} user={userInfo} loadMoreComment={loadMoreComment} totalComments={totalComments} />
+      <CommentList isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} />
     </PostContent>
   </Post>
 );
