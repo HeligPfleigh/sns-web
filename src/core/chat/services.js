@@ -27,6 +27,14 @@ export class FirebaseProvider {
       let user = await this.service.auth().currentUser;
       user = await this.getStaticData(`users/${user.uid}`);
       this.user = user;
+      const amOnline = this.service.database().ref('/.info/connected');
+      const userRef = this.service.database().ref(`/online/${user.uid}`);
+      amOnline.on('value', (snapshot) => {
+        if (snapshot.val()) {
+          userRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+          userRef.set(true);
+        }
+      });
       return user;
     } catch (error) {
       return error;
@@ -44,12 +52,19 @@ export class FirebaseProvider {
     }
     return this.user;
   }
-  async onMessage(conversationId, cb) {
+  async onMessage({ conversationId, endAt }, cb) {
     if (this.user) {
       const messengerRef = this.service.database().ref(`messages/${conversationId}`);
-      messengerRef.limitToLast(20).on('child_added', (snapshot) => {
-        cb(null, { [snapshot.key]: snapshot.val() });
-      });
+      if (endAt) {
+        messengerRef.orderByChild('timestamp').endAt(endAt).limitToLast(30).on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) cb(null, snapshot.val());
+        });
+      } else {
+        messengerRef.orderByChild('timestamp').limitToLast(30).on('child_added', (snapshot) => {
+          cb(null, { [snapshot.key]: snapshot.val() });
+        });
+      }
     }
   }
   async sendMessage(data) {
@@ -83,6 +98,7 @@ export class FirebaseProvider {
       };
 
       await this.service.database().ref().update(updates);
+      this.makeNotification(data, messageId);
       return data.conversationId;
     }
     return null;
@@ -112,6 +128,45 @@ export class FirebaseProvider {
           cb(null, status);
         }
       });
+    }
+  }
+  onNotification(cb) {
+    if (this.user) {
+      const refNotification = this.service.database().ref(`notifications/${this.user.uid}`);
+      refNotification.on('value', (chatSnap) => {
+        const value = chatSnap.val();
+        if (value) {
+          cb(null, { value });
+        }
+      });
+      refNotification.on('child_removed', (chatSnap) => {
+        if (chatSnap.key) {
+          const removed = chatSnap.key;
+          cb(null, { removed });
+        }
+      });
+    }
+  }
+  async makeNotification(data, messageId) {
+    if (this.user) {
+      const { conversationId } = data;
+      let { to } = data;
+      if (!to) {
+        const conversation = await this.getStaticData(`conversations/${conversationId}`);
+        if (conversation && conversation.user && conversation.receiver) {
+          to = conversation.receiver;
+          if (to.uid === this.user.uid) {
+            to = conversation.user;
+          }
+        }
+      }
+      this.service.database().ref(`notifications/${to.uid}/${conversationId}`).set(messageId);
+    }
+  }
+  makeNotificationRead(data) {
+    if (this.user) {
+      const { conversationId } = data;
+      this.service.database().ref(`notifications/${this.user.uid}/${conversationId}`).remove();
     }
   }
   dataEvent(params) {
