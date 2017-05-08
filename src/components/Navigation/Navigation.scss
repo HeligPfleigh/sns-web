@@ -23,6 +23,7 @@
     text-decoration: none;
     text-align: center;
     color:  #c7d1d8;
+    position: relative;
     i {
       vertical-align: middle;
       font-size: 21px;
@@ -33,7 +34,22 @@
     }
   }
 }
-
+.jewelCount {
+  position: absolute;
+  right: 10px;
+  span {
+    background-color: #fa3e3e;
+    border-radius: 2px;
+    color: #fff;
+    padding: 1px 3px;
+    line-height: 1.3;
+    min-height: 13px;
+    font-size: 10px !important;
+    -webkit-font-smoothing: subpixel-antialiased;
+    background-clip: padding-box;
+    display: inline-block;
+  }
+}
 /*********** Style mobile ***************/
 
 @media (max-width: 992px) {

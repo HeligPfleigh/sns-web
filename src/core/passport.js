@@ -23,7 +23,7 @@ import jwt from 'jsonwebtoken';
 import * as admin from 'firebase-admin';
 import * as firebase from 'firebase';
 import _ from 'lodash';
-import serviceAccount from './private/firebase-admin.json';
+import serviceAccount from './private/configAdminFirebase';
 import { auth as config } from '../config';
 import {
   UsersModel,
@@ -76,7 +76,7 @@ export async function verifiedChatToken(req, res) {
       req.user = { ...user, chatToken, chatExp: moment().add(0, 'hours').unix() };
       const expiresIn = 60 * 60 * 24 * 180;
       const token = jwt.sign(_.omit(req.user, ['exp', 'iat']), config.jwt.secret, { expiresIn });
-      res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
+      res.cookie('id_token', token, { maxAge: 1000 * expiresIn });
       return req.user;
     }
   } catch (error) {

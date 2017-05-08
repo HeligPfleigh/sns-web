@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 import _ from 'lodash';
-import * as firebase from 'firebase';
 import {
   CHAT_SET_USER,
   CONTROL_NEW_CONVERSATION,
@@ -10,6 +9,7 @@ import {
   CHAT_ON_MESSAGE_CHILD_ADD,
   CHAT_LOAD_MESSAGE_HISTORY_SUCCESS,
   CHAT_ON_CHANGE_ONLINE_STATE,
+  CHAT_ON_NOTIFICATION,
   CHAT_ON_FAIL,
  } from '../constants';
 
@@ -19,6 +19,29 @@ export function isLoad(state, conversationId) {
   }
   return !_.isEmpty(state.chat && (state.chat.conversations || state.chat.messages));
 }
+export function makeError(error) {
+  return {
+    type: CHAT_ON_FAIL,
+    error,
+  };
+}
+export function listeningNotification() {
+  return async (dispatch, getState, { chat }) => {
+    try {
+      chat.onNotification((error, payload) => {
+        if (error) makeError(error);
+        else {
+          dispatch({
+            type: CHAT_ON_NOTIFICATION,
+            payload,
+          });
+        }
+      });
+    } catch (error) {
+      makeError(error);
+    }
+  };
+}
 export function auth(token) {
   return async (dispatch, getState, { chat }) => {
     const user = await chat.auth(token);
@@ -27,21 +50,8 @@ export function auth(token) {
         type: CHAT_SET_USER,
         payload: user,
       });
-      const amOnline = chat.service.database().ref('/.info/connected');
-      const userRef = chat.service.database().ref(`/online/${user.uid}`);
-      amOnline.on('value', (snapshot) => {
-        if (snapshot.val()) {
-          userRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
-          userRef.set(true);
-        }
-      });
+      dispatch(listeningNotification());
     }
-  };
-}
-export function makeError(error) {
-  return {
-    type: CHAT_ON_FAIL,
-    error,
   };
 }
 export function activeNewChat(status) {
@@ -61,6 +71,7 @@ export function activeConversation({ conversation }) {
           type: CHAT_ACTIVE_CONVERSATION,
           payload: conversationId,
         });
+        chat.makeNotificationRead({ conversationId });
         if (isLoad(getState(), conversationId)) return;
         chat.onMessage({ conversationId }, (error, data) => {
           if (error) makeError(error);
@@ -73,6 +84,11 @@ export function activeConversation({ conversation }) {
               },
             });
           }
+        });
+      } else {
+        dispatch({
+          type: CHAT_ACTIVE_CONVERSATION,
+          payload: null,
         });
       }
     } catch (error) {
@@ -157,6 +173,16 @@ export function sendMessage({ message, to, conversationId }) {
   };
 }
 
+export function makeNotificationRead({ conversationId }) {
+  return async (dispatch, getState, { chat }) => {
+    try {
+      chat.makeNotificationRead({ conversationId });
+    } catch (error) {
+      makeError(error);
+    }
+  };
+}
+
 export function getFriendStatus(friend) {
   return async (dispatch, getState, { chat }) => {
     try {
@@ -196,6 +222,7 @@ export function getConversations() {
             type: CHAT_ON_CONVERSATION_CHILD_ADD,
             payload: { [key]: value },
           });
+          if (isLoad(getState(), key)) return;
           dispatch(getFriendStatus(value.receiver));
         }
       });
