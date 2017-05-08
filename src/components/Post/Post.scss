@@ -40,7 +40,7 @@
       display: inline-block;
     }
     i {
-      color: $text-color-grey;      
+      color: $text-color-grey;
       font-size: 7px;
     }
   }
@@ -89,4 +89,17 @@
   padding: 15px;
   font-size: 14px;
   background-color: #F3F6F8;
+}
+
+/*********** Style mobile ***************/
+@media (max-width: 992px) {
+  .postPanel {
+    .postHeaderLeft {
+      width: 83%;
+    }
+
+    .postHeaderRight {
+      width: 17%;
+    }
+  }
 }
