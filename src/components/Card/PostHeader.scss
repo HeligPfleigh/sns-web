@@ -1,0 +1,39 @@
+@import "../../theme/resources.scss";
+
+.postHeaderLeft {
+  width: 90%;
+  float: left;
+  display: flex;
+  .time {
+    font-size: 11px;
+    color: $text-color-grey;
+  }
+  .avarta {
+    img {
+      width: 45px;
+      height: 45px;
+      margin: 4px 10px 0 0px;
+    }
+  }
+  .userInfo {
+    margin-top: 10px;
+    a {
+      color: black;
+    }
+  }
+}
+
+.postHeaderRight {
+  width: 10%;
+  display: inline-block;
+  padding: 6px 9px;
+  text-align: right;
+  span {
+    cursor: pointer;
+    display: inline-block;
+  }
+  i {
+    color: $text-color-grey;      
+    font-size: 7px;
+  }
+}

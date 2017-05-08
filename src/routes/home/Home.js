@@ -1,12 +1,3 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import React, { Component, PropTypes } from 'react';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -15,10 +6,10 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
-import Post from '../../components/Post';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
+import FeedList from './FeedList';
 import s from './Home.scss';
 
 const userFragment = gql`
@@ -44,6 +35,9 @@ const postFragment = gql`
     totalComments,
     isLiked,
     createdAt,
+    comments (limit: 5) {
+      _id
+    }
   }
   ${userFragment}
 `;
@@ -87,31 +81,7 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
 }
 ${postFragment}`;
 
-const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
-  <div>
-    {feeds.map(item => (
-      item.user && item.user.profile && <Post
-        key={item._id}
-        data={item}
-        likePostEvent={likePostEvent}
-        unlikePostEvent={unlikePostEvent}
-        userInfo={userInfo}
-        isTimeLineMe={false}
-      />
-    ))}
-  </div>
-);
 
-FeedList.propTypes = {
-  feeds: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-  likePostEvent: PropTypes.func.isRequired,
-  unlikePostEvent: PropTypes.func.isRequired,
-  userInfo: PropTypes.object.isRequired,
-};
 
 class Home extends Component {
   static propTypes = {
@@ -132,6 +102,7 @@ class Home extends Component {
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
         <Loading show={loading} full>Loading ...</Loading>
@@ -151,7 +122,6 @@ class Home extends Component {
               />}
             </InfiniteScroll>
           </Col>
-
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col sm={4} xs={12}>
               <FriendSuggestions />

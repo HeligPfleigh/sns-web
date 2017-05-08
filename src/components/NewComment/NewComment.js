@@ -19,9 +19,9 @@ import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 
 /**
-       * Super simple decorators for handles and hashtags, for demonstration
-       * purposes only. Don't reuse these regexes.
-       */
+ * Super simple decorators for handles and hashtags, for demonstration
+ * purposes only. Don't reuse these regexes.
+ */
 const styles = {
   editor: {
     border: '1px solid #ddd',
@@ -85,7 +85,6 @@ class NewPost extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { isFocus } = this.props;
-    // console.log(nextProps.isFocus);
     if (nextProps.isFocus !== isFocus) {
       this.editor.focus();
     }

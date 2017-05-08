@@ -2,16 +2,13 @@ import React, { PropTypes } from 'react';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import TimeAgo from 'react-timeago';
-import vnStrings from 'react-timeago/lib/language-strings/vi';
-import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
 import {
   Image,
   Col,
 } from 'react-bootstrap';
+import Link from '../Link';
+import TimeAgo from '../TimeAgo';
 import s from './CommentStyle.scss';
-
-const formatter = buildFormatter(vnStrings);
 
 class CommentItem extends React.Component {
   static propTypes = {
@@ -29,21 +26,21 @@ class CommentItem extends React.Component {
     return (
       <div className={s.commentPanel}>
         <Col className={s.commentAvarta}>
-          <a href="#">
+          <Link to={`user/${comment.user._id}`}>
             <Image src={comment.user.profile.picture} circle />
-          </a>
+          </Link>
         </Col>
         <Col className={s.commentContent}>
           <Col
             dangerouslySetInnerHTML={{
-              __html: `<p><a href='#'>${comment.user.profile.firstName}
-              ${comment.user.profile.lastName}</a></p>
+              __html: `<p>${comment.user.profile.firstName}
+              ${comment.user.profile.lastName}</p>
               ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}`,
             }}
           />
           <Col className={s.commentControl}>
             <a href="#" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
-              <TimeAgo date={comment.updatedAt} formatter={formatter} />
+              <TimeAgo time={comment.updatedAt} />
             </a>
           </Col>
         </Col>
