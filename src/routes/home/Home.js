@@ -14,7 +14,7 @@ import Feed from './Feed';
 import s from './Home.scss';
 
 const userFragment = gql`
-  fragment UserView on UserSchemas {
+  fragment HomeUserView on UserSchemas {
     _id,
     username,
     profile {
@@ -25,22 +25,10 @@ const userFragment = gql`
   }
 `;
 
-const commentFragment = gql`fragment CommentView on CommentSchemas {
-    _id,
-    message,
-    user {
-      ...UserView
-    },
-    parent,
-    updatedAt,
-  }
-  ${userFragment}
-`;
-
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
     edges {
-      ...PostView
+      ...HomePostView
     }
     pageInfo {
       endCursor,
@@ -48,31 +36,11 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
     }
   }
   me {
-    ...UserView,
+    ...HomeUserView,
   },
 }
 ${userFragment}
-${Feed.fragments.post} 
-`;
-
-const createNewComment = gql`
-  mutation createNewComment (
-    $postId: String!,
-    $message: String!,
-    $commentId: String,
-  ) {
-    createNewComment(
-      postId: $postId,
-      message: $message,
-      commentId: $commentId,
-    ) {
-      ...CommentView
-      reply {
-        ...CommentView
-      },
-    }
-  }
-${commentFragment}`;
+${Feed.fragments.post}`;
 
 class Home extends Component {
   static propTypes = {
@@ -97,7 +65,7 @@ class Home extends Component {
       <Grid>
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
-          <Col sm={8} xs={12}>
+          <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
             <InfiniteScroll
               loadMore={loadMoreRows}
@@ -115,7 +83,7 @@ class Home extends Component {
             </InfiniteScroll>
           </Col>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
-            <Col sm={4} xs={12}>
+            <Col md={4} smHidden xsHidden>
               <FriendSuggestions />
             </Col>
           </MediaQuery>
