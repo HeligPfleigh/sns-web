@@ -26,7 +26,7 @@ class NotificationList extends React.Component {
         { notifications && notifications.map(item => (
           item.user && item.subject && <MenuItem
             key={`notification-${item._id}`}
-            href={`/${item.user.username}/posts/${item.subject._id}`}
+            href={`/posts/${item.subject._id}`}
           >
             <NotificationItem data={item} userInfo={userInfo} />
           </MenuItem>
