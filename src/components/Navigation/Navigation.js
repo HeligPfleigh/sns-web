@@ -9,11 +9,16 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { Dropdown, MenuItem } from 'react-bootstrap';
+import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import s from './Navigation.scss';
 import Link from '../Link';
 import { makeNotificationRead } from '../../actions/chat';
+import CustomToggle from '../Common/DropdownMenu/CustomToggle';
+import history from '../../core/history';
+import NotificationList from '../Notification/NotificationList';
 
 const getNotificationCount = (chatNotification, current) => {
   const copyObjectNotification = chatNotification && Object.assign({}, chatNotification);
@@ -43,25 +48,32 @@ class Navigation extends React.Component {
     location: React.PropTypes.object,
     current: React.PropTypes.string,
     makeNotificationRead: React.PropTypes.func.isRequired,
+    user: React.PropTypes.object,
+    data: React.PropTypes.object,
+    loadMoreRows: React.PropTypes.func,
   }
 
   componentDidMount() {
     this.handleUpdateTitle();
   }
+
   componentWillReceiveProps(nextProps) {
     const { chatNotification, current } = this.props;
     if (current && chatNotification !== nextProps.chatNotification && nextProps.chatNotification && nextProps.chatNotification[current]) {
       this.props.makeNotificationRead({ conversationId: current });
     }
   }
+
   shouldComponentUpdate(nextProps) {
     const { location } = this.props;
     if (location && location.pathname !== (nextProps.location && nextProps.location.pathname)) return true;
     return true;
   }
+
   componentDidUpdate() {
     this.handleUpdateTitle();
   }
+
   handleUpdateTitle = () => {
     const { chatNotification, current } = this.props;
     const countChatNotification = getNotificationCount(chatNotification, current);
@@ -75,8 +87,25 @@ class Navigation extends React.Component {
     }
   }
 
+  navEventHandler = (path) => {
+    history.push(path);
+  };
+
   render() {
-    const { isMobile, chatNotification, current } = this.props;
+    const {
+      isMobile,
+      chatNotification,
+      current,
+      user,
+      user: { totalNotification },
+      data: { loading, edges, pageInfo },
+      loadMoreRows,
+    } = this.props;
+
+    let hasNextPage = false;
+    if (!loading && pageInfo) {
+      hasNextPage = pageInfo.hasNextPage;
+    }
     const countChatNotification = getNotificationCount(chatNotification, current);
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
@@ -101,10 +130,43 @@ class Navigation extends React.Component {
           {isMobile ? '' : <span>Tinh nhắn</span>}
         </Link>
 
-        <Link className={s.link} to="/contact">
-          <i className="fa fa-bell"></i>
-          {isMobile ? '' : <span>Thông báo</span>}
-        </Link>
+        <MediaQuery query="(max-width: 992px)">
+          <Link className={s.link} to="/notifications">
+            {
+              totalNotification > 0 &&
+              <i className="fa fa-bell-o" data-badge={totalNotification}></i>
+            }
+
+            {
+              totalNotification < 1 &&
+              <i className="fa fa-bell"></i>
+            }
+          </Link>
+        </MediaQuery>
+
+        <MediaQuery query="(min-width: 992px)">
+          <Dropdown className={s.link} id="dropdown-notification" componentClass="div" pullRight>
+            <CustomToggle bsRole="toggle">
+              {
+                totalNotification > 0 &&
+                <i className="fa fa-bell-o" data-badge={totalNotification}></i>
+              }
+
+              {
+                totalNotification < 1 &&
+                <i className="fa fa-bell"></i>
+              }
+              <span>Thông báo</span>
+            </CustomToggle>
+            <Dropdown.Menu className={s.dropdownNotiPanel}>
+              <MenuItem header className={s.headerItem}>Thông báo</MenuItem>
+              { edges && <NotificationList notifications={edges} userInfo={user} /> }
+              <MenuItem className={s.showAllItem} href="/notifications">
+                Xem toàn bộ thông báo
+              </MenuItem>
+            </Dropdown.Menu>
+          </Dropdown>
+        </MediaQuery>
       </div>
     );
   }

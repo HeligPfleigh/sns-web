@@ -1,0 +1,17 @@
+@import "../../theme/resources.scss";
+
+.notificationPanel {
+  font-size: 12px;
+  .avarta {
+    float: left;
+    img {
+      width: 45px;
+      height: 45px;
+      margin-right: 10px;
+    }
+  }
+
+  .content {
+    // width: 80%;
+  }
+}

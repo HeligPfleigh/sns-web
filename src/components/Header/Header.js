@@ -22,16 +22,59 @@ import history from '../../core/history';
 // import logoUrl from './logo-small.png';
 // import logoUrl2x from './logo-small@2x.png';
 
-const userInfoQuery = gql`query userInfoQuery {
-  me {
-    _id
+const userFragment = gql`
+  fragment HeaderUserView on UserSchemas {
+    _id,
+    username,
     profile {
-      firstName
+      picture,
+      firstName,
       lastName
-      picture
+    }
+    totalNotification
+  }
+`;
+
+const NotifyFragment = gql`
+  fragment NotificationView on NotificationSchemas {
+    _id
+    user {
+      ...HeaderUserView
+    }
+    type
+    seen
+    subject {
+      _id
+      message
+      user {
+        ...HeaderUserView
+      }
+    }
+    actors {
+      ...HeaderUserView
+    }
+    isRead
+    createdAt
+  }
+  ${userFragment}
+`;
+
+const headerQuery = gql`query headerQuery($cursor: String) {
+  notifications (cursor: $cursor) {
+    edges {
+      ...NotificationView
+    }
+    pageInfo {
+      endCursor,
+      hasNextPage
     }
   }
+  me {
+    ...HeaderUserView,
+  },
 }
+${userFragment}
+${NotifyFragment}
 `;
 
 class Header extends React.Component {
@@ -39,6 +82,7 @@ class Header extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool.isRequired,
     }).isRequired,
+    loadMoreRows: PropTypes.func.isRequired,
   };
 
   gotoHomePage =() => {
@@ -46,7 +90,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { data: { me } } = this.props;
+    const { data: { notifications, me }, loadMoreRows } = this.props;
     return (
       <div className={s.root} >
         <Grid>
@@ -63,13 +107,13 @@ class Header extends React.Component {
             <Col md={6} sm={6} xs={6} >
               <NavRight user={me} />
               <MediaQuery query="(min-width: 992px)">
-                <Navigation />
+                <Navigation user={me} data={notifications} loadMoreRows={loadMoreRows} />
               </MediaQuery>
             </Col>
           </Row>
           <MediaQuery query="(max-width: 992px)">
             <div className={s.boxMobileHeader}>
-              <Navigation user={me} isMobile />
+              <Navigation user={me} data={notifications} loadMoreRows={loadMoreRows} isMobile />
             </div>
           </MediaQuery>
         </Grid>
@@ -80,5 +124,31 @@ class Header extends React.Component {
 
 export default compose(
   withStyles(s),
-  graphql(userInfoQuery, {}),
+  graphql(headerQuery, {
+    options: () => ({
+      variables: {},
+    }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreRows = () => fetchMore({
+        variables: {
+          cursor: data.feeds.pageInfo.endCursor,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newEdges = fetchMoreResult.feeds.edges;
+          const pageInfo = fetchMoreResult.feeds.pageInfo;
+          return {
+            feeds: {
+              edges: [...previousResult.feeds.edges, ...newEdges],
+              pageInfo,
+            },
+          };
+        },
+      });
+      return {
+        data,
+        loadMoreRows,
+      };
+    },
+  }),
 )(Header);
