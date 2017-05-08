@@ -1,11 +1,10 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { MenuItem } from 'react-bootstrap';
-import s from './Notification.scss';
-import Notification from './Notification';
+import NotificationItem from './NotificationItem';
 import history from '../../core/history';
+import s from './NotificationList.scss';
 
-// {`${item.actors[0].profile.lastName} vua thuc hien ${item.type} bai viet ${item.subject._id}`}
 class NotificationList extends React.Component {
   static propTypes = {
     notifications: PropTypes.arrayOf(
@@ -14,15 +13,12 @@ class NotificationList extends React.Component {
       }),
     ).isRequired,
     userInfo: PropTypes.object.isRequired,
-    // likePostEvent: PropTypes.func.isRequired,
-    // unlikePostEvent: PropTypes.func.isRequired,
   };
 
   navEventHandler = (path) => {
     history.push(path);
   };
 
-  // href={`/${item.user.username}/posts/${item._id}`}
   render() {
     const { notifications, userInfo } = this.props;
     return (
@@ -32,7 +28,7 @@ class NotificationList extends React.Component {
             key={`notification-${item._id}`}
             href={`/${item.user.username}/posts/${item.subject._id}`}
           >
-            <Notification data={item} userInfo={userInfo} />
+            <NotificationItem data={item} userInfo={userInfo} />
           </MenuItem>
         ))}
       </span>

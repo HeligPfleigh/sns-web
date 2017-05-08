@@ -127,6 +127,7 @@ export default compose(
   graphql(headerQuery, {
     options: () => ({
       variables: {},
+      // pollInterval: 20000,
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
