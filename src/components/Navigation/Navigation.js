@@ -122,11 +122,13 @@ class Navigation extends React.Component {
         <Link className={s.link} to="/messages">
           {
             countChatNotification > 0 &&
-            <span className={s.jewelCount}>
-              <span>{countChatNotification}</span>
-            </span>
+            <i className="fa fa-comment-o" data-badge={countChatNotification}></i>
           }
-          <i className="fa fa-comment"></i>
+
+          {
+            countChatNotification < 1 &&
+            <i className="fa fa-comment"></i>
+          }
           {isMobile ? '' : <span>Tinh nhắn</span>}
         </Link>
 
