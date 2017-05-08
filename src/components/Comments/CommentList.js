@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from 'react';
+import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Clearfix } from 'react-bootstrap';
 import ScrollableAnchor, { configureAnchors, goToAnchor } from 'react-scrollable-anchor';
@@ -8,7 +8,18 @@ import NewComment from './NewComment';
 
 configureAnchors({ offset: -160, scrollDuration: 200 });
 
-class CommentList extends Component {
+class CommentList extends React.Component {
+  static propTypes = {
+    comments: PropTypes.arrayOf(PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    })).isRequired,
+    postId: PropTypes.string.isRequired,
+    isFocus: PropTypes.bool.isRequired,
+    user: PropTypes.object.isRequired,
+    // createNewComment: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    totalComments: PropTypes.number.isRequired,
+  };
 
   constructor(props) {
     super(props);
