@@ -15,7 +15,14 @@
 }
 
 .commentContent {
-  padding-left: 10px;
+  word-wrap: break-word;
+    width:100%;
+    padding-left: 10px;
+     img {
+      max-width: 100%;
+    }  
+  
+  
   p {
     margin: 0;
     padding: 0;
@@ -27,8 +34,10 @@
       font-size: 13px;
     }
     &:first-child, &:first-child + p {
-      display: inline;
+      
       margin: 0 0 10px;
+      padding-right: 25px;
+     
     }
   }
   a {
