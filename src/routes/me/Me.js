@@ -25,6 +25,7 @@ const userFragment = gql`
     }
   }
 `;
+
 const postFragment = gql`
   fragment PostView on PostSchemas {
     _id,
@@ -39,13 +40,13 @@ const postFragment = gql`
   }
   ${userFragment}
 `;
+
 const createNewPost = gql`mutation createNewPost ($message: String!) {
   createNewPost(message: $message) {
     ...PostView
   }
 }
 ${postFragment}`;
-
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
@@ -58,7 +59,6 @@ const profilePageQuery = gql`query profilePageQuery {
 ${userFragment}
 ${postFragment}
 `;
-
 
 const likePost = gql`mutation likePost ($postId: String!) {
   likePost(postId: $postId) {
@@ -73,7 +73,6 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
   }
 }
 ${postFragment}`;
-
 
 class Me extends React.Component {
   static propTypes = {
@@ -126,15 +125,14 @@ class Me extends React.Component {
                 ))}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  <Info profile={profile} />
+                  {profile && <Info profile={profile} />}
                 </div>
               </Grid>
             </div>
           </Col>
-          <Col sm={4} xs={12}>123</Col>
+          <Col sm={4} xs={12}></Col>
         </Row >
       </Grid>
-
     );
   }
 }
@@ -170,7 +168,6 @@ export default compose(
         },
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
-            console.log(ownProps);
             const newPost = mutationResult.data.createNewPost;
             return update(previousResult, {
               me: {

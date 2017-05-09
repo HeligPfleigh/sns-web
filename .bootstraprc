@@ -11,7 +11,7 @@ useCustomIconFontPath: false
 # Webpack loaders, order matters
 styleLoaders:
   - style
-  - css
+  - css-loader?minimize=true
   - sass
 
 # Extract styles to stand-alone css file
@@ -59,10 +59,10 @@ styles:
   glyphicons: true
 
   # Core CSS
-  scaffolding: true
+  scaffolding: false
   type: true
   code: true
-  grid: true
+  grid: false
   tables: true
   forms: true
   buttons: true

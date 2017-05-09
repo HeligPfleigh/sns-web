@@ -50,13 +50,17 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
 app.use(compression());
+const oneDay = 86400000; // in milliseconds
+function setCustomCacheControl(res) {
+  res.setHeader('Expires', new Date(Date.now() + oneDay).toUTCString());
+}
 if (__DEV__) {
   app.use(express.static(path.join(__dirname, 'public')));
 } else {
-  const oneDay = 86400000; // in milliseconds
   app.use(express.static(path.join(__dirname, 'public'), {
     etag: true,
     maxage: oneDay,
+    setHeaders: setCustomCacheControl,
   }));
 }
 app.use(cookieParser());
