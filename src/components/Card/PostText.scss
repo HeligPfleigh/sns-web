@@ -3,12 +3,11 @@
 .postContent {
   padding: 10px 0px;
   font-size: 13px;
-   word-wrap: break-word;
-    width:100%; 
-    img {
-      max-width: 100%;
-    } 
-
+  word-break: break-all;
+  width: 100%;
+  img {
+    max-width: 100%;
+  }
   p {
     margin: 0;
     padding: 0;
