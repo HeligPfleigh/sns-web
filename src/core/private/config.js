@@ -1,4 +1,4 @@
-export default {
+export const firebaseService = {
   type: 'service_account',
   project_id: process.env.FIREBASE_PROJECT_ID || 'sns-chat-dev',
   private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID || 'de883bbdad9897b8db4bc25d2bb2c33cda963fc5',
@@ -9,4 +9,7 @@ export default {
   token_uri: 'https://accounts.google.com/o/oauth2/token',
   auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
   client_x509_cert_url: 'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-1gt28%40snschat-fb64b.iam.gserviceaccount.com',
+};
+export const auth = {
+  jwt: { secret: process.env.JWT_SECRET || 'React Starter Kit' },
 };

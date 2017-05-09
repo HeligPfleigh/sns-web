@@ -12,8 +12,6 @@
 export const port = process.env.PORT || 3004;
 export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-export const databaseUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/sns_test';
-
 export const analytics = {
 
   // https://analytics.google.com/
@@ -28,12 +26,10 @@ export const server = {
   graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://localhost:3005/graphql',
   ipBrowser: process.env.SERVER_IP_BROWSER || 'http://localhost:3005',
   graphqlBrowser: process.env.SERVER_IP_BROWSER ? `${process.env.SERVER_IP_BROWSER}/graphql` : 'http://localhost:3005/graphql',
+  authPath: '/auth',
 };
 
 export const auth = {
-
-  jwt: { secret: process.env.JWT_SECRET || 'React Starter Kit' },
-
   // https://developers.facebook.com/
   facebook: {
     id: process.env.FACEBOOK_APP_ID || '678961598943405',

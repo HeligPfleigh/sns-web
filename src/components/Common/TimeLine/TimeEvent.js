@@ -17,7 +17,7 @@ class TimeEvent extends React.Component {
 
         </div>
         <div className={s.time}>
-         {this.props.time}
+          {this.props.time}
         </div>
 
 

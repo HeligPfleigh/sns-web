@@ -14,7 +14,7 @@ class TimeLine extends React.Component {
       <div >
         <div className={s.line}>
           {this.props.events.map(data => (
-            <div key ={1}>
+            <div key={1}>
               <TimeEvent time={data.time} />
               <TimeContent images={data.images} />
             </div>

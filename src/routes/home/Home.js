@@ -82,7 +82,6 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
 ${postFragment}`;
 
 
-
 class Home extends Component {
   static propTypes = {
     data: PropTypes.shape({

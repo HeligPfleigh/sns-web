@@ -12,33 +12,42 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import compression from 'compression';
-import expressJwt from 'express-jwt';
-import jwt from 'jsonwebtoken';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import { renderToStringWithData } from 'react-apollo';
 import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
+import httpProxy from 'http-proxy';
+import http from 'http';
 import createApolloClient from './core/createApolloClient';
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
-import passport, { verifiedChatToken } from './core/passport';
-// import schema from './data/schema';
 import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
-import { port, auth, databaseUrl } from './config';
-import Mongoose from './data/mongoose';
+import { port, server as apiConfig } from './config';
 import chat from './core/chat';
-
-// Create connect database
-Mongoose.connect(databaseUrl, {});
+import { jwtMiddleware, veryfiedFirebaseMiddleware } from './core/private/admin';
 
 const app = express();
+const server = new http.Server(app);
+const proxy = httpProxy.createProxyServer({
+  target: apiConfig.ipBrowser,
+  ws: true,
+});
+app.use('/auth', (req, res) => {
+  proxy.web(req, res, { target: `${apiConfig.ipBrowser}${apiConfig.authPath}` });
+});
 
+//
+// Authentication
+// -----------------------------------------------------------------------------
+app.use(cookieParser());
+app.use(jwtMiddleware());
+app.use(veryfiedFirebaseMiddleware());
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
 // user agent is not known.
@@ -63,48 +72,19 @@ if (__DEV__) {
     setHeaders: setCustomCacheControl,
   }));
 }
-app.use(cookieParser());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-//
-// Authentication
-// -----------------------------------------------------------------------------
-app.use(expressJwt({
-  secret: auth.jwt.secret,
-  credentialsRequired: false,
-  getToken: req => req.cookies.id_token,
-}));
-app.use(passport.initialize());
 
 if (__DEV__) {
   app.enable('trust proxy');
 }
-app.get('/login/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false }),
-);
-app.get('/login/facebook/return',
-  passport.authenticate('facebook', { failureRedirect: '/login', session: false }),
-  (req, res) => {
-    const expiresIn = 60 * 60 * 24 * 180;
-    const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn });
-    res.redirect('/');
-  },
-);
-
-app.get('/logout', (req, res) => {
-// app.post('/logout', (req, res) => {
-  res.clearCookie('id_token');
-  res.redirect('/');
-});
 
 //
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
-    await verifiedChatToken(req, res);
     const apolloClient = createApolloClient({
       rootValue: { request: req },
     });
@@ -211,7 +191,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // Launch the server
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`The server is running at http://localhost:${port}/`);
 });
 /* eslint-enable no-console */

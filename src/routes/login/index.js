@@ -8,7 +8,6 @@
  */
 
 import React from 'react';
-import { selectUser } from '../../selectors';
 
 const title = 'Log In';
 
@@ -16,10 +15,9 @@ export default {
 
   path: '/login',
 
-  async action(context) {
-    const { store } = context;
-
-    if (selectUser(store)) {
+  async action({ store }) {
+    const state = store.getState();
+    if (state.user) {
       return { redirect: '/' };
     }
     const Login = await require.ensure([], require => require('./Login').default, 'login');

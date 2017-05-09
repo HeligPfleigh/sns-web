@@ -118,7 +118,8 @@ class CommentList extends React.Component {
         {this.hasMore() && <a
           onClick={this.props.loadMoreComments} style={{
             fontSize: 12,
-          }}>Xem thêm</a>
+          }}
+        >Xem thêm</a>
         }
         {comments.map(item => (
           <span key={item._id}>
