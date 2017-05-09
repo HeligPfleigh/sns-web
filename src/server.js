@@ -11,6 +11,7 @@ import path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import compression from 'compression';
 import expressJwt from 'express-jwt';
 import jwt from 'jsonwebtoken';
 import React from 'react';
@@ -48,7 +49,16 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 //
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(compression());
+if (__DEV__) {
+  app.use(express.static(path.join(__dirname, 'public')));
+} else {
+  const oneDay = 86400000; // in milliseconds
+  app.use(express.static(path.join(__dirname, 'public'), {
+    etag: true,
+    maxage: oneDay,
+  }));
+}
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

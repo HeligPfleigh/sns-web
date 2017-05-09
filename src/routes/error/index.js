@@ -8,13 +8,14 @@
  */
 
 import React from 'react';
-import ErrorPage from './ErrorPage';
 
 export default {
 
   path: '/error',
 
-  action({ error }) {
+  async action({ error }) {
+    const ErrorPage = await require.ensure([], require => require('./ErrorPage').default, 'error');
+
     return {
       title: error.name,
       description: error.message,

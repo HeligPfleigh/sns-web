@@ -1,5 +1,4 @@
 import React from 'react';
-import User from './User';
 import Layout from '../../components/Layout';
 import { selectUser } from '../../selectors';
 
@@ -13,6 +12,7 @@ export default {
     if (!selectUser(store)) {
       return { redirect: '/login' };
     }
+    const User = await require.ensure([], require => require('./User').default, 'user');
 
     return {
       title: 'SNS - User',

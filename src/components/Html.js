@@ -70,7 +70,7 @@ class Html extends React.Component {
               `window.APP_STATE=${serialize(state, { isJSON: true })}` }}
             />
           )}
-          {scripts.map(script => <script key={script} src={script} />)}
+          {scripts.map(script => <script defer key={script} src={script} />)}
           {analytics.google.trackingId &&
             <script
               // eslint-disable-next-line react/no-danger

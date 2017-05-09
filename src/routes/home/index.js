@@ -8,7 +8,6 @@
  */
 
 import React from 'react';
-import Home from './Home';
 import Layout from '../../components/Layout';
 import { selectUser } from '../../selectors';
 
@@ -22,6 +21,7 @@ export default {
     if (!selectUser(store)) {
       return { redirect: '/login' };
     }
+    const Home = await require.ensure([], require => require('./Home').default, 'home');
 
     return {
       title: 'SNS',
