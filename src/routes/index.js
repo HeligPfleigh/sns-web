@@ -18,7 +18,7 @@ export default {
 
   // Keep in mind, routes are evaluated in order
   children: [
-    require('./home').default,
+    requireAuth(require('./home').default),
     requireAuth(require('./friends').default),
     requireAuth(require('./messages').default),
     require('./contact').default,

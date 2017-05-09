@@ -9,20 +9,13 @@
 
 import React from 'react';
 import Layout from '../../components/Layout';
-import { selectUser } from '../../selectors';
 
 export default {
 
   path: '/',
 
-  async action(context) {
-    const { store } = context;
-
-    if (!selectUser(store)) {
-      return { redirect: '/login' };
-    }
+  async action() {
     const Home = await require.ensure([], require => require('./Home').default, 'home');
-
     return {
       title: 'SNS',
       component: <Layout><Home /></Layout>,
