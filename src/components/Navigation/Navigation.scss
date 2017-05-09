@@ -12,34 +12,62 @@
   color: #fff;
   text-decoration: none;
 }
- .userDropdown {
+ 
+.navigation {
+  float: right;
+  margin: 10px 0px 4px;
+  text-decoration: none;
+   .userDropdown {
     margin: 0;
-    float: left;
     
-    // padding-right: 10px;
-    // margin-right: 10px;
+    display: inline-block;
+    :global(.btn-group){
+       display: block;
+    }
+    
+  
     
 
     .userDropdownMenu {
       
-      min-width: 400px;
+      min-width: 500px;
       top:50px;
       border-radius: 0px;
       border: 1px solid #dedede;
       li {
         float: left;
         width: 100%;
+        a {
+          padding: 3px 0px;
+        }
         .pullLeft {
           float: left;
           margin-bottom: 10px;
         }
       }
-      >li.headerItem {
-        padding-top: 7px !important;
-        padding-left: 5px !important;
+     .headerItem {
+          a{
+            cursor: pointer;
+             color:#283E4a;
+          } 
+        padding: 8px 15px;
         font-weight: bold;
-        background-color: #e1e9ee;
-        border-top: 1px solid #c7d1d8;
+        border-bottom: 1px solid #c7d1d8;
+        width: 100%;
+         }
+         .icon{
+           float: right;
+          // display: inline-block;
+         }
+     
+      .bottomItem {
+        text-align: center;
+         padding: 10px 15px;
+         a {
+           cursor: pointer;
+           font-weight: bold;
+           color:#283E4a;
+         }
       }
       .name {
         margin-left: 55px;
@@ -67,14 +95,20 @@
       }
     }
 
-    .boxUserItem {
+   
+  
+  }
+  .boxListUser{ 
+    width: 100%;
+    display: inline-block;
+    overflow: hidden;  
+    :global(.infinite-scroll-component) {
+       width: 110%;
+      height: 320px !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
     }
   }
-.navigation {
-  float: right;
-  margin: 10px 0px 4px;
-  text-decoration: none;
-   
 
   .link {
     display: inline-block;

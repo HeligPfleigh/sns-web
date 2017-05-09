@@ -17,7 +17,8 @@ import _ from 'lodash';
 import s from './Navigation.scss';
 import Link from '../Link';
 import { makeNotificationRead } from '../../actions/chat';
-import FriendDropDown from '../FriendDropDown';
+
+import Friend from '../Friend/Friend';
 
 const getNotificationCount = (chatNotification, current) => {
   const copyObjectNotification = chatNotification && Object.assign({}, chatNotification);
@@ -38,6 +39,7 @@ const getNotificationCount = (chatNotification, current) => {
 )
 class Navigation extends React.Component {
   static defaultProps = {
+
     isMobile: false,
   }
 
@@ -48,22 +50,15 @@ class Navigation extends React.Component {
     location: React.PropTypes.object,
     current: React.PropTypes.string,
     makeNotificationRead: React.PropTypes.func.isRequired,
+    handleFriendAction: React.PropTypes.func.isRequired,
+    friendType: React.PropTypes.string,
+    friends: React.PropTypes.array,
   }
-  constructor() {
-    super();
-    const divs = [
-      <div key={1} style={{ height: 50, background: '#9bc95b' }}>Div no 1</div>,
-      <div key={2} style={{ height: 50, background: '#ffd47b' }}>Div no 2</div>,
-      <div key={3} style={{ height: 50, background: '#95a9d6' }}>Div no 3</div>,
-      <div key={4} style={{ height: 50, background: '#ffa8e1' }}>Div no 4</div>,
-      <div key={5} style={{ height: 50, background: '#ffa8e1' }}>Div no 4</div>,
-      <div key={6} style={{ height: 50, background: '#ffa8e1' }}>Div no 4</div>,
-
-      <div key={7} style={{ height: 50, background: '#ffa8e1' }}>Div no 4</div>,
-      <div key={8} style={{ height: 50, background: '#ffa8e1' }}>Div no 4</div>,
-
-    ];
-    this.state = { divs };
+  constructor(props) {
+    super(props);
+    const { friends } = props;
+    
+    this.state = { friends };
   }
   componentDidMount() {
     this.handleUpdateTitle();
@@ -96,7 +91,7 @@ class Navigation extends React.Component {
   }
   generateDivs = () => {
     const moreDivs = [];
-    let count = this.state.divs.length;
+    let count = this.state.friends.length;
     for (let i = 0; i < 30; i++) {
       moreDivs.push(
         <div key={`div${count++}`} style={{ height: 50 }}>
@@ -105,12 +100,15 @@ class Navigation extends React.Component {
       );
     }
     setTimeout(() => {
-      this.setState({ divs: this.state.divs.concat(moreDivs) });
+      this.setState({ friends: this.state.friends.concat(moreDivs) });
     }, 500);
   }
+
+
   render() {
-    const testArray = ['aaa', 'bbb', 'ccc', 'ddd', 'eee', 'ggg'];
     const { isMobile, chatNotification, current } = this.props;
+    const { friends, ...customs } = this.props;
+
     const countChatNotification = getNotificationCount(chatNotification, current);
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
@@ -122,7 +120,7 @@ class Navigation extends React.Component {
           <Dropdown id="dropdown-custom-1" pullRight>
 
             <CustomToggle bsRole="toggle">
-              <Link className={s.link} to="/friends">
+              <Link className={s.link} to="/">
 
                 <i className="fa fa-users"></i>
 
@@ -131,19 +129,29 @@ class Navigation extends React.Component {
             </CustomToggle>
 
             <Dropdown.Menu className={s.userDropdownMenu}>
-              <MenuItem header className={s.headerItem}>Bạn bè</MenuItem>
-              <MenuItem>
+              <div className={s.headerItem}><strong>Bạn bè</strong>
+                <a onClick={this.addFriend} hidden>
+                  <div className={s.icon}><i className="fa fa-plus" aria-hidden="true" ></i>
+
+                  </div>
+                </a>
+              </div>
+
+              <div className={s.boxListUser}>
                 <InfiniteScroll
                   next={this.generateDivs}
                   hasMore
-                  height={300}
                   loader={<h4>Loading...</h4>}
                 >
-                  {testArray.map(value => <FriendDropDown userName={value} />)}
-                 {/*// {this.state.divs}*/}
+                  { friends && friends.map(friend =>
+                    <Friend className={s.pop} friend={friend} {...customs} />,
+                )}
+
                 </InfiniteScroll>
-              </MenuItem>
-              <MenuItem >See All</MenuItem>
+              </div>
+
+
+              <div className={s.bottomItem}><a href="/friends">Xem tất cả</a></div>
 
             </Dropdown.Menu>
           </Dropdown>
