@@ -32,7 +32,6 @@ const config = {
     publicPath: '/assets/',
     pathinfo: isVerbose,
   },
-
   module: {
     rules: [
       {

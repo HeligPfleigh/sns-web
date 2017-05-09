@@ -5,11 +5,11 @@ import * as admin from 'firebase-admin';
 import _ from 'lodash';
 import expressJwt from 'express-jwt';
 import { firebaseService, auth } from './config';
-import { auth as config } from '../../config';
+import config from '../../config';
 
 const defaultAdminApp = admin.initializeApp({
   credential: admin.credential.cert(firebaseService),
-  databaseURL: config.firebase.databaseURL,
+  databaseURL: config.auth.firebase.databaseURL,
 });
 async function verifiedChatToken(req, res) {
   try {

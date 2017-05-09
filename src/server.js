@@ -28,18 +28,18 @@ import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
-import { port, server as apiConfig } from './config';
+import config from './config';
 import chat from './core/chat';
 import { jwtMiddleware, veryfiedFirebaseMiddleware } from './core/private/admin';
 
 const app = express();
 const server = new http.Server(app);
 const proxy = httpProxy.createProxyServer({
-  target: apiConfig.ipBrowser,
+  target: config.server.ipBrowser,
   ws: true,
 });
 app.use('/auth', (req, res) => {
-  proxy.web(req, res, { target: `${apiConfig.ipBrowser}${apiConfig.authPath}` });
+  proxy.web(req, res, { target: `${config.server.ipBrowser}${config.server.authPath}` });
 });
 
 //
@@ -191,7 +191,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // Launch the server
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
-server.listen(port, () => {
-  console.log(`The server is running at http://localhost:${port}/`);
+server.listen(config.port, () => {
+  console.log(`The server is running at http://localhost:${config.port}/`);
 });
 /* eslint-enable no-console */

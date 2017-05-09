@@ -1,9 +1,9 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
-import { server } from '../../config';
+import config from '../../config';
 
 export default function createApolloClient(options) {
   const networkInterface = createNetworkInterface({
-    uri: server.graphql,
+    uri: config.server.graphql,
     opts: {
       // credentials: 'same-origin',
       credentials: 'include',
