@@ -117,7 +117,7 @@ class Header extends React.Component {
 
   render() {
     const { data: { me, refetch } } = this.props;
-    console.log(me);
+
     return (
       <div className={s.root} >
         <Grid>

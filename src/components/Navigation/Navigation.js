@@ -146,7 +146,7 @@ class Navigation extends React.Component {
                 <InfiniteScroll
                   next={this.generateDivs}
                   hasMore
-                  loader={<h4>Loading...</h4>}
+                //  loader={<h4>Loading...</h4>}
                 >
                   { friends && friends.map(friend =>
                     <Friend friend={friend} {...customs} />,
@@ -154,8 +154,6 @@ class Navigation extends React.Component {
 
                 </InfiniteScroll>
               </div>
-
-
               <div className={s.bottomItem}><a href="/friends">Xem tất cả</a></div>
 
             </Dropdown.Menu>
