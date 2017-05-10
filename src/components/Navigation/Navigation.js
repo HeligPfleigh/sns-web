@@ -54,6 +54,7 @@ class Navigation extends React.Component {
     handleFriendAction: React.PropTypes.func.isRequired,
     friendType: React.PropTypes.string,
     friends: React.PropTypes.array,
+    refetch: React.PropTypes.func.isRequired,
   }
   constructor(props) {
     super(props);
@@ -61,9 +62,11 @@ class Navigation extends React.Component {
 
     this.state = { friends };
   }
+
   componentDidMount() {
     this.handleUpdateTitle();
   }
+
   componentWillReceiveProps(nextProps) {
     const { chatNotification, current } = this.props;
     if (current && chatNotification !== nextProps.chatNotification && nextProps.chatNotification && nextProps.chatNotification[current]) {
@@ -77,6 +80,9 @@ class Navigation extends React.Component {
   }
   componentDidUpdate() {
     this.handleUpdateTitle();
+  }
+  onToggleClick = () => {
+    this.props.refetch();
   }
   handleUpdateTitle = () => {
     const { chatNotification, current } = this.props;
@@ -105,9 +111,7 @@ class Navigation extends React.Component {
     }, 500);
   }
 
-  exmapleFunc = () => {
 
-  }
   render() {
     const { isMobile, chatNotification, current } = this.props;
     const { friends, ...customs } = this.props;
@@ -120,13 +124,11 @@ class Navigation extends React.Component {
           {isMobile ? '' : <span>Trang chủ</span>}
         </Link>
         <div className={s.userDropdown}>
-          <Dropdown ref="dropDown" id="dropdown-custom-1" pullRight onToggle={this.exmapleFunc} >
+          <Dropdown id="dropdown-custom-1" pullRight onToggle={this.onToggleClick} >
 
-            <CustomToggle bsRole="toggle" >
+            <CustomToggle bsRole="toggle" refs="child">
               <Link className={s.link} to="/">
-
                 <i className="fa fa-users"></i>
-
                 {isMobile ? '' : <span>Nhóm</span>}
               </Link>
             </CustomToggle>

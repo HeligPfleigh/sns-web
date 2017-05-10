@@ -35,7 +35,9 @@ import { PENDING, NONE, ACCEPTED, REJECTED } from '../../constants';
 //   }
 // }
 // `;
-const friendsPageQuery = gql`query friendsPageQuery {
+update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
+
+const headerQuery = gql`query headerQuery {
   me {
     _id,
     username,
@@ -78,7 +80,7 @@ const friendAction = gql`mutation friendAction ($userId: String!, $cmd: String!)
   }
 }`;
 
-@graphql(friendsPageQuery)
+@graphql(headerQuery)
 @graphql(friendAction, { name: 'friendAction' })
 class Header extends React.Component {
   static propTypes = {
@@ -87,29 +89,24 @@ class Header extends React.Component {
       loading: PropTypes.bool.isRequired,
     }).isRequired,
   };
+  getAllfriends=() => {
+
+  }
   handleFriendAction = (userId, cmd) => {
+  //  debugger;
     this.props.friendAction({
       variables: { userId, cmd },
-      ...cmd === PENDING && {
-        refetchQueries: [{
-          query: friendsPageQuery,
-        }],
-      },
-      ...(cmd === ACCEPTED || cmd === REJECTED) && {
-        updateQueries: {
-          friendsPageQuery: (previousResult, { mutationResult }) => {
-            const newFriend = mutationResult.data.friendAction;
-            return update(previousResult, {
-              me: {
-                friends: {
-                  $unshift: [newFriend],
-                },
-                friendRequests: {
-                  $unset: [newFriend._id],
-                },
+      updateQueries: {
+        headerQuery: (previousResult, { mutationResult }) => {
+          const newFriend = mutationResult.data.friendAction;
+          console.log(newFriend);
+          return update(previousResult, {
+            me: {
+              friendRequests: {
+                $unset: [newFriend._id],
               },
-            });
-          },
+            },
+          });
         },
       },
     });
@@ -119,8 +116,8 @@ class Header extends React.Component {
   }
 
   render() {
-    const { data: { me } } = this.props;
-
+    const { data: { me, refetch } } = this.props;
+    console.log(me);
     return (
       <div className={s.root} >
         <Grid>
@@ -137,7 +134,12 @@ class Header extends React.Component {
             <Col md={6} sm={6} xs={6} >
               <NavRight user={me} />
               <MediaQuery query="(min-width: 992px)">
-                <Navigation handleFriendAction={this.handleFriendAction} friendType={PENDING} friends={me.friendRequests} />
+                <Navigation
+                  handleFriendAction={this.handleFriendAction}
+                  friendType={PENDING}
+                  friends={me.friendRequests}
+                  refetch={refetch}
+                />
               </MediaQuery>
             </Col>
           </Row>
@@ -155,5 +157,5 @@ class Header extends React.Component {
 export default compose(
   withStyles(s),
 
-  graphql(friendsPageQuery, {}),
+  graphql(headerQuery, {}),
 )(Header);
