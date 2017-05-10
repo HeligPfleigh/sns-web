@@ -10,10 +10,11 @@
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
-import { Image, Dropdown, MenuItem } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import CustomToggle from '../Common/DropdownMenu/CustomToggle';
 import _ from 'lodash';
+import CustomToggle from '../Common/DropdownMenu/CustomToggle';
+
 import s from './Navigation.scss';
 import Link from '../Link';
 import { makeNotificationRead } from '../../actions/chat';
@@ -105,7 +106,7 @@ class Navigation extends React.Component {
   }
 
   exmapleFunc = () => {
-    
+
   }
   render() {
     const { isMobile, chatNotification, current } = this.props;
