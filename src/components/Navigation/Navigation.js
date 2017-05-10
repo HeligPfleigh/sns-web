@@ -57,7 +57,7 @@ class Navigation extends React.Component {
   constructor(props) {
     super(props);
     const { friends } = props;
-    
+
     this.state = { friends };
   }
   componentDidMount() {
@@ -104,7 +104,9 @@ class Navigation extends React.Component {
     }, 500);
   }
 
-
+  exmapleFunc = () => {
+    
+  }
   render() {
     const { isMobile, chatNotification, current } = this.props;
     const { friends, ...customs } = this.props;
@@ -117,9 +119,9 @@ class Navigation extends React.Component {
           {isMobile ? '' : <span>Trang chủ</span>}
         </Link>
         <div className={s.userDropdown}>
-          <Dropdown id="dropdown-custom-1" pullRight>
+          <Dropdown ref="dropDown" id="dropdown-custom-1" pullRight onToggle={this.exmapleFunc} >
 
-            <CustomToggle bsRole="toggle">
+            <CustomToggle bsRole="toggle" >
               <Link className={s.link} to="/">
 
                 <i className="fa fa-users"></i>
@@ -128,7 +130,7 @@ class Navigation extends React.Component {
               </Link>
             </CustomToggle>
 
-            <Dropdown.Menu className={s.userDropdownMenu}>
+            <Dropdown.Menu className={s.userDropdownMenu} hidden>
               <div className={s.headerItem}><strong>Bạn bè</strong>
                 <a onClick={this.addFriend} hidden>
                   <div className={s.icon}><i className="fa fa-plus" aria-hidden="true" ></i>
@@ -144,7 +146,7 @@ class Navigation extends React.Component {
                   loader={<h4>Loading...</h4>}
                 >
                   { friends && friends.map(friend =>
-                    <Friend className={s.pop} friend={friend} {...customs} />,
+                    <Friend friend={friend} {...customs} />,
                 )}
 
                 </InfiniteScroll>

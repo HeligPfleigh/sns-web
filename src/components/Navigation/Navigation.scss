@@ -34,6 +34,7 @@
       top:50px;
       border-radius: 0px;
       border: 1px solid #dedede;
+      right: -135px;
       li {
         float: left;
         width: 100%;
@@ -89,7 +90,7 @@
         display: block;
         position: absolute;
         top: -20px;
-        right: 14px;
+        right: 130px;
         border: 10px solid transparent;
         border-bottom-color: #fff;
       }
@@ -107,6 +108,7 @@
       height: 320px !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
+      padding-right: 7%;
     }
   }
 
