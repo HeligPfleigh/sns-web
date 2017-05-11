@@ -104,6 +104,28 @@ class Html extends React.Component {
             if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
             else window.addEventListener('load', loadDeferredStyles);` }}
           />
+
+          {/**
+            <script
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html:
+              `window.fbAsyncInit = function() {
+                FB.init({
+                  appId: '678961598943405',
+                  cookie: true,
+                  version: 'v2.2'
+                });
+              };
+
+              (function(d, s, id){
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {return;}
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+              }(document, 'script', 'facebook-jssdk'));` }}
+            />
+           */}
         </body>
       </html>
     );
