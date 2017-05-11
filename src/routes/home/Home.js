@@ -98,6 +98,7 @@ export default compose(
   graphql(homePageQuery, {
     options: () => ({
       variables: {},
+      // pollInterval: 30000,
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
