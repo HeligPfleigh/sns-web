@@ -85,6 +85,7 @@ class Me extends React.Component {
 
   render() {
     const { data: { me }, query } = this.props;
+
     const edges = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
@@ -107,7 +108,7 @@ class Me extends React.Component {
                 </div>
               </div>
               <div className={s.infors}>
-                <Tab numbers={numbers} stateChildShow={tab} />
+                <Tab numbers={numbers} stateChildShow={tab} isMe />
               </div>
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
@@ -125,7 +126,7 @@ class Me extends React.Component {
                 ))}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile && <Info profile={profile} />}
+                  {profile && <Info profile={profile} isMe />}
                 </div>
               </Grid>
             </div>

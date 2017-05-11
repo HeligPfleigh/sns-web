@@ -35,6 +35,7 @@ class Info extends React.Component {
   static propTypes = {
     profile: PropTypes.object.isRequired,
     updateProfile: PropTypes.func.isRequired,
+    isMe: PropTypes.bool.isRequired,
   };
   constructor(props) {
     super(props);
@@ -66,7 +67,7 @@ class Info extends React.Component {
   };
   render() {
     const { address, email, gender, birthday, phone } = this.state.profile;
-
+    const { isMe } = this.props;
     return (
 
       <div className={s.root}>
@@ -94,7 +95,14 @@ class Info extends React.Component {
             <i className="fa fa-birthday-cake fa-2x" aria-hidden="true"></i>
             <span>Ngày Sinh</span> {birthday || ''}
           </li>
-          <li><Button onClick={this.editProfile} className={s.button} >{this.state.isEdit ? SAVE : CHANGE}</Button></li>
+          { isMe && <li>
+            <Button
+              onClick={this.editProfile}
+              className={s.button}
+            >
+              {this.state.isEdit ? SAVE : CHANGE}
+            </Button></li>
+         }
         </ul>
       </div>
 
