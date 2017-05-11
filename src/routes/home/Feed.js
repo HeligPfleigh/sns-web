@@ -13,7 +13,7 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt }, likePostEvent, unlikePostEvent, userInfo }) => (
+const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt, comments }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <Post>
     <PostHeader
       avatar={
@@ -49,7 +49,7 @@ const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, 
       <Icon onClick={doNothing} title="Chia sẻ" icons="fa fa-share fa-lg" />
     </PostActions>
     <PostContent className={s.commentPanel}>
-      <CommentList isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} />
+      <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
     </PostContent>
   </Post>
 );
@@ -69,6 +69,7 @@ Feed.propTypes = {
     totalLikes: PropTypes.number,
     totalComments: PropTypes.number,
     createdAt: PropTypes.string,
+    comments: PropTypes.array,
   }),
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,

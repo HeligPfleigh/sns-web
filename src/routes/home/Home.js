@@ -24,6 +24,18 @@ const userFragment = gql`
   }
 `;
 
+const commentFragment = gql`fragment CommentView on CommentSchemas {
+    _id,
+    message,
+    user {
+      ...UserView
+    },
+    parent,
+    updatedAt,
+  }
+  ${userFragment}
+`;
+
 const postFragment = gql`
   fragment PostView on PostSchemas {
     _id,
@@ -35,11 +47,21 @@ const postFragment = gql`
     totalComments,
     isLiked,
     createdAt,
-    comments (limit: 5) {
+    comments (limit: 2) {
       _id
+      message
+      user {
+        ...UserView,
+      },
+      parent,
+      reply {
+        ...CommentView
+      },
+      updatedAt,
     }
   }
   ${userFragment}
+  ${commentFragment}
 `;
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -81,6 +103,24 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
 }
 ${postFragment}`;
 
+const createNewComment = gql`
+  mutation createNewComment (
+    $postId: String!,
+    $message: String!,
+    $commentId: String,
+  ) {
+    createNewComment(
+      postId: $postId,
+      message: $message,
+      commentId: $commentId,
+    ) {
+      ...CommentView
+      reply {
+        ...CommentView
+      },
+    }
+  }
+${commentFragment}`;
 
 class Home extends Component {
   static propTypes = {
@@ -96,12 +136,11 @@ class Home extends Component {
 
   render() {
     // Pre-fetch data
-    const { data: { loading, feeds, me }, loadMoreRows } = this.props;
+    const { data: { loading, feeds, me }, loadMoreRows, loadMoreComments, createNewComment } = this.props;
     let hasNextPage = false;
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
-
     return (
       <Grid>
         <Loading show={loading} full>Loading ...</Loading>
@@ -118,6 +157,8 @@ class Home extends Component {
                 likePostEvent={this.props.likePost}
                 unlikePostEvent={this.props.unlikePost}
                 userInfo={me}
+                loadMoreComments={loadMoreComments}
+                createNewComment={createNewComment}
               />}
             </InfiniteScroll>
           </Col>
@@ -155,9 +196,52 @@ export default compose(
           };
         },
       });
+      const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
+        variables: {
+          commentId,
+          limit,
+          postId,
+        },
+        query: gql`query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+          post (_id: $postId) {
+            _id
+            comments (_id: $commentId, limit: $limit) {
+              _id
+              message
+              user {
+                ...UserView,
+              },
+              parent,
+              reply {
+                ...CommentView
+              },
+              updatedAt,
+            }
+          }
+        }
+        ${userFragment}
+        ${commentFragment}`,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
+
+          const updatedPost = update(previousResult.feeds.edges[index], {
+            comments: {
+              $push: fetchMoreResult.post.comments,
+            },
+          });
+          return update(previousResult, {
+            feeds: {
+              edges: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+        },
+      });
       return {
         data,
         loadMoreRows,
+        loadMoreComments,
       };
     },
   }),
@@ -267,6 +351,71 @@ export default compose(
                 },
               },
             });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(createNewComment, {
+    props: ({ mutate }) => ({
+      createNewComment: (postId, message, commentId, user) => mutate({
+        variables: { postId, message, commentId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewComment: {
+            __typename: 'CommentSchemas',
+            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            parent: commentId || null,
+            reply: [],
+            updatedAt: (new Date()).toString(),
+          },
+        },
+        updateQueries: {
+          homePageQuery: (previousResult, { mutationResult }) => {
+            const newComment = mutationResult.data.createNewComment;
+            const index = previousResult.feeds.edges.findIndex(item => item._id === postId);
+            // if (previousResult.post._id === postId) {
+            //   if (commentId) {
+            //     const index = previousResult.post.comments.findIndex(item => item._id === commentId);
+            //     const commentItem = previousResult.post.comments[index];
+
+            //     // init reply value
+            //     if (!commentItem.reply) {
+            //       commentItem.reply = [];
+            //     }
+
+            //     // push value into property reply
+            //     commentItem.reply.push(newComment);
+
+            //     return update(previousResult, {
+            //       post: {
+            //         comments: {
+            //           $splice: [[index, 1, commentItem]],
+            //         },
+            //       },
+            //     });
+            //   }
+            const updatedPost = update(previousResult.feeds.edges[index], {
+              comments: {
+                $unshift: [newComment],
+              },
+            });
+            return update(previousResult, {
+              feeds: {
+                edges: {
+                  $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+            // }
+            // return previousResult;
           },
         },
       }),

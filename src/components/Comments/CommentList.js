@@ -76,13 +76,13 @@ ${commentFragment}`;
 
 class CommentList extends React.Component {
   static propTypes = {
-    comments: PropTypes.shape({
-      loading: PropTypes.bool.isRequired,
-    }).isRequired,
+    comments: PropTypes.arrayOf(PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    })).isRequired,
     postId: PropTypes.string.isRequired,
     isFocus: PropTypes.bool.isRequired,
     user: PropTypes.object.isRequired,
-    createNewComment: PropTypes.func.isRequired,
+    // createNewComment: PropTypes.func.isRequired,
     loadMoreComments: PropTypes.func.isRequired,
     totalComments: PropTypes.number.isRequired,
   };
@@ -109,6 +109,16 @@ class CommentList extends React.Component {
     return totalComments > comments.length;
   }
 
+  loadMoreComments = (evt) => {
+    evt.preventDefault();
+    const comments = this.props.comments ? this.props.comments : [];
+    let commentId = null;
+    if (comments.length !== 0) {
+      commentId = comments[0]._id;
+    }
+    this.props.loadMoreComments(commentId, this.props.postId);
+  }
+
   render() {
     const { postId, isFocus, user, comments } = this.props;
     const { initContent, commentId, isSubForm } = this.state;
@@ -116,7 +126,7 @@ class CommentList extends React.Component {
     return (
       <div>
         {this.hasMore() && <a
-          onClick={this.props.loadMoreComments} style={{
+          onClick={this.loadMoreComments} style={{
             fontSize: 12,
           }}
         >Xem thêm</a>
@@ -151,7 +161,7 @@ class CommentList extends React.Component {
     );
   }
 }
-
+/**
 export default compose(
   withStyles(s),
   graphql(loadCommentsQuery, {
@@ -253,3 +263,5 @@ export default compose(
     }),
   }),
 )(CommentList);
+*/
+export default withStyles(s)(CommentList);

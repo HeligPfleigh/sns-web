@@ -12,7 +12,7 @@ isTimeLineMe={false}
 />
 */
 
-const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
+const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <div>
     {feeds.map(item => (
       item.user && item.user.profile && <Feed
@@ -21,6 +21,8 @@ const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
         likePostEvent={likePostEvent}
         unlikePostEvent={unlikePostEvent}
         userInfo={userInfo}
+        loadMoreComments={loadMoreComments}
+        createNewComment={createNewComment}
       />
     ))}
   </div>
