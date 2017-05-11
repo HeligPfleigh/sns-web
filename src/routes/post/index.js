@@ -1,19 +1,17 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 
-const title = 'Post Page';
-
 export default {
 
-  path: '/post/:id',
+  path: '/post/:postId',
 
-  async action() {
+  async action(context) {
     const Post = await require.ensure([], require => require('./Post').default, 'post');
 
     return {
-      title,
+      title: 'SNS - Bài viết',
       chunk: 'post',
-      component: <Layout><Post title={title} /></Layout>,
+      component: <Layout><Post postId={context.params.postId} /></Layout>,
     };
   },
 };
