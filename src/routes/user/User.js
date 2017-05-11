@@ -12,7 +12,6 @@ import Post from '../../components/Post';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './User.scss';
 
-
 const userFragment = gql`
   fragment UserView on UserSchemas {
     _id,
@@ -49,16 +48,14 @@ const createNewPost = gql`mutation createNewPost ($message: String!) {
 ${postFragment}`;
 
 const profilePageQuery = gql`query profilePageQuery($_id: String!) {
-        user(_id : $_id){
-         ...UserView,
-         posts {
-         ...PostView
-             }
-      }
-    
-  
+  user(_id : $_id){
+    ...UserView,
+    posts {
+      ...PostView
+    }
+  }
 }
- ${userFragment}
+${userFragment}
 ${postFragment}
 `;
 
