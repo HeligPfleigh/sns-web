@@ -50,7 +50,9 @@
       font-size: 12px;
     }
     .dropdownNotiPanel {
-      min-width: 350px;
+      min-width: 370px;
+      max-height: 350px;
+      overflow: hidden;
       top:50px;
       border-radius: 0px;
       &:before, &:after {
@@ -61,6 +63,12 @@
         right: 25px;
         border: 10px solid transparent;
         border-bottom-color: #fff;
+      }
+      div.boxNotificationList {
+        max-height: 270px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 105%;
       }
       li {
         margin: 0px;

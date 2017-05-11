@@ -13,6 +13,7 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import s from './Navigation.scss';
 import Link from '../Link';
 import { makeNotificationRead } from '../../actions/chat';
@@ -51,6 +52,8 @@ class Navigation extends React.Component {
     user: React.PropTypes.object,
     data: React.PropTypes.object,
     loadMoreRows: React.PropTypes.func,
+    updateSeen: React.PropTypes.func.isRequired,
+    updateIsRead: React.PropTypes.func.isRequired,
   }
 
   componentDidMount() {
@@ -59,7 +62,8 @@ class Navigation extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { chatNotification, current } = this.props;
-    if (current && chatNotification !== nextProps.chatNotification && nextProps.chatNotification && nextProps.chatNotification[current]) {
+    if (current && chatNotification !== nextProps.chatNotification &&
+      nextProps.chatNotification && nextProps.chatNotification[current]) {
       this.props.makeNotificationRead({ conversationId: current });
     }
   }
@@ -75,12 +79,13 @@ class Navigation extends React.Component {
   }
 
   handleUpdateTitle = () => {
-    const { chatNotification, current } = this.props;
+    const { chatNotification, current, user: { totalNotification } } = this.props;
     const countChatNotification = getNotificationCount(chatNotification, current);
     if (document && document.title) {
       const clearTitle =  document.title.replace(/^(\([0-9\-]+\)\s)/ig, ''); //eslint-disable-line
-      if (countChatNotification > 0) {
-        document.title = `(${countChatNotification}) ${clearTitle}`;
+      if (countChatNotification > 0 || totalNotification > 0) {
+        const cnt = totalNotification + countChatNotification;
+        document.title = `(${cnt}) ${clearTitle}`;
       } else {
         document.title = clearTitle;
       }
@@ -91,6 +96,13 @@ class Navigation extends React.Component {
     history.push(path);
   };
 
+  dropEventHandler = (isOpen) => {
+    const { updateSeen } = this.props;
+    if (isOpen) {
+      updateSeen();
+    }
+  }
+
   render() {
     const {
       isMobile,
@@ -100,6 +112,7 @@ class Navigation extends React.Component {
       user: { totalNotification },
       data: { loading, edges, pageInfo },
       loadMoreRows,
+      updateIsRead,
     } = this.props;
 
     let hasNextPage = false;
@@ -147,7 +160,10 @@ class Navigation extends React.Component {
         </MediaQuery>
 
         <MediaQuery query="(min-width: 992px)">
-          <Dropdown className={s.link} id="dropdown-notification" componentClass="div" pullRight>
+          <Dropdown
+            className={s.link} id="dropdown-notification"
+            componentClass="div" pullRight onToggle={this.dropEventHandler}
+          >
             <CustomToggle bsRole="toggle">
               {
                 totalNotification > 0 &&
@@ -162,7 +178,17 @@ class Navigation extends React.Component {
             </CustomToggle>
             <Dropdown.Menu className={s.dropdownNotiPanel}>
               <MenuItem header className={s.headerItem}>Thông báo</MenuItem>
-              { edges && <NotificationList notifications={edges} userInfo={user} /> }
+              <div className={s.boxNotificationList}>
+                <InfiniteScroll
+                  next={loadMoreRows}
+                  hasMore={hasNextPage}
+                  scrollThreshold={0.7}
+                  loader={<span style={{ display: 'none' }}>Loading...</span>}
+                  endMessage={<span style={{ display: 'none' }}>Loading...</span>}
+                >
+                  { edges && <NotificationList notifications={edges} userInfo={user} updateIsRead={updateIsRead} isHeader /> }
+                </InfiniteScroll>
+              </div>
               <MenuItem className={s.showAllItem} href="/notifications">
                 Xem toàn bộ thông báo
               </MenuItem>

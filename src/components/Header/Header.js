@@ -13,6 +13,7 @@ import { Grid, Row, Col, Button } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
+import update from 'immutability-helper';
 
 import s from './Header.scss';
 import SearchBox from '../SearchBox';
@@ -60,7 +61,7 @@ const NotifyFragment = gql`
 `;
 
 const headerQuery = gql`query headerQuery($cursor: String) {
-  notifications (cursor: $cursor) {
+  notifications (cursor: $cursor, limit: 6) {
     edges {
       ...NotificationView
     }
@@ -77,12 +78,27 @@ ${userFragment}
 ${NotifyFragment}
 `;
 
+const updateSeenQuery = gql`mutation updateSeen {
+  UpdateSeen {
+    ...NotificationView
+  }
+}
+${NotifyFragment}`;
+
+const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
+  UpdateIsRead(_id: $_id) {
+    _id
+  }
+}`;
+
 class Header extends React.Component {
   static propTypes = {
     data: PropTypes.shape({
       loading: PropTypes.bool.isRequired,
     }).isRequired,
     loadMoreRows: PropTypes.func.isRequired,
+    updateSeen: PropTypes.func.isRequired,
+    updateIsRead: PropTypes.func.isRequired,
   };
 
   gotoHomePage =() => {
@@ -90,7 +106,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { data: { notifications, me }, loadMoreRows } = this.props;
+    const { data: { notifications, me }, loadMoreRows, updateSeen, updateIsRead } = this.props;
     return (
       <div className={s.root} >
         <Grid>
@@ -107,13 +123,26 @@ class Header extends React.Component {
             <Col md={6} sm={6} xs={6} >
               <NavRight user={me} />
               <MediaQuery query="(min-width: 992px)">
-                <Navigation user={me} data={notifications} loadMoreRows={loadMoreRows} />
+                <Navigation
+                  user={me}
+                  data={notifications}
+                  loadMoreRows={loadMoreRows}
+                  updateSeen={updateSeen}
+                  updateIsRead={updateIsRead}
+                />
               </MediaQuery>
             </Col>
           </Row>
           <MediaQuery query="(max-width: 992px)">
             <div className={s.boxMobileHeader}>
-              <Navigation user={me} data={notifications} loadMoreRows={loadMoreRows} isMobile />
+              <Navigation
+                user={me}
+                data={notifications}
+                loadMoreRows={loadMoreRows}
+                updateSeen={updateSeen}
+                updateIsRead={updateIsRead}
+                isMobile
+              />
             </div>
           </MediaQuery>
         </Grid>
@@ -126,21 +155,20 @@ export default compose(
   withStyles(s),
   graphql(headerQuery, {
     options: () => ({
-      variables: {},
-      // pollInterval: 20000,
+      pollInterval: 30000,
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
       const loadMoreRows = () => fetchMore({
         variables: {
-          cursor: data.feeds.pageInfo.endCursor,
+          cursor: data.notifications.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.feeds.edges;
-          const pageInfo = fetchMoreResult.feeds.pageInfo;
+          const newEdges = fetchMoreResult.notifications.edges;
+          const pageInfo = fetchMoreResult.notifications.pageInfo;
           return {
-            feeds: {
-              edges: [...previousResult.feeds.edges, ...newEdges],
+            notifications: {
+              edges: [...previousResult.notifications.edges, ...newEdges],
               pageInfo,
             },
           };
@@ -151,5 +179,26 @@ export default compose(
         loadMoreRows,
       };
     },
+  }),
+  graphql(updateSeenQuery, {
+    props: ({ mutate }) => ({
+      updateSeen: () => mutate({
+        variables: {},
+        updateQueries: {
+          headerQuery: previousResult => update(previousResult, {
+            me: {
+              totalNotification: { $set: 0 },
+            },
+          }),
+        },
+      }),
+    }),
+  }),
+  graphql(updateIsReadQuery, {
+    props: ({ mutate }) => ({
+      updateIsRead: _id => mutate({
+        variables: { _id },
+      }),
+    }),
   }),
 )(Header);
