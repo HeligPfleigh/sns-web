@@ -1,0 +1,32 @@
+@import "../../theme/resources.scss";
+
+div.boxNotificationItem {
+  border-bottom: 1px solid #c7d1d8;
+  font-size: 12px;
+  padding: 5px 10px;
+  a {
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
+
+    .avarta {
+      float: left;
+      img {
+        width: 45px;
+        height: 45px;
+        margin-right: 10px;
+      }
+    }
+  }
+  &:hover {
+    background-color: #c7d1d8;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.readStyle {
+  background-color: #e0e4ed;
+}
