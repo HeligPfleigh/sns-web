@@ -23,6 +23,7 @@ class CommentItem extends React.Component {
   }
   render() {
     const { comment } = this.props;
+    const link = `user/${comment.user._id}`;
     return (
       <div className={s.commentPanel}>
         <Col className={s.commentAvarta}>
@@ -33,8 +34,8 @@ class CommentItem extends React.Component {
         <Col className={s.commentContent}>
           <Col
             dangerouslySetInnerHTML={{
-              __html: `<p>${comment.user.profile.firstName}
-              ${comment.user.profile.lastName}</p>
+              __html: `<a href=${link}>${comment.user.profile.firstName}
+              ${comment.user.profile.lastName}<a/>               
               ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}`,
             }}
           />
