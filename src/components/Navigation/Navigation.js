@@ -82,7 +82,8 @@ class Navigation extends React.Component {
     this.handleUpdateTitle();
   }
   onToggleClick = () => {
-    this.props.refetch();
+    // debugger;
+    // this.props.refetch();
   }
   handleUpdateTitle = () => {
     const { chatNotification, current } = this.props;
