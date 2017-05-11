@@ -10,6 +10,7 @@ import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
 import FeedList from './FeedList';
+import Feed from './Feed';
 import s from './Home.scss';
 
 const userFragment = gql`
@@ -36,34 +37,6 @@ const commentFragment = gql`fragment CommentView on CommentSchemas {
   ${userFragment}
 `;
 
-const postFragment = gql`
-  fragment PostView on PostSchemas {
-    _id,
-    message,
-    user {
-      ...UserView,
-    },
-    totalLikes,
-    totalComments,
-    isLiked,
-    createdAt,
-    comments (limit: 2) {
-      _id
-      message
-      user {
-        ...UserView,
-      },
-      parent,
-      reply {
-        ...CommentView
-      },
-      updatedAt,
-    }
-  }
-  ${userFragment}
-  ${commentFragment}
-`;
-
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
     edges {
@@ -79,29 +52,8 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
   },
 }
 ${userFragment}
-${postFragment}
+${Feed.fragments.post} 
 `;
-
-const createNewPost = gql`mutation createNewPost ($message: String!) {
-  createNewPost(message: $message) {
-    ...PostView
-  }
-}
-${postFragment}`;
-
-const likePost = gql`mutation likePost ($postId: String!) {
-  likePost(postId: $postId) {
-    ...PostView
-  }
-}
-${postFragment}`;
-
-const unlikePost = gql`mutation unlikePost ($postId: String!) {
-  unlikePost(postId: $postId) {
-    ...PostView
-  }
-}
-${postFragment}`;
 
 const createNewComment = gql`
   mutation createNewComment (
@@ -245,7 +197,7 @@ export default compose(
       };
     },
   }),
-  graphql(createNewPost, {
+  graphql(Feed.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
       createNewPost: message => mutate({
         variables: { message },
@@ -282,7 +234,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(likePost, {
+  graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
       likePost: (postId, message, totalLikes, totalComments, user) => mutate({
         variables: { postId },
@@ -319,7 +271,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(unlikePost, {
+  graphql(Feed.mutation.unlikePost, {
     props: ({ mutate }) => ({
       unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
         variables: { postId },

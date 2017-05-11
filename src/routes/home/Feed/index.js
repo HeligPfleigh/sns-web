@@ -1,12 +1,13 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image } from 'react-bootstrap';
-import Post, { PostHeader, PostText, PostActions, PostContent } from '../../components/Card';
-import Icon from '../../components/Icon';
-import TimeAgo from '../../components/TimeAgo';
-import Divider from '../../components/Divider';
-import Link from '../../components/Link';
-import CommentList from '../../components/Comments/CommentList';
+import gql from 'graphql-tag';
+import Post, { PostHeader, PostText, PostActions, PostContent } from '../../../components/Card';
+import Icon from '../../../components/Icon';
+import TimeAgo from '../../../components/TimeAgo';
+import Divider from '../../../components/Divider';
+import Link from '../../../components/Link';
+import CommentList from '../../../components/Comments/CommentList';
 import s from './Feed.scss';
 
 function doNothing(e) {
@@ -81,6 +82,84 @@ Feed.propTypes = {
       lastName: PropTypes.string,
     }),
   }),
+};
+
+const userFragment = gql`
+  fragment UserView on UserSchemas {
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    }
+  }
+`;
+
+const commentFragment = gql`fragment CommentView on CommentSchemas {
+    _id,
+    message,
+    user {
+      ...UserView
+    },
+    parent,
+    updatedAt,
+  }
+  ${userFragment}
+`;
+
+Feed.fragments = {
+  post: gql`
+    fragment PostView on PostSchemas {
+      _id,
+      message,
+      user {
+        ...UserView,
+      },
+      totalLikes,
+      totalComments,
+      isLiked,
+      createdAt,
+      comments (limit: 2) {
+        _id
+        message
+        user {
+          ...UserView,
+        },
+        parent,
+        reply {
+          ...CommentView
+        },
+        updatedAt,
+      }
+    }
+    ${userFragment}
+    ${commentFragment}
+  `,
+};
+
+Feed.mutation = {
+  createNewPost: gql`mutation createNewPost ($message: String!) {
+    createNewPost(message: $message) {
+      ...PostView
+    }
+  }
+  ${Feed.fragments.post}
+  `,
+  likePost: gql`mutation likePost ($postId: String!) {
+    likePost(postId: $postId) {
+      ...PostView
+    }
+  }
+  ${Feed.fragments.post}
+  `,
+  unlikePost: gql`mutation unlikePost ($postId: String!) {
+    unlikePost(postId: $postId) {
+      ...PostView
+    }
+  }
+  ${Feed.fragments.post}
+  `,
 };
 
 export default withStyles(s)(Feed);
