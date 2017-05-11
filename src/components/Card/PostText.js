@@ -10,7 +10,8 @@ const PostText = ({ children, html, className }) => (
     <Clearfix />
     { html && <Col
       className={s.postContent}
-      dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(html))) }} />
+      dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(html))) }}
+    />
     }
     {children}
   </div>

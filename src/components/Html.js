@@ -9,7 +9,7 @@
 
 import React, { PropTypes } from 'react';
 import serialize from 'serialize-javascript';
-import { analytics } from '../config';
+import config from '../config';
 
 class Html extends React.Component {
   static propTypes = {
@@ -35,6 +35,7 @@ class Html extends React.Component {
 
   render() {
     const { title, description, styles, cssVendors, scripts, state, children } = this.props;
+    const { analytics } = config;
     return (
       <html className="no-js" lang="en">
         <head>
