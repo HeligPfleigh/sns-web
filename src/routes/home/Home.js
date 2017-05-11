@@ -381,32 +381,33 @@ export default compose(
           homePageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
             const index = previousResult.feeds.edges.findIndex(item => item._id === postId);
-            // if (previousResult.post._id === postId) {
-            //   if (commentId) {
-            //     const index = previousResult.post.comments.findIndex(item => item._id === commentId);
-            //     const commentItem = previousResult.post.comments[index];
+            const currentPost = previousResult.feeds.edges[index];
+            let updatedPost = null;
+            if (currentPost._id !== postId) {
+              return previousResult;
+            }
+            if (commentId) {
+              const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
+              const commentItem = currentPost.comments[indexComment];
+              // init reply value
+              if (!commentItem.reply) {
+                commentItem.reply = [];
+              }
 
-            //     // init reply value
-            //     if (!commentItem.reply) {
-            //       commentItem.reply = [];
-            //     }
-
-            //     // push value into property reply
-            //     commentItem.reply.push(newComment);
-
-            //     return update(previousResult, {
-            //       post: {
-            //         comments: {
-            //           $splice: [[index, 1, commentItem]],
-            //         },
-            //       },
-            //     });
-            //   }
-            const updatedPost = update(previousResult.feeds.edges[index], {
-              comments: {
-                $unshift: [newComment],
-              },
-            });
+              // push value into property reply
+              commentItem.reply.push(newComment);
+              updatedPost = update(currentPost, {
+                comments: {
+                  $splice: [[indexComment, 1, commentItem]],
+                },
+              });
+            } else {
+              updatedPost = update(currentPost, {
+                comments: {
+                  $unshift: [newComment],
+                },
+              });
+            }
             return update(previousResult, {
               feeds: {
                 edges: {
@@ -414,8 +415,6 @@ export default compose(
                 },
               },
             });
-            // }
-            // return previousResult;
           },
         },
       }),
