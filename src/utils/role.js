@@ -39,3 +39,12 @@ export const requireAuth = (route) => {
   }
   return newRoute;
 };
+export const checkAuth = (store) => {
+  const state = store.getState();
+  if (!state.user || !state.user.id) {
+    return {
+      redirect: '/login',
+    };
+  }
+  return false;
+};

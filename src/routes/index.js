@@ -1,35 +1,24 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 /* eslint-disable global-require */
 
 // The top-level (parent) route
-import { requireAuth } from '../utils/role';
-
 export default {
 
   path: '/',
 
   // Keep in mind, routes are evaluated in order
   children: [
-    requireAuth(require('./home').default),
-    requireAuth(require('./friends').default),
-    requireAuth(require('./messages').default),
+    require('./home').default,
+    require('./friends').default,
+    require('./messages').default,
     require('./contact').default,
     require('./login').default,
     require('./register').default,
     require('./about').default,
     require('./privacy').default,
-    requireAuth(require('./post').default),
-    requireAuth(require('./user').default),
-    requireAuth(require('./notifications').default),
-    requireAuth(require('./me').default),
+    require('./notifications').default,
+    require('./post').default,
+    require('./user').default,
+    require('./me').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],
