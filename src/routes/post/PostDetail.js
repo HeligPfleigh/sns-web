@@ -5,87 +5,76 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
-import Post from '../../components/Post';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
+import Feed from '../home/Feed';
 import s from './PostDetail.scss';
-
-const userFragment = gql`
-  fragment frmUserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-
-const postFragment = gql`
-  fragment frmPostView on PostSchemas {
-    _id,
-    message,
-    user {
-      ...frmUserView,
-    },
-    totalLikes,
-    totalComments,
-    isLiked,
-    createdAt,
-  }
-  ${userFragment}
-`;
-
-const commentFragment = gql`fragment frmCommentView on CommentSchemas {
-    _id,
-    message,
-    user {
-      ...frmUserView
-    },
-    parent,
-    updatedAt,
-  }
-  ${userFragment}
-`;
 
 const PostDetailQuery = gql`query PostDetailQuery ($postId: String) {
   post (_id: $postId) {
-    ...frmPostView
-    comments {
-      _id
-      message
-      user {
-        ...frmUserView,
-      },
-      parent,
-      reply {
-        ...frmCommentView
-      },
-      updatedAt,
-    }
+    ...PostView
   }
   me {
-    ...frmUserView,
+    ...UserView,
   },
 }
-${postFragment}
-${userFragment}
-${commentFragment}`;
+${Feed.fragments.post}
+${Feed.fragments.user}`;
 
 const likePostQuery = gql`mutation likePost ($postId: String!) {
   likePost(postId: $postId) {
-    ...frmPostView
+    ...PostView
   }
 }
-${postFragment}`;
+${Feed.fragments.post}`;
 
 const unlikePostQuery = gql`mutation unlikePost ($postId: String!) {
   unlikePost(postId: $postId) {
-    ...frmPostView
+    ...PostView
   }
 }
-${postFragment}`;
+${Feed.fragments.post}`;
+
+const loadCommentsQuery = gql`
+  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+    post (_id: $postId) {
+      _id
+      comments (_id: $commentId, limit: $limit) {
+        _id
+        message
+        user {
+          ...UserView,
+        },
+        parent,
+        reply {
+          ...CommentView
+        },
+        updatedAt,
+      }
+    }
+  }
+  ${Feed.fragments.user}
+  ${Feed.fragments.comment}
+`;
+
+const createNewCommentQuery = gql`
+  mutation createNewComment (
+    $postId: String!,
+    $message: String!,
+    $commentId: String,
+  ) {
+    createNewComment(
+      postId: $postId,
+      message: $message,
+      commentId: $commentId,
+    ) {
+      ...CommentView
+      reply {
+        ...CommentView
+      },
+    }
+  }
+${Feed.fragments.comment}`;
 
 class PostDetail extends Component {
   static propTypes = {
@@ -95,22 +84,24 @@ class PostDetail extends Component {
     }).isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    createNewComment: PropTypes.func.isRequired,
   };
 
   render() {
-    const { data: { loading, post, me }, likePost, unlikePost } = this.props;
-    // console.log(this.props);
+    const { data: { loading, post, me }, likePost, unlikePost, loadMoreComments, createNewComment } = this.props;
     return (
       <Grid>
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
-            { post && <Post
+            { post && <Feed
               data={post}
               likePostEvent={likePost}
               unlikePostEvent={unlikePost}
               userInfo={me}
-              isTimeLineMe={false}
+              loadMoreComments={loadMoreComments}
+              createNewComment={createNewComment}
             />}
           </Col>
 
@@ -134,6 +125,28 @@ export default compose(
         postId: props.postId,
       },
     }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
+        variables: {
+          commentId,
+          limit,
+          postId,
+        },
+        query: loadCommentsQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => update(previousResult, {
+          post: {
+            comments: {
+              $push: fetchMoreResult.post.comments,
+            },
+          },
+        }),
+      });
+      return {
+        data,
+        loadMoreComments,
+      };
+    },
   }),
   graphql(likePostQuery, {
     props: ({ mutate }) => ({
@@ -194,6 +207,69 @@ export default compose(
             return update(previousResult, {
               post: { $set: updatedPost },
             });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(createNewCommentQuery, {
+    props: ({ mutate }) => ({
+      createNewComment: (postId, message, commentId, user) => mutate({
+        variables: { postId, message, commentId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewComment: {
+            __typename: 'CommentSchemas',
+            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            parent: commentId || null,
+            reply: [],
+            updatedAt: (new Date()).toString(),
+          },
+        },
+        updateQueries: {
+          PostDetailQuery: (previousResult, { mutationResult }) => {
+            console.log(previousResult);
+            console.log(mutationResult);
+            const { post } = previousResult;
+            const newComment = mutationResult.data.createNewComment;
+            let updatedPost = null;
+            if (post._id !== postId) {
+              return previousResult;
+            }
+            if (commentId) {
+              const indexComment = post.comments.findIndex(item => item._id === commentId);
+              const commentItem = post.comments[indexComment];
+              // init reply value
+              if (!commentItem.reply) {
+                commentItem.reply = [];
+              }
+
+              // push value into property reply
+              commentItem.reply.push(newComment);
+              updatedPost = update(previousResult, {
+                post: {
+                  comments: {
+                    $splice: [[indexComment, 1, commentItem]],
+                  },
+                },
+              });
+            } else {
+              updatedPost = update(previousResult, {
+                post: {
+                  comments: {
+                    $unshift: [newComment],
+                  },
+                },
+              });
+            }
+            return update(previousResult, { $set: updatedPost });
           },
         },
       }),
