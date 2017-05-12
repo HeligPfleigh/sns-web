@@ -33,7 +33,11 @@ const updateProfile = gql`mutation updateProfile ($profile: UpdateProfileInput!)
 class Info extends React.Component {
 
   static propTypes = {
-    profile: PropTypes.object.isRequired,
+    profile: PropTypes.shape({
+      picture: PropTypes.string.isRequired,
+      firstName: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+    }).isRequired,
     updateProfile: PropTypes.func.isRequired,
     isMe: PropTypes.bool.isRequired,
   };

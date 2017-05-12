@@ -75,18 +75,29 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
 ${postFragment}`;
 
 class Me extends React.Component {
+
   static propTypes = {
-    data: PropTypes.object,
+    data: PropTypes.shape({
+      me: PropTypes.shape({
+        posts: PropTypes.arrayOf(PropTypes.object).isRequired,
+        profile: PropTypes.shape({
+          picture: PropTypes.string.isRequired,
+          firstName: PropTypes.string.isRequired,
+          lastName: PropTypes.string.isRequired,
+        }).isRequired,
+      }).isRequired,
+    }).isRequired,
     createNewPost: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
-    query: PropTypes.object.isRequired,
+    query: PropTypes.shape({
+      tab: PropTypes.string.isRequired,
+    }),
   };
 
   render() {
     const { data: { me }, query } = this.props;
-
-    const edges = me ? me.posts : [];
+    const posts = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
     const numbers = 100;
@@ -115,7 +126,7 @@ class Me extends React.Component {
                   <div className={s.parent}>
                     <NewPost createNewPost={this.props.createNewPost} />
                   </div>
-                  { edges.map(data => (
+                  { posts.map(data => (
                     <Feed
                       key={data._id}
                       data={data}
