@@ -74,6 +74,8 @@ Feed.propTypes = {
   }),
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
   userInfo: PropTypes.shape({
     _id: PropTypes.string,
     profile: PropTypes.shape({

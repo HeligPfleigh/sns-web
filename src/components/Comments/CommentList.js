@@ -43,7 +43,7 @@ class CommentList extends React.Component {
 
   hasMore = () => {
     const { totalComments, comments } = this.props;
-    return totalComments > comments.length;
+    return comments && totalComments > comments.length;
   }
 
   loadMoreComments = (evt) => {
@@ -61,14 +61,11 @@ class CommentList extends React.Component {
     const { initContent, commentId, isSubForm } = this.state;
 
     return (
-      <div>
-        {this.hasMore() && <a
-          onClick={this.loadMoreComments} style={{
-            fontSize: 12,
-          }}
-        >Xem thêm</a>
-        }
-        {comments.map(item => (
+      <div className={s.commentContent}>
+        {this.hasMore() && <a onClick={this.loadMoreComments}>
+          <i className="fa fa-hand-o-right" aria-hidden="true"></i> Xem thêm
+        </a>}
+        { comments && comments.map(item => (
           <span key={item._id}>
             <CommentItem comment={item} showCommentForm={this.showCommentForm} />
             {item && item.reply && item.reply.map(_item => (
@@ -77,7 +74,6 @@ class CommentList extends React.Component {
               </span>
             ))}
             { commentId === item._id && <ScrollableAnchor id={`#add-comment-${item._id}`}>
-              123
               <span className={s.subComment}>
                 <NewComment
                   initContent={initContent}
