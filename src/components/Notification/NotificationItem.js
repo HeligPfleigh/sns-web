@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { NOTIFY_TYPES } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
+import history from '../../core/history';
 
 const getActorsContent = (actors) => {
   if (actors && actors.length > 0) {
@@ -17,7 +18,12 @@ const getActorsContent = (actors) => {
   return '';
 };
 
-const getNotifyContent = (currentUser, author, type, actors, message) => {
+const collectionNotifyMessages = {
+  [NOTIFY_TYPES[1]]: lastContent => ` vừa bình luận bài viết ${lastContent}.`,
+  [NOTIFY_TYPES[2]]: () => ' vừ:cập nhật trạng thái.',
+};
+
+const getNotifyContent = (currentUser, author, type, actors) => {
   if (actors && actors.length > 0) {
     const {
       _id: userId,
@@ -36,17 +42,9 @@ const getNotifyContent = (currentUser, author, type, actors, message) => {
       // }
     }
 
-    let notifyContent;
-    switch (type) {
-      case NOTIFY_TYPES[1]:
-        notifyContent = ` vừa bình luận bài viết ${lastContent}.`;
-        break;
-      case NOTIFY_TYPES[2]:
-        notifyContent = ' vừa cập nhật trạng thái.';
-        break;
-      default:
-        notifyContent = ` vừa thích bài viết ${lastContent}.`;
-        break;
+    let notifyContent = ` vừa thích bài viết ${lastContent}.`;
+    if (type && collectionNotifyMessages[type]) {
+      notifyContent = collectionNotifyMessages[type](lastContent);
     }
 
     return notifyContent;
@@ -64,6 +62,7 @@ class NotificationItem extends React.Component {
     }),
     userInfo: PropTypes.object.isRequired,
     updateIsRead: PropTypes.func.isRequired,
+    hidePopup: PropTypes.func,
   };
 
   constructor(props) {
@@ -75,9 +74,22 @@ class NotificationItem extends React.Component {
 
   onClick = (e) => {
     e.preventDefault();
-    const { data: { _id, subject: { _id: subjectId } }, updateIsRead } = this.props;
+    const {
+      data: {
+        _id,
+        subject: {
+          _id: subjectId,
+        },
+      },
+      updateIsRead,
+      hidePopup,
+    } = this.props;
+
     updateIsRead(_id);
-    window.location.href = `/post/${subjectId}`;
+    if (hidePopup) {
+      hidePopup();
+    }
+    history.push(`/post/${subjectId}`);
   }
 
   render() {

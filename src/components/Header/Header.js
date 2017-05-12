@@ -87,9 +87,9 @@ ${NotifyFragment}`;
 
 const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
   UpdateIsRead(_id: $_id) {
-    _id
+    ...NotificationView
   }
-}`;
+}${NotifyFragment}`;
 
 class Header extends React.Component {
   static propTypes = {
@@ -198,6 +198,19 @@ export default compose(
     props: ({ mutate }) => ({
       updateIsRead: _id => mutate({
         variables: { _id },
+        updateQueries: {
+          headerQuery: (previousResult, { mutationResult }) => {
+            const result = mutationResult.data.UpdateIsRead;
+            const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
+            return update(previousResult, {
+              notifications: {
+                edges: {
+                  $splice: [[index, 1, result]],
+                },
+              },
+            });
+          },
+        },
       }),
     }),
   }),

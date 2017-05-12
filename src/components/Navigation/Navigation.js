@@ -55,6 +55,12 @@ class Navigation extends React.Component {
     updateSeen: React.PropTypes.func.isRequired,
     updateIsRead: React.PropTypes.func.isRequired,
   }
+  constructor(props) {
+    super(props);
+    this.state = {
+      isOpen: false,
+    };
+  }
 
   componentDidMount() {
     this.handleUpdateTitle();
@@ -101,6 +107,15 @@ class Navigation extends React.Component {
     if (isOpen) {
       updateSeen();
     }
+    this.setState({
+      isOpen,
+    });
+  }
+
+  popupHandler = () => {
+    this.setState({
+      isOpen: !this.state.isOpen,
+    });
   }
 
   render() {
@@ -114,6 +129,8 @@ class Navigation extends React.Component {
       loadMoreRows,
       updateIsRead,
     } = this.props;
+
+    const { isOpen } = this.state;
 
     let hasNextPage = false;
     if (!loading && pageInfo) {
@@ -163,6 +180,7 @@ class Navigation extends React.Component {
           <Dropdown
             className={s.link} id="dropdown-notification"
             componentClass="div" pullRight onToggle={this.dropEventHandler}
+            open={isOpen}
           >
             <CustomToggle bsRole="toggle">
               {
@@ -186,10 +204,16 @@ class Navigation extends React.Component {
                   loader={<span style={{ display: 'none' }}>Loading...</span>}
                   endMessage={<span style={{ display: 'none' }}>Loading...</span>}
                 >
-                  { edges && <NotificationList notifications={edges} userInfo={user} updateIsRead={updateIsRead} isHeader /> }
+                  { edges && <NotificationList
+                    notifications={edges}
+                    userInfo={user}
+                    updateIsRead={updateIsRead}
+                    hidePopup={this.popupHandler}
+                    isHeader
+                  /> }
                 </InfiniteScroll>
               </div>
-              <MenuItem className={s.showAllItem} href="/notifications">
+              <MenuItem className={s.showAllItem} onClick={() => this.navEventHandler('/notifications')}>
                 Xem toàn bộ thông báo
               </MenuItem>
             </Dropdown.Menu>

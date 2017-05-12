@@ -14,6 +14,8 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
+import update from 'immutability-helper';
+
 import FriendSuggestions from '../../components/FriendSuggestions';
 import { NotificationList } from '../../components/Notification';
 import Loading from '../../components/Loading';
@@ -75,9 +77,9 @@ ${notificationFragment}`;
 
 const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
   UpdateIsRead(_id: $_id) {
-    _id
+    ...frmNotificationView
   }
-}`;
+}${notificationFragment}`;
 
 class Notifications extends Component {
   static propTypes = {
@@ -127,7 +129,7 @@ class Notifications extends Component {
 export default compose(
   withStyles(s),
   graphql(notificationQuery, {
-    options: () => ({}),
+    // options: () => ({}),
     props: ({ data }) => {
       const { fetchMore } = data;
       const loadMoreRows = () => fetchMore({
@@ -152,9 +154,25 @@ export default compose(
     },
   }),
   graphql(updateIsReadQuery, {
+    options: () => ({
+      pollInterval: 30000,
+    }),
     props: ({ mutate }) => ({
       updateIsRead: _id => mutate({
         variables: { _id },
+        updateQueries: {
+          headerQuery: (previousResult, { mutationResult }) => {
+            const result = mutationResult.data.UpdateIsRead;
+            const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
+            return update(previousResult, {
+              notifications: {
+                edges: {
+                  $splice: [[index, 1, result]],
+                },
+              },
+            });
+          },
+        },
       }),
     }),
   }),

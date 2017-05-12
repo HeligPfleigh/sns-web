@@ -13,10 +13,11 @@ class NotificationList extends React.Component {
     userInfo: PropTypes.object.isRequired,
     isHeader: PropTypes.bool,
     updateIsRead: PropTypes.func.isRequired,
+    hidePopup: PropTypes.func,
   };
 
   render() {
-    const { notifications, userInfo, isHeader, updateIsRead } = this.props;
+    const { notifications, userInfo, isHeader, updateIsRead, hidePopup } = this.props;
     const header = isHeader || false;
     return (
       <span>
@@ -25,6 +26,7 @@ class NotificationList extends React.Component {
             key={`notification-${header ? 'header' : 'page'}-${item._id}`}
             data={item} userInfo={userInfo}
             updateIsRead={updateIsRead}
+            hidePopup={hidePopup}
           />
         ))}
       </span>
