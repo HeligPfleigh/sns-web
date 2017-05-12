@@ -8,7 +8,7 @@ import MediaQuery from 'react-responsive';
 import Post from '../../components/Post';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
-import s from './Post.scss';
+import s from './PostDetail.scss';
 
 const userFragment = gql`
   fragment frmUserView on UserSchemas {
