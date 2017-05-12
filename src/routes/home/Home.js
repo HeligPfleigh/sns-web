@@ -13,22 +13,10 @@ import FeedList from './FeedList';
 import Feed from './Feed';
 import s from './Home.scss';
 
-const userFragment = gql`
-  fragment HomeUserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
     edges {
-      ...HomePostView
+      ...PostView
     }
     pageInfo {
       endCursor,
@@ -36,11 +24,52 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
     }
   }
   me {
-    ...HomeUserView,
+    ...UserView,
   },
 }
-${userFragment}
+${Feed.fragments.user}
 ${Feed.fragments.post}`;
+
+const createNewCommentQuery = gql`
+  mutation createNewComment (
+    $postId: String!,
+    $message: String!,
+    $commentId: String,
+  ) {
+    createNewComment(
+      postId: $postId,
+      message: $message,
+      commentId: $commentId,
+    ) {
+      ...CommentView
+      reply {
+        ...CommentView
+      },
+    }
+  }
+${Feed.fragments.comment}`;
+
+const loadCommentsQuery = gql`
+  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+    post (_id: $postId) {
+      _id
+      comments (_id: $commentId, limit: $limit) {
+        _id
+        message
+        user {
+          ...UserView,
+        },
+        parent,
+        reply {
+          ...CommentView
+        },
+        updatedAt,
+      }
+    }
+  }
+  ${Feed.fragments.user}
+  ${Feed.fragments.comment}
+`;
 
 class Home extends Component {
   static propTypes = {
@@ -52,6 +81,8 @@ class Home extends Component {
     loadMoreRows: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    createNewComment: PropTypes.func.isRequired,
   };
 
   render() {
@@ -123,25 +154,7 @@ export default compose(
           limit,
           postId,
         },
-        query: gql`query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
-          post (_id: $postId) {
-            _id
-            comments (_id: $commentId, limit: $limit) {
-              _id
-              message
-              user {
-                ...UserView,
-              },
-              parent,
-              reply {
-                ...CommentView
-              },
-              updatedAt,
-            }
-          }
-        }
-        ${userFragment}
-        ${commentFragment}`,
+        query: loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
 
@@ -277,7 +290,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(createNewComment, {
+  graphql(createNewCommentQuery, {
     props: ({ mutate }) => ({
       createNewComment: (postId, message, commentId, user) => mutate({
         variables: { postId, message, commentId },
