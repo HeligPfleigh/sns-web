@@ -92,14 +92,6 @@ const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
 }${NotifyFragment}`;
 
 class Header extends React.Component {
-  static propTypes = {
-    data: PropTypes.shape({
-      loading: PropTypes.bool.isRequired,
-    }).isRequired,
-    loadMoreRows: PropTypes.func.isRequired,
-    updateSeen: PropTypes.func.isRequired,
-    updateIsRead: PropTypes.func.isRequired,
-  };
 
   gotoHomePage =() => {
     history.push('/');
@@ -150,6 +142,28 @@ class Header extends React.Component {
     );
   }
 }
+
+const doNothing = (e) => {
+  if (e) {
+    e.preventDefault();
+  }
+};
+
+Header.propTypes = {
+  data: PropTypes.shape({
+    loading: PropTypes.bool.isRequired,
+  }).isRequired,
+  loadMoreRows: PropTypes.func.isRequired,
+  updateSeen: PropTypes.func.isRequired,
+  updateIsRead: PropTypes.func.isRequired,
+};
+
+Header.defaultProps = {
+  data: {},
+  loadMoreRows: doNothing,
+  updateSeen: doNothing,
+  updateIsRead: doNothing,
+};
 
 export default compose(
   withStyles(s),

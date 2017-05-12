@@ -77,17 +77,6 @@ const createNewCommentQuery = gql`
 ${Feed.fragments.comment}`;
 
 class PostDetail extends Component {
-  static propTypes = {
-    data: PropTypes.shape({
-      feeds: PropTypes.object,
-      loading: PropTypes.bool.isRequired,
-    }).isRequired,
-    likePost: PropTypes.func.isRequired,
-    unlikePost: PropTypes.func.isRequired,
-    loadMoreComments: PropTypes.func.isRequired,
-    createNewComment: PropTypes.func.isRequired,
-  };
-
   render() {
     const { data: { loading, post, me }, likePost, unlikePost, loadMoreComments, createNewComment } = this.props;
     return (
@@ -115,6 +104,36 @@ class PostDetail extends Component {
     );
   }
 }
+
+const doNothing = (e) => {
+  if (e) e.preventDefault();
+};
+
+PostDetail.defaultProps = {
+  data: {
+    post: {
+      comments: [],
+    },
+    loading: false,
+  },
+  likePost: doNothing,
+  unlikePost: doNothing,
+  loadMoreComments: doNothing,
+  createNewComment: doNothing,
+};
+
+PostDetail.propTypes = {
+  data: PropTypes.shape({
+    post: PropTypes.shape({
+      comments: PropTypes.array.isRequired,
+    }).isRequired,
+    loading: PropTypes.bool.isRequired,
+  }).isRequired,
+  likePost: PropTypes.func.isRequired,
+  unlikePost: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
+};
 
 export default compose(
   withStyles(s),
@@ -235,8 +254,6 @@ export default compose(
         },
         updateQueries: {
           PostDetailQuery: (previousResult, { mutationResult }) => {
-            console.log(previousResult);
-            console.log(mutationResult);
             const { post } = previousResult;
             const newComment = mutationResult.data.createNewComment;
             let updatedPost = null;

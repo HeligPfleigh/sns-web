@@ -9,17 +9,6 @@ import NewComment from './NewComment';
 configureAnchors({ offset: -160, scrollDuration: 200 });
 
 class CommentList extends React.Component {
-  static propTypes = {
-    comments: PropTypes.arrayOf(PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-    })).isRequired,
-    postId: PropTypes.string.isRequired,
-    isFocus: PropTypes.bool.isRequired,
-    user: PropTypes.object.isRequired,
-    // createNewComment: PropTypes.func.isRequired,
-    loadMoreComments: PropTypes.func.isRequired,
-    totalComments: PropTypes.number.isRequired,
-  };
 
   constructor(props) {
     super(props);
@@ -96,6 +85,12 @@ class CommentList extends React.Component {
   }
 }
 
+const doNothing = (e) => {
+  if (e) {
+    e.preventDefault();
+  }
+};
+
 CommentList.propTypes = {
   comments: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -106,6 +101,14 @@ CommentList.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   totalComments: PropTypes.number.isRequired,
+};
+
+CommentList.defaultProps = {
+  comments: [],
+  isFocus: false,
+  createNewComment: doNothing,
+  loadMoreComments: doNothing,
+  totalComments: doNothing,
 };
 
 export default withStyles(s)(CommentList);

@@ -54,23 +54,6 @@ const getNotifyContent = (currentUser, author, type, actors) => {
 };
 
 class NotificationItem extends React.Component {
-  static propTypes = {
-    data: PropTypes.shape({
-      _id: PropTypes.string,
-      message: PropTypes.string,
-      user: PropTypes.object,
-    }),
-    userInfo: PropTypes.object.isRequired,
-    updateIsRead: PropTypes.func.isRequired,
-    hidePopup: PropTypes.func,
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFocus: false,
-    };
-  }
 
   onClick = (e) => {
     e.preventDefault();
@@ -80,15 +63,19 @@ class NotificationItem extends React.Component {
         subject: {
           _id: subjectId,
         },
+        isRead,
       },
       updateIsRead,
       hidePopup,
     } = this.props;
 
-    updateIsRead(_id);
-    if (hidePopup) {
-      hidePopup();
-    }
+    // check and call func update notification
+    if (isRead) updateIsRead(_id);
+
+    // Change state dropdown open=false;
+    if (hidePopup) hidePopup();
+
+    // redirect to PostDetail Page
     history.push(`/post/${subjectId}`);
   }
 
@@ -132,5 +119,31 @@ class NotificationItem extends React.Component {
     );
   }
 }
+
+const doNothing = (e) => {
+  if (e) e.preventDefault();
+};
+
+NotificationItem.defaultProps = {
+  data: {
+    _id: '',
+    message: '',
+    user: {},
+  },
+  userInfo: {},
+  updateIsRead: doNothing,
+  hidePopup: doNothing,
+};
+
+NotificationItem.propTypes = {
+  data: PropTypes.shape({
+    _id: PropTypes.string,
+    message: PropTypes.string,
+    user: PropTypes.object,
+  }),
+  userInfo: PropTypes.object.isRequired,
+  updateIsRead: PropTypes.func.isRequired,
+  hidePopup: PropTypes.func,
+};
 
 export default withStyles(s)(NotificationItem);

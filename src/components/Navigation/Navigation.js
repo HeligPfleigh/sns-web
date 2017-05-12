@@ -39,28 +39,8 @@ const getNotificationCount = (chatNotification, current) => {
   { makeNotificationRead },
 )
 class Navigation extends React.Component {
-  static defaultProps = {
-    isMobile: false,
-  }
 
-  static propTypes = {
-    isMobile: React.PropTypes.bool,
-    chatNotification: React.PropTypes.object,
-    location: React.PropTypes.object,
-    current: React.PropTypes.string,
-    makeNotificationRead: React.PropTypes.func.isRequired,
-    user: React.PropTypes.object,
-    data: React.PropTypes.object,
-    loadMoreRows: React.PropTypes.func,
-    updateSeen: React.PropTypes.func.isRequired,
-    updateIsRead: React.PropTypes.func.isRequired,
-  }
-  constructor(props) {
-    super(props);
-    this.state = {
-      isOpen: false,
-    };
-  }
+  state = { isOpen: false };
 
   componentDidMount() {
     this.handleUpdateTitle();
@@ -107,15 +87,17 @@ class Navigation extends React.Component {
     if (isOpen) {
       updateSeen();
     }
-    this.setState({
+    this.setState(prevState => ({
+      ...prevState,
       isOpen,
-    });
+    }));
   }
 
   popupHandler = () => {
-    this.setState({
-      isOpen: !this.state.isOpen,
-    });
+    this.setState(prevState => ({
+      ...prevState,
+      isOpen: !prevState.isOpen,
+    }));
   }
 
   render() {
@@ -223,5 +205,35 @@ class Navigation extends React.Component {
     );
   }
 }
+
+const doNothing = (e) => {
+  if (e) e.preventDefault();
+};
+
+Navigation.defaultProps = {
+  isMobile: false,
+  chatNotification: {},
+  location: {},
+  current: '',
+  makeNotificationRead: doNothing,
+  user: {},
+  data: {},
+  loadMoreRows: doNothing,
+  updateSeen: doNothing,
+  updateIsRead: doNothing,
+};
+
+Navigation.propTypes = {
+  isMobile: React.PropTypes.bool,
+  chatNotification: React.PropTypes.object,
+  location: React.PropTypes.object,
+  current: React.PropTypes.string,
+  makeNotificationRead: React.PropTypes.func.isRequired,
+  user: React.PropTypes.object,
+  data: React.PropTypes.object,
+  loadMoreRows: React.PropTypes.func,
+  updateSeen: React.PropTypes.func.isRequired,
+  updateIsRead: React.PropTypes.func.isRequired,
+};
 
 export default withStyles(s)(Navigation);
