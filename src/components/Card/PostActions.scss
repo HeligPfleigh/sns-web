@@ -7,6 +7,9 @@
   a {
     padding-right: 5%;
     font-size: 13px;
+    &:hover, &:active {
+      text-decoration: none;
+    }
     span {
       display: inline-block;
       vertical-align: -webkit-baseline-middle;
