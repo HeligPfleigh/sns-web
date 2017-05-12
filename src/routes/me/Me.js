@@ -10,7 +10,7 @@ import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
-import Post from '../../components/Post';
+import Feed from '../home/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
 const userFragment = gql`
@@ -116,7 +116,7 @@ class Me extends React.Component {
                     <NewPost createNewPost={this.props.createNewPost} />
                   </div>
                   { edges.map(data => (
-                    <Post
+                    <Feed
                       key={data._id}
                       data={data}
                       userInfo={me}
