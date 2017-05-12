@@ -112,7 +112,7 @@ class Header extends React.Component {
                 <SearchBox isMobile />
               </MediaQuery>
             </Col>
-            <Col md={6} sm={6} xs={6} >
+            <Col md={6} sm={6} xs={6}>
               <NavRight user={me} />
               <MediaQuery query="(min-width: 992px)">
                 <Navigation

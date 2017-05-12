@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -6,21 +6,18 @@ import {
   Image,
   Col,
 } from 'react-bootstrap';
-import Link from '../Link';
-import TimeAgo from '../TimeAgo';
-import s from './CommentStyle.scss';
+import Link from '../../Link';
+import TimeAgo from '../../TimeAgo';
+import s from './CommentItem.scss';
 
-class CommentItem extends React.Component {
-  static propTypes = {
-    comment: PropTypes.object.isRequired,
-    showCommentForm: PropTypes.func,
-  };
+class CommentItem extends Component {
 
   showCommentFormHandle = (e) => {
     e.preventDefault();
     const { comment } = this.props;
     this.props.showCommentForm(comment);
   }
+
   render() {
     const { comment } = this.props;
     const link = `user/${comment.user._id}`;
@@ -49,5 +46,10 @@ class CommentItem extends React.Component {
     );
   }
 }
+
+CommentItem.propTypes = {
+  comment: PropTypes.object.isRequired,
+  showCommentForm: PropTypes.isRequired,
+};
 
 export default withStyles(s)(CommentItem);
