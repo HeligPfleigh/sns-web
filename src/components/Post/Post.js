@@ -36,7 +36,6 @@ class Post extends React.Component {
     e.preventDefault();
     this.setState({
       isFocus: !this.state.isFocus,
-
     });
     const { data: { _id } } = this.props;
     goToAnchor(`#add-comment-${_id}`);

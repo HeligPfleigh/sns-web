@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
 import Draft, {
@@ -15,8 +15,8 @@ import {
 } from 'react-bootstrap';
 
 import s from './NewComment.css';
-import HandleSpan from '../Common/Editor/HandleSpan';
-import HashtagSpan from '../Common/Editor/HashtagSpan';
+import HandleSpan from '../../Common/Editor/HandleSpan';
+import HashtagSpan from '../../Common/Editor/HashtagSpan';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -64,15 +64,7 @@ const compositeDecorator = new CompositeDecorator([{
 }]);
 
 /** NewPost Component */
-class NewPost extends React.Component {
-  static propTypes = {
-    // initContent: PropTypes.string,
-    commentId: PropTypes.string,
-    isFocus: PropTypes.bool.isRequired,
-    postId: PropTypes.string.isRequired,
-    user: PropTypes.object.isRequired,
-    createNewComment: PropTypes.func.isRequired,
-  };
+class NewPost extends Component {
 
   constructor(props) {
     super(props);
@@ -155,5 +147,14 @@ class NewPost extends React.Component {
     );
   }
 }
+
+NewPost.propTypes = {
+  // initContent: PropTypes.string,
+  commentId: PropTypes.string,
+  isFocus: PropTypes.bool.isRequired,
+  postId: PropTypes.string.isRequired,
+  user: PropTypes.object.isRequired,
+  createNewComment: PropTypes.func.isRequired,
+};
 
 export default withStyles(s)(NewPost);

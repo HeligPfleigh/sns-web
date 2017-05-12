@@ -1,91 +1,14 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-import update from 'immutability-helper';
 import { Clearfix } from 'react-bootstrap';
-import ScrollableAnchor, { configureAnchors } from 'react-scrollable-anchor';
+import ScrollableAnchor, { configureAnchors, goToAnchor } from 'react-scrollable-anchor';
 import s from './CommentStyle.scss';
 import CommentItem from './CommentItem';
-import NewComment from '../NewComment/NewComment';
+import NewComment from './NewComment';
 
 configureAnchors({ offset: -160, scrollDuration: 200 });
 
-const userFragment = gql`
-  fragment UserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-
-const commentFragment = gql`fragment CommentView on CommentSchemas {
-    _id,
-    message,
-    user {
-      ...UserView
-    },
-    parent,
-    updatedAt,
-  }
-  ${userFragment}
-`;
-
-const loadCommentsQuery = gql`query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
-  post (_id: $postId) {
-    _id
-    comments (_id: $commentId, limit: $limit) {
-      _id
-      message
-      user {
-        ...UserView,
-      },
-      parent,
-      reply {
-        ...CommentView
-      },
-      updatedAt,
-    }
-  }
-}
-${userFragment}
-${commentFragment}`;
-
-const createNewComment = gql`
-  mutation createNewComment (
-    $postId: String!,
-    $message: String!,
-    $commentId: String,
-  ) {
-    createNewComment(
-      postId: $postId,
-      message: $message,
-      commentId: $commentId,
-    ) {
-      ...CommentView
-      reply {
-        ...CommentView
-      },
-    }
-  }
-${commentFragment}`;
-
-class CommentList extends React.Component {
-  static propTypes = {
-    comments: PropTypes.arrayOf(PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-    })).isRequired,
-    postId: PropTypes.string.isRequired,
-    isFocus: PropTypes.bool.isRequired,
-    user: PropTypes.object.isRequired,
-    // createNewComment: PropTypes.func.isRequired,
-    loadMoreComments: PropTypes.func.isRequired,
-    totalComments: PropTypes.number.isRequired,
-  };
+class CommentList extends Component {
 
   constructor(props) {
     super(props);
@@ -93,6 +16,9 @@ class CommentList extends React.Component {
       commentId: null,
       isSubForm: false,
     };
+    if (process.env.BROWSER) {
+      window.goToAnchor = goToAnchor;
+    }
   }
 
   showCommentForm = ({ _id, parent, user }) => {
@@ -140,6 +66,7 @@ class CommentList extends React.Component {
               </span>
             ))}
             { commentId === item._id && <ScrollableAnchor id={`#add-comment-${item._id}`}>
+              123
               <span className={s.subComment}>
                 <NewComment
                   initContent={initContent}
@@ -161,107 +88,17 @@ class CommentList extends React.Component {
     );
   }
 }
-/**
-export default compose(
-  withStyles(s),
-  graphql(loadCommentsQuery, {
-    options: props => ({
-      variables: {
-        postId: props.postId,
-      },
-      // fetchPolicy: 'cache-only',
-    }),
-    props: ({ data, ownProps }) => {
-      const { fetchMore } = data;
-      const comments = data.post ? data.post.comments : [];
-      let commentId = null;
-      if (comments.length !== 0) {
-        commentId = comments[comments.length - 1]._id;
-      }
 
-      const loadMoreComments = () => fetchMore({
-        variables: {
-          postId: ownProps.postId,
-          commentId,
-          limit: 5,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { return previousResult; }
-          return update(previousResult, {
-            post: {
-              comments: {
-                $push: fetchMoreResult.post.comments,
-              },
-            },
-          });
-        },
-      });
-      return {
-        data,
-        comments: comments.slice().reverse(),
-        loadMoreComments,
-      };
-    },
-  }),
-  graphql(createNewComment, {
-    props: ({ mutate }) => ({
-      createNewComment: (postId, message, commentId, user) => mutate({
-        variables: { postId, message, commentId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          createNewComment: {
-            __typename: 'CommentSchemas',
-            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
-            message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
-            },
-            parent: commentId || null,
-            reply: [],
-            updatedAt: new Date(),
-          },
-        },
-        updateQueries: {
-          loadCommentsQuery: (previousResult, { mutationResult }) => {
-            const newComment = mutationResult.data.createNewComment;
-            if (previousResult.post._id === postId) {
-              if (commentId) {
-                const index = previousResult.post.comments.findIndex(item => item._id === commentId);
-                const commentItem = previousResult.post.comments[index];
+CommentList.propTypes = {
+  comments: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+  })).isRequired,
+  postId: PropTypes.string.isRequired,
+  isFocus: PropTypes.bool.isRequired,
+  user: PropTypes.object.isRequired,
+  createNewComment: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  totalComments: PropTypes.number.isRequired,
+};
 
-                // init reply value
-                if (!commentItem.reply) {
-                  commentItem.reply = [];
-                }
-
-                // push value into property reply
-                commentItem.reply.push(newComment);
-
-                return update(previousResult, {
-                  post: {
-                    comments: {
-                      $splice: [[index, 1, commentItem]],
-                    },
-                  },
-                });
-              }
-              return update(previousResult, {
-                post: {
-                  comments: {
-                    $unshift: [newComment],
-                  },
-                },
-              });
-            }
-            return previousResult;
-          },
-        },
-      }),
-    }),
-  }),
-)(CommentList);
-*/
 export default withStyles(s)(CommentList);
