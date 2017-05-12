@@ -28,6 +28,7 @@ export default {
     require('./privacy').default,
     requireAuth(require('./post').default),
     requireAuth(require('./user').default),
+    
     require('./me').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
