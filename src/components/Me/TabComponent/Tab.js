@@ -8,19 +8,23 @@ import { MY_TIME_LINE, MY_INFO } from '../../../constants';
 class Tab extends Component {
   static propTypes = {
     stateChildShow: PropTypes.string.isRequired,
+    isMe: PropTypes.bool.isRequired,
+    id: PropTypes.string,
   };
 
   render() {
+    const { isMe, id } = this.props;
+
     return (
       <ul className={s.tab}>
         <li className={this.props.stateChildShow === MY_TIME_LINE ? s.active : ''}>
-          <Link to="/me" className={s.button}>
+          <Link to={isMe ? '/me' : `/user/${id}`} className={s.button}>
             Dòng thời gian
             <i className="fa fa-sort-asc"></i>
           </Link>
         </li>
         <li className={this.props.stateChildShow === MY_INFO ? s.active : ''}>
-          <Link to={`/me?tab=${MY_INFO}`} className={s.button}>
+          <Link to={isMe ? `/me?tab=${MY_INFO}` : `/user/${id}?tab=${MY_INFO}`} className={s.button}>
             Thông tin <i className="fa fa-sort-asc"></i>
           </Link>
         </li>
