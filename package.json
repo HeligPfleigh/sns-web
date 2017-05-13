@@ -22,6 +22,7 @@
     "compression": "^1.6.2",
     "cookie-parser": "^1.4.3",
     "core-js": "^2.4.1",
+    "cross-env": "^5.0.0",
     "draft-js": "^0.10.0",
     "draft-js-export-html": "^0.5.2",
     "express": "^4.14.1",
@@ -97,12 +98,11 @@
     "babel-types": "^6.22.0",
     "bootstrap-loader": "^2.0.0",
     "browser-sync": "^2.18.7",
-    "chai": "^3.5.0",
     "chokidar": "^1.6.1",
     "css-loader": "^0.28.0",
     "downgrade-webpack-loader-config": "^0.1.2",
     "editorconfig-tools": "^0.1.1",
-    "enzyme": "^2.7.1",
+    "enzyme": "^2.8.2",
     "eslint": "^3.15.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-loader": "^1.6.1",
@@ -114,11 +114,11 @@
     "file-loader": "^0.10.0",
     "front-matter": "^2.1.2",
     "glob": "^7.1.1",
+    "jest-cli": "^20.0.1",
     "json-loader": "^0.5.4",
     "lint-staged": "^3.3.0",
     "markdown-it": "^8.2.2",
     "mkdirp": "^0.5.1",
-    "mocha": "^3.2.0",
     "node-sass": "^4.5.2",
     "pixrem": "^3.0.2",
     "pleeease-filters": "^3.0.0",
@@ -194,7 +194,8 @@
       "__DEV__": true
     },
     "env": {
-      "browser": true
+      "browser": true,
+      "jest": true
     },
     "rules": {
       "import/extensions": "off",
@@ -241,13 +242,35 @@
       "git add"
     ]
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/**/*.test.{js,jsx}"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 98,
+        "branches": 91,
+        "functions": 98,
+        "lines": 98
+      }
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "moduleNameMapper": {
+      ".*\\.(css|less|styl|scss|sass)$": "<rootDir>/test/cssModule.js",
+      ".*\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/image.js"
+    },
+    "setupTestFrameworkScriptFile": "<rootDir>/test/test-bundler.js",
+    "testRegex": "tests/.*\\.test\\.js$"
+  },
   "scripts": {
     "lint:js": "eslint src tools --fix",
     "lint:css": "stylelint \"src/**/*.{css,less,scss,sss}\"",
     "lint:staged": "lint-staged",
     "lint": "yarn run lint:js && yarn run lint:css",
-    "test": "mocha \"src/**/*.test.js\" --require babel-register --require test/setup.js",
-    "test:watch": "yarn run test -- --reporter min --watch",
     "clean": "babel-node tools/run clean",
     "copy": "babel-node tools/run copy",
     "bundle": "babel-node tools/run bundle",
@@ -257,6 +280,9 @@
     "render": "babel-node tools/run render",
     "serve": "babel-node tools/run runServer",
     "start": "babel-node tools/run start",
-    "storybook": "start-storybook -p 9001 -c .storybook"
+
+    "storybook": "start-storybook -p 9001 -c .storybook",
+    "test": "cross-env NODE_ENV=test jest --coverage",
+    "test:watch": "cross-env NODE_ENV=test jest --watchAll"
   }
 }
