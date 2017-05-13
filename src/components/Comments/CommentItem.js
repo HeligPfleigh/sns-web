@@ -35,7 +35,7 @@ class CommentItem extends React.Component {
           <Col
             dangerouslySetInnerHTML={{
               __html: `<a href=${link}>${comment.user.profile.firstName}
-              ${comment.user.profile.lastName}<a/>               
+              ${comment.user.profile.lastName}<a/>
               ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}`,
             }}
           />

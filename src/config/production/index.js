@@ -9,8 +9,8 @@
 
 /* eslint-disable max-len */
 
-export const port = 3005;
-export const host = `localhost:${port}`;
+export const port = process.env.PORT || 3004;
+export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
 export const analytics = {
 
@@ -22,37 +22,38 @@ export const analytics = {
 };
 
 export const server = {
-  ip: 'http://localhost:3005',
-  graphql: 'http://localhost:3005/graphql',
-  ipBrowser: 'http://localhost:3005',
-  graphqlBrowser: 'http://localhost:3005/graphql',
+  ip: process.env.SERVER_IP || 'http://sns-app-server.herokuapp.com',
+  graphql: process.env.SERVER_IP ? `${process.env.SERVER_IP}/graphql` : 'http://sns-app-server.herokuapp.com/graphql',
+  ipBrowser: process.env.SERVER_IP_BROWSER || 'http://sns-app-server.herokuapp.com',
+  graphqlBrowser: process.env.SERVER_IP_BROWSER ? `${process.env.SERVER_IP_BROWSER}/graphql` : 'http://sns-app-server.herokuapp.com/graphql',
   authPath: '/auth',
 };
 
 export const auth = {
   // https://developers.facebook.com/
   facebook: {
-    id: '678961598943405',
-    secret: '06a4ac09ae386fa9779547a6de5c0dd3',
+    id: process.env.FACEBOOK_APP_ID || '678961598943405',
+    secret: process.env.FACEBOOK_APP_SECRET || '06a4ac09ae386fa9779547a6de5c0dd3',
   },
 
   // https://cloud.google.com/console/project
   google: {
-    id: '251410730550-ahcg0ou5mgfhl8hlui1urru7jn5s12km.apps.googleusercontent.com',
-    secret: 'Y8yR9yZAhm9jQ8FKAL8QIEcd',
+    id: process.env.GOOGLE_CLIENT_ID || '251410730550-ahcg0ou5mgfhl8hlui1urru7jn5s12km.apps.googleusercontent.com',
+    secret: process.env.GOOGLE_CLIENT_SECRET || 'Y8yR9yZAhm9jQ8FKAL8QIEcd',
   },
 
   // https://apps.twitter.com/
   twitter: {
-    key: 'Ie20AZvLJI2lQD5Dsgxgjauns',
-    secret: 'KTZ6cxoKnEakQCeSpZlaUCJWGAlTEBJj0y2EMkUBujA7zWSvaQ',
+    key: process.env.TWITTER_CONSUMER_KEY || 'Ie20AZvLJI2lQD5Dsgxgjauns',
+    secret: process.env.TWITTER_CONSUMER_SECRET || 'KTZ6cxoKnEakQCeSpZlaUCJWGAlTEBJj0y2EMkUBujA7zWSvaQ',
   },
+
   firebase: {
-    apiKey: 'AIzaSyC-AodKtlF-jqrHwVZ5SfxAYlWBHEbC6Xc',
-    authDomain: 'sns-chat-dev.firebaseapp.com',
-    databaseURL: 'https://sns-chat-dev.firebaseio.com',
-    projectId: 'sns-chat-dev',
-    storageBucket: 'sns-chat-dev.appspot.com',
-    messagingSenderId: '755931811387',
+    apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyC-AodKtlF-jqrHwVZ5SfxAYlWBHEbC6Xc',
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'sns-chat-dev.firebaseapp.com',
+    databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://sns-chat-dev.firebaseio.com',
+    projectId: process.env.FIREBASE_PROJECT_ID || 'sns-chat-dev',
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'sns-chat-dev.appspot.com',
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '755931811387',
   },
 };

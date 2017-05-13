@@ -13,6 +13,7 @@ import { Grid, Row, Col, Button } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
+import update from 'immutability-helper';
 
 import s from './Header.scss';
 import SearchBox from '../SearchBox';
@@ -22,31 +23,82 @@ import history from '../../core/history';
 // import logoUrl from './logo-small.png';
 // import logoUrl2x from './logo-small@2x.png';
 
-const userInfoQuery = gql`query userInfoQuery {
-  me {
-    _id
+const userFragment = gql`
+  fragment HeaderUserView on UserSchemas {
+    _id,
+    username,
     profile {
-      firstName
+      picture,
+      firstName,
       lastName
-      picture
     }
+    totalNotification
   }
-}
 `;
 
+const NotifyFragment = gql`
+  fragment NotificationView on NotificationSchemas {
+    _id
+    user {
+      ...HeaderUserView
+    }
+    type
+    seen
+    subject {
+      _id
+      message
+      user {
+        ...HeaderUserView
+      }
+    }
+    actors {
+      ...HeaderUserView
+    }
+    isRead
+    createdAt
+  }
+  ${userFragment}
+`;
+
+const headerQuery = gql`query headerQuery($cursor: String) {
+  notifications (cursor: $cursor, limit: 6) {
+    edges {
+      ...NotificationView
+    }
+    pageInfo {
+      endCursor,
+      hasNextPage
+    }
+  }
+  me {
+    ...HeaderUserView,
+  },
+}
+${userFragment}
+${NotifyFragment}
+`;
+
+const updateSeenQuery = gql`mutation updateSeen {
+  UpdateSeen {
+    ...NotificationView
+  }
+}
+${NotifyFragment}`;
+
+const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
+  UpdateIsRead(_id: $_id) {
+    ...NotificationView
+  }
+}${NotifyFragment}`;
+
 class Header extends React.Component {
-  static propTypes = {
-    data: PropTypes.shape({
-      loading: PropTypes.bool.isRequired,
-    }).isRequired,
-  };
 
   gotoHomePage =() => {
     history.push('/');
   }
 
   render() {
-    const { data: { me } } = this.props;
+    const { data: { notifications, me }, loadMoreRows, updateSeen, updateIsRead } = this.props;
     return (
       <div className={s.root} >
         <Grid>
@@ -63,13 +115,26 @@ class Header extends React.Component {
             <Col md={6} sm={6} xs={6} >
               <NavRight user={me} />
               <MediaQuery query="(min-width: 992px)">
-                <Navigation />
+                <Navigation
+                  user={me}
+                  data={notifications}
+                  loadMoreRows={loadMoreRows}
+                  updateSeen={updateSeen}
+                  updateIsRead={updateIsRead}
+                />
               </MediaQuery>
             </Col>
           </Row>
           <MediaQuery query="(max-width: 992px)">
             <div className={s.boxMobileHeader}>
-              <Navigation user={me} isMobile />
+              <Navigation
+                user={me}
+                data={notifications}
+                loadMoreRows={loadMoreRows}
+                updateSeen={updateSeen}
+                updateIsRead={updateIsRead}
+                isMobile
+              />
             </div>
           </MediaQuery>
         </Grid>
@@ -78,7 +143,89 @@ class Header extends React.Component {
   }
 }
 
+const doNothing = (e) => {
+  if (e) {
+    e.preventDefault();
+  }
+};
+
+Header.propTypes = {
+  data: PropTypes.shape({
+    loading: PropTypes.bool.isRequired,
+  }).isRequired,
+  loadMoreRows: PropTypes.func.isRequired,
+  updateSeen: PropTypes.func.isRequired,
+  updateIsRead: PropTypes.func.isRequired,
+};
+
+Header.defaultProps = {
+  data: {},
+  loadMoreRows: doNothing,
+  updateSeen: doNothing,
+  updateIsRead: doNothing,
+};
+
 export default compose(
   withStyles(s),
-  graphql(userInfoQuery, {}),
+  graphql(headerQuery, {
+    options: () => ({
+      pollInterval: 30000,
+    }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreRows = () => fetchMore({
+        variables: {
+          cursor: data.notifications.pageInfo.endCursor,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newEdges = fetchMoreResult.notifications.edges;
+          const pageInfo = fetchMoreResult.notifications.pageInfo;
+          return {
+            notifications: {
+              edges: [...previousResult.notifications.edges, ...newEdges],
+              pageInfo,
+            },
+          };
+        },
+      });
+      return {
+        data,
+        loadMoreRows,
+      };
+    },
+  }),
+  graphql(updateSeenQuery, {
+    props: ({ mutate }) => ({
+      updateSeen: () => mutate({
+        variables: {},
+        updateQueries: {
+          headerQuery: previousResult => update(previousResult, {
+            me: {
+              totalNotification: { $set: 0 },
+            },
+          }),
+        },
+      }),
+    }),
+  }),
+  graphql(updateIsReadQuery, {
+    props: ({ mutate }) => ({
+      updateIsRead: _id => mutate({
+        variables: { _id },
+        updateQueries: {
+          headerQuery: (previousResult, { mutationResult }) => {
+            const result = mutationResult.data.UpdateIsRead;
+            const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
+            return update(previousResult, {
+              notifications: {
+                edges: {
+                  $splice: [[index, 1, result]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
 )(Header);

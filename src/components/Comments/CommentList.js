@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from 'react';
+import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Clearfix } from 'react-bootstrap';
 import ScrollableAnchor, { configureAnchors, goToAnchor } from 'react-scrollable-anchor';
@@ -8,7 +8,7 @@ import NewComment from './NewComment';
 
 configureAnchors({ offset: -160, scrollDuration: 200 });
 
-class CommentList extends Component {
+class CommentList extends React.Component {
 
   constructor(props) {
     super(props);
@@ -32,7 +32,7 @@ class CommentList extends Component {
 
   hasMore = () => {
     const { totalComments, comments } = this.props;
-    return totalComments > comments.length;
+    return comments && totalComments > comments.length;
   }
 
   loadMoreComments = (evt) => {
@@ -50,14 +50,11 @@ class CommentList extends Component {
     const { initContent, commentId, isSubForm } = this.state;
 
     return (
-      <div>
-        {this.hasMore() && <a
-          onClick={this.loadMoreComments} style={{
-            fontSize: 12,
-          }}
-        >Xem thêm</a>
-        }
-        {comments.map(item => (
+      <div className={s.commentContent}>
+        {this.hasMore() && <a onClick={this.loadMoreComments}>
+          <i className="fa fa-hand-o-right" aria-hidden="true"></i> Xem thêm
+        </a>}
+        { comments && comments.map(item => (
           <span key={item._id}>
             <CommentItem comment={item} showCommentForm={this.showCommentForm} />
             {item && item.reply && item.reply.map(_item => (
@@ -66,7 +63,6 @@ class CommentList extends Component {
               </span>
             ))}
             { commentId === item._id && <ScrollableAnchor id={`#add-comment-${item._id}`}>
-              123
               <span className={s.subComment}>
                 <NewComment
                   initContent={initContent}
@@ -89,6 +85,12 @@ class CommentList extends Component {
   }
 }
 
+const doNothing = (e) => {
+  if (e) {
+    e.preventDefault();
+  }
+};
+
 CommentList.propTypes = {
   comments: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -99,6 +101,14 @@ CommentList.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   totalComments: PropTypes.number.isRequired,
+};
+
+CommentList.defaultProps = {
+  comments: [],
+  isFocus: false,
+  createNewComment: doNothing,
+  loadMoreComments: doNothing,
+  totalComments: doNothing,
 };
 
 export default withStyles(s)(CommentList);

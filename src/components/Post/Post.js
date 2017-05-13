@@ -115,7 +115,7 @@ class Post extends React.Component {
           </a>
         </Col>
         <Col className={s.commentPanel}>
-          <CommentList isFocus={this.state.isFocus} postId={_id} user={userInfo} />
+          <CommentList isFocus={this.state.isFocus} postId={_id} user={userInfo} totalComments={totalComments} />
         </Col>
       </div>
     );

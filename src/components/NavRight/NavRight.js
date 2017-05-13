@@ -42,7 +42,7 @@ class NavRight extends React.Component {
                   <Image src={profile && profile.picture} circle width={45} height={45} className={s.pullLeft} />
                   <div className={s.name}>
                     <h2>
-                      <strong>{`${profile.firstName} ${profile.lastName}`}</strong>
+                      { profile && <strong>{`${profile.firstName} ${profile.lastName}`}</strong> }
                       <p>View profile</p>
                     </h2>
                   </div>

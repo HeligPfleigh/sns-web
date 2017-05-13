@@ -11,14 +11,13 @@ import React from 'react';
 import Layout from '../../components/Layout';
 
 export default {
-  path: '/',
-
+  path: '/notifications',
   async action() {
-    const Home = await require.ensure([], require => require('./Home').default, 'home');
+    const Notifications = await require.ensure([], require => require('./Notifications').default, 'notifications');
+
     return {
-      title: 'SNS - Trang chủ',
-      component: <Layout><Home /></Layout>,
+      title: 'SNS - Thông báo ngơời dùng',
+      component: <Layout><Notifications /></Layout>,
     };
   },
-
 };

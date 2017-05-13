@@ -74,6 +74,8 @@ Feed.propTypes = {
   }),
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
   userInfo: PropTypes.shape({
     _id: PropTypes.string,
     profile: PropTypes.shape({
@@ -93,6 +95,7 @@ const userFragment = gql`
       firstName,
       lastName
     }
+    totalNotification
   }
 `;
 
@@ -109,6 +112,8 @@ const commentFragment = gql`fragment CommentView on CommentSchemas {
 `;
 
 Feed.fragments = {
+  comment: commentFragment,
+  user: userFragment,
   post: gql`
     fragment PostView on PostSchemas {
       _id,

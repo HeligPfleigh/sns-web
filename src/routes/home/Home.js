@@ -13,30 +13,6 @@ import FeedList from './FeedList';
 import Feed from './Feed';
 import s from './Home.scss';
 
-const userFragment = gql`
-  fragment UserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-
-const commentFragment = gql`fragment CommentView on CommentSchemas {
-    _id,
-    message,
-    user {
-      ...UserView
-    },
-    parent,
-    updatedAt,
-  }
-  ${userFragment}
-`;
-
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
     edges {
@@ -51,11 +27,10 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
     ...UserView,
   },
 }
-${userFragment}
-${Feed.fragments.post} 
-`;
+${Feed.fragments.user}
+${Feed.fragments.post}`;
 
-const createNewComment = gql`
+const createNewCommentQuery = gql`
   mutation createNewComment (
     $postId: String!,
     $message: String!,
@@ -72,7 +47,29 @@ const createNewComment = gql`
       },
     }
   }
-${commentFragment}`;
+${Feed.fragments.comment}`;
+
+const loadCommentsQuery = gql`
+  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+    post (_id: $postId) {
+      _id
+      comments (_id: $commentId, limit: $limit) {
+        _id
+        message
+        user {
+          ...UserView,
+        },
+        parent,
+        reply {
+          ...CommentView
+        },
+        updatedAt,
+      }
+    }
+  }
+  ${Feed.fragments.user}
+  ${Feed.fragments.comment}
+`;
 
 class Home extends Component {
   static propTypes = {
@@ -84,6 +81,8 @@ class Home extends Component {
     loadMoreRows: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    createNewComment: PropTypes.func.isRequired,
   };
 
   render() {
@@ -97,7 +96,7 @@ class Home extends Component {
       <Grid>
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
-          <Col sm={8} xs={12}>
+          <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
             <InfiniteScroll
               loadMore={loadMoreRows}
@@ -115,7 +114,7 @@ class Home extends Component {
             </InfiniteScroll>
           </Col>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
-            <Col sm={4} xs={12}>
+            <Col md={4} smHidden xsHidden>
               <FriendSuggestions />
             </Col>
           </MediaQuery>
@@ -130,6 +129,7 @@ export default compose(
   graphql(homePageQuery, {
     options: () => ({
       variables: {},
+      // pollInterval: 30000,
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -154,25 +154,7 @@ export default compose(
           limit,
           postId,
         },
-        query: gql`query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
-          post (_id: $postId) {
-            _id
-            comments (_id: $commentId, limit: $limit) {
-              _id
-              message
-              user {
-                ...UserView,
-              },
-              parent,
-              reply {
-                ...CommentView
-              },
-              updatedAt,
-            }
-          }
-        }
-        ${userFragment}
-        ${commentFragment}`,
+        query: loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
 
@@ -308,7 +290,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(createNewComment, {
+  graphql(createNewCommentQuery, {
     props: ({ mutate }) => ({
       createNewComment: (postId, message, commentId, user) => mutate({
         variables: { postId, message, commentId },
