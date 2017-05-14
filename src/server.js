@@ -39,7 +39,7 @@ const proxy = httpProxy.createProxyServer({
   ws: true,
 });
 app.use('/auth', (req, res) => {
-  proxy.web(req, res, { target: `${config.server.ipBrowser}${config.server.authPath}` });
+  proxy.web(req, res, { target: `${config.server.ip}${config.server.authPath}` });
 });
 
 //
