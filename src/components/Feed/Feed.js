@@ -2,19 +2,19 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image } from 'react-bootstrap';
 import gql from 'graphql-tag';
-import Post, { PostHeader, PostText, PostActions, PostContent } from '../../../components/Card';
-import Icon from '../../../components/Icon';
-import TimeAgo from '../../../components/TimeAgo';
-import Divider from '../../../components/Divider';
-import Link from '../../../components/Link';
-import CommentList from '../../../components/Comments/CommentList';
+import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
+import Icon from '../Icon';
+import TimeAgo from '../TimeAgo';
+import Divider from '../Divider';
+import Link from '../Link';
+import CommentList from '../Comments/CommentList';
 import s from './Feed.scss';
 
 function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt, comments }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <Post>
     <PostHeader
       avatar={
@@ -84,6 +84,13 @@ Feed.propTypes = {
       lastName: PropTypes.string,
     }),
   }),
+};
+
+Feed.defaultProps = {
+  data: {
+    comments: [],
+    totalComments: 0,
+  },
 };
 
 const userFragment = gql`

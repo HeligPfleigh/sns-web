@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Clearfix } from 'react-bootstrap';
 import ScrollableAnchor, { configureAnchors, goToAnchor } from 'react-scrollable-anchor';
@@ -109,6 +110,75 @@ CommentList.defaultProps = {
   createNewComment: doNothing,
   loadMoreComments: doNothing,
   totalComments: doNothing,
+};
+
+const userFragment = gql`
+  fragment UserView on UserSchemas {
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    }
+    totalNotification
+  }
+`;
+
+const commentFragment = gql`fragment CommentView on CommentSchemas {
+    _id,
+    message,
+    user {
+      ...UserView
+    },
+    parent,
+    updatedAt,
+  }
+  ${userFragment}
+`;
+
+CommentList.fragments = {
+  loadCommentsQuery: gql`
+    query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+      post (_id: $postId) {
+        _id
+        comments (_id: $commentId, limit: $limit) {
+          _id
+          message
+          user {
+            ...UserView,
+          },
+          parent,
+          reply {
+            ...CommentView
+          },
+          updatedAt,
+        }
+      }
+    }
+    ${userFragment}
+    ${commentFragment}`,
+};
+
+CommentList.mutation = {
+  createNewCommentQuery: gql`
+    mutation createNewComment (
+      $postId: String!,
+      $message: String!,
+      $commentId: String,
+    ) {
+      createNewComment(
+        postId: $postId,
+        message: $message,
+        commentId: $commentId,
+      ) {
+        ...CommentView
+        reply {
+          ...CommentView
+        },
+      }
+    }
+    ${commentFragment}`,
 };
 
 export default withStyles(s)(CommentList);
