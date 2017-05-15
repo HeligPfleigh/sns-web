@@ -87,6 +87,7 @@ class Home extends Component {
 
   render() {
     // Pre-fetch data
+   
     const { data: { loading, feeds, me }, loadMoreRows, loadMoreComments, createNewComment } = this.props;
     let hasNextPage = false;
     if (!loading && feeds && feeds.pageInfo) {
