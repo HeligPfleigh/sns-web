@@ -49,7 +49,7 @@ class CommentItem extends Component {
 
 CommentItem.propTypes = {
   comment: PropTypes.object.isRequired,
-  showCommentForm: PropTypes.isRequired,
+  showCommentForm: PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(CommentItem);
