@@ -13,40 +13,13 @@ import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import Feed from '../home/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
-const userFragment = gql`
-  fragment UserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName,
-      gender,
-    }
-  }
-`;
-
-const postFragment = gql`
-  fragment PostView on PostSchemas {
-    _id,
-    message,
-    user {
-      ...UserView,
-    },
-    totalLikes,
-    totalComments,
-    isLiked,
-    createdAt,
-  }
-  ${userFragment}
-`;
 
 const createNewPost = gql`mutation createNewPost ($message: String!) {
   createNewPost(message: $message) {
     ...PostView
   }
 }
-${postFragment}`;
+${Feed.fragments.post}`;
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
@@ -56,8 +29,8 @@ const profilePageQuery = gql`query profilePageQuery {
     }
   },
 }
-${userFragment}
-${postFragment}
+${Feed.fragments.user}
+${Feed.fragments.post}
 `;
 
 const likePost = gql`mutation likePost ($postId: String!) {
@@ -65,14 +38,14 @@ const likePost = gql`mutation likePost ($postId: String!) {
     ...PostView
   }
 }
-${postFragment}`;
+${Feed.fragments.post}`;
 
 const unlikePost = gql`mutation unlikePost ($postId: String!) {
   unlikePost(postId: $postId) {
     ...PostView
   }
 }
-${postFragment}`;
+${Feed.fragments.post}`;
 
 const createNewCommentQuery = gql`
   mutation createNewComment (
@@ -93,6 +66,27 @@ const createNewCommentQuery = gql`
   }
 ${Feed.fragments.comment}`;
 
+const loadCommentsQuery = gql`
+  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+    post (_id: $postId) {
+      _id
+      comments (_id: $commentId, limit: $limit) {
+        _id
+        message
+        user {
+          ...UserView,
+        },
+        parent,
+        reply {
+          ...CommentView
+        },
+        updatedAt,
+      }
+    }
+  }
+  ${Feed.fragments.user}
+  ${Feed.fragments.comment}
+`;
 class Me extends React.Component {
 
   static propTypes = {
@@ -176,6 +170,53 @@ export default compose(
     options: () => ({
       variables: {},
     }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreRows = () => fetchMore({
+        variables: {
+          cursor: data.feeds.pageInfo.endCursor,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newPosts = fetchMoreResult.me.posts;
+          const pageInfo = fetchMoreResult.feeds.pageInfo;
+          return {
+            me: {
+              posts: [...previousResult.me.posts, ...newPosts],
+
+            },
+          };
+        },
+      });
+      const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
+        variables: {
+          commentId,
+          limit,
+          postId,
+        },
+        query: loadCommentsQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
+
+          const updatedPost = update(previousResult.me.posts[index], {
+            comments: {
+              $push: fetchMoreResult.post.comments,
+            },
+          });
+          return update(previousResult, {
+            feeds: {
+              edges: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+        },
+      });
+      return {
+        data,
+        loadMoreRows,
+        loadMoreComments,
+      };
+    },
   }),
   graphql(createNewPost, {
     props: ({ ownProps, mutate }) => ({
@@ -311,11 +352,10 @@ export default compose(
          },
          updateQueries: {
            profilePageQuery: (previousResult, { mutationResult }) => {
-            
              const newComment = mutationResult.data.createNewComment;
              const index = previousResult.me.posts.findIndex(item => item._id === postId);
              const currentPost = previousResult.me.posts[index];
-             
+
              let updatedPost = null;
              if (currentPost._id !== postId) {
                return previousResult;
