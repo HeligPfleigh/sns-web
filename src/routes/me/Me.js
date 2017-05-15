@@ -116,7 +116,6 @@ class Me extends React.Component {
   };
 
   render() {
-    debugger;
     const { data: { me }, query, createNewComment } = this.props;
     const posts = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
@@ -126,7 +125,7 @@ class Me extends React.Component {
     if (query.tab) {
       tab = MY_INFO;
     }
-
+    debugger;
     return (
       <Grid className={s.margintop30}>
         <Row>
@@ -311,10 +310,12 @@ export default compose(
            },
          },
          updateQueries: {
-           homePageQuery: (previousResult, { mutationResult }) => {
+           profilePageQuery: (previousResult, { mutationResult }) => {
+            
              const newComment = mutationResult.data.createNewComment;
-             const index = previousResult.feeds.edges.findIndex(item => item._id === postId);
-             const currentPost = previousResult.feeds.edges[index];
+             const index = previousResult.me.posts.findIndex(item => item._id === postId);
+             const currentPost = previousResult.me.posts[index];
+             
              let updatedPost = null;
              if (currentPost._id !== postId) {
                return previousResult;
@@ -342,8 +343,8 @@ export default compose(
                });
              }
              return update(previousResult, {
-               feeds: {
-                 edges: {
+               me: {
+                 post: {
                    $splice: [[index, 1, updatedPost]],
                  },
                },
