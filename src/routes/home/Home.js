@@ -54,7 +54,7 @@ class Home extends Component {
     }
     return (
       <Grid>
-        <Loading show={loading} full>Loading ...</Loading>
+        {/**<Loading show={loading} full>Loading ...</Loading>*/}
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
@@ -90,6 +90,7 @@ export default compose(
     options: () => ({
       variables: {},
       // pollInterval: 30000,
+      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -155,6 +156,7 @@ export default compose(
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
             },
+            comments: [],
             createdAt: new Date(),
             totalLikes: 0,
             totalComments: 0,
