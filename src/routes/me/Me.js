@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
@@ -10,7 +9,7 @@ import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
-import Feed from '../home/Feed';
+import Feed from '../../components/Feed/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
 const userFragment = gql`
