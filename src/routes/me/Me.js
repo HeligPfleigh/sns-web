@@ -48,7 +48,7 @@ const createNewPost = gql`mutation createNewPost ($message: String!) {
 }
 ${postFragment}`;
 
-const profilePageQuery = gql`query me {
+const profilePageQuery = gql`query profilePageQuery {
   me {
     ...UserView,
     posts {
@@ -190,7 +190,7 @@ export default compose(
             message,
             user: {
               __typename: 'UserSchemas',
-              id: ownProps.data.me._id,
+              _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
             },
@@ -202,7 +202,6 @@ export default compose(
         },
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
-            debugger;
             const newPost = mutationResult.data.createNewPost;
             return update(previousResult, {
               me: {
