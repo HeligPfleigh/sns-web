@@ -14,7 +14,7 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments, createdAt, comments }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <Post>
     <PostHeader
       avatar={

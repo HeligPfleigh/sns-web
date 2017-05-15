@@ -48,7 +48,7 @@ const createNewPost = gql`mutation createNewPost ($message: String!) {
 }
 ${postFragment}`;
 
-const profilePageQuery = gql`query profilePageQuery {
+const profilePageQuery = gql`query me {
   me {
     ...UserView,
     posts {
