@@ -104,13 +104,14 @@ class Me extends React.Component {
     createNewPost: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
     query: PropTypes.shape({
       tab: PropTypes.string.isRequired,
     }),
   };
 
   render() {
-    const { data: { me }, query, createNewComment } = this.props;
+    const { data: { me }, query, createNewComment, loadMoreComments } = this.props;
     const posts = me ? me.posts : [];
     const avatar = me && me.profile && me.profile.picture;
     const profile = me && me.profile;
@@ -119,7 +120,7 @@ class Me extends React.Component {
     if (query.tab) {
       tab = MY_INFO;
     }
-    debugger;
+
     return (
       <Grid className={s.margintop30}>
         <Row>
@@ -148,6 +149,7 @@ class Me extends React.Component {
                       likePostEvent={this.props.likePost}
                       unlikePostEvent={this.props.unlikePost}
                       createNewComment={createNewComment}
+                      loadMoreComments={loadMoreComments}
                     />
                 ))}
                 </div>
@@ -174,11 +176,10 @@ export default compose(
       const { fetchMore } = data;
       const loadMoreRows = () => fetchMore({
         variables: {
-          cursor: data.feeds.pageInfo.endCursor,
+          cursor: {},
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const newPosts = fetchMoreResult.me.posts;
-          const pageInfo = fetchMoreResult.feeds.pageInfo;
           return {
             me: {
               posts: [...previousResult.me.posts, ...newPosts],
@@ -195,16 +196,17 @@ export default compose(
         },
         query: loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
+          const index = previousResult.me.posts.findIndex(item => item._id === fetchMoreResult.post._id);
 
           const updatedPost = update(previousResult.me.posts[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
             },
           });
+
           return update(previousResult, {
-            feeds: {
-              edges: {
+            me: {
+              posts: {
                 $splice: [[index, 1, updatedPost]],
               },
             },
@@ -243,6 +245,7 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newPost = mutationResult.data.createNewPost;
+            debugger;
             return update(previousResult, {
               me: {
                 posts: {
@@ -382,9 +385,10 @@ export default compose(
                  },
                });
              }
+
              return update(previousResult, {
                me: {
-                 post: {
+                 posts: {
                    $splice: [[index, 1, updatedPost]],
                  },
                },
