@@ -245,7 +245,6 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newPost = mutationResult.data.createNewPost;
-            debugger;
             return update(previousResult, {
               me: {
                 posts: {
