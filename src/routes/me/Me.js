@@ -12,33 +12,6 @@ import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import Feed from '../../components/Feed/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
-const userFragment = gql`
-  fragment UserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName,
-      gender,
-    }
-  }
-`;
-
-const postFragment = gql`
-  fragment PostView on PostSchemas {
-    _id,
-    message,
-    user {
-      ...UserView,
-    },
-    totalLikes,
-    totalComments,
-    isLiked,
-    createdAt,
-  }
-  ${userFragment}
-`;
 const createNewPost = gql`mutation createNewPost ($message: String!) {
   createNewPost(message: $message) {
     ...PostView
@@ -261,6 +234,7 @@ export default compose(
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
             },
+            comments: [],
             createdAt: new Date(),
             totalLikes: 0,
             totalComments: 0,
