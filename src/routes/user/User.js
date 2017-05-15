@@ -21,24 +21,32 @@ const profilePageQuery = gql`query profilePageQuery($_id: String!) {
       ...PostView
     }
   }
+  me {
+    ...UserView,
+  }
 }
 ${Feed.fragments.user}
 ${Feed.fragments.post}`;
 
 class User extends Component {
+
   static propTypes = {
-    data: PropTypes.object,
+    data: PropTypes.shape({
+      feeds: PropTypes.object,
+      loading: PropTypes.bool.isRequired,
+    }).isRequired,
     createNewPost: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
-    query: PropTypes.object.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    createNewComment: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
-    // query: PropTypes.object.isRequired,
+    query: PropTypes.object.isRequired,
   };
 
   render() {
-    const { data: { user }, query, id } = this.props;
-    const edges = user ? user.posts : [];
+    const { data: { user, me }, query, id } = this.props;
+    const posts = user ? user.posts : [];
     const avatar = user && user.profile && user.profile.picture;
     const profile = user && user.profile;
     const numbers = 100;
@@ -67,15 +75,14 @@ class User extends Component {
                   <div className={s.parent}>
                     <NewPost createNewPost={this.props.createNewPost} />
                   </div>
-                  { edges.map(data => (
-                    <Feed
-                      key={data._id}
-                      data={data}
-                      userInfo={user}
-                      likePostEvent={this.props.likePost}
-                      unlikePostEvent={this.props.unlikePost}
-                    />
-                ))}
+                  { posts && <FeedList
+                    feeds={posts}
+                    likePostEvent={this.props.likePost}
+                    unlikePostEvent={this.props.unlikePost}
+                    userInfo={me}
+                    loadMoreComments={this.props.loadMoreComments}
+                    createNewComment={this.props.createNewComment}
+                  />}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
                   {profile && <Info profile={profile} isMe={false} />}
@@ -96,6 +103,37 @@ export default compose(
     options: props => ({
       variables: { _id: props.id },
     }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
+        variables: {
+          commentId,
+          limit,
+          postId,
+        },
+        query: CommentList.fragments.loadCommentsQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const index = previousResult.user.posts.findIndex(item => item._id === fetchMoreResult.post._id);
+
+          const updatedPost = update(previousResult.user.posts[index], {
+            comments: {
+              $push: fetchMoreResult.post.comments,
+            },
+          });
+          return update(previousResult, {
+            user: {
+              posts: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+        },
+      });
+      return {
+        data,
+        loadMoreComments,
+      };
+    },
   }),
   graphql(Feed.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
@@ -122,7 +160,6 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newPost = mutationResult.data.createNewPost;
-            console.log(previousResult, newPost, 'updateQueries.profilePageQuery');
             return update(previousResult, {
               user: {
                 posts: {
