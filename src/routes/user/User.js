@@ -151,6 +151,7 @@ export default compose(
               username: ownProps.username,
               profile: ownProps.profile,
             },
+            comments: [],
             createdAt: new Date(),
             totalLikes: 0,
             totalComments: 0,
