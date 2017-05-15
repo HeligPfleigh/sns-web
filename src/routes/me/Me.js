@@ -13,7 +13,33 @@ import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import Feed from '../home/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
+const userFragment = gql`
+  fragment UserView on UserSchemas {
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName,
+      gender,
+    }
+  }
+`;
 
+const postFragment = gql`
+  fragment PostView on PostSchemas {
+    _id,
+    message,
+    user {
+      ...UserView,
+    },
+    totalLikes,
+    totalComments,
+    isLiked,
+    createdAt,
+  }
+  ${userFragment}
+`;
 const createNewPost = gql`mutation createNewPost ($message: String!) {
   createNewPost(message: $message) {
     ...PostView
