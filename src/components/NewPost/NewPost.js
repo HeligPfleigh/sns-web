@@ -14,6 +14,7 @@ import {
   Button,
 } from 'react-bootstrap';
 
+import { HANDLE_REGEX, HASHTAG_REGEX } from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
@@ -30,9 +31,6 @@ const styles = {
     padding: '10px 0px',
   },
 };
-
-const HANDLE_REGEX = /@[\w\d]+/g;
-const HASHTAG_REGEX = /#[\w\d]+/g;
 
 const findWithRegex = (regex, contentBlock, callback) => {
   const text = contentBlock.getText();
@@ -64,33 +62,29 @@ const compositeDecorator = new CompositeDecorator([{
 
 /** NewPost Component */
 class NewPost extends React.Component {
-  static propTypes = {
-    createNewPost: PropTypes.func.isRequired,
+
+  state = {
+    editorState: EditorState.createEmpty(compositeDecorator),
+    isSubmit: true,
   };
 
-  constructor() {
-    super();
-
-    this.state = {
-      editorState: EditorState.createEmpty(compositeDecorator),
-      isSubmit: true,
-    };
-  }
-
   onChange = (editorState) => {
-    this.setState({
+    this.setState(prevState => ({
+      ...prevState,
       editorState,
       isSubmit: !editorState.getCurrentContent().hasText(),
-    });
+    }));
   }
 
   onSubmit = () => {
+    const { author } = this.props;
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    this.props.createNewPost(data);
-    this.setState({
+    this.props.createNewPost(data, author);
+    this.setState(prevState => ({
+      ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: true,
-    });
+    }));
   }
 
   focus = () => this.editor.focus();
@@ -127,5 +121,19 @@ class NewPost extends React.Component {
     );
   }
 }
+
+const doNothing = (e) => {
+  if (e) e.preventDefault();
+};
+
+NewPost.propTypes = {
+  createNewPost: PropTypes.func.isRequired,
+  author: PropTypes.object,
+};
+
+NewPost.defaultProps = {
+  createNewPost: doNothing,
+  author: {},
+};
 
 export default withStyles(s)(NewPost);
