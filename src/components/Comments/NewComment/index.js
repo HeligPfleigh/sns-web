@@ -14,6 +14,7 @@ import {
   Clearfix,
 } from 'react-bootstrap';
 
+import { HANDLE_REGEX, HASHTAG_REGEX } from '../../../constants';
 import s from './NewComment.css';
 import HandleSpan from '../../Common/Editor/HandleSpan';
 import HashtagSpan from '../../Common/Editor/HashtagSpan';
@@ -31,9 +32,6 @@ const styles = {
     backgroundColor: '#fff',
   },
 };
-
-const HANDLE_REGEX = /@[\w\d]+/g;
-const HASHTAG_REGEX = /#[\w\d]+/g;
 
 const findWithRegex = (regex, contentBlock, callback) => {
   const text = contentBlock.getText();
