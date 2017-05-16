@@ -14,18 +14,41 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <Post>
     <PostHeader
       avatar={
-        <Link to={`/user/${user._id}`}>
-          <Image src={user.profile.picture} circle />
-        </Link>
+        <span>
+          { author && (user._id !== author._id) &&
+            <Link to={`/user/${author._id}`}>
+              <Image src={author.profile.picture} circle />
+            </Link>
+          }
+
+          { author && (user._id === author._id) &&
+            <Link to={`/user/${user._id}`}>
+              <Image src={user.profile.picture} circle />
+            </Link>
+          }
+        </span>
       }
       title={
-        <Link to={`/user/${user._id}`}>
-          <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
-        </Link>
+        <span>
+          { author && (user._id !== author._id) && <Link to={`/user/${author._id}`}>
+            <strong>{`${author.profile.firstName} ${author.profile.lastName}`}</strong>
+            </Link>
+          }
+
+          { author && (user._id !== author._id) &&
+            <span style={{ margin: '0 6px' }}>
+              <i className="fa fa-caret-right" aria-hidden="true"></i>
+            </span>
+          }
+
+          <Link to={`/user/${user._id}`}>
+            <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+          </Link>
+        </span>
       }
       subtitle={<Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>}
     />
@@ -128,6 +151,9 @@ Feed.fragments = {
       user {
         ...UserView,
       },
+      author {
+        ...UserView,
+      },
       totalLikes,
       totalComments,
       isLiked,
@@ -151,8 +177,8 @@ Feed.fragments = {
 };
 
 Feed.mutation = {
-  createNewPost: gql`mutation createNewPost ($message: String!) {
-    createNewPost(message: $message) {
+  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String) {
+    createNewPost(message: $message, userId: $userId) {
       ...PostView
     }
   }
