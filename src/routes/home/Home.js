@@ -9,8 +9,8 @@ import InfiniteScroll from 'react-infinite-scroller';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import Loading from '../../components/Loading';
-import FeedList from './FeedList';
-import Feed from './Feed';
+import CommentList from '../../components/Comments/CommentList';
+import FeedList, { Feed } from '../../components/Feed';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -29,47 +29,6 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
 }
 ${Feed.fragments.user}
 ${Feed.fragments.post}`;
-
-const createNewCommentQuery = gql`
-  mutation createNewComment (
-    $postId: String!,
-    $message: String!,
-    $commentId: String,
-  ) {
-    createNewComment(
-      postId: $postId,
-      message: $message,
-      commentId: $commentId,
-    ) {
-      ...CommentView
-      reply {
-        ...CommentView
-      },
-    }
-  }
-${Feed.fragments.comment}`;
-
-const loadCommentsQuery = gql`
-  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
-    post (_id: $postId) {
-      _id
-      comments (_id: $commentId, limit: $limit) {
-        _id
-        message
-        user {
-          ...UserView,
-        },
-        parent,
-        reply {
-          ...CommentView
-        },
-        updatedAt,
-      }
-    }
-  }
-  ${Feed.fragments.user}
-  ${Feed.fragments.comment}
-`;
 
 class Home extends Component {
   static propTypes = {
@@ -94,7 +53,7 @@ class Home extends Component {
     }
     return (
       <Grid>
-        <Loading show={loading} full>Loading ...</Loading>
+        {/**<Loading show={loading} full>Loading ...</Loading>*/}
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
@@ -130,6 +89,7 @@ export default compose(
     options: () => ({
       variables: {},
       // pollInterval: 30000,
+      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -154,7 +114,7 @@ export default compose(
           limit,
           postId,
         },
-        query: loadCommentsQuery,
+        query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
 
@@ -195,6 +155,7 @@ export default compose(
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
             },
+            comments: [],
             createdAt: new Date(),
             totalLikes: 0,
             totalComments: 0,
@@ -290,7 +251,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(createNewCommentQuery, {
+  graphql(CommentList.mutation.createNewCommentQuery, {
     props: ({ mutate }) => ({
       createNewComment: (postId, message, commentId, user) => mutate({
         variables: { postId, message, commentId },
