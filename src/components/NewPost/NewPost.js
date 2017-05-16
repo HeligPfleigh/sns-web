@@ -77,9 +77,9 @@ class NewPost extends React.Component {
   }
 
   onSubmit = () => {
-    const { author } = this.props;
+    const { friend } = this.props;
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    this.props.createNewPost(data, author);
+    this.props.createNewPost(data, friend);
     this.setState(prevState => ({
       ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
@@ -128,12 +128,12 @@ const doNothing = (e) => {
 
 NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
-  author: PropTypes.object,
+  friend: PropTypes.object,
 };
 
 NewPost.defaultProps = {
   createNewPost: doNothing,
-  author: {},
+  friend: {},
 };
 
 export default withStyles(s)(NewPost);
