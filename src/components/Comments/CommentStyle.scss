@@ -1,5 +1,9 @@
 @import "../../theme/resources.scss";
-
+.commentContent{
+  a:hover{
+    cursor: pointer
+  }
+}
 .subComment {
   width: 93%;
   float: right;
