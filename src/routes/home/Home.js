@@ -281,6 +281,8 @@ export default compose(
             if (currentPost._id !== postId) {
               return previousResult;
             }
+
+            let commentCount = currentPost.totalComments;
             if (commentId) {
               const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
               const commentItem = currentPost.comments[indexComment];
@@ -292,12 +294,14 @@ export default compose(
               // push value into property reply
               commentItem.reply.push(newComment);
               updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
                 comments: {
                   $splice: [[indexComment, 1, commentItem]],
                 },
               });
             } else {
               updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
                 comments: {
                   $unshift: [newComment],
                 },
