@@ -8,7 +8,7 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
-import Loading from '../../components/Loading';
+// import Loading from '../../components/Loading';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import s from './Home.scss';
@@ -53,7 +53,7 @@ class Home extends Component {
     }
     return (
       <Grid>
-        {/**<Loading show={loading} full>Loading ...</Loading>*/}
+        {/** <Loading show={loading} full>Loading ...</Loading>*/}
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
