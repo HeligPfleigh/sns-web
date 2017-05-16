@@ -27,7 +27,7 @@ FeedList.propTypes = {
   unlikePostEvent: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
-  userInfo: PropTypes.object.isRequired,
+  userInfo: PropTypes.object,
 };
 
 export default FeedList;

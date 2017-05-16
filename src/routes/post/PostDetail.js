@@ -7,7 +7,7 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
-import Feed from '../home/Feed';
+import { Feed } from '../../components/Feed';
 import s from './PostDetail.scss';
 
 const PostDetailQuery = gql`query PostDetailQuery ($postId: String) {

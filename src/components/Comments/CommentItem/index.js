@@ -20,11 +20,11 @@ class CommentItem extends Component {
 
   render() {
     const { comment } = this.props;
-    const link = `user/${comment.user._id}`;
+    const link = `/user/${comment.user._id}`;
     return (
       <div className={s.commentPanel}>
         <Col className={s.commentAvarta}>
-          <Link to={`user/${comment.user._id}`}>
+          <Link to={`/user/${comment.user._id}`}>
             <Image src={comment.user.profile.picture} circle />
           </Link>
         </Col>
