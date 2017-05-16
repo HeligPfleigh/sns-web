@@ -181,7 +181,6 @@ export default compose(
           return {
             me: {
               posts: [...previousResult.me.posts, ...newPosts],
-
             },
           };
         },
@@ -201,7 +200,6 @@ export default compose(
               $push: fetchMoreResult.post.comments,
             },
           });
-
           return update(previousResult, {
             me: {
               posts: {
@@ -361,6 +359,8 @@ export default compose(
              if (currentPost._id !== postId) {
                return previousResult;
              }
+
+             let commentNum = currentPost.totalComments;
              if (commentId) {
                const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
                const commentItem = currentPost.comments[indexComment];
@@ -368,22 +368,22 @@ export default compose(
                if (!commentItem.reply) {
                  commentItem.reply = [];
                }
-
               // push value into property reply
                commentItem.reply.push(newComment);
                updatedPost = update(currentPost, {
+                 totalComments: { $set: ++commentNum },
                  comments: {
                    $splice: [[indexComment, 1, commentItem]],
                  },
                });
              } else {
                updatedPost = update(currentPost, {
+                 totalComments: { $set: ++commentNum },
                  comments: {
                    $unshift: [newComment],
                  },
                });
              }
-
              return update(previousResult, {
                me: {
                  posts: {
