@@ -20,7 +20,7 @@ const getActorsContent = (actors) => {
 
 const collectionNotifyMessages = {
   [NOTIFY_TYPES[1]]: lastContent => ` vừa bình luận bài viết ${lastContent}.`,
-  [NOTIFY_TYPES[2]]: () => ' vừ:cập nhật trạng thái.',
+  [NOTIFY_TYPES[2]]: () => ' vừa viết lên tường nhà bạn.',
 };
 
 const getNotifyContent = (currentUser, author, type, actors) => {
