@@ -87,8 +87,8 @@ class Me extends React.Component {
     const { data: { me }, query } = this.props;
 
     const edges = me ? me.posts : [];
-    const avatar = me && me.profile && me.profile.picture;
-    const profile = me && me.profile;
+    const avatar = (me && me.profile && me.profile.picture) || '';
+    const profile = (me && me.profile) || {};
     const numbers = 100;
     let tab = MY_TIME_LINE;
     if (query.tab) {
@@ -132,7 +132,7 @@ class Me extends React.Component {
             </div>
           </Col>
           <Col sm={4} xs={12}></Col>
-        </Row >
+        </Row>
       </Grid>
     );
   }

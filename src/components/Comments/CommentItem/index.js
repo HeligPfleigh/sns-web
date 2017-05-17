@@ -2,10 +2,8 @@ import React, { PropTypes, Component } from 'react';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import {
-  Image,
-  Col,
-} from 'react-bootstrap';
+import { Image, Col } from 'react-bootstrap';
+
 import Link from '../../Link';
 import TimeAgo from '../../TimeAgo';
 import s from './CommentItem.scss';
@@ -31,8 +29,7 @@ class CommentItem extends Component {
         <Col className={s.commentContent}>
           <Col
             dangerouslySetInnerHTML={{
-              __html: `<a href=${link}>${comment.user.profile.firstName}
-              ${comment.user.profile.lastName}<a/>
+              __html: `<p><a href=${link}>${comment.user.profile.firstName} ${comment.user.profile.lastName}<a/></p>
               ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}`,
             }}
           />

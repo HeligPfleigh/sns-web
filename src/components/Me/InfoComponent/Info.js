@@ -4,13 +4,12 @@ import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import update from 'immutability-helper';
 import { Button } from 'react-bootstrap';
-
 import s from './Info.scss';
 
 const CHANGE = 'Thay đổi thông tin';
 const SAVE = 'Lưu';
-const UserFragment =
-  gql`
+
+const UserFragment = gql`
   fragment UserView on UserSchemas {
     _id,
     username,
@@ -20,23 +19,27 @@ const UserFragment =
       lastName
     }
   }
-  `;
-
+`;
 
 const updateProfile = gql`mutation updateProfile ($profile: UpdateProfileInput!) {
   updateProfile(profile : $profile) {
     ...UserView
     }
   }
-  ${UserFragment}`;
+  ${UserFragment}
+`;
 
 class Info extends React.Component {
-
   static propTypes = {
-    profile: PropTypes.object.isRequired,
+    profile: PropTypes.shape({
+      picture: PropTypes.string.isRequired,
+      firstName: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+    }).isRequired,
     updateProfile: PropTypes.func.isRequired,
     isMe: PropTypes.bool.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -44,16 +47,16 @@ class Info extends React.Component {
       profile: this.props.profile,
     };
   }
+
   editProfile = () => {
     this.setState({
       isEdit: !this.state.isEdit,
-
     });
-
     if (this.state.isEdit === true) {
       this.props.updateProfile(this.state.profile);
     }
   };
+
   genderChange =(e) => {
     const { profile: { picture, firstName, lastName } } = this.state;
     this.setState({
@@ -65,15 +68,13 @@ class Info extends React.Component {
       },
     });
   };
+
   render() {
     const { address, email, gender, birthday, phone } = this.state.profile;
     const { isMe } = this.props;
     return (
-
       <div className={s.root}>
-
         <ul className={s.profile}>
-
           <li className={s.fixfont}>
             <i className="fa fa-mobile fa-3x " aria-hidden="true"></i><span>Số điện thoại</span> {phone || ''}
           </li>
@@ -105,12 +106,9 @@ class Info extends React.Component {
          }
         </ul>
       </div>
-
-
     );
   }
 }
-
 export default compose(
   withStyles(s),
    graphql(updateProfile, {
@@ -125,10 +123,8 @@ export default compose(
              lastName: profile.lastName,
              gender: profile.gender,
            },
-
          },
          updateQueries: {
-
            mePageQuery: (previousResult, { mutationResult }) => {
              const newProfile = mutationResult.data && mutationResult.data.profile;
              return update(previousResult, {
@@ -140,8 +136,6 @@ export default compose(
            },
          },
        }),
-
      }),
    }),
-
 )(Info);

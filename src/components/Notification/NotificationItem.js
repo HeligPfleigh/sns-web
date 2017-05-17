@@ -70,7 +70,7 @@ class NotificationItem extends React.Component {
     } = this.props;
 
     // check and call func update notification
-    if (isRead) updateIsRead(_id);
+    if (!isRead && updateIsRead) updateIsRead(_id);
 
     // Change state dropdown open=false;
     if (hidePopup) hidePopup();
@@ -120,10 +120,6 @@ class NotificationItem extends React.Component {
   }
 }
 
-const doNothing = (e) => {
-  if (e) e.preventDefault();
-};
-
 NotificationItem.defaultProps = {
   data: {
     _id: '',
@@ -131,8 +127,6 @@ NotificationItem.defaultProps = {
     user: {},
   },
   userInfo: {},
-  updateIsRead: doNothing,
-  hidePopup: doNothing,
 };
 
 NotificationItem.propTypes = {

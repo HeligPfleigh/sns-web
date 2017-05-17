@@ -4,7 +4,7 @@ import { Col } from 'react-bootstrap';
 import classNames from 'classnames';
 import s from './PostContent.scss';
 
-export const PostContent = ({ children, className }) => (
+const PostContent = ({ children, className }) => (
   <Col className={classNames(s.postContent, className)}>{children}</Col>
 );
 

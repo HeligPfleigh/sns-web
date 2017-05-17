@@ -51,6 +51,7 @@ class Home extends Component {
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
         {/** <Loading show={loading} full>Loading ...</Loading>*/}
@@ -87,7 +88,7 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      variables: {},
+      // variables: {},
       // pollInterval: 30000,
       fetchPolicy: 'cache-and-network',
     }),
