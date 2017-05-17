@@ -1,37 +1,23 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
 .link:active,
 .link:visited,
 .link:hover {
   color: #fff;
   text-decoration: none;
 }
- 
+
 .navigation {
   float: right;
   margin: 10px 0px 4px;
   text-decoration: none;
-   .userDropdown {
+  .userDropdown {
     margin: 0;
-    
     display: inline-block;
     :global(.btn-group){
        display: block;
     }
-    
-  
-    
-
     .userDropdownMenu {
-      
       min-width: 500px;
-      top:50px;
+      top: 50px;
       border-radius: 0px;
       border: 1px solid #dedede;
       right: -135px;
@@ -46,34 +32,33 @@
           margin-bottom: 10px;
         }
       }
-     .headerItem {
-          a{
-            cursor: pointer;
-             color:#283E4a;
-          } 
+      .headerItem {
+        a {
+          cursor: pointer;
+          color: #283E4a;
+        }
         padding: 8px 15px;
         font-weight: bold;
         border-bottom: 1px solid #c7d1d8;
         width: 100%;
-         }
-         .icon{
-           float: right;
-          // display: inline-block;
-         }
-     
+      }
+      .icon {
+        float: right;
+      // display: inline-block;
+      }
       .bottomItem {
         text-align: center;
-         padding: 10px 15px;
-         a {
-           cursor: pointer;
-           font-weight: bold;
-           color:#283E4a;
-         }
+        padding: 10px 15px;
+        a {
+          cursor: pointer;
+          font-weight: bold;
+          color: #283E4a;
+        }
       }
       .name {
         margin-left: 55px;
         padding-top: 8px;
-        p{
+        p {
           font-weight: bold;
           color: #0084bf;
         }
@@ -96,13 +81,13 @@
       }
     }
 
-   
-  
+
+
   }
-  .boxListUser{ 
+  .boxListUser{
     width: 100%;
     display: inline-block;
-    overflow: hidden;  
+    overflow: hidden;
     :global(.infinite-scroll-component) {
        width: 110%;
       height: 320px !important;
@@ -118,17 +103,97 @@
     text-decoration: none;
     text-align: center;
     color:  #c7d1d8;
-    position: relative;
+    cursor: pointer;
     i {
       vertical-align: middle;
       font-size: 21px;
+      position: relative;
+    }
+    i[data-badge]:after {
+      content: attr(data-badge);
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 12px;
+      font-weight: bold;
+      background: red;
+      color: white;
+      width: 15px;
+      height:15px;
+      text-align: center;
+      line-height: 15px;
+      border-radius: 50%;
+      box-shadow: 0 0 1px #333;
     }
     span {
       display: block;
       font-size: 12px;
     }
+    .dropdownNotiPanel {
+      min-width: 370px;
+      max-height: 350px;
+      overflow: hidden;
+      top:50px;
+      border-radius: 0px;
+      &:before, &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -20px;
+        right: 25px;
+        border: 10px solid transparent;
+        border-bottom-color: #fff;
+      }
+      div.boxNotificationList {
+        max-height: 270px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 105%;
+      }
+      li {
+        margin: 0px;
+        padding: 5px 5px;
+        border-bottom: 1px solid #c7d1d8;
+        &:hover {
+          background-color: #c7d1d8;
+        }
+        &:last-child {
+          border-bottom: none;
+        }
+        a:hover {
+            text-decoration: none;
+        }
+      }
+      >li.headerItem {
+        padding: 3px 8px;
+        font-size: 13px;
+        font-weight: bold;
+        border-bottom: 1px solid #c7d1d8;
+        &:hover {
+          background-color: #fff;
+        }
+      }
+      >li.showAllItem {
+        padding-bottom: 0px;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+        border-top: 1px solid #c7d1d8;
+        &:hover {
+          background-color: #fff;
+        }
+        a {
+          font-weight: bold;
+          &:hover {
+            text-decoration: none;
+            background-color: #fff;
+          }
+        }
+      }
+    }
   }
 }
+
 .jewelCount {
   position: absolute;
   right: 10px;
@@ -152,10 +217,30 @@
     margin: 8px 5%;
     display: flex;
     justify-content: space-between;
+    text-decoration: none;
+    cursor: pointer;
     .link {
       color: #c7d1d8;
       font-size: 18px;
+      i {
+        vertical-align: middle;
+        position:relative;
+      }
+      i[data-badge]:after {
+        content: attr(data-badge);
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        font-size: 11px;
+        font-weight: bold;
+        background: red;
+        color: white;
+        width: 13px;
+        height:13px;
+        text-align: center;
+        line-height: 13px;
+        border-radius: 50%;
+      }
     }
   }
 }
-

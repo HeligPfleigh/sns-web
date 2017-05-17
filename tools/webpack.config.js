@@ -12,7 +12,7 @@ import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import OfflinePlugin from 'offline-plugin';
+// import OfflinePlugin from 'offline-plugin';
 import pkg from '../package.json';
 
 const isDebug = !process.argv.includes('--release');
@@ -32,7 +32,6 @@ const config = {
     publicPath: '/assets/',
     pathinfo: isVerbose,
   },
-
   module: {
     rules: [
       {
@@ -114,6 +113,8 @@ const config = {
             loader: 'css-loader',
             options: {
               modules: true,
+              // CSS Nano http://cssnano.co/options/
+              // minimize: !isDebug,
               localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
             },
           },
@@ -238,7 +239,7 @@ const clientConfig = {
           screw_ie8: true,
         },
       }),
-
+      /**
       // Put it in the end to capture all the HtmlWebpackPlugin's
       // assets manipulations and do leak its manipulations to HtmlWebpackPlugin
       new OfflinePlugin({
@@ -258,6 +259,7 @@ const clientConfig = {
         safeToUseOptionalCaches: true,
         AppCache: false,
       }),
+      */
     ],
 
     // Webpack Bundle Analyzer

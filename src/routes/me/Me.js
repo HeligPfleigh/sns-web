@@ -25,6 +25,7 @@ const userFragment = gql`
     }
   }
 `;
+
 const postFragment = gql`
   fragment PostView on PostSchemas {
     _id,
@@ -39,13 +40,13 @@ const postFragment = gql`
   }
   ${userFragment}
 `;
+
 const createNewPost = gql`mutation createNewPost ($message: String!) {
   createNewPost(message: $message) {
     ...PostView
   }
 }
 ${postFragment}`;
-
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
@@ -58,7 +59,6 @@ const profilePageQuery = gql`query profilePageQuery {
 ${userFragment}
 ${postFragment}
 `;
-
 
 const likePost = gql`mutation likePost ($postId: String!) {
   likePost(postId: $postId) {
@@ -74,7 +74,6 @@ const unlikePost = gql`mutation unlikePost ($postId: String!) {
 }
 ${postFragment}`;
 
-
 class Me extends React.Component {
   static propTypes = {
     data: PropTypes.object,
@@ -86,6 +85,7 @@ class Me extends React.Component {
 
   render() {
     const { data: { me }, query } = this.props;
+
     const edges = me ? me.posts : [];
     const avatar = (me && me.profile && me.profile.picture) || '';
     const profile = (me && me.profile) || {};
@@ -108,7 +108,7 @@ class Me extends React.Component {
                 </div>
               </div>
               <div className={s.infors}>
-                <Tab numbers={numbers} stateChildShow={tab} />
+                <Tab numbers={numbers} stateChildShow={tab} isMe />
               </div>
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
@@ -126,15 +126,14 @@ class Me extends React.Component {
                 ))}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  <Info profile={profile} />
+                  {profile && <Info profile={profile} isMe />}
                 </div>
               </Grid>
             </div>
           </Col>
-          <Col sm={4} xs={12}>123</Col>
-        </Row >
+          <Col sm={4} xs={12}></Col>
+        </Row>
       </Grid>
-
     );
   }
 }
@@ -170,7 +169,6 @@ export default compose(
         },
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
-            console.log(ownProps);
             const newPost = mutationResult.data.createNewPost;
             return update(previousResult, {
               me: {
@@ -207,7 +205,6 @@ export default compose(
         },
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
-            debugger;
             const updatedPost = mutationResult.data.likePost;
             const index = previousResult.me.posts.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {

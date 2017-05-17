@@ -9,17 +9,18 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { Dropdown, MenuItem } from 'react-bootstrap';
+import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
-import { Dropdown } from 'react-bootstrap';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import _ from 'lodash';
-import CustomToggle from '../Common/DropdownMenu/CustomToggle';
-
-import s from './Navigation.scss';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import Link from '../Link';
+import history from '../../core/history';
 import { makeNotificationRead } from '../../actions/chat';
-
+import CustomToggle from '../Common/DropdownMenu/CustomToggle';
+import NotificationList from '../Notification/NotificationList';
 import Friend from '../Friend/Friend';
+import s from './Navigation.scss';
 
 const getNotificationCount = (chatNotification, current) => {
   const copyObjectNotification = chatNotification && Object.assign({}, chatNotification);
@@ -39,28 +40,11 @@ const getNotificationCount = (chatNotification, current) => {
   { makeNotificationRead },
 )
 class Navigation extends React.Component {
-  static defaultProps = {
 
-    isMobile: false,
-  }
-
-
-  static propTypes = {
-    isMobile: React.PropTypes.bool,
-    chatNotification: React.PropTypes.object,
-    location: React.PropTypes.object,
-    current: React.PropTypes.string,
-    makeNotificationRead: React.PropTypes.func.isRequired,
-    handleFriendAction: React.PropTypes.func.isRequired,
-    friendType: React.PropTypes.string,
-    friends: React.PropTypes.array,
-    refetch: React.PropTypes.func.isRequired,
-  }
   constructor(props) {
     super(props);
     const { friends } = props;
-
-    this.state = { friends };
+    this.state = { friends, isOpen: false };
   }
 
   componentDidMount() {
@@ -73,51 +57,90 @@ class Navigation extends React.Component {
       this.props.makeNotificationRead({ conversationId: current });
     }
   }
+
   shouldComponentUpdate(nextProps) {
     const { location } = this.props;
     if (location && location.pathname !== (nextProps.location && nextProps.location.pathname)) return true;
     return true;
   }
+
   componentDidUpdate() {
     this.handleUpdateTitle();
   }
-  onToggleClick = () => {
-    // debugger;
-    // this.props.refetch();
-  }
+
   handleUpdateTitle = () => {
-    const { chatNotification, current } = this.props;
+    const { chatNotification, current, user: { totalNotification } } = this.props;
     const countChatNotification = getNotificationCount(chatNotification, current);
     if (document && document.title) {
       const clearTitle =  document.title.replace(/^(\([0-9\-]+\)\s)/ig, ''); //eslint-disable-line
-      if (countChatNotification > 0) {
-        document.title = `(${countChatNotification}) ${clearTitle}`;
+      if (countChatNotification > 0 || totalNotification > 0) {
+        const cnt = totalNotification + countChatNotification;
+        document.title = `(${cnt}) ${clearTitle}`;
       } else {
         document.title = clearTitle;
       }
     }
   }
+
+  navEventHandler = (path) => {
+    history.push(path);
+  };
+
+  dropEventHandler = (isOpen) => {
+    const { updateSeen } = this.props;
+    if (isOpen) {
+      updateSeen();
+    }
+    this.setState(prevState => ({
+      ...prevState,
+      isOpen,
+    }));
+  }
+
+  popupHandler = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      isOpen: !prevState.isOpen,
+    }));
+  }
+
   generateDivs = () => {
     const moreDivs = [];
-    let count = this.state.friends.length;
-    for (let i = 0; i < 30; i++) {
-      moreDivs.push(
-        <div key={`div${count++}`} style={{ height: 50 }}>
-          Div no {count}
-        </div>,
-      );
-    }
+    // let count = this.state.friends.length;
+    // for (let i = 0; i < 30; i++) {
+    //   moreDivs.push(
+    //     <div key={`div${count++}`} style={{ height: 50 }}>
+    //       Div no {count}
+    //     </div>,
+    //   );
+    // }
     setTimeout(() => {
       this.setState({ friends: this.state.friends.concat(moreDivs) });
     }, 500);
   }
 
-
   render() {
-    const { isMobile, chatNotification, current } = this.props;
+    const {
+      isMobile,
+      chatNotification,
+      current,
+      user,
+      user: { totalNotification },
+      data: { loading, edges, pageInfo },
+      loadMoreRows,
+      updateIsRead,
+    } = this.props;
+
+    const { isOpen } = this.state;
     const { friends, ...customs } = this.props;
 
+    let hasNextPage = false;
+    if (!loading && pageInfo) {
+      hasNextPage = pageInfo.hasNextPage;
+    }
+
     const countChatNotification = getNotificationCount(chatNotification, current);
+
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
         <Link className={s.link} to="/">
@@ -137,26 +160,20 @@ class Navigation extends React.Component {
             <Dropdown.Menu className={s.userDropdownMenu} hidden>
               <div className={s.headerItem}><strong>Bạn bè</strong>
                 <a onClick={this.addFriend} hidden>
-                  <div className={s.icon}><i className="fa fa-plus" aria-hidden="true" ></i>
-
-                  </div>
+                  <div className={s.icon}><i className="fa fa-plus" aria-hidden="true" ></i></div>
                 </a>
               </div>
-
               <div className={s.boxListUser}>
                 <InfiniteScroll
                   next={this.generateDivs}
                   hasMore
-                //  loader={<h4>Loading...</h4>}
+                  loader={<span style={{ display: 'none' }}>Loading...</span>}
+                  endMessage={<span style={{ display: 'none' }}>Loading...</span>}
                 >
-                  { friends && friends.map(friend =>
-                    <Friend friend={friend} {...customs} />,
-                )}
-
+                  { friends && friends.map(friend => <Friend key={`friend-id-${friend._id}`} friend={friend} {...customs} />) }
                 </InfiniteScroll>
               </div>
               <div className={s.bottomItem}><a href="/friends">Xem tất cả</a></div>
-
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -164,21 +181,102 @@ class Navigation extends React.Component {
         <Link className={s.link} to="/messages">
           {
             countChatNotification > 0 &&
-            <span className={s.jewelCount}>
-              <span>{countChatNotification}</span>
-            </span>
+            <i className="fa fa-comment-o" data-badge={countChatNotification}></i>
           }
-          <i className="fa fa-comment"></i>
-          {isMobile ? '' : <span>Tinh nhắn</span>}
+
+          {
+            countChatNotification < 1 &&
+            <i className="fa fa-comment"></i>
+          }
+          { isMobile ? '' : <span>Tinh nhắn</span> }
         </Link>
 
-        <Link className={s.link} to="/contact">
-          <i className="fa fa-bell"></i>
-          {isMobile ? '' : <span>Thông báo</span>}
-        </Link>
+        <MediaQuery query="(max-width: 992px)">
+          <Link className={s.link} to="/notifications">
+            {
+              totalNotification > 0 &&
+              <i className="fa fa-bell-o" data-badge={totalNotification}></i>
+            }
+
+            {
+              totalNotification < 1 &&
+              <i className="fa fa-bell"></i>
+            }
+          </Link>
+        </MediaQuery>
+
+        <MediaQuery query="(min-width: 992px)">
+          <Dropdown
+            className={s.link} id="dropdown-notification"
+            componentClass="div" pullRight onToggle={this.dropEventHandler}
+            open={isOpen}
+          >
+            <CustomToggle bsRole="toggle">
+              {
+                totalNotification > 0 &&
+                <i className="fa fa-bell-o" data-badge={totalNotification}></i>
+              }
+
+              {
+                totalNotification < 1 &&
+                <i className="fa fa-bell"></i>
+              }
+              <span>Thông báo</span>
+            </CustomToggle>
+            <Dropdown.Menu className={s.dropdownNotiPanel}>
+              <MenuItem header className={s.headerItem}>Thông báo</MenuItem>
+              <div className={s.boxNotificationList}>
+                <InfiniteScroll
+                  next={loadMoreRows}
+                  hasMore={hasNextPage}
+                  scrollThreshold={0.7}
+                  loader={<span style={{ display: 'none' }}>Loading...</span>}
+                  endMessage={<span style={{ display: 'none' }}>Loading...</span>}
+                >
+                  { edges && <NotificationList
+                    notifications={edges}
+                    userInfo={user}
+                    updateIsRead={updateIsRead}
+                    hidePopup={this.popupHandler}
+                    isHeader
+                  /> }
+                </InfiniteScroll>
+              </div>
+              <MenuItem className={s.showAllItem} onClick={() => this.navEventHandler('/notifications')}>
+                Xem toàn bộ thông báo
+              </MenuItem>
+            </Dropdown.Menu>
+          </Dropdown>
+        </MediaQuery>
       </div>
     );
   }
 }
+
+Navigation.defaultProps = {
+  isMobile: false,
+  chatNotification: {},
+  location: {},
+  current: '',
+  user: {},
+  data: {},
+};
+
+Navigation.propTypes = {
+  isMobile: React.PropTypes.bool,
+  chatNotification: React.PropTypes.object,
+  location: React.PropTypes.object,
+  current: React.PropTypes.string,
+  makeNotificationRead: React.PropTypes.func,
+  user: React.PropTypes.object,
+  data: React.PropTypes.object,
+  loadMoreRows: React.PropTypes.func,
+  updateSeen: React.PropTypes.func.isRequired,
+  updateIsRead: React.PropTypes.func.isRequired,
+  handleFriendAction: React.PropTypes.func.isRequired,
+  friendType: React.PropTypes.string,
+  friends: React.PropTypes.array,
+  refetch: React.PropTypes.func.isRequired,
+};
 
 export default withStyles(s)(Navigation);

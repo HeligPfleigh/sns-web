@@ -19,6 +19,12 @@
     margin-top: 10px;
     a {
       color: black;
+      text-decoration: none;
+      cursor: pointer;
+      &:hover {
+        text-decoration: none;
+        cursor: pointer;
+      }
     }
   }
 }
@@ -33,7 +39,18 @@
     display: inline-block;
   }
   i {
-    color: $text-color-grey;      
+    color: $text-color-grey;
     font-size: 7px;
+  }
+}
+
+/*********** Style mobile ***************/
+@media (max-width: 992px) {
+  .postHeaderLeft {
+    width: 85%;
+  }
+
+  .postHeaderRight {
+    width: 15%;
   }
 }

@@ -8,39 +8,10 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
-import Loading from '../../components/Loading';
-import FeedList from './FeedList';
+// import Loading from '../../components/Loading';
+import CommentList from '../../components/Comments/CommentList';
+import FeedList, { Feed } from '../../components/Feed';
 import s from './Home.scss';
-
-const userFragment = gql`
-  fragment UserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-
-const postFragment = gql`
-  fragment PostView on PostSchemas {
-    _id,
-    message,
-    user {
-      ...UserView,
-    },
-    totalLikes,
-    totalComments,
-    isLiked,
-    createdAt,
-    comments (limit: 5) {
-      _id
-    }
-  }
-  ${userFragment}
-`;
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
@@ -56,32 +27,8 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
     ...UserView,
   },
 }
-${userFragment}
-${postFragment}
-`;
-
-const createNewPost = gql`mutation createNewPost ($message: String!) {
-  createNewPost(message: $message) {
-    ...PostView
-  }
-}
-${postFragment}`;
-
-const likePost = gql`mutation likePost ($postId: String!) {
-  likePost(postId: $postId) {
-    ...PostView
-  }
-}
-${postFragment}`;
-
-const unlikePost = gql`mutation unlikePost ($postId: String!) {
-  unlikePost(postId: $postId) {
-    ...PostView
-  }
-}
-${postFragment}`;
-
-
+${Feed.fragments.user}
+${Feed.fragments.post}`;
 
 class Home extends Component {
   static propTypes = {
@@ -93,11 +40,13 @@ class Home extends Component {
     loadMoreRows: PropTypes.func.isRequired,
     likePost: PropTypes.func.isRequired,
     unlikePost: PropTypes.func.isRequired,
+    loadMoreComments: PropTypes.func.isRequired,
+    createNewComment: PropTypes.func.isRequired,
   };
 
   render() {
     // Pre-fetch data
-    const { data: { loading, feeds, me }, loadMoreRows } = this.props;
+    const { data: { loading, feeds, me }, loadMoreRows, loadMoreComments, createNewComment } = this.props;
     let hasNextPage = false;
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
@@ -105,9 +54,9 @@ class Home extends Component {
 
     return (
       <Grid>
-        <Loading show={loading} full>Loading ...</Loading>
+        {/** <Loading show={loading} full>Loading ...</Loading>*/}
         <Row className={s.containerTop30}>
-          <Col sm={8} xs={12}>
+          <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
             <InfiniteScroll
               loadMore={loadMoreRows}
@@ -119,11 +68,13 @@ class Home extends Component {
                 likePostEvent={this.props.likePost}
                 unlikePostEvent={this.props.unlikePost}
                 userInfo={me}
+                loadMoreComments={loadMoreComments}
+                createNewComment={createNewComment}
               />}
             </InfiniteScroll>
           </Col>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
-            <Col sm={4} xs={12}>
+            <Col md={4} smHidden xsHidden>
               <FriendSuggestions />
             </Col>
           </MediaQuery>
@@ -137,7 +88,9 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      variables: {},
+      // variables: {},
+      // pollInterval: 30000,
+      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -156,13 +109,38 @@ export default compose(
           };
         },
       });
+      const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
+        variables: {
+          commentId,
+          limit,
+          postId,
+        },
+        query: CommentList.fragments.loadCommentsQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
+
+          const updatedPost = update(previousResult.feeds.edges[index], {
+            comments: {
+              $push: fetchMoreResult.post.comments,
+            },
+          });
+          return update(previousResult, {
+            feeds: {
+              edges: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+        },
+      });
       return {
         data,
         loadMoreRows,
+        loadMoreComments,
       };
     },
   }),
-  graphql(createNewPost, {
+  graphql(Feed.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
       createNewPost: message => mutate({
         variables: { message },
@@ -178,6 +156,7 @@ export default compose(
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
             },
+            comments: [],
             createdAt: new Date(),
             totalLikes: 0,
             totalComments: 0,
@@ -199,7 +178,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(likePost, {
+  graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
       likePost: (postId, message, totalLikes, totalComments, user) => mutate({
         variables: { postId },
@@ -236,7 +215,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(unlikePost, {
+  graphql(Feed.mutation.unlikePost, {
     props: ({ mutate }) => ({
       unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
         variables: { postId },
@@ -261,6 +240,74 @@ export default compose(
           homePageQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
+            return update(previousResult, {
+              feeds: {
+                edges: {
+                  $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(CommentList.mutation.createNewCommentQuery, {
+    props: ({ mutate }) => ({
+      createNewComment: (postId, message, commentId, user) => mutate({
+        variables: { postId, message, commentId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewComment: {
+            __typename: 'CommentSchemas',
+            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'UserSchemas',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            parent: commentId || null,
+            reply: [],
+            updatedAt: (new Date()).toString(),
+          },
+        },
+        updateQueries: {
+          homePageQuery: (previousResult, { mutationResult }) => {
+            const newComment = mutationResult.data.createNewComment;
+            const index = previousResult.feeds.edges.findIndex(item => item._id === postId);
+            const currentPost = previousResult.feeds.edges[index];
+            let updatedPost = null;
+            if (currentPost._id !== postId) {
+              return previousResult;
+            }
+
+            let commentCount = currentPost.totalComments;
+            if (commentId) {
+              const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
+              const commentItem = currentPost.comments[indexComment];
+              // init reply value
+              if (!commentItem.reply) {
+                commentItem.reply = [];
+              }
+
+              // push value into property reply
+              commentItem.reply.push(newComment);
+              updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
+                comments: {
+                  $splice: [[indexComment, 1, commentItem]],
+                },
+              });
+            } else {
+              updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
+                comments: {
+                  $unshift: [newComment],
+                },
+              });
+            }
             return update(previousResult, {
               feeds: {
                 edges: {

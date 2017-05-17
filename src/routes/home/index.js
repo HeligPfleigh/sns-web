@@ -8,23 +8,18 @@
  */
 
 import React from 'react';
-import Home from './Home';
 import Layout from '../../components/Layout';
-import { selectUser } from '../../selectors';
+import { checkAuth } from '../../utils/role';
 
 export default {
-
   path: '/',
 
-  async action(context) {
-    const { store } = context;
-
-    if (!selectUser(store)) {
-      return { redirect: '/login' };
-    }
-
+  async action({ store }) {
+    const redirect = checkAuth(store);
+    if (redirect) return redirect;
+    const Home = await require.ensure([], require => require('./Home').default, 'home');
     return {
-      title: 'SNS',
+      title: 'SNS - Trang chủ',
       component: <Layout><Home /></Layout>,
     };
   },

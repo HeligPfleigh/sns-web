@@ -39,10 +39,10 @@ class NavRight extends React.Component {
             <Dropdown.Menu className={s.userDropdownMenu}>
               <MenuItem onClick={() => this.navEventHandler('/me')}>
                 <div className={s.boxUserItem}>
-                  <Image src={profile && profile.picture} circle width={45} height={45}   className={s.pullLeft}/>
+                  <Image src={profile && profile.picture} circle width={45} height={45} className={s.pullLeft} />
                   <div className={s.name}>
                     <h2>
-                      <strong>{`${profile.firstName} ${profile.lastName}`}</strong> 
+                      { profile && <strong>{`${profile.firstName} ${profile.lastName}`}</strong> }
                       <p>View profile</p>
                     </h2>
                   </div>
@@ -51,7 +51,7 @@ class NavRight extends React.Component {
               <MenuItem header className={s.headerItem}>TÀI KHOẢN</MenuItem>
               <MenuItem onClick={() => this.navEventHandler('/settings')}>Cài đặt</MenuItem>
               <MenuItem onClick={() => this.navEventHandler('/helps')}>Trợ giúp</MenuItem>
-              <MenuItem href="/logout">Đăng xuất</MenuItem>
+              <MenuItem href="/auth/logout">Đăng xuất</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
         </div>

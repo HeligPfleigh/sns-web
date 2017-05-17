@@ -36,7 +36,6 @@ class Post extends React.Component {
     e.preventDefault();
     this.setState({
       isFocus: !this.state.isFocus,
-
     });
     const { data: { _id } } = this.props;
     goToAnchor(`#add-comment-${_id}`);
@@ -116,7 +115,7 @@ class Post extends React.Component {
           </a>
         </Col>
         <Col className={s.commentPanel}>
-          <CommentList isFocus={this.state.isFocus} postId={_id} user={userInfo} />
+          <CommentList isFocus={this.state.isFocus} postId={_id} user={userInfo} totalComments={totalComments} />
         </Col>
       </div>
     );

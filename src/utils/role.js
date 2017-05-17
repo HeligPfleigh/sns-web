@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default role => (route) => {
   const newRoute = {
     ...route,
@@ -31,5 +33,18 @@ export const requireAuth = (route) => {
       return result;
     },
   };
+  const children = route && route.children;
+  if (!_.isEmpty(children)) {
+    newRoute.children = children.map(childRoute => requireAuth(childRoute));
+  }
   return newRoute;
+};
+export const checkAuth = (store) => {
+  const state = store.getState();
+  if (!state.user || !state.user.id) {
+    return {
+      redirect: '/login',
+    };
+  }
+  return false;
 };
