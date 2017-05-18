@@ -12,7 +12,7 @@ isTimeLineMe={false}
 />
 */
 
-const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
+const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <div>
     {feeds.map(item => (
       item.user && item.user.profile && <Feed
@@ -21,6 +21,8 @@ const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
         likePostEvent={likePostEvent}
         unlikePostEvent={unlikePostEvent}
         userInfo={userInfo}
+        loadMoreComments={loadMoreComments}
+        createNewComment={createNewComment}
       />
     ))}
   </div>
@@ -35,6 +37,8 @@ FeedList.propTypes = {
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,
   userInfo: PropTypes.object.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
 };
 
 export default FeedList;
