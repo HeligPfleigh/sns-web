@@ -1,5 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 
+export const HANDLE_REGEX = /@[\w\d]+/g;
+export const HASHTAG_REGEX = /#[\w\d]+/g;
+
 export const SET_RUNTIME_VARIABLE = 'SET_RUNTIME_VARIABLE';
 
 export const POST_TYPES = ['STATUS', 'EVENT'];

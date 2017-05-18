@@ -8,7 +8,7 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
-import Loading from '../../components/Loading';
+// import Loading from '../../components/Loading';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import s from './Home.scss';
@@ -46,15 +46,15 @@ class Home extends Component {
 
   render() {
     // Pre-fetch data
-   
     const { data: { loading, feeds, me }, loadMoreRows, loadMoreComments, createNewComment } = this.props;
     let hasNextPage = false;
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
-        {/**<Loading show={loading} full>Loading ...</Loading>*/}
+        {/** <Loading show={loading} full>Loading ...</Loading>*/}
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />
@@ -88,7 +88,7 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      variables: {},
+      // variables: {},
       // pollInterval: 30000,
       fetchPolicy: 'cache-and-network',
     }),
@@ -282,6 +282,8 @@ export default compose(
             if (currentPost._id !== postId) {
               return previousResult;
             }
+
+            let commentCount = currentPost.totalComments;
             if (commentId) {
               const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
               const commentItem = currentPost.comments[indexComment];
@@ -293,12 +295,14 @@ export default compose(
               // push value into property reply
               commentItem.reply.push(newComment);
               updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
                 comments: {
                   $splice: [[indexComment, 1, commentItem]],
                 },
               });
             } else {
               updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
                 comments: {
                   $unshift: [newComment],
                 },

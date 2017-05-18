@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Clearfix } from 'react-bootstrap';
 import ScrollableAnchor, { configureAnchors, goToAnchor } from 'react-scrollable-anchor';
+
 import s from './CommentStyle.scss';
 import CommentItem from './CommentItem';
 import NewComment from './NewComment';
@@ -86,12 +87,6 @@ class CommentList extends React.Component {
   }
 }
 
-const doNothing = (e) => {
-  if (e) {
-    e.preventDefault();
-  }
-};
-
 CommentList.propTypes = {
   comments: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -107,9 +102,6 @@ CommentList.propTypes = {
 CommentList.defaultProps = {
   comments: [],
   isFocus: false,
-  createNewComment: doNothing,
-  loadMoreComments: doNothing,
-  totalComments: doNothing,
 };
 
 const userFragment = gql`

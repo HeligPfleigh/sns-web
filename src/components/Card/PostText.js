@@ -8,10 +8,11 @@ import s from './PostText.scss';
 const PostText = ({ children, html, className }) => (
   <div className={className}>
     <Clearfix />
-    { html && <Col
-      className={s.postContent}
-      dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(html))) }}
-    />
+    {
+      html && <Col
+        className={s.postContent}
+        dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(html))) }}
+      />
     }
     {children}
   </div>

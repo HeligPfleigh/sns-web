@@ -15,32 +15,40 @@ import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
 import update from 'immutability-helper';
 
-import s from './Header.scss';
 import SearchBox from '../SearchBox';
 import Navigation from '../Navigation';
 import NavRight from '../NavRight';
 import history from '../../core/history';
+import { Feed } from '../../components/Feed';
+import s from './Header.scss';
+
+import { PENDING } from '../../constants';
 // import logoUrl from './logo-small.png';
 // import logoUrl2x from './logo-small@2x.png';
 
+update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
+
 const userFragment = gql`
   fragment HeaderUserView on UserSchemas {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
+    ...UserView,
+    friends {
+      ...UserView,
     }
-    totalNotification
+    friendRequests {
+      ...UserView,
+    }
+    friendSuggestions {
+      ...UserView,
+    }
   }
+  ${Feed.fragments.user}
 `;
 
 const NotifyFragment = gql`
   fragment NotificationView on NotificationSchemas {
     _id
     user {
-      ...HeaderUserView
+      ...UserView,
     }
     type
     seen
@@ -48,16 +56,16 @@ const NotifyFragment = gql`
       _id
       message
       user {
-        ...HeaderUserView
+        ...UserView,
       }
     }
     actors {
-      ...HeaderUserView
+      ...UserView,
     }
     isRead
     createdAt
   }
-  ${userFragment}
+  ${Feed.fragments.user}
 `;
 
 const headerQuery = gql`query headerQuery($cursor: String) {
@@ -77,6 +85,12 @@ const headerQuery = gql`query headerQuery($cursor: String) {
 ${userFragment}
 ${NotifyFragment}
 `;
+
+const friendAction = gql`mutation friendAction ($userId: String!, $cmd: String!) {
+  friendAction(userId: $userId, cmd: $cmd) {
+    _id,
+  }
+}`;
 
 const updateSeenQuery = gql`mutation updateSeen {
   UpdateSeen {
@@ -98,7 +112,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { data: { notifications, me }, loadMoreRows, updateSeen, updateIsRead } = this.props;
+    const { data: { notifications, me, refetch }, loadMoreRows, updateSeen, updateIsRead, handleFriendAction } = this.props;
     return (
       <div className={s.root} >
         <Grid>
@@ -121,6 +135,10 @@ class Header extends React.Component {
                   loadMoreRows={loadMoreRows}
                   updateSeen={updateSeen}
                   updateIsRead={updateIsRead}
+                  refetch={refetch}
+                  friendType={PENDING}
+                  friends={me.friendRequests}
+                  handleFriendAction={handleFriendAction}
                 />
               </MediaQuery>
             </Col>
@@ -133,6 +151,10 @@ class Header extends React.Component {
                 loadMoreRows={loadMoreRows}
                 updateSeen={updateSeen}
                 updateIsRead={updateIsRead}
+                refetch={refetch}
+                friendType={PENDING}
+                friends={me.friendRequests}
+                handleFriendAction={handleFriendAction}
                 isMobile
               />
             </div>
@@ -143,12 +165,6 @@ class Header extends React.Component {
   }
 }
 
-const doNothing = (e) => {
-  if (e) {
-    e.preventDefault();
-  }
-};
-
 Header.propTypes = {
   data: PropTypes.shape({
     loading: PropTypes.bool.isRequired,
@@ -156,13 +172,11 @@ Header.propTypes = {
   loadMoreRows: PropTypes.func.isRequired,
   updateSeen: PropTypes.func.isRequired,
   updateIsRead: PropTypes.func.isRequired,
+  handleFriendAction: PropTypes.func.isRequired,
 };
 
 Header.defaultProps = {
   data: {},
-  loadMoreRows: doNothing,
-  updateSeen: doNothing,
-  updateIsRead: doNothing,
 };
 
 export default compose(
@@ -220,6 +234,26 @@ export default compose(
               notifications: {
                 edges: {
                   $splice: [[index, 1, result]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  // friendAction
+  graphql(friendAction, {
+    props: ({ mutate }) => ({
+      handleFriendAction: (userId, cmd) => mutate({
+        variables: { userId, cmd },
+        updateQueries: {
+          headerQuery: (previousResult, { mutationResult }) => {
+            const newFriend = mutationResult.data.friendAction;
+            return update(previousResult, {
+              me: {
+                friendRequests: {
+                  $unset: [newFriend._id],
                 },
               },
             });

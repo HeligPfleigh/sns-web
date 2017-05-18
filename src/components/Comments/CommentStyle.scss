@@ -1,15 +1,21 @@
 @import "../../theme/resources.scss";
-.commentContent{
-  a:hover{
-    cursor: pointer
+
+.commentContent {
+  a {
+    text-decoration: none;
+    cursor: pointer;
+    &:hover, &:active {
+      text-decoration: none;
+      cursor: pointer;
+    }
   }
-}
-.subComment {
-  width: 93%;
-  float: right;
-  img {
-    width: 32px;
-    height: 32px;
+  .subComment {
+    width: 93%;
+    float: right;
+    img {
+      width: 32px;
+      height: 32px;
+    }
+    font-size: 0.9em;
   }
-  font-size: 0.9em;
 }
