@@ -14,12 +14,13 @@ import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import s from './Navigation.scss';
 import Link from '../Link';
+import history from '../../core/history';
 import { makeNotificationRead } from '../../actions/chat';
 import CustomToggle from '../Common/DropdownMenu/CustomToggle';
-import history from '../../core/history';
 import NotificationList from '../Notification/NotificationList';
+import Friend from '../Friend/Friend';
+import s from './Navigation.scss';
 
 const getNotificationCount = (chatNotification, current) => {
   const copyObjectNotification = chatNotification && Object.assign({}, chatNotification);
@@ -40,7 +41,11 @@ const getNotificationCount = (chatNotification, current) => {
 )
 class Navigation extends React.Component {
 
-  state = { isOpen: false };
+  constructor(props) {
+    super(props);
+    const { friends } = props;
+    this.state = { friends, isOpen: false };
+  }
 
   componentDidMount() {
     this.handleUpdateTitle();
@@ -48,8 +53,7 @@ class Navigation extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { chatNotification, current } = this.props;
-    if (current && chatNotification !== nextProps.chatNotification &&
-      nextProps.chatNotification && nextProps.chatNotification[current]) {
+    if (current && chatNotification !== nextProps.chatNotification && nextProps.chatNotification && nextProps.chatNotification[current]) {
       this.props.makeNotificationRead({ conversationId: current });
     }
   }
@@ -100,6 +104,21 @@ class Navigation extends React.Component {
     }));
   }
 
+  generateDivs = () => {
+    const moreDivs = [];
+    // let count = this.state.friends.length;
+    // for (let i = 0; i < 30; i++) {
+    //   moreDivs.push(
+    //     <div key={`div${count++}`} style={{ height: 50 }}>
+    //       Div no {count}
+    //     </div>,
+    //   );
+    // }
+    setTimeout(() => {
+      this.setState({ friends: this.state.friends.concat(moreDivs) });
+    }, 500);
+  }
+
   render() {
     const {
       isMobile,
@@ -113,23 +132,51 @@ class Navigation extends React.Component {
     } = this.props;
 
     const { isOpen } = this.state;
+    const { friends, ...customs } = this.props;
 
     let hasNextPage = false;
     if (!loading && pageInfo) {
       hasNextPage = pageInfo.hasNextPage;
     }
+
     const countChatNotification = getNotificationCount(chatNotification, current);
+
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
         <Link className={s.link} to="/">
           <i className="fa fa-home"></i>
           {isMobile ? '' : <span>Trang chủ</span>}
         </Link>
+        <div className={s.userDropdown}>
+          <Dropdown id="dropdown-custom-1" pullRight onToggle={this.onToggleClick} >
 
-        <Link className={s.link} to="/friends">
-          <i className="fa fa-users"></i>
-          {isMobile ? '' : <span>Nhóm</span>}
-        </Link>
+            <CustomToggle bsRole="toggle" refs="child">
+              <Link className={s.link} to="/">
+                <i className="fa fa-users"></i>
+                {isMobile ? '' : <span>Nhóm</span>}
+              </Link>
+            </CustomToggle>
+
+            <Dropdown.Menu className={s.userDropdownMenu} hidden>
+              <div className={s.headerItem}><strong>Bạn bè</strong>
+                <a onClick={this.addFriend} hidden>
+                  <div className={s.icon}><i className="fa fa-plus" aria-hidden="true" ></i></div>
+                </a>
+              </div>
+              <div className={s.boxListUser}>
+                <InfiniteScroll
+                  next={this.generateDivs}
+                  hasMore
+                  loader={<span style={{ display: 'none' }}>Loading...</span>}
+                  endMessage={<span style={{ display: 'none' }}>Loading...</span>}
+                >
+                  { friends && friends.map(friend => <Friend key={`friend-id-${friend._id}`} friend={friend} {...customs} />) }
+                </InfiniteScroll>
+              </div>
+              <div className={s.bottomItem}><a href="/friends">Xem tất cả</a></div>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
 
         <Link className={s.link} to="/messages">
           {
@@ -141,7 +188,7 @@ class Navigation extends React.Component {
             countChatNotification < 1 &&
             <i className="fa fa-comment"></i>
           }
-          {isMobile ? '' : <span>Tinh nhắn</span>}
+          { isMobile ? '' : <span>Tinh nhắn</span> }
         </Link>
 
         <MediaQuery query="(max-width: 992px)">
@@ -206,21 +253,13 @@ class Navigation extends React.Component {
   }
 }
 
-const doNothing = (e) => {
-  if (e) e.preventDefault();
-};
-
 Navigation.defaultProps = {
   isMobile: false,
   chatNotification: {},
   location: {},
   current: '',
-  makeNotificationRead: doNothing,
   user: {},
   data: {},
-  loadMoreRows: doNothing,
-  updateSeen: doNothing,
-  updateIsRead: doNothing,
 };
 
 Navigation.propTypes = {
@@ -228,12 +267,16 @@ Navigation.propTypes = {
   chatNotification: React.PropTypes.object,
   location: React.PropTypes.object,
   current: React.PropTypes.string,
-  makeNotificationRead: React.PropTypes.func.isRequired,
+  makeNotificationRead: React.PropTypes.func,
   user: React.PropTypes.object,
   data: React.PropTypes.object,
   loadMoreRows: React.PropTypes.func,
   updateSeen: React.PropTypes.func.isRequired,
   updateIsRead: React.PropTypes.func.isRequired,
+  handleFriendAction: React.PropTypes.func.isRequired,
+  friendType: React.PropTypes.string,
+  friends: React.PropTypes.array,
+  refetch: React.PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(Navigation);

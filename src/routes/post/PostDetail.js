@@ -7,7 +7,7 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
-import Feed from '../../components/Feed/Feed';
+import { Feed } from '../../components/Feed';
 import s from './PostDetail.scss';
 
 const PostDetailQuery = gql`query PostDetailQuery ($postId: String) {
@@ -80,34 +80,35 @@ class PostDetail extends Component {
   render() {
     const { data: { loading, post, me }, likePost, unlikePost, loadMoreComments, createNewComment } = this.props;
     return (
-      <Grid>
-        <Loading show={loading} full>Loading ...</Loading>
-        <Row className={s.containerTop30}>
-          <Col md={8} sm={12} xs={12}>
-            { post && <Feed
-              data={post}
-              likePostEvent={likePost}
-              unlikePostEvent={unlikePost}
-              userInfo={me}
-              loadMoreComments={loadMoreComments}
-              createNewComment={createNewComment}
-            />}
-          </Col>
+      <span>
+        {
+          post &&
+          <Grid>
+            <Loading show={loading} full>Loading ...</Loading>
+            <Row className={s.containerTop30}>
+              <Col md={8} sm={12} xs={12}>
+                { post && <Feed
+                  data={post}
+                  likePostEvent={likePost}
+                  unlikePostEvent={unlikePost}
+                  userInfo={me}
+                  loadMoreComments={loadMoreComments}
+                  createNewComment={createNewComment}
+                />}
+              </Col>
 
-          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
-            <Col md={4} smHidden xsHidden>
-              <FriendSuggestions />
-            </Col>
-          </MediaQuery>
-        </Row>
-      </Grid>
+              <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+                <Col md={4} smHidden xsHidden>
+                  <FriendSuggestions />
+                </Col>
+              </MediaQuery>
+            </Row>
+          </Grid>
+        }
+      </span>
     );
   }
 }
-
-const doNothing = (e) => {
-  if (e) e.preventDefault();
-};
 
 PostDetail.defaultProps = {
   data: {
@@ -116,17 +117,13 @@ PostDetail.defaultProps = {
     },
     loading: false,
   },
-  likePost: doNothing,
-  unlikePost: doNothing,
-  loadMoreComments: doNothing,
-  createNewComment: doNothing,
 };
 
 PostDetail.propTypes = {
   data: PropTypes.shape({
     post: PropTypes.shape({
-      comments: PropTypes.array.isRequired,
-    }).isRequired,
+      comments: PropTypes.array,
+    }),
     loading: PropTypes.bool.isRequired,
   }).isRequired,
   likePost: PropTypes.func.isRequired,

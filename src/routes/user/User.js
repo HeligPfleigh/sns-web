@@ -4,6 +4,7 @@ import { Grid, Row, Col, Image } from 'react-bootstrap';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
+import { generate as idRandom } from 'shortid';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
@@ -73,7 +74,7 @@ class User extends Component {
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
                   <div className={s.parent}>
-                    <NewPost createNewPost={this.props.createNewPost} />
+                    { me && user && <NewPost createNewPost={this.props.createNewPost} friend={user} /> }
                   </div>
                   { posts && <FeedList
                     feeds={posts}
@@ -91,7 +92,7 @@ class User extends Component {
             </div>
           </Col>
           <Col sm={4} xs={12}></Col>
-        </Row >
+        </Row>
       </Grid>
     );
   }
@@ -137,22 +138,30 @@ export default compose(
   }),
   graphql(Feed.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: message => mutate({
-        variables: { message },
+      createNewPost: (message, friend) => mutate({
+        variables: { message, userId: friend._id },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
             __typename: 'PostSchemas',
-            _id: 'TENPORARY_ID_OF_THE_POST_OPTIMISTIC_UI',
+            _id: idRandom(),
             message,
             user: {
               __typename: 'UserSchemas',
-              _id: ownProps.id,
-              username: ownProps.username,
-              profile: ownProps.profile,
+              _id: friend._id,
+              username: friend.username,
+              profile: friend.profile,
+              totalNotification: 0,
+            },
+            author: {
+              __typename: 'UserSchemas',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              totalNotification: 0,
             },
             comments: [],
-            createdAt: new Date(),
+            createdAt: (new Date()).toString(),
             totalLikes: 0,
             totalComments: 0,
             isLiked: false,
@@ -277,6 +286,8 @@ export default compose(
             if (currentPost._id !== postId) {
               return previousResult;
             }
+
+            let commentNum = currentPost.totalComments;
             if (commentId) {
               const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
               const commentItem = currentPost.comments[indexComment];
@@ -288,17 +299,20 @@ export default compose(
               // push value into property reply
               commentItem.reply.push(newComment);
               updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentNum },
                 comments: {
                   $splice: [[indexComment, 1, commentItem]],
                 },
               });
             } else {
               updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentNum },
                 comments: {
                   $unshift: [newComment],
                 },
               });
             }
+
             return update(previousResult, {
               user: {
                 posts: {
