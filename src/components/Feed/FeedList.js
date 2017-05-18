@@ -1,7 +1,18 @@
 import React, { PropTypes } from 'react';
+// import Post from '../../components/Post';
 import Feed from './Feed';
+/**
+<Post
+key={item._id}
+data={item}
+likePostEvent={likePostEvent}
+unlikePostEvent={unlikePostEvent}
+userInfo={userInfo}
+isTimeLineMe={false}
+/>
+*/
 
-const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo }) => (
   <div>
     {feeds.map(item => (
       item.user && item.user.profile && <Feed
@@ -10,8 +21,6 @@ const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo, loadMoreCom
         likePostEvent={likePostEvent}
         unlikePostEvent={unlikePostEvent}
         userInfo={userInfo}
-        loadMoreComments={loadMoreComments}
-        createNewComment={createNewComment}
       />
     ))}
   </div>
@@ -25,9 +34,7 @@ FeedList.propTypes = {
   ).isRequired,
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,
-  loadMoreComments: PropTypes.func.isRequired,
-  createNewComment: PropTypes.func.isRequired,
-  userInfo: PropTypes.object,
+  userInfo: PropTypes.object.isRequired,
 };
 
 export default FeedList;
