@@ -6,6 +6,8 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
+import { generate as idRandom } from 'shortid';
+
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 // import Loading from '../../components/Loading';
@@ -88,9 +90,9 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      // variables: {},
+      variables: {},
       // pollInterval: 30000,
-      fetchPolicy: 'cache-and-network',
+      // fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -148,16 +150,24 @@ export default compose(
           __typename: 'Mutation',
           createNewPost: {
             __typename: 'PostSchemas',
-            _id: 'TENPORARY_ID_OF_THE_POST_OPTIMISTIC_UI',
+            _id: idRandom(),
             message,
             user: {
               __typename: 'UserSchemas',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
+              totalNotification: 0,
+            },
+            author: {
+              __typename: 'UserSchemas',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              totalNotification: 0,
             },
             comments: [],
-            createdAt: new Date(),
+            createdAt: (new Date()).toString(),
             totalLikes: 0,
             totalComments: 0,
             isLiked: false,

@@ -4,6 +4,8 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
+import { generate as idRandom } from 'shortid';
+
 import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
@@ -87,32 +89,11 @@ const loadCommentsQuery = gql`
 `;
 class Me extends React.Component {
 
-  static propTypes = {
-    data: PropTypes.shape({
-      me: PropTypes.shape({
-        posts: PropTypes.arrayOf(PropTypes.object).isRequired,
-        profile: PropTypes.shape({
-          picture: PropTypes.string.isRequired,
-          firstName: PropTypes.string.isRequired,
-          lastName: PropTypes.string.isRequired,
-        }).isRequired,
-      }).isRequired,
-    }).isRequired,
-    createNewComment: PropTypes.func.isRequired,
-    createNewPost: PropTypes.func.isRequired,
-    likePost: PropTypes.func.isRequired,
-    unlikePost: PropTypes.func.isRequired,
-    loadMoreComments: PropTypes.func.isRequired,
-    query: PropTypes.shape({
-      tab: PropTypes.string.isRequired,
-    }),
-  };
-
   render() {
     const { data: { me }, query, createNewComment, loadMoreComments } = this.props;
     const posts = me ? me.posts : [];
     const avatar = (me && me.profile && me.profile.picture) || '';
-    const profile = (me && me.profile) || {};
+    const profile = me && me.profile;
 
     const numbers = 100;
     let tab = MY_TIME_LINE;
@@ -165,27 +146,39 @@ class Me extends React.Component {
   }
 }
 
+Me.propTypes = {
+  data: PropTypes.shape({
+    me: PropTypes.shape({
+      posts: PropTypes.arrayOf(PropTypes.object).isRequired,
+      profile: PropTypes.shape({
+        picture: PropTypes.string.isRequired,
+        firstName: PropTypes.string.isRequired,
+        lastName: PropTypes.string.isRequired,
+      }).isRequired,
+    }),
+  }).isRequired,
+  createNewComment: PropTypes.func.isRequired,
+  createNewPost: PropTypes.func.isRequired,
+  likePost: PropTypes.func.isRequired,
+  unlikePost: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  query: PropTypes.shape({
+    tab: PropTypes.string,
+  }),
+};
+
+Me.defaultProps = {
+  data: [],
+};
+
 export default compose(
   withStyles(s),
   graphql(profilePageQuery, {
     options: () => ({
-      variables: {},
+      // variables: {},
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
-      const loadMoreRows = () => fetchMore({
-        variables: {
-          cursor: {},
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newPosts = fetchMoreResult.me.posts;
-          return {
-            me: {
-              posts: [...previousResult.me.posts, ...newPosts],
-            },
-          };
-        },
-      });
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {
           commentId,
@@ -212,7 +205,6 @@ export default compose(
       });
       return {
         data,
-        loadMoreRows,
         loadMoreComments,
       };
     },
@@ -225,16 +217,24 @@ export default compose(
           __typename: 'Mutation',
           createNewPost: {
             __typename: 'PostSchemas',
-            _id: 'TENPORARY_ID_OF_THE_POST_OPTIMISTIC_UI',
+            _id: idRandom(),
             message,
             user: {
               __typename: 'UserSchemas',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
+              totalNotification: 0,
+            },
+            author: {
+              __typename: 'UserSchemas',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              totalNotification: 0,
             },
             comments: [],
-            createdAt: new Date(),
+            createdAt: (new Date()).toString(),
             totalLikes: 0,
             totalComments: 0,
             isLiked: false,
