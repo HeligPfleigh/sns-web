@@ -21,12 +21,12 @@ export const auth = {
     secret: process.env.FACEBOOK_APP_SECRET || '06a4ac09ae386fa9779547a6de5c0dd3',
   },
   firebase: {
-    apiKey: process.env.FIREBASE_PROJECT_APIKEY || 'AIzaSyDgbPU5DuXmvxWprMwc-HxTMae05c6rCPc',
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'snschat-fb64b.firebaseapp.com',
-    databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://snschat-fb64b.firebaseio.com',
-    projectId: process.env.FIREBASE_PROJECT_ID || 'snschat-fb64b',
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'snschat-fb64b.appspot.com',
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '1034925992768',
+    apiKey: 'AIzaSyDgbPU5DuXmvxWprMwc-HxTMae05c6rCPc',
+    authDomain: 'snschat-fb64b.firebaseapp.com',
+    databaseURL: 'https://snschat-fb64b.firebaseio.com',
+    projectId: 'snschat-fb64b',
+    storageBucket: 'snschat-fb64b.appspot.com',
+    messagingSenderId: '1034925992768',
   },
 };
 
