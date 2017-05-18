@@ -6,8 +6,10 @@ import update from 'immutability-helper';
 import { Grid, Row, Col } from 'react-bootstrap';
 import Loading from '../../components/Loading';
 import FriendList from '../../components/Friend/FriendList';
+import Friend from '../../components/Friend/Friend';
 import { PENDING, NONE, ACCEPTED, REJECTED } from '../../constants';
 import s from './Friends.scss';
+import Label from '../../components/Friend/Label';
 
 const friendsPageQuery = gql`query friendsPageQuery {
   me {
@@ -102,13 +104,32 @@ class Friends extends React.Component {
           <Col md={8} xs={12}>
             {
               me && me.friendRequests &&
-              <FriendList friends={me.friendRequests} friendType={PENDING} handleFriendAction={this.handleFriendAction} />
+              <FriendList>
+                <Label label={`Respond to Your ${me.friendRequests.length} Friend Requests`}></Label>
+                <ul>
+                  {
+                    me.friendRequests.map(friend =>
+                      <li key={friend._id}>
+                        <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={PENDING} />
+                      </li>
+                    )
+                  }
+                </ul>
+              </FriendList>
             }
           </Col>
           <Col md={4} xs={12}>
             {
               me && me.friendSuggestions && me.friendSuggestions.length > 0 &&
-              <FriendList friends={me.friendSuggestions} friendType={NONE} handleFriendAction={this.handleFriendAction} />
+              <FriendList>
+                {
+                  me.friendSuggestions.map(friend =>
+                    <li key={friend._id}>
+                      <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={NONE} />
+                    </li>
+                  )
+                }
+              </FriendList>
             }
           </Col>
         </Row>

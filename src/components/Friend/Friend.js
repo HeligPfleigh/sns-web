@@ -20,7 +20,7 @@ class Friend extends React.Component {
     const { friend, handleFriendAction, friendType } = this.props;
     return (
       <div className={s.friend} onClick={this.handleClickFriend}>
-        <div className={s.friendAvata}>
+        <div className={s.friendAvatar}>
           <img alt={friend.profile && friend.profile.firstName} src={friend.profile && friend.profile.picture} />
         </div>
         <div className={s.friendInfo}>

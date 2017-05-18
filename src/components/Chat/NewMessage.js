@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import { connect } from 'react-redux';
 import Loading from '../../components/Loading';
 import FriendList from '../../components/Friend/FriendList';
+import Friend from '../../components/Friend/Friend';
 import { ACCEPTED } from '../../constants';
 import s from './Conversation.scss';
 import { addNewUserToConversation } from '../../actions/chat';
@@ -74,7 +75,15 @@ class NewMessage extends React.Component {
             <Loading show={loading} />
             {
               me && me.friends &&
-              <FriendList className={s.listPeople} friends={me.friends} friendType={ACCEPTED} handleFriendAction={this.handleFriendAction} />
+              <FriendList className={s.listPeople}>
+                {
+                  me.friends.map(friend =>
+                    <li key={friend._id}>
+                      <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={ACCEPTED} />
+                    </li>
+                  )
+                }
+              </FriendList>
             }
           </div>
         }
