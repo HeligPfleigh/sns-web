@@ -8,9 +8,13 @@ export const analytics = {
 
 };
 
-// const serverIp = 'http://api-sns.mttjsc.com';
-const serverIp = 'http://server:3005';
-const browserIp = 'http://api-sns.mttjsc.com';
+// server run dev config
+// const serverIp = 'http://server:3005';
+// const browserIp = 'http://api-sns.mttjsc.com';
+
+// local run dev config
+const serverIp = 'http://localhost:3005';
+const browserIp = 'http://localhost:3005';
 
 export const server = {
   ip: serverIp,
