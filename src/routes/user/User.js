@@ -31,20 +31,6 @@ ${Feed.fragments.post}`;
 
 class User extends Component {
 
-  static propTypes = {
-    data: PropTypes.shape({
-      feeds: PropTypes.object,
-      loading: PropTypes.bool.isRequired,
-    }).isRequired,
-    createNewPost: PropTypes.func.isRequired,
-    likePost: PropTypes.func.isRequired,
-    unlikePost: PropTypes.func.isRequired,
-    loadMoreComments: PropTypes.func.isRequired,
-    createNewComment: PropTypes.func.isRequired,
-    id: PropTypes.string.isRequired,
-    query: PropTypes.object.isRequired,
-  };
-
   render() {
     const { data: { user, me }, query, id } = this.props;
     const posts = user ? user.posts : [];
@@ -76,7 +62,7 @@ class User extends Component {
                   <div className={s.parent}>
                     { me && user && <NewPost createNewPost={this.props.createNewPost} friend={user} /> }
                   </div>
-                  { posts && <FeedList
+                  { me && posts && <FeedList
                     feeds={posts}
                     likePostEvent={this.props.likePost}
                     unlikePostEvent={this.props.unlikePost}
@@ -97,6 +83,26 @@ class User extends Component {
     );
   }
 }
+
+User.propTypes = {
+  data: PropTypes.shape({
+    feeds: PropTypes.object,
+    loading: PropTypes.bool.isRequired,
+  }).isRequired,
+  createNewPost: PropTypes.func.isRequired,
+  likePost: PropTypes.func.isRequired,
+  unlikePost: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  query: PropTypes.object.isRequired,
+};
+
+User.defaultProps = {
+  data: [],
+  id: '',
+  query: {},
+};
 
 export default compose(
   withStyles(s),
