@@ -47,6 +47,13 @@ Info.propTypes = {
   }).isRequired,
   isMe: PropTypes.bool.isRequired,
 };
+Info.defaultProps = {
+  birthday: '',
+  phone: '',
+  address: '',
+  gender: '',
+  email: '',
+};
 export default withStyles(s)(Info);
 
 //  graphql(updateProfile, {
