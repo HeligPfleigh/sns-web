@@ -8,11 +8,15 @@ export const analytics = {
 
 };
 
+// const serverIp = 'http://api-sns.mttjsc.com';
+const serverIp = 'http://server:3005';
+const browserIp = 'http://api-sns.mttjsc.com';
+
 export const server = {
-  ip: 'http://localhost:3005',
-  graphql: 'http://localhost:3005/graphql',
-  ipBrowser: 'http://localhost:3005',
-  graphqlBrowser: 'http://localhost:3005/graphql',
+  ip: serverIp,
+  graphql: `${serverIp}/graphql`,
+  ipBrowser: browserIp,
+  graphqlBrowser: `${browserIp}/graphql`,
   authPath: '/auth',
 };
 

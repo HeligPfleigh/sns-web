@@ -8,8 +8,8 @@ export const analytics = {
 };
 
 export const server = {
-  ip: process.env.APP_IP || 'http://localhost:8081',
-  graphql: process.env.APP_GRAPHQL_URL || 'http://localhost:8081/graphql',
+  ip: process.env.APP_IP || 'http://server:8081',
+  graphql: process.env.APP_GRAPHQL_URL || 'http://server:8081/graphql',
   ipBrowser: process.env.BROWSER_IP || 'http://api-sns.mttjsc.com',
   graphqlBrowser: process.env.BROWSER_GRAPHQL_URL || 'http://api-sns.mttjsc.com/graphql',
   authPath: process.env.APP_AUTH_PATH || '/auth',
