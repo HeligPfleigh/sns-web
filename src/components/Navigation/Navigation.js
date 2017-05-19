@@ -173,7 +173,7 @@ class Navigation extends React.Component {
                   { friends && friends.map(friend => <Friend key={`friend-id-${friend._id}`} friend={friend} {...customs} />) }
                 </InfiniteScroll>
               </div>
-              <div className={s.bottomItem}><a href="/friends">Xem tất cả</a></div>
+              <Link to="/friends"><div className={s.bottomItem}>Xem tất cả</div></Link>
             </Dropdown.Menu>
           </Dropdown>
         </div>
