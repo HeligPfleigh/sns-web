@@ -43,7 +43,8 @@ class Html extends React.Component {
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
           <title>{title}</title>
           <meta name="description" content={description} />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="theme-color" content="#ffffff" />
+          <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, user-scalable=0, width=device-width" />
           <link rel="apple-touch-icon" href="apple-touch-icon.png" />
           <style
             type="text/css"
