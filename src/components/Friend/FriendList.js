@@ -1,36 +1,25 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Friend from './Friend';
+import Label from './Label';
 import s from './FriendStyle.scss';
 import { PENDING } from '../../constants';
 
 class FriendList extends React.Component {
-  static propTypes = {
-    friends: PropTypes.array.isRequired,
-    className: PropTypes.string,
-    handleFriendAction: PropTypes.func,
-  }
   render() {
-    const { friends, className, ...customs } = this.props;
-    const { friendType } = customs;
-
-   // const styleNofriend = friends.length > 0 ? s.friendList : s.friendListHide;
+    const { className, children } = this.props;
     return (
       <div className={`${s.friendList} ${className}`}>
-        {
-          friendType === PENDING &&
-          <h4>
-            Respond to Your {friends.length} Friend Requests
-          </h4>
-        }
         <ul>
-          {
-            friends.map(friend => <li key={friend._id}><Friend friend={friend} {...customs} /></li>)
-          }
+          {children}
         </ul>
       </div>
     );
   }
 }
+
+FriendList.propTypes = {
+  className: PropTypes.string
+};
 
 export default withStyles(s)(FriendList);
