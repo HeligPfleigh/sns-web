@@ -106,15 +106,11 @@ class Friends extends React.Component {
               me && me.friendRequests &&
               <FriendList>
                 <Label label={`Respond to Your ${me.friendRequests.length} Friend Requests`}></Label>
-                <ul>
-                  {
-                    me.friendRequests.map(friend =>
-                      <li key={friend._id}>
-                        <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={PENDING} />
-                      </li>
-                    )
-                  }
-                </ul>
+                {
+                  me.friendRequests.map(friend =>
+                    <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={PENDING} />
+                  )
+                }
               </FriendList>
             }
           </Col>

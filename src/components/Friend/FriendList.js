@@ -6,17 +6,20 @@ import s from './FriendStyle.scss';
 import { PENDING } from '../../constants';
 
 class FriendList extends React.Component {
-  static propTypes = {
-    className: PropTypes.string
-  }
   render() {
     const { className, children } = this.props;
     return (
       <div className={`${s.friendList} ${className}`}>
+        <ul>
           {children}
+        </ul>
       </div>
     );
   }
 }
+
+FriendList.propTypes = {
+  className: PropTypes.string
+};
 
 export default withStyles(s)(FriendList);

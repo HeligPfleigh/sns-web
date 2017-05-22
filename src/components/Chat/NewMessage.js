@@ -78,9 +78,7 @@ class NewMessage extends React.Component {
               <FriendList className={s.listPeople}>
                 {
                   me.friends.map(friend =>
-                    <li key={friend._id}>
-                      <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={ACCEPTED} />
-                    </li>
+                    <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={ACCEPTED} />
                   )
                 }
               </FriendList>
