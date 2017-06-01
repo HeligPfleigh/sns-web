@@ -216,7 +216,7 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
-            __typename: 'PostSchemas',
+            __typename: 'Post',
             _id: idRandom(),
             message,
             user: {

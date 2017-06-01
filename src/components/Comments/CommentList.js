@@ -105,7 +105,7 @@ CommentList.defaultProps = {
 };
 
 const userFragment = gql`
-  fragment UserView on UserSchemas {
+  fragment UserView on Author {
     _id,
     username,
     profile {
@@ -117,7 +117,7 @@ const userFragment = gql`
   }
 `;
 
-const commentFragment = gql`fragment CommentView on CommentSchemas {
+const commentFragment = gql`fragment CommentView on Comment {
     _id,
     message,
     user {

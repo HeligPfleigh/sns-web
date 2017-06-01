@@ -117,7 +117,7 @@ Feed.defaultProps = {
 };
 
 const userFragment = gql`
-  fragment UserView on UserSchemas {
+  fragment UserView on User {
     _id,
     username,
     profile {
@@ -125,11 +125,10 @@ const userFragment = gql`
       firstName,
       lastName
     }
-    totalNotification
   }
 `;
 
-const commentFragment = gql`fragment CommentView on CommentSchemas {
+const commentFragment = gql`fragment CommentView on Comment {
     _id,
     message,
     user {
@@ -145,7 +144,7 @@ Feed.fragments = {
   comment: commentFragment,
   user: userFragment,
   post: gql`
-    fragment PostView on PostSchemas {
+    fragment PostView on Post {
       _id,
       message,
       user {

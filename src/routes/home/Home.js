@@ -149,22 +149,22 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
-            __typename: 'PostSchemas',
+            __typename: 'Post',
             _id: idRandom(),
             message,
             user: {
-              __typename: 'UserSchemas',
+              __typename: 'Friend',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              totalNotification: 0,
+              // totalNotification: 0,
             },
             author: {
-              __typename: 'UserSchemas',
+              __typename: 'Author',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              totalNotification: 0,
+              // totalNotification: 0,
             },
             comments: [],
             createdAt: (new Date()).toString(),
@@ -195,11 +195,11 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
-            __typename: 'PostSchemas',
+            __typename: 'Post',
             _id: postId,
             message,
             user: {
-              __typename: 'UserSchemas',
+              __typename: 'Friend',
               _id: user._id,
               username: user.username,
               profile: user.profile,
@@ -232,11 +232,11 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           unlikePost: {
-            __typename: 'PostSchemas',
+            __typename: 'Post',
             _id: postId,
             message,
             user: {
-              __typename: 'UserSchemas',
+              __typename: 'Friend',
               _id: user._id,
               username: user.username,
               profile: user.profile,
@@ -269,11 +269,11 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           createNewComment: {
-            __typename: 'CommentSchemas',
+            __typename: 'Comment',
             _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
             message,
             user: {
-              __typename: 'UserSchemas',
+              __typename: 'Author',
               _id: user._id,
               username: user.username,
               profile: user.profile,

@@ -22,7 +22,7 @@ import Loading from '../../components/Loading';
 import s from './Notifications.scss';
 
 const userFragment = gql`
-  fragment userNotificationView on UserSchemas {
+  fragment userNotificationView on Author {
     _id,
     username,
     profile {
@@ -35,7 +35,7 @@ const userFragment = gql`
 `;
 
 const notificationFragment = gql`
-  fragment frmNotificationView on NotificationSchemas {
+  fragment frmNotificationView on Notification {
     _id
     user {
       ...userNotificationView

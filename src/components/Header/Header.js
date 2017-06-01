@@ -19,7 +19,6 @@ import SearchBox from '../SearchBox';
 import Navigation from '../Navigation';
 import NavRight from '../NavRight';
 import history from '../../core/history';
-import { Feed } from '../../components/Feed';
 import s from './Header.scss';
 
 import { PENDING } from '../../constants';
@@ -28,9 +27,22 @@ import { PENDING } from '../../constants';
 
 update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
 
+const UserView = gql`
+  fragment UserView on User {
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    }
+  }
+`;
+
 const userFragment = gql`
-  fragment HeaderUserView on UserSchemas {
+  fragment HeaderUserView on Me {
     ...UserView,
+    totalNotification
     friends {
       ...UserView,
     }
@@ -41,11 +53,11 @@ const userFragment = gql`
       ...UserView,
     }
   }
-  ${Feed.fragments.user}
+  ${UserView}
 `;
 
 const NotifyFragment = gql`
-  fragment NotificationView on NotificationSchemas {
+  fragment NotificationView on Notification {
     _id
     user {
       ...UserView,
@@ -65,7 +77,7 @@ const NotifyFragment = gql`
     isRead
     createdAt
   }
-  ${Feed.fragments.user}
+  ${UserView}
 `;
 
 const headerQuery = gql`query headerQuery($cursor: String) {
