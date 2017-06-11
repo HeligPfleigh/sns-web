@@ -17,16 +17,27 @@ import s from './User.scss';
 
 const profilePageQuery = gql`query profilePageQuery($_id: String!) {
   user(_id : $_id){
-    ...UserView,
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    },
     posts {
       ...PostView
     }
   }
   me {
-    ...UserView,
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    },
   }
 }
-${Feed.fragments.user}
 ${Feed.fragments.post}`;
 
 class User extends Component {
