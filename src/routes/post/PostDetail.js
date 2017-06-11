@@ -10,40 +10,51 @@ import Loading from '../../components/Loading';
 import { Feed } from '../../components/Feed';
 import s from './PostDetail.scss';
 
-const PostDetailQuery = gql`query PostDetailQuery ($postId: String) {
+const PostDetailQuery = gql`query PostDetailQuery ($postId: String!) {
   post (_id: $postId) {
     ...PostView
   }
   me {
-    ...UserView,
-  },
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
+  }
 }
-${Feed.fragments.post}
-${Feed.fragments.user}`;
+${Feed.fragments.post}`;
 
 const likePostQuery = gql`mutation likePost ($postId: String!) {
-  likePost(postId: $postId) {
+  likePost(_id: $postId) {
     ...PostView
   }
 }
 ${Feed.fragments.post}`;
 
 const unlikePostQuery = gql`mutation unlikePost ($postId: String!) {
-  unlikePost(postId: $postId) {
+  unlikePost(_id: $postId) {
     ...PostView
   }
 }
 ${Feed.fragments.post}`;
 
 const loadCommentsQuery = gql`
-  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+  query loadCommentsQuery ($postId: String!, $commentId: String, $limit: Int) {
     post (_id: $postId) {
       _id
       comments (_id: $commentId, limit: $limit) {
         _id
         message
         user {
-          ...UserView,
+          _id
+          username
+          profile {
+            picture
+            firstName
+            lastName
+          }
         },
         parent,
         reply {
@@ -53,7 +64,6 @@ const loadCommentsQuery = gql`
       }
     }
   }
-  ${Feed.fragments.user}
   ${Feed.fragments.comment}
 `;
 
@@ -64,7 +74,7 @@ const createNewCommentQuery = gql`
     $commentId: String,
   ) {
     createNewComment(
-      postId: $postId,
+      _id: $postId,
       message: $message,
       commentId: $commentId,
     ) {
@@ -137,7 +147,6 @@ export default compose(
   graphql(PostDetailQuery, {
     options: props => ({
       variables: {
-        ...props,
         postId: props.postId,
       },
     }),
@@ -167,7 +176,9 @@ export default compose(
   graphql(likePostQuery, {
     props: ({ mutate }) => ({
       likePost: (postId, message, totalLikes, totalComments, user) => mutate({
-        variables: { postId },
+        variables: {
+          postId,
+        },
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
