@@ -113,7 +113,6 @@ const userFragment = gql`
       firstName,
       lastName
     }
-    totalNotification
   }
 `;
 
@@ -131,7 +130,7 @@ const commentFragment = gql`fragment CommentView on Comment {
 
 CommentList.fragments = {
   loadCommentsQuery: gql`
-    query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+    query loadCommentsQuery ($postId: String!, $commentId: String, $limit: Int) {
       post (_id: $postId) {
         _id
         comments (_id: $commentId, limit: $limit) {
@@ -160,7 +159,7 @@ CommentList.mutation = {
       $commentId: String,
     ) {
       createNewComment(
-        postId: $postId,
+        _id: $postId,
         message: $message,
         commentId: $commentId,
       ) {

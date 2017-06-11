@@ -7,10 +7,8 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import { generate as idRandom } from 'shortid';
-
 import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
-// import Loading from '../../components/Loading';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import s from './Home.scss';
@@ -26,10 +24,15 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
     }
   }
   me {
-    ...UserView,
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    }
   },
 }
-${Feed.fragments.user}
 ${Feed.fragments.post}`;
 
 class Home extends Component {
@@ -56,7 +59,6 @@ class Home extends Component {
 
     return (
       <Grid>
-        {/** <Loading show={loading} full>Loading ...</Loading>*/}
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
             <NewPost createNewPost={this.props.createNewPost} />

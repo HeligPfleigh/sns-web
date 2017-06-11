@@ -1,16 +1,5 @@
 import React, { PropTypes } from 'react';
-// import Post from '../../components/Post';
 import Feed from './Feed';
-/**
-<Post
-key={item._id}
-data={item}
-likePostEvent={likePostEvent}
-unlikePostEvent={unlikePostEvent}
-userInfo={userInfo}
-isTimeLineMe={false}
-/>
-*/
 
 const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <div>

@@ -14,7 +14,7 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+export const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <Post>
     <PostHeader
       avatar={
@@ -44,7 +44,6 @@ const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalCo
               <i className="fa fa-caret-right" aria-hidden="true"></i>
             </span>
           }
-
           <Link to={`/user/${user._id}`}>
             <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
           </Link>
@@ -116,6 +115,7 @@ Feed.defaultProps = {
   },
 };
 
+/**
 const userFragment = gql`
   fragment UserView on User {
     _id,
@@ -127,31 +127,49 @@ const userFragment = gql`
     }
   }
 `;
+*/
 
 const commentFragment = gql`fragment CommentView on Comment {
     _id,
     message,
     user {
-      ...UserView
+      _id,
+      username,
+      profile {
+        picture,
+        firstName,
+        lastName
+      }
     },
     parent,
     updatedAt,
   }
-  ${userFragment}
 `;
 
 Feed.fragments = {
   comment: commentFragment,
-  user: userFragment,
+  // user: userFragment,
   post: gql`
     fragment PostView on Post {
       _id,
       message,
       user {
-        ...UserView,
+        _id,
+        username,
+        profile {
+          picture,
+          firstName,
+          lastName
+        }
       },
       author {
-        ...UserView,
+        _id,
+        username,
+        profile {
+          picture,
+          firstName,
+          lastName
+        }
       },
       totalLikes,
       totalComments,
@@ -161,7 +179,13 @@ Feed.fragments = {
         _id
         message
         user {
-          ...UserView,
+          _id,
+          username,
+          profile {
+            picture,
+            firstName,
+            lastName
+          }
         },
         parent,
         reply {
@@ -170,7 +194,6 @@ Feed.fragments = {
         updatedAt,
       }
     }
-    ${userFragment}
     ${commentFragment}
   `,
 };
@@ -184,14 +207,14 @@ Feed.mutation = {
   ${Feed.fragments.post}
   `,
   likePost: gql`mutation likePost ($postId: String!) {
-    likePost(postId: $postId) {
+    likePost(_id: $postId) {
       ...PostView
     }
   }
   ${Feed.fragments.post}
   `,
   unlikePost: gql`mutation unlikePost ($postId: String!) {
-    unlikePost(postId: $postId) {
+    unlikePost(_id: $postId) {
       ...PostView
     }
   }
