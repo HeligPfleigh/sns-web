@@ -21,24 +21,29 @@ import { NotificationList } from '../../components/Notification';
 import Loading from '../../components/Loading';
 import s from './Notifications.scss';
 
-const userFragment = gql`
-  fragment userNotificationView on Author {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-    totalNotification
-  }
-`;
+// const userFragment = gql`
+//   fragment userNotificationView on Author {
+//     _id,
+//     username,
+//     profile {
+//       picture,
+//       firstName,
+//       lastName
+//     }
+//   }
+// `;
 
 const notificationFragment = gql`
   fragment frmNotificationView on Notification {
     _id
     user {
-      ...userNotificationView
+      _id,
+      username,
+      profile {
+        picture,
+        firstName,
+        lastName
+      }
     }
     type
     seen
@@ -46,16 +51,27 @@ const notificationFragment = gql`
       _id
       message
       user {
-        ...userNotificationView
+        _id,
+        username,
+        profile {
+          picture,
+          firstName,
+          lastName
+        }
       }
     }
     actors {
-      ...userNotificationView
+      _id,
+      username,
+      profile {
+        picture,
+        firstName,
+        lastName
+      }
     }
     isRead
     createdAt
   }
-  ${userFragment}
 `;
 
 const notificationQuery = gql`query notificationQuery($cursor: String) {
@@ -69,10 +85,16 @@ const notificationQuery = gql`query notificationQuery($cursor: String) {
     }
   }
   me {
-    ...userNotificationView,
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    }
+    totalNotification
   },
 }
-${userFragment}
 ${notificationFragment}`;
 
 const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {

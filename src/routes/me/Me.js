@@ -11,7 +11,7 @@ import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
-import Feed from '../../components/Feed/Feed';
+import { Feed } from '../../components/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
 const createNewPost = gql`mutation createNewPost ($message: String!) {
@@ -23,25 +23,30 @@ ${Feed.fragments.post}`;
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
-    ...UserView,
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
+    }
     posts {
       ...PostView
     }
   },
 }
-${Feed.fragments.user}
 ${Feed.fragments.post}
 `;
 
 const likePost = gql`mutation likePost ($postId: String!) {
-  likePost(postId: $postId) {
+  likePost(_id: $postId) {
     ...PostView
   }
 }
 ${Feed.fragments.post}`;
 
 const unlikePost = gql`mutation unlikePost ($postId: String!) {
-  unlikePost(postId: $postId) {
+  unlikePost(_id: $postId) {
     ...PostView
   }
 }
@@ -54,7 +59,7 @@ const createNewCommentQuery = gql`
     $commentId: String,
   ) {
     createNewComment(
-      postId: $postId,
+      _id: $postId,
       message: $message,
       commentId: $commentId,
     ) {
@@ -67,14 +72,20 @@ const createNewCommentQuery = gql`
 ${Feed.fragments.comment}`;
 
 const loadCommentsQuery = gql`
-  query loadCommentsQuery ($postId: String, $commentId: String, $limit: Int) {
+  query loadCommentsQuery ($postId: String!, $commentId: String, $limit: Int) {
     post (_id: $postId) {
       _id
       comments (_id: $commentId, limit: $limit) {
         _id
         message
         user {
-          ...UserView,
+          _id,
+          username,
+          profile {
+            picture,
+            firstName,
+            lastName
+          }
         },
         parent,
         reply {
@@ -84,7 +95,6 @@ const loadCommentsQuery = gql`
       }
     }
   }
-  ${Feed.fragments.user}
   ${Feed.fragments.comment}
 `;
 class Me extends React.Component {
