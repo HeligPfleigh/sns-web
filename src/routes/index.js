@@ -9,6 +9,7 @@ export default {
   children: [
     require('./home').default,
     require('./friends').default,
+    require('./building').default,
     require('./messages').default,
     require('./contact').default,
     require('./login').default,
