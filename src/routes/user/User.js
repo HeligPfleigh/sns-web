@@ -17,13 +17,13 @@ import s from './User.scss';
 
 const profilePageQuery = gql`query profilePageQuery($_id: String!) {
   user(_id : $_id){
-    _id,
-    username,
+    _id
+    username
     profile {
-      picture,
-      firstName,
+      picture
+      firstName
       lastName
-    },
+    }
     posts {
       ...PostView
     }
