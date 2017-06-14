@@ -3,9 +3,10 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
-import { Grid } from 'react-bootstrap';
-import s from './Building.scss';
+import { Grid, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import s from './Building.scss';
 
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!) {
@@ -34,37 +35,43 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-function doNothing(evt) {
-  evt.preventDefault();
-}
-
 class Building extends Component {
   render() {
-    const { data: { loading, building, me }, likePost, unlikePost } = this.props;
-    console.log(building);
+    const { data: { building, me }, likePost, unlikePost, createNewComment, loadMoreComments } = this.props;
     return (
       <Grid>
-        { building && <div>
-          name: { building.name } <br />
-          address <br />
-          <ul>
-            <li>country: {building.address.country}</li>
-            <li>city: {building.address.city}</li>
-            <li>state: {building.address.state}</li>
-            <li>street: {building.address.street}</li>
-          </ul>
-          new post here <br />
-          { building && building.posts && <FeedList
-            feeds={building ? building.posts : []}
-            likePostEvent={likePost}
-            unlikePostEvent={unlikePost}
-            userInfo={me}
-            loadMoreComments={doNothing}
-            createNewComment={doNothing}
-          />}
-          if admin show request to join group <br />
-        </div>
-        }
+        <Row>
+          <Col sm={8} xs={12}>
+            <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
+              <Tab eventKey={1} title="Posts">
+                { building && building.posts && <FeedList
+                  feeds={building ? building.posts : []}
+                  likePostEvent={likePost}
+                  unlikePostEvent={unlikePost}
+                  userInfo={me}
+                  loadMoreComments={loadMoreComments}
+                  createNewComment={createNewComment}
+                />}
+              </Tab>
+              <Tab eventKey={2} title="Information">
+                { building && <div>
+                  name: { building.name } <br />
+                  address <br />
+                  <ul>
+                    <li>country: {building.address.country}</li>
+                    <li>city: {building.address.city}</li>
+                    <li>state: {building.address.state}</li>
+                    <li>street: {building.address.street}</li>
+                  </ul>
+                  new post here <br />
+                  if admin show request to join group <br />
+                </div>
+                }
+              </Tab>
+            </Tabs>
+          </Col>
+          <Col sm={4} xs={12}></Col>
+        </Row>
       </Grid>
     );
   }
@@ -79,6 +86,8 @@ Building.propTypes = {
   }).isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
   // buildingId: PropTypes.string.isRequired,
 };
 
@@ -95,7 +104,39 @@ export default compose(
       variables: {
         buildingId: props.buildingId,
       },
+      // fetchPolicy: 'cache-and-network', ???
     }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
+        variables: {
+          commentId,
+          limit,
+          postId,
+        },
+        query: CommentList.fragments.loadCommentsQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) { return previousResult; }
+          const index = previousResult.building.posts.findIndex(item => item._id === postId);
+          const updatedPost = update(previousResult.building.posts[index], {
+            comments: {
+              $push: fetchMoreResult.post.comments,
+            },
+          });
+          return update(previousResult, {
+            building: {
+              posts: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+        },
+      });
+      return {
+        data,
+        loadMoreComments,
+      };
+    },
   }),
   graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
@@ -158,9 +199,77 @@ export default compose(
           },
         },
         updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.building.posts.findIndex(item => item._id === updatedPost._id);
+            return update(previousResult, {
+              building: {
+                posts: {
+                  $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(CommentList.mutation.createNewCommentQuery, {
+    props: ({ mutate }) => ({
+      createNewComment: (postId, message, commentId, user) => mutate({
+        variables: { postId, message, commentId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewComment: {
+            __typename: 'Comment',
+            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            message,
+            user: {
+              __typename: 'Author',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            parent: commentId || null,
+            reply: [],
+            updatedAt: (new Date()).toString(),
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            const newComment = mutationResult.data.createNewComment;
+            const index = previousResult.building.posts.findIndex(item => item._id === postId);
+            const currentPost = previousResult.building.posts[index];
+            let updatedPost = null;
+            if (currentPost._id !== postId) {
+              return previousResult;
+            }
+
+            let commentCount = currentPost.totalComments;
+            if (commentId) {
+              const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
+              const commentItem = currentPost.comments[indexComment];
+              // init reply value
+              if (!commentItem.reply) {
+                commentItem.reply = [];
+              }
+
+              // push value into property reply
+              commentItem.reply.push(newComment);
+              updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
+                comments: {
+                  $splice: [[indexComment, 1, commentItem]],
+                },
+              });
+            } else {
+              updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentCount },
+                comments: {
+                  $unshift: [newComment],
+                },
+              });
+            }
             return update(previousResult, {
               building: {
                 posts: {
