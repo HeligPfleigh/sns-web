@@ -4,8 +4,10 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
 import { Grid, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import NewPost from '../../components/NewPost';
 import s from './Building.scss';
 
 const loadBuildingQuery = gql`
@@ -35,15 +37,24 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
+const createNewPost = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
+  createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
+    ...PostView
+  }
+}
+${Feed.fragments.post}
+`;
+
 class Building extends Component {
   render() {
-    const { data: { building, me }, likePost, unlikePost, createNewComment, loadMoreComments } = this.props;
+    const { data: { building, me }, likePost, unlikePost, createNewComment, loadMoreComments, createNewPost } = this.props;
     return (
       <Grid>
         <Row>
           <Col sm={8} xs={12}>
             <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
               <Tab eventKey={1} title="Posts">
+                <NewPost createNewPost={createNewPost} />
                 { building && building.posts && <FeedList
                   feeds={building ? building.posts : []}
                   likePostEvent={likePost}
@@ -88,6 +99,7 @@ Building.propTypes = {
   unlikePost: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
+  createNewPost: PropTypes.func.isRequired,
   // buildingId: PropTypes.string.isRequired,
 };
 
@@ -137,6 +149,55 @@ export default compose(
         loadMoreComments,
       };
     },
+  }),
+  graphql(createNewPost, {
+    props: ({ ownProps, mutate }) => ({
+      createNewPost: message => mutate({
+        variables: {
+          message,
+          buildingId: ownProps.buildingId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewPost: {
+            __typename: 'Post',
+            _id: idRandom(),
+            message,
+            user: {
+              __typename: 'Friend',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              // totalNotification: 0,
+            },
+            author: {
+              __typename: 'Author',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              // totalNotification: 0,
+            },
+            comments: [],
+            createdAt: (new Date()).toString(),
+            totalLikes: 0,
+            totalComments: 0,
+            isLiked: false,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            const newPost = mutationResult.data.createNewPost;
+            return update(previousResult, {
+              building: {
+                posts: {
+                  $unshift: [newPost],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
   }),
   graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
