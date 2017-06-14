@@ -37,7 +37,7 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPost = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
+const createNewPostOnBuilding = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
   createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
     ...PostView
   }
@@ -47,14 +47,14 @@ ${Feed.fragments.post}
 
 class Building extends Component {
   render() {
-    const { data: { building, me }, likePost, unlikePost, createNewComment, loadMoreComments, createNewPost } = this.props;
+    const { data: { building, me }, likePost, unlikePost, createNewComment, loadMoreComments, createNewPostOnBuilding } = this.props;
     return (
       <Grid>
         <Row>
           <Col sm={8} xs={12}>
             <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
               <Tab eventKey={1} title="Posts">
-                <NewPost createNewPost={createNewPost} />
+                <NewPost createNewPost={createNewPostOnBuilding} />
                 { building && building.posts && <FeedList
                   feeds={building ? building.posts : []}
                   likePostEvent={likePost}
@@ -99,7 +99,7 @@ Building.propTypes = {
   unlikePost: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
-  createNewPost: PropTypes.func.isRequired,
+  createNewPostOnBuilding: PropTypes.func.isRequired,
   // buildingId: PropTypes.string.isRequired,
 };
 
@@ -150,16 +150,16 @@ export default compose(
       };
     },
   }),
-  graphql(createNewPost, {
+  graphql(createNewPostOnBuilding, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: message => mutate({
+      createNewPostOnBuilding: message => mutate({
         variables: {
           message,
           buildingId: ownProps.buildingId,
         },
         optimisticResponse: {
           __typename: 'Mutation',
-          createNewPost: {
+          createNewPostOnBuilding: {
             __typename: 'Post',
             _id: idRandom(),
             message,
@@ -168,14 +168,12 @@ export default compose(
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              // totalNotification: 0,
             },
             author: {
               __typename: 'Author',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              // totalNotification: 0,
             },
             comments: [],
             createdAt: (new Date()).toString(),
@@ -186,7 +184,7 @@ export default compose(
         },
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
-            const newPost = mutationResult.data.createNewPost;
+            const newPost = mutationResult.data.createNewPostOnBuilding;
             return update(previousResult, {
               building: {
                 posts: {
