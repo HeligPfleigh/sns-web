@@ -24,6 +24,7 @@ const loadBuildingQuery = gql`
       posts {
         ...PostView
       }
+      isAdmin
     }
     me {
       _id
@@ -79,6 +80,9 @@ class Building extends Component {
                 </div>
                 }
               </Tab>
+              { building && building.isAdmin && <Tab eventKey={3} title="Requests">
+              
+              </Tab> }
             </Tabs>
           </Col>
           <Col sm={4} xs={12}></Col>
