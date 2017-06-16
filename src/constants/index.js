@@ -29,3 +29,8 @@ export const CHAT_ON_NOTIFICATION = 'CHAT_ON_NOTIFICATION';
 export const CHAT_ON_FAIL = 'CHAT_ON_FAIL';
 export const MY_TIME_LINE = 'MY_TIME_LINE';
 export const MY_INFO = 'MY_INFO';
+
+export const ADMIN = 'ADMIN';
+export const MEMBER = 'MEMBER';
+export const BUILDING_MEMBER_TYPE = [ADMIN, MEMBER];
+export const BUILDING_MEMBER_STATUS = [PENDING, ACCEPTED, REJECTED];

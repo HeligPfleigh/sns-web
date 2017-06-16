@@ -63,10 +63,6 @@ class Friends extends React.Component {
       loading: PropTypes.bool.isRequired,
     }).isRequired,
   }
-  constructor() {
-    super();
-    update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
-  }
   handleFriendAction = (userId, cmd) => {
     this.props.friendAction({
       variables: { userId, cmd },
