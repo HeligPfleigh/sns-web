@@ -427,14 +427,14 @@ export default compose(
         },
         optimisticResponse: {
           __typename: 'Mutation',
-          rejectRequestForJoiningBuilding: {
+          acceptRequestForJoiningBuilding: {
             __typename: 'Friend',
             _id: data._id,
           },
         },
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
-            const r = mutationResult.data.rejectRequestForJoiningBuilding;
+            const r = mutationResult.data.acceptRequestForJoiningBuilding;
             return update(previousResult, {
               building: {
                 requests: {
