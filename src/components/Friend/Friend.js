@@ -53,7 +53,7 @@ class Friend extends React.Component {
 Friend.propTypes = {
   friend: PropTypes.object.isRequired,
   handleFriendAction: PropTypes.func,
-  friendType: PropTypes.string.isRequired
+  friendType: PropTypes.string.isRequired,
 };
 
 export default withStyles(s)(Friend);

@@ -8,6 +8,8 @@ import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import NewPost from '../../components/NewPost';
+import FriendList, { Friend } from './FriendList';
+import Errors from './Errors';
 import s from './Building.scss';
 
 const loadBuildingQuery = gql`
@@ -25,6 +27,14 @@ const loadBuildingQuery = gql`
         ...PostView
       }
       isAdmin
+      requests {
+        _id
+        profile {
+          picture
+          firstName
+          lastName
+        }
+      }
     }
     me {
       _id
@@ -38,7 +48,7 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPostOnBuilding = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
+const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
   createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
     ...PostView
   }
@@ -46,9 +56,56 @@ const createNewPostOnBuilding = gql`mutation createNewPostOnBuilding ($message: 
 ${Feed.fragments.post}
 `;
 
+const acceptRequestForJoiningBuildingMutation = gql`mutation acceptRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
+  acceptRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
+    _id
+  }
+}
+`;
+
+const rejectRequestForJoiningBuildingMutation = gql`mutation rejectRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
+  rejectRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
+    _id
+  }
+}
+`;
+
 class Building extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      errorMessage: '',
+    };
+  }
+
+  accept = friend => (evt) => {
+    evt.preventDefault();
+    this.props.acceptRequestForJoiningBuilding(friend).catch((error) => {
+      this.setState({
+        errorMessage: error.message,
+      });
+    });
+  }
+
+  cancel = friend => (evt) => {
+    evt.preventDefault();
+    this.props.rejectRequestForJoiningBuilding(friend).catch((error) => {
+      this.setState({
+        errorMessage: error.message,
+      });
+    });
+  }
+
   render() {
-    const { data: { building, me }, likePost, unlikePost, createNewComment, loadMoreComments, createNewPostOnBuilding } = this.props;
+    const {
+      data: { building, me },
+      likePost,
+      unlikePost,
+      createNewComment,
+      loadMoreComments,
+      createNewPostOnBuilding,
+    } = this.props;
     return (
       <Grid>
         <Row>
@@ -75,13 +132,27 @@ class Building extends Component {
                     <li>state: {building.address.state}</li>
                     <li>street: {building.address.street}</li>
                   </ul>
-                  new post here <br />
-                  if admin show request to join group <br />
                 </div>
                 }
               </Tab>
               { building && building.isAdmin && <Tab eventKey={3} title="Requests">
-              
+                <FriendList>
+                  <Errors
+                    open
+                    message={this.state.errorMessage}
+                    autoHideDuration={4000}
+                  />
+                  {
+                    building && building.requests.length === 0 && <h3>
+                      you don't have any joining requests
+                    </h3>
+                  }
+                  {
+                    building && building.requests.length > 0 && building.requests.map(friend =>
+                      <Friend key={friend._id} friend={friend} onAccept={this.accept(friend)} onCancel={this.cancel(friend)} />,
+                    )
+                  }
+                </FriendList>
               </Tab> }
             </Tabs>
           </Col>
@@ -104,6 +175,8 @@ Building.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewPostOnBuilding: PropTypes.func.isRequired,
+  acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
+  rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
   // buildingId: PropTypes.string.isRequired,
 };
 
@@ -154,7 +227,7 @@ export default compose(
       };
     },
   }),
-  graphql(createNewPostOnBuilding, {
+  graphql(createNewPostOnBuildingMutation, {
     props: ({ ownProps, mutate }) => ({
       createNewPostOnBuilding: message => mutate({
         variables: {
@@ -337,6 +410,64 @@ export default compose(
               building: {
                 posts: {
                   $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(acceptRequestForJoiningBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      acceptRequestForJoiningBuilding: data => mutate({
+        variables: {
+          buildingId: ownProps.buildingId,
+          userId: data._id,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectRequestForJoiningBuilding: {
+            __typename: 'Friend',
+            _id: data._id,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            const r = mutationResult.data.rejectRequestForJoiningBuilding;
+            return update(previousResult, {
+              building: {
+                requests: {
+                  $unset: [r._id],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(rejectRequestForJoiningBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      rejectRequestForJoiningBuilding: data => mutate({
+        variables: {
+          buildingId: ownProps.buildingId,
+          userId: data._id,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectRequestForJoiningBuilding: {
+            __typename: 'Friend',
+            _id: data._id,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            const r = mutationResult.data.rejectRequestForJoiningBuilding;
+            return update(previousResult, {
+              building: {
+                requests: {
+                  $unset: [r._id],
                 },
               },
             });
