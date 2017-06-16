@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom';
 import FastClick from 'fastclick';
 import UniversalRouter from 'universal-router';
 import queryString from 'query-string';
+import update from 'immutability-helper';
 import { createPath } from 'history/PathUtils';
 import history from './core/history';
 import App from './components/App';
@@ -21,6 +22,8 @@ import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 import createApolloClient from './core/createApolloClient';
 import chat from './core/chat';
 import { setRuntimeVariable } from './actions/runtime';
+
+update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
 
 const apolloClient = createApolloClient();
 const store = configureStore(window.APP_STATE, { history, apolloClient, chat });
