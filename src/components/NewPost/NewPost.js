@@ -12,17 +12,24 @@ import {
   Col,
   Clearfix,
   Button,
+  FormControl,
 } from 'react-bootstrap';
 
-import { HANDLE_REGEX, HASHTAG_REGEX } from '../../constants';
+import {
+  HANDLE_REGEX,
+  HASHTAG_REGEX,
+  PUBLIC,
+  FRIEND,
+  ONLY_ME
+} from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 
 /**
-       * Super simple decorators for handles and hashtags, for demonstration
-       * purposes only. Don't reuse these regexes.
-       */
+ * Super simple decorators for handles and hashtags, for demonstration
+ * purposes only. Don't reuse these regexes.
+ */
 const styles = {
   editor: {
     // border: '1px solid #ddd',
@@ -66,6 +73,7 @@ class NewPost extends React.Component {
   state = {
     editorState: EditorState.createEmpty(compositeDecorator),
     isSubmit: true,
+    privacy: PUBLIC,
   };
 
   onChange = (editorState) => {
@@ -84,10 +92,18 @@ class NewPost extends React.Component {
       ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: true,
+      privacy: PUBLIC,
     }));
   }
 
   focus = () => this.editor.focus();
+
+  onChangePrivacy = (evt) => {
+    evt.preventDefault();
+    this.setState({
+      privacy: evt.target.value,
+    });
+  }
 
   render() {
     const { editorState, isSubmit } = this.state;
@@ -115,6 +131,14 @@ class NewPost extends React.Component {
           <Col className="pull-right">
             <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
+          <Col className="pull-right">
+            <FormControl onChange={this.onChangePrivacy} defaultValue={PUBLIC} componentClass="select" placeholder="select">
+              <option value={PUBLIC}>{PUBLIC}</option>
+              <option value={FRIEND}>{FRIEND}</option>
+              <option value={ONLY_ME}>{ONLY_ME}</option>
+            </FormControl>
+          </Col>
+
           <Clearfix />
         </Col>
       </div>
