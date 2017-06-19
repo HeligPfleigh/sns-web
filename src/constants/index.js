@@ -34,3 +34,8 @@ export const ADMIN = 'ADMIN';
 export const MEMBER = 'MEMBER';
 export const BUILDING_MEMBER_TYPE = [ADMIN, MEMBER];
 export const BUILDING_MEMBER_STATUS = [PENDING, ACCEPTED, REJECTED];
+
+export const PUBLIC = 'PUBLIC';
+export const FRIEND = 'FRIEND';
+export const ONLY_ME = 'ONLY_ME';
+export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME];
