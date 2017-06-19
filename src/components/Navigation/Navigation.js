@@ -1,18 +1,9 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import React from 'react';
+import MediaQuery from 'react-responsive';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Dropdown, MenuItem } from 'react-bootstrap';
-import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Link from '../Link';
 import history from '../../core/history';
@@ -27,7 +18,7 @@ const getNotificationCount = (chatNotification, current) => {
   if (current && chatNotification && chatNotification[current]) {
     delete copyObjectNotification[current];
   }
-  const countChatNotification = !_.isEmpty(copyObjectNotification) && Object.keys(copyObjectNotification).length;
+  const countChatNotification = !isEmpty(copyObjectNotification) && Object.keys(copyObjectNotification).length;
   return countChatNotification;
 };
 
@@ -140,6 +131,7 @@ class Navigation extends React.Component {
     }
 
     const countChatNotification = getNotificationCount(chatNotification, current);
+    const buildingId = user.building[0] && user.building[0]._id;
 
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
@@ -177,6 +169,11 @@ class Navigation extends React.Component {
             </Dropdown.Menu>
           </Dropdown>
         </div>
+
+        <Link className={s.link} to={`/building/${buildingId}`}>
+          <i className="fa fa-address-book-o"></i>
+          {isMobile ? '' : <span>Tòa nhà</span>}
+        </Link>
 
         <Link className={s.link} to="/messages">
           {
