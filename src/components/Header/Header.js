@@ -27,40 +27,60 @@ import { PENDING } from '../../constants';
 
 update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
 
-const UserView = gql`
-  fragment UserView on User {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-
 const userFragment = gql`
   fragment HeaderUserView on Me {
-    ...UserView,
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
     totalNotification
     friends {
-      ...UserView,
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
     }
     friendRequests {
-      ...UserView,
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
     }
     friendSuggestions {
-      ...UserView,
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    building {
+      _id
     }
   }
-  ${UserView}
 `;
 
 const NotifyFragment = gql`
   fragment NotificationView on Notification {
     _id
     user {
-      ...UserView,
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
     }
     type
     seen
@@ -68,16 +88,27 @@ const NotifyFragment = gql`
       _id
       message
       user {
-        ...UserView,
+        _id
+        username
+        profile {
+          picture
+          firstName
+          lastName
+        }
       }
     }
     actors {
-      ...UserView,
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
     }
     isRead
     createdAt
   }
-  ${UserView}
 `;
 
 const headerQuery = gql`query headerQuery($cursor: String) {
