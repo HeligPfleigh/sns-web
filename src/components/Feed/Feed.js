@@ -8,13 +8,15 @@ import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
 import Link from '../Link';
 import CommentList from '../Comments/CommentList';
+import { PUBLIC, FRIEND, ONLY_ME } from '../../constants';
+
 import s from './Feed.scss';
 
 function doNothing(e) {
   e.preventDefault();
 }
 
-export const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalComments = 0, createdAt, comments = [] }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+export const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalComments = 0, createdAt, comments = [], privacy }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
   <Post>
     <PostHeader
       avatar={
@@ -49,7 +51,12 @@ export const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, 
           </Link>
         </span>
       }
-      subtitle={<Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>}
+      subtitle={<div>
+        { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
+        { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
+        { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
+        <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
+      </div>}
     />
     <PostText html={message} />
     <PostText className={s.postStatistic}>
@@ -89,6 +96,7 @@ Feed.propTypes = {
         lastName: PropTypes.string,
       }),
     }),
+    privacy: PropTypes.string,
     totalLikes: PropTypes.number,
     totalComments: PropTypes.number,
     createdAt: PropTypes.string,
@@ -163,31 +171,32 @@ Feed.fragments = {
         }
       },
       author {
-        _id,
-        username,
+        _id
+        username
         profile {
-          picture,
-          firstName,
+          picture
+          firstName
           lastName
         }
       },
-      totalLikes,
-      totalComments,
-      isLiked,
-      createdAt,
+      totalLikes
+      totalComments
+      isLiked
+      createdAt
+      privacy
       comments (limit: 2) {
         _id
         message
         user {
-          _id,
-          username,
+          _id
+          username
           profile {
-            picture,
-            firstName,
+            picture
+            firstName
             lastName
           }
         },
-        parent,
+        parent
         reply {
           ...CommentView
         },
