@@ -8,6 +8,7 @@ import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import NewPost from '../../components/NewPost';
+import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import Errors from './Errors';
 import s from './Building.scss';
@@ -112,7 +113,7 @@ class Building extends Component {
           <Col sm={8} xs={12}>
             <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
               <Tab eventKey={1} title="Posts">
-                <NewPost createNewPost={createNewPostOnBuilding} />
+                <NewPost createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
                 { building && building.posts && <FeedList
                   feeds={building ? building.posts : []}
                   likePostEvent={likePost}

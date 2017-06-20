@@ -144,10 +144,10 @@ export default compose(
       };
     },
   }),
-  graphql(Feed.mutation.createNewPost, {
+  graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: message => mutate({
-        variables: { message },
+      createNewPost: (message, privacy) => mutate({
+        variables: { message, privacy },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -168,6 +168,7 @@ export default compose(
               profile: ownProps.data.me.profile,
               // totalNotification: 0,
             },
+            privacy,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,

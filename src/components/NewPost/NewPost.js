@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import gql from 'graphql-tag';
 
 import {
   Editor,
@@ -20,11 +21,12 @@ import {
   HASHTAG_REGEX,
   PUBLIC,
   FRIEND,
-  ONLY_ME
+  ONLY_ME,
 } from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
+import { Feed } from '../Feed';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -85,9 +87,8 @@ class NewPost extends React.Component {
   }
 
   onSubmit = () => {
-    const { friend } = this.props;
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    this.props.createNewPost(data, friend);
+    this.props.createNewPost(data, this.state.privacy);
     this.setState(prevState => ({
       ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
@@ -96,8 +97,6 @@ class NewPost extends React.Component {
     }));
   }
 
-  focus = () => this.editor.focus();
-
   onChangePrivacy = (evt) => {
     evt.preventDefault();
     this.setState({
@@ -105,8 +104,11 @@ class NewPost extends React.Component {
     });
   }
 
+  focus = () => this.editor.focus();
+
   render() {
     const { editorState, isSubmit } = this.state;
+    const { privacy } = this.props;
     return (
       <div className={s.newPostPanel}>
         <Col className={s.newPostEditor}>
@@ -132,10 +134,10 @@ class NewPost extends React.Component {
             <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
           <Col className="pull-right">
-            <FormControl onChange={this.onChangePrivacy} defaultValue={PUBLIC} componentClass="select" placeholder="select">
-              <option value={PUBLIC}>{PUBLIC}</option>
-              <option value={FRIEND}>{FRIEND}</option>
-              <option value={ONLY_ME}>{ONLY_ME}</option>
+            <FormControl onChange={this.onChangePrivacy} defaultValue={privacy[0]} componentClass="select" placeholder="select">
+              {privacy.map(item => (
+                <option value={item}>{item}</option>
+              ))}
             </FormControl>
           </Col>
 
@@ -152,12 +154,23 @@ const doNothing = (e) => {
 
 NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
-  friend: PropTypes.object,
+  privacy: PropTypes.array.isRequired,
 };
 
 NewPost.defaultProps = {
   createNewPost: doNothing,
-  friend: {},
+  privacy: [PUBLIC, FRIEND, ONLY_ME],
+};
+
+NewPost.fragments = {};
+NewPost.mutation = {
+  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String, $privacy: PrivacyType) {
+    createNewPost(message: $message, userId: $userId, privacy: $privacy) {
+      ...PostView
+    }
+  }
+  ${Feed.fragments.post}
+  `,
 };
 
 export default withStyles(s)(NewPost);
