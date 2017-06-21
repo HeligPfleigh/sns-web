@@ -25,6 +25,9 @@ export const server = {
 };
 
 export const auth = {
+  facebook: {
+    id: process.env.FACEBOOK_APP_ID || '678961598943405',
+  },
   firebase: {
     apiKey: 'AIzaSyC-AodKtlF-jqrHwVZ5SfxAYlWBHEbC6Xc',
     authDomain: 'sns-chat-dev.firebaseapp.com',

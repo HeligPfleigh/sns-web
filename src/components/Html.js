@@ -11,6 +11,11 @@ import React, { PropTypes } from 'react';
 import serialize from 'serialize-javascript';
 import config from '../config';
 
+const { auth: {
+  facebook: { id: facebookId },
+ },
+} = config;
+
 class Html extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
@@ -106,27 +111,25 @@ class Html extends React.Component {
             else window.addEventListener('load', loadDeferredStyles);` }}
           />
 
-          {/**
-            <script
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{ __html:
-              `window.fbAsyncInit = function() {
-                FB.init({
-                  appId: '678961598943405',
-                  cookie: true,
-                  version: 'v2.2'
-                });
-              };
+          <script
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html:
+            `window.fbAsyncInit = function() {
+              FB.init({
+                appId: ${facebookId || '678961598943405'},
+                cookie: true,
+                version: 'v2.9'
+              });
+            };
 
-              (function(d, s, id){
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (d.getElementById(id)) {return;}
-                js = d.createElement(s); js.id = id;
-                js.src = "//connect.facebook.net/en_US/sdk.js";
-                fjs.parentNode.insertBefore(js, fjs);
-              }(document, 'script', 'facebook-jssdk'));` }}
-            />
-           */}
+            (function(d, s, id){
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) {return;}
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/en_US/sdk.js";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));` }}
+          />
         </body>
       </html>
     );
