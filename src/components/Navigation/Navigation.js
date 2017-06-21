@@ -131,7 +131,7 @@ class Navigation extends React.Component {
     }
 
     const countChatNotification = getNotificationCount(chatNotification, current);
-    const buildingId = user.building[0] && user.building[0]._id;
+    const buildingId = !isEmpty(user) && user.building[0] && user.building[0]._id;
 
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">

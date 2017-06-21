@@ -94,7 +94,7 @@ export default compose(
     options: () => ({
       variables: {},
       // pollInterval: 30000,
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'network-only',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
