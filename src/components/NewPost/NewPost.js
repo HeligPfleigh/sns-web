@@ -137,7 +137,7 @@ class NewPost extends React.Component {
           <Col className="pull-right">
             <FormControl onChange={this.onChangePrivacy} defaultValue={privacy[0]} componentClass="select" placeholder="select">
               {privacy.map(item => (
-                <option key={idRandom()} value={item}>{item}</option>
+                <option key={item} value={item}>{item}</option>
               ))}
             </FormControl>
           </Col>
