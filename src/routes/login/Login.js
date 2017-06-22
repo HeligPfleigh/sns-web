@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 
 import history from '../../core/history';
 import loginSuccess from '../../actions/user';
-import s from './Login.css';
+import s from './Login.scss';
 
 @connect(null, { loginSuccess })
 class Login extends React.Component {
@@ -57,75 +57,47 @@ class Login extends React.Component {
 
   render() {
     return (
-      <div className="container text-center">
-        <div className={`row ${s.div_blank}`}>
-          &nbsp;
-        </div>
-        <div className={`row hidden-xs ${s.div_blank_2}`}></div>
-        <div className="row">
-          <div className="col-sm-8 col-sm-offset-2 text">
-            <h1>.: SNS :.</h1>
-          </div>
-        </div>
+      <section className={`container ${s.login_form}`}>
+        <section>
+          <form>
+            <img src="/logo2.png" alt="" className="img-responsive" />
 
-        <div className="row">
-          {/**
-           * <div className="col-sm-5 col-sm-offset-2"></div>
-           */}
-          {/**
-          <div className="col-sm-5">
-              <div className={s.form_box}>
-                <div className={s.form_top}>
-                  <div className={s.form_top_left}>
-                    <h3>Login to our site</h3>
-                    <p>Enter username and password to log on:</p>
-                  </div>
-                  <div className={s.form_top_right}>
-                    <i className="fa fa-key"></i>
-                  </div>
-                </div>
-
-                <div className={s.form_bottom}>
-                  <form role="form" action="" method="post">
-                    <div className="form-group">
-                      <label className="sr-only" htmlFor="form_username">Username</label>
-                      <input type="text" name="form_username" placeholder="Username..."
-                        className="form_username form-control" id="form_username" />
-                    </div>
-                    <div className="form-group">
-                      <label className="sr-only" htmlFor="form_password">Password</label>
-                      <input type="password" name="form_password" placeholder="Password..."
-                        className="form_password form-control" id="form_password" />
-                    </div>
-                    <button type="submit" className={`btn ${s.btn_signin}`}>Sign in!</button>
-                  </form>
-                </div>
-              </div>
-            */}
-
-          <div className={s.social_login}>
-            <h3 className="hidden">...or login with:</h3>
-            <div className={s.social_login_buttons}>
-              <a
-                href="#"
-                onClick={this.fbLoginAction}
-                className={`btn ${s.btn_link_login} ${s.btn_link_login_facebook}`}
-              >
-                <i className="fa fa-facebook"></i> Login Facebook
-              </a>
-              {/**
-              <a className={`btn ${s.btn_link_login} ${s.btn_link_login_twitter}`} href="#">
-                <i className="fa fa-twitter"></i> Twitter
-              </a>
-              <a className={`btn ${s.btn_link_login} ${s.btn_link_login_google_plus}`} href="#">
-                <i className="fa fa-google-plus"></i> Google Plus
-              </a>
-              */}
+            <div className="form-group">
+              <input type="text" className="form-control" placeholder="Tên đăng nhập" required />
+              <span className={`glyphicon glyphicon-user ${s.addon}`}></span>
             </div>
-          </div>
-          {/** </div> */}
+
+            <div className="form-group" style={{ marginBottom: 15 }}>
+              <input type="password" className="form-control" placeholder="Mật khẩu" required />
+              <span className={`glyphicon glyphicon-lock ${s.addon}`}></span>
+            </div>
+
+            <div className="form-group" style={{ textAlign: 'left', margin: 0 }}>
+              <label className="checkbox-inline">
+                <input className={s.input_normal} type="checkbox" value="true" /> Lưu tài khoản?
+              </label>
+            </div>
+
+            <span className="btn btn-primary btn-block">Đăng nhập</span>
+            <a href="#">Reset password</a> or <a href="#">create account</a>
+          </form>
+        </section>
+        <div>
+          <a
+            href="#"
+            onClick={this.fbLoginAction}
+            className={`btn ${s.btn_link_login} ${s.btn_link_login_facebook}`}
+          >
+            <i className="fa fa-facebook"></i> Facebook
+          </a>
+          <a className={`btn ${s.btn_link_login} ${s.btn_link_login_twitter}`} href="#">
+            <i className="fa fa-twitter"></i> Twitter
+          </a>
+          <a className={`btn ${s.btn_link_login} ${s.btn_link_login_google_plus}`} href="#">
+            <i className="fa fa-google-plus"></i> Google Plus
+          </a>
         </div>
-      </div>
+      </section>
     );
   }
 }
