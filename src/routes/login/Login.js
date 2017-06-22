@@ -9,12 +9,51 @@
 
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { connect } from 'react-redux';
+
+import history from '../../core/history';
+import loginSuccess from '../../actions/user';
 import s from './Login.css';
 
+@connect(null, { loginSuccess })
 class Login extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    loginSuccess: PropTypes.func.isRequired,
   };
+
+  fbLoginAction = (evt) => {
+    evt.preventDefault();
+    const { FB } = window;
+    if (FB) {
+      FB.login((res) => {
+        if (res.authResponse) {
+          const { accessToken: access_token } = res.authResponse;
+          fetch('/auth/facebook', {
+            headers: new Headers({
+              'Content-Type': 'application/json',
+            }),
+            credentials: 'same-origin',
+            method: 'post',
+            body: JSON.stringify({ access_token }),
+          }).then((response) => {
+            if (!response.ok) {
+              throw Error(response.statusText);
+            }
+            return response.json();
+          }).then((user) => {
+            this.props.loginSuccess(user);
+            history.push('/');
+          }).catch((err) => {
+            console.log(err); // eslint-disable-line
+          });
+        } else {
+          alert('User cancelled login or did not fully authorize.');
+        }
+      });
+    } else {
+      alert('Please import FB sdk after call api');
+    }
+  }
 
   render() {
     return (
@@ -67,7 +106,11 @@ class Login extends React.Component {
           <div className={s.social_login}>
             <h3 className="hidden">...or login with:</h3>
             <div className={s.social_login_buttons}>
-              <a className={`btn ${s.btn_link_login} ${s.btn_link_login_facebook}`} href="/auth/facebook">
+              <a
+                href="#"
+                onClick={this.fbLoginAction}
+                className={`btn ${s.btn_link_login} ${s.btn_link_login_facebook}`}
+              >
                 <i className="fa fa-facebook"></i> Login Facebook
               </a>
               {/**

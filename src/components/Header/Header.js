@@ -156,6 +156,8 @@ class Header extends React.Component {
 
   render() {
     const { data: { notifications, me, refetch }, loadMoreRows, updateSeen, updateIsRead, handleFriendAction } = this.props;
+    const user = me || {};
+
     return (
       <div className={s.root} >
         <Grid>
@@ -170,17 +172,17 @@ class Header extends React.Component {
               </MediaQuery>
             </Col>
             <Col md={6} sm={6} xs={6}>
-              <NavRight user={me} />
+              <NavRight user={user} />
               <MediaQuery query="(min-width: 992px)">
                 <Navigation
-                  user={me}
+                  user={user}
                   data={notifications}
                   loadMoreRows={loadMoreRows}
                   updateSeen={updateSeen}
                   updateIsRead={updateIsRead}
                   refetch={refetch}
                   friendType={PENDING}
-                  friends={me.friendRequests}
+                  friends={user.friendRequests || []}
                   handleFriendAction={handleFriendAction}
                 />
               </MediaQuery>
@@ -189,14 +191,14 @@ class Header extends React.Component {
           <MediaQuery query="(max-width: 992px)">
             <div className={s.boxMobileHeader}>
               <Navigation
-                user={me}
+                user={user}
                 data={notifications}
                 loadMoreRows={loadMoreRows}
                 updateSeen={updateSeen}
                 updateIsRead={updateIsRead}
                 refetch={refetch}
                 friendType={PENDING}
-                friends={me.friendRequests}
+                friends={user.friendRequests || []}
                 handleFriendAction={handleFriendAction}
                 isMobile
               />
@@ -211,6 +213,7 @@ class Header extends React.Component {
 Header.propTypes = {
   data: PropTypes.shape({
     loading: PropTypes.bool.isRequired,
+    me: PropTypes.object,
   }).isRequired,
   loadMoreRows: PropTypes.func.isRequired,
   updateSeen: PropTypes.func.isRequired,
@@ -219,7 +222,9 @@ Header.propTypes = {
 };
 
 Header.defaultProps = {
-  data: {},
+  data: {
+    me: {},
+  },
 };
 
 export default compose(
