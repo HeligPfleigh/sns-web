@@ -1,10 +1,17 @@
 import React, { PropTypes } from 'react';
 import Feed from './Feed';
 
-const FeedList = ({ feeds, likePostEvent, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+const FeedList = ({
+  feeds,
+  likePostEvent,
+  unlikePostEvent,
+  userInfo,
+  loadMoreComments,
+  createNewComment,
+}) => (
   <div>
     {feeds.map(item => (
-      item.user && item.user.profile && <Feed
+      <Feed
         key={item._id}
         data={item}
         likePostEvent={likePostEvent}

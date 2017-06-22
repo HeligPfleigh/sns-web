@@ -16,39 +16,58 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-export const Feed = ({ data: { _id, message, user, author, totalLikes, isLiked, totalComments = 0, createdAt, comments = [], privacy }, likePostEvent = doNothing, unlikePostEvent, userInfo, loadMoreComments, createNewComment }) => (
+export const Feed = ({
+  data: {
+    _id,
+    message,
+    user,
+    author,
+    totalLikes,
+    isLiked,
+    totalComments = 0,
+    createdAt,
+    comments = [],
+    privacy,
+    building,
+  },
+  likePostEvent = doNothing,
+  unlikePostEvent,
+  userInfo,
+  loadMoreComments,
+  createNewComment,
+}) => (
   <Post>
     <PostHeader
       avatar={
         <span>
-          { author && (user._id !== author._id) &&
+          { author &&
             <Link to={`/user/${author._id}`}>
               <Image src={author.profile.picture} circle />
-            </Link>
-          }
-
-          { author && (user._id === author._id) &&
-            <Link to={`/user/${user._id}`}>
-              <Image src={user.profile.picture} circle />
             </Link>
           }
         </span>
       }
       title={
         <span>
-          { author && (user._id !== author._id) && <Link to={`/user/${author._id}`}>
+          { author && <Link to={`/user/${author._id}`}>
             <strong>{`${author.profile.firstName} ${author.profile.lastName}`}</strong>
             </Link>
           }
 
-          { author && (user._id !== author._id) &&
+          { ((user && (user._id !== author._id)) || building) &&
             <span style={{ margin: '0 6px' }}>
               <i className="fa fa-caret-right" aria-hidden="true"></i>
             </span>
           }
-          <Link to={`/user/${user._id}`}>
+
+          { user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
             <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
           </Link>
+          }
+          { building && <Link to={`/building/${building._id}`}>
+            <strong>{building.name}</strong>
+          </Link>
+          }
         </span>
       }
       subtitle={<div>
@@ -96,6 +115,10 @@ Feed.propTypes = {
         lastName: PropTypes.string,
       }),
     }),
+    building: PropTypes.shape({
+      _id: PropTypes.string,
+      name: PropTypes.string,
+    }),
     privacy: PropTypes.string,
     totalLikes: PropTypes.number,
     totalComments: PropTypes.number,
@@ -139,18 +162,18 @@ const userFragment = gql`
 
 const commentFragment = gql`fragment CommentView on Comment {
     _id,
-    message,
+    message
     user {
-      _id,
-      username,
+      _id
+      username
       profile {
-        picture,
-        firstName,
+        picture
+        firstName
         lastName
       }
     },
-    parent,
-    updatedAt,
+    parent
+    updatedAt
   }
 `;
 
@@ -160,16 +183,16 @@ Feed.fragments = {
   post: gql`
     fragment PostView on Post {
       _id,
-      message,
+      message
       user {
-        _id,
-        username,
+        _id
+        username
         profile {
-          picture,
-          firstName,
+          picture
+          firstName
           lastName
         }
-      },
+      }
       author {
         _id
         username
@@ -178,7 +201,11 @@ Feed.fragments = {
           firstName
           lastName
         }
-      },
+      }
+      building {
+        _id
+        name
+      }
       totalLikes
       totalComments
       isLiked
@@ -200,7 +227,7 @@ Feed.fragments = {
         reply {
           ...CommentView
         },
-        updatedAt,
+        updatedAt
       }
     }
     ${commentFragment}
