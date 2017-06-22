@@ -241,11 +241,16 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
+            user: null,
             author: {
               __typename: 'Author',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
+            },
+            building: {
+              _id: ownProps.data.building._id,
+              name: ownProps.data.building.name,
             },
             privacy: PUBLIC,
             comments: [],
@@ -271,8 +276,8 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.likePost, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments, user) => mutate({
+    props: ({ ownProps, mutate }) => ({
+      likePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: {
           postId,
         },
@@ -283,10 +288,10 @@ export default compose(
             _id: postId,
             message,
             user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
+              __typename: 'Friend',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
             },
             totalLikes: totalLikes + 1,
             totalComments,
@@ -310,8 +315,8 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.unlikePost, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
+    props: ({ ownProps, mutate }) => ({
+      unlikePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
@@ -321,9 +326,9 @@ export default compose(
             message,
             user: {
               __typename: 'Friend',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
             },
             totalLikes: totalLikes - 1,
             totalComments,

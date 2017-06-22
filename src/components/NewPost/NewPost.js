@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
-import { generate as idRandom } from 'shortid';
 
 import {
   Editor,
