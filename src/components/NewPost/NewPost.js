@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
+import { generate as idRandom } from 'shortid';
 
 import {
   Editor,
@@ -136,7 +137,7 @@ class NewPost extends React.Component {
           <Col className="pull-right">
             <FormControl onChange={this.onChangePrivacy} defaultValue={privacy[0]} componentClass="select" placeholder="select">
               {privacy.map(item => (
-                <option value={item}>{item}</option>
+                <option key={idRandom()} value={item}>{item}</option>
               ))}
             </FormControl>
           </Col>

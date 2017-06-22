@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import throttle from 'lodash/throttle';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
@@ -56,7 +57,6 @@ class Home extends Component {
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
-
     return (
       <Grid>
         <Row className={s.containerTop30}>
@@ -94,25 +94,29 @@ export default compose(
     options: () => ({
       variables: {},
       // pollInterval: 30000,
-      fetchPolicy: 'network-only',
+      // fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
-      const loadMoreRows = () => fetchMore({
+      const loadMoreRows = throttle(() => fetchMore({
         variables: {
           cursor: data.feeds.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const newEdges = fetchMoreResult.feeds.edges;
           const pageInfo = fetchMoreResult.feeds.pageInfo;
-          return {
+          return update(previousResult, {
             feeds: {
-              edges: [...previousResult.feeds.edges, ...newEdges],
-              pageInfo,
+              edges: {
+                $push: newEdges,
+              },
+              pageInfo: {
+                $set: pageInfo,
+              },
             },
-          };
+          });
         },
-      });
+      }), 300);
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {
           commentId,
@@ -168,6 +172,7 @@ export default compose(
               profile: ownProps.data.me.profile,
               // totalNotification: 0,
             },
+            building: null,
             privacy,
             comments: [],
             createdAt: (new Date()).toString(),
@@ -192,8 +197,8 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.likePost, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments, user) => mutate({
+    props: ({ ownProps, mutate }) => ({
+      likePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
@@ -203,9 +208,9 @@ export default compose(
             message,
             user: {
               __typename: 'Friend',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
             },
             totalLikes: totalLikes + 1,
             totalComments,
@@ -229,8 +234,8 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.unlikePost, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
+    props: ({ ownProps, mutate }) => ({
+      unlikePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
@@ -240,9 +245,9 @@ export default compose(
             message,
             user: {
               __typename: 'Friend',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
             },
             totalLikes: totalLikes - 1,
             totalComments,
@@ -273,7 +278,7 @@ export default compose(
           __typename: 'Mutation',
           createNewComment: {
             __typename: 'Comment',
-            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            _id: idRandom(),
             message,
             user: {
               __typename: 'Author',
