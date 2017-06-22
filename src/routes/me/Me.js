@@ -5,7 +5,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
-
+import CommentList from '../../components/Comments/CommentList';
 import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
@@ -13,13 +13,6 @@ import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
-
-const createNewPost = gql`mutation createNewPost ($message: String!) {
-  createNewPost(message: $message) {
-    ...PostView
-  }
-}
-${Feed.fragments.post}`;
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
@@ -38,65 +31,6 @@ const profilePageQuery = gql`query profilePageQuery {
 ${Feed.fragments.post}
 `;
 
-const likePost = gql`mutation likePost ($postId: String!) {
-  likePost(_id: $postId) {
-    ...PostView
-  }
-}
-${Feed.fragments.post}`;
-
-const unlikePost = gql`mutation unlikePost ($postId: String!) {
-  unlikePost(_id: $postId) {
-    ...PostView
-  }
-}
-${Feed.fragments.post}`;
-
-const createNewCommentQuery = gql`
-  mutation createNewComment (
-    $postId: String!,
-    $message: String!,
-    $commentId: String,
-  ) {
-    createNewComment(
-      _id: $postId,
-      message: $message,
-      commentId: $commentId,
-    ) {
-      ...CommentView
-      reply {
-        ...CommentView
-      },
-    }
-  }
-${Feed.fragments.comment}`;
-
-const loadCommentsQuery = gql`
-  query loadCommentsQuery ($postId: String!, $commentId: String, $limit: Int) {
-    post (_id: $postId) {
-      _id
-      comments (_id: $commentId, limit: $limit) {
-        _id
-        message
-        user {
-          _id,
-          username,
-          profile {
-            picture,
-            firstName,
-            lastName
-          }
-        },
-        parent,
-        reply {
-          ...CommentView
-        },
-        updatedAt,
-      }
-    }
-  }
-  ${Feed.fragments.comment}
-`;
 class Me extends React.Component {
 
   render() {
@@ -195,7 +129,7 @@ export default compose(
           limit,
           postId,
         },
-        query: loadCommentsQuery,
+        query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const index = previousResult.me.posts.findIndex(item => item._id === fetchMoreResult.post._id);
 
@@ -219,10 +153,10 @@ export default compose(
       };
     },
   }),
-  graphql(createNewPost, {
+  graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: message => mutate({
-        variables: { message },
+      createNewPost: (message, privacy) => mutate({
+        variables: { message, privacy },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -234,15 +168,15 @@ export default compose(
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              totalNotification: 0,
             },
             author: {
               __typename: 'UserSchemas',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              totalNotification: 0,
             },
+            building: null,
+            privacy,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
@@ -265,9 +199,9 @@ export default compose(
       }),
     }),
   }),
-  graphql(likePost, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments, user) => mutate({
+  graphql(Feed.mutation.likePost, {
+    props: ({ ownProps, mutate }) => ({
+      likePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
@@ -276,10 +210,10 @@ export default compose(
             _id: postId,
             message,
             user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
+              __typename: 'Friend',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
             },
             totalLikes: totalLikes + 1,
             totalComments,
@@ -302,9 +236,9 @@ export default compose(
       }),
     }),
   }),
-  graphql(unlikePost, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
+  graphql(Feed.mutation.unlikePost, {
+    props: ({ ownProps, mutate }) => ({
+      unlikePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
@@ -313,10 +247,10 @@ export default compose(
             _id: postId,
             message,
             user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
+              __typename: 'Friend',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
             },
             totalLikes: totalLikes - 1,
             totalComments,
@@ -339,72 +273,72 @@ export default compose(
       }),
     }),
   }),
-   graphql(createNewCommentQuery, {
-     props: ({ mutate }) => ({
-       createNewComment: (postId, message, commentId, user) => mutate({
-         variables: { postId, message, commentId },
-         optimisticResponse: {
-           __typename: 'Mutation',
-           createNewComment: {
-             __typename: 'CommentSchemas',
-             _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
-             message,
-             user: {
-               __typename: 'UserSchemas',
-               _id: user._id,
-               username: user.username,
-               profile: user.profile,
-             },
-             parent: commentId || null,
-             reply: [],
-             updatedAt: (new Date()).toString(),
-           },
-         },
-         updateQueries: {
-           profilePageQuery: (previousResult, { mutationResult }) => {
-             const newComment = mutationResult.data.createNewComment;
-             const index = previousResult.me.posts.findIndex(item => item._id === postId);
-             const currentPost = previousResult.me.posts[index];
+  graphql(CommentList.mutation.createNewCommentQuery, {
+    props: ({ mutate }) => ({
+      createNewComment: (postId, message, commentId, user) => mutate({
+        variables: { postId, message, commentId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewComment: {
+            __typename: 'Comment',
+            _id: idRandom(),
+            message,
+            user: {
+              __typename: 'Author',
+              _id: user._id,
+              username: user.username,
+              profile: user.profile,
+            },
+            parent: commentId || null,
+            reply: [],
+            updatedAt: (new Date()).toString(),
+          },
+        },
+        updateQueries: {
+          profilePageQuery: (previousResult, { mutationResult }) => {
+            const newComment = mutationResult.data.createNewComment;
+            const index = previousResult.me.posts.findIndex(item => item._id === postId);
+            const currentPost = previousResult.me.posts[index];
 
-             let updatedPost = null;
-             if (currentPost._id !== postId) {
-               return previousResult;
-             }
+            let updatedPost = null;
+            if (currentPost._id !== postId) {
+              return previousResult;
+            }
 
-             let commentNum = currentPost.totalComments;
-             if (commentId) {
-               const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
-               const commentItem = currentPost.comments[indexComment];
+            let commentNum = currentPost.totalComments;
+            if (commentId) {
+              const indexComment = currentPost.comments.findIndex(item => item._id === commentId);
+              const commentItem = currentPost.comments[indexComment];
               // init reply value
-               if (!commentItem.reply) {
-                 commentItem.reply = [];
-               }
+              if (!commentItem.reply) {
+                commentItem.reply = [];
+              }
               // push value into property reply
-               commentItem.reply.push(newComment);
-               updatedPost = update(currentPost, {
-                 totalComments: { $set: ++commentNum },
-                 comments: {
-                   $splice: [[indexComment, 1, commentItem]],
-                 },
-               });
-             } else {
-               updatedPost = update(currentPost, {
-                 totalComments: { $set: ++commentNum },
-                 comments: {
-                   $unshift: [newComment],
-                 },
-               });
-             }
-             return update(previousResult, {
-               me: {
-                 posts: {
-                   $splice: [[index, 1, updatedPost]],
-                 },
-               },
-             });
-           },
-         },
-       }),
-     }),
-   }),
+              commentItem.reply.push(newComment);
+              updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentNum },
+                comments: {
+                  $splice: [[indexComment, 1, commentItem]],
+                },
+              });
+            } else {
+              updatedPost = update(currentPost, {
+                totalComments: { $set: ++commentNum },
+                comments: {
+                  $unshift: [newComment],
+                },
+              });
+            }
+            return update(previousResult, {
+              me: {
+                posts: {
+                  $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
 )(Me);
