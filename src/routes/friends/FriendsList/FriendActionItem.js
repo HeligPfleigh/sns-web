@@ -1,0 +1,49 @@
+import React, { PropTypes } from 'react';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { Button, ButtonToolbar } from 'react-bootstrap';
+import s from './FriendItem.scss';
+
+class FriendActionItem extends React.Component {
+
+  onAcceptCLick = (evt) => {
+    evt.preventDefault();
+    const { friend, handleAcceptFriendAction } = this.props;
+    handleAcceptFriendAction(friend._id);
+  }
+
+  onRejectCLick = (evt) => {
+    evt.preventDefault();
+    const { friend, handleRejectFriendAction } = this.props;
+    handleRejectFriendAction(friend._id);
+  }
+
+  render() {
+    const { friend } = this.props;
+    return (
+      <li>
+        <div className={s.friend} onClick={this.handleClickFriend}>
+          <div className={s.friendAvatar}>
+            <img alt={friend.profile && friend.profile.firstName} src={friend.profile && friend.profile.picture} />
+          </div>
+          <div className={s.friendInfo}>
+            <div className={s.friendName}>
+              <span>{friend.profile.firstName} {friend.profile.lastName}</span>
+            </div>
+            <ButtonToolbar>
+              <Button onClick={this.onAcceptCLick} bsStyle="primary">Confirm</Button>
+              <Button onClick={this.onRejectCLick} >Delete Request</Button>
+            </ButtonToolbar>
+          </div>
+        </div>
+      </li>
+    );
+  }
+}
+
+FriendActionItem.propTypes = {
+  friend: PropTypes.object.isRequired,
+  handleAcceptFriendAction: PropTypes.func,
+  handleRejectFriendAction: PropTypes.func,
+};
+
+export default withStyles(s)(FriendActionItem);

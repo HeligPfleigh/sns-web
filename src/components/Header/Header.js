@@ -136,14 +136,14 @@ const friendAction = gql`mutation friendAction ($userId: String!, $cmd: String!)
 }`;
 
 const updateSeenQuery = gql`mutation updateSeen {
-  UpdateSeen {
+  updateSeen {
     ...NotificationView
   }
 }
 ${NotifyFragment}`;
 
 const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
-  UpdateIsRead(_id: $_id) {
+  updateIsRead(_id: $_id) {
     ...NotificationView
   }
 }${NotifyFragment}`;

@@ -1,46 +1,45 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { Grid, Row, Col } from 'react-bootstrap';
 import Loading from '../../components/Loading';
-import FriendList from '../../components/Friend/FriendList';
-import Friend from '../../components/Friend/Friend';
-import { PENDING, NONE, ACCEPTED, REJECTED } from '../../constants';
+import { PENDING, ACCEPTED, REJECTED } from '../../constants';
 import s from './Friends.scss';
 import Label from '../../components/Friend/Label';
+import FriendsList, { FriendItem, FriendActionItem } from './FriendsList';
 
 const friendsPageQuery = gql`query friendsPageQuery {
   me {
-    _id,
+    _id
     username,
     profile {
-      picture,
-      firstName,
+      picture
+      firstName
       lastName
     }
     friends {
       _id
       profile {
-        picture,
-        firstName,
+        picture
+        firstName
         lastName
       }
     }
     friendRequests {
       _id
       profile {
-        picture,
-        firstName,
+        picture
+        firstName
         lastName
       }
     }
     friendSuggestions {
       _id
       profile {
-        picture,
-        firstName,
+        picture
+        firstName
         lastName
       }
     }
@@ -48,38 +47,148 @@ const friendsPageQuery = gql`query friendsPageQuery {
 }
 `;
 
-const friendAction = gql`mutation friendAction ($userId: String!, $cmd: String!) {
-  friendAction(userId: $userId, cmd: $cmd) {
+const sendFriendRequest = gql`mutation sendFriendRequest ($userId: String!) {
+  sendFriendRequest(_id: $userId) {
     _id,
   }
 }`;
 
-@graphql(friendsPageQuery)
-@graphql(friendAction, { name: 'friendAction' })
-class Friends extends React.Component {
-  static propTypes = {
-    friendAction: PropTypes.func.isRequired,
-    data: PropTypes.shape({
-      loading: PropTypes.bool.isRequired,
-    }).isRequired,
+const acceptFriend = gql`mutation acceptFriend ($userId: String!) {
+  acceptFriend(_id: $userId) {
+    _id,
   }
-  handleFriendAction = (userId, cmd) => {
-    this.props.friendAction({
-      variables: { userId, cmd },
-      ...cmd === PENDING && {
-        refetchQueries: [{
-          query: friendsPageQuery,
-        }],
-      },
-      ...(cmd === ACCEPTED || cmd === REJECTED) && {
+}`;
+
+const rejectFriend = gql`mutation rejectFriend ($userId: String!) {
+  rejectFriend(_id: $userId) {
+    _id,
+  }
+}`;
+
+const mapResultsToProps = ({ data }) => {
+  if (!data.me) {
+    return {
+      loading: data.loading,
+    };
+  }
+  const { me } = data;
+
+  return {
+    loading: data.loading,
+    me,
+    data,
+  };
+};
+const mapPropsToOptions = () => ({
+  variables: {},
+  // pollInterval: 30000,
+  // fetchPolicy: 'cache-and-network',
+});
+
+class Friends extends React.Component {
+  // handleFriendAction = (userId, cmd) => {
+  //   this.props.friendAction({
+  //     variables: { userId, cmd },
+  //     ...cmd === PENDING && {
+  //       refetchQueries: [{
+  //         query: friendsPageQuery,
+  //       }],
+  //     },
+  //     ...(cmd === ACCEPTED || cmd === REJECTED) && {
+  //       updateQueries: {
+  //         friendsPageQuery: (previousResult, { mutationResult }) => {
+  //           const newFriend = mutationResult.data.friendAction;
+  //           return update(previousResult, {
+  //             me: {
+  //               friends: {
+  //                 $unshift: [newFriend],
+  //               },
+  //               friendRequests: {
+  //                 $unset: [newFriend._id],
+  //               },
+  //             },
+  //           });
+  //         },
+  //       },
+  //     },
+  //   });
+  // }
+  render() {
+    const {
+      data: { loading, me },
+      sendFriendRequestAction,
+      acceptFriendAction,
+      rejectFriendAction,
+    } = this.props;
+    return (
+      <Grid>
+        <Loading show={loading} full />
+        <Row className={s.containerTop30}>
+          <Col md={8} xs={12}>
+            {
+              me && me.friendRequests &&
+              <FriendsList>
+                <Label label={`Respond to Your ${me.friendRequests.length} Friend Requests`}></Label>
+                {
+                  me.friendRequests.map(friend =>
+                    <FriendActionItem
+                      key={friend._id}
+                      friend={friend}
+                      handleAcceptFriendAction={acceptFriendAction}
+                      handleRejectFriendAction={rejectFriendAction}
+                    />,
+                  )
+                }
+              </FriendsList>
+            }
+          </Col>
+          <Col md={4} xs={12}>
+            {
+              me && me.friendSuggestions && me.friendSuggestions.length > 0 &&
+              <FriendsList>
+                {
+                  me.friendSuggestions.map(friend =>
+                    <FriendItem
+                      key={friend._id}
+                      friend={friend}
+                      handleFriendAction={sendFriendRequestAction}
+                    />,
+                  )
+                }
+              </FriendsList>
+            }
+          </Col>
+        </Row>
+      </Grid>
+    );
+  }
+}
+
+Friends.propTypes = {
+  sendFriendRequestAction: PropTypes.func.isRequired,
+  acceptFriendAction: PropTypes.func.isRequired,
+  rejectFriendAction: PropTypes.func.isRequired,
+  data: PropTypes.shape({
+    loading: PropTypes.bool.isRequired,
+  }).isRequired,
+};
+Friends.defaultProps = {};
+
+export default compose(
+  withStyles(s),
+  graphql(friendsPageQuery, {
+    options: mapPropsToOptions,
+    props: mapResultsToProps,
+  }),
+  graphql(acceptFriend, {
+    props: ({ mutate }) => ({
+      acceptFriendAction: userId => mutate({
+        variables: { userId },
         updateQueries: {
           friendsPageQuery: (previousResult, { mutationResult }) => {
-            const newFriend = mutationResult.data.friendAction;
+            const newFriend = mutationResult.data.acceptFriend;
             return update(previousResult, {
               me: {
-                friends: {
-                  $unshift: [newFriend],
-                },
                 friendRequests: {
                   $unset: [newFriend._id],
                 },
@@ -87,49 +196,45 @@ class Friends extends React.Component {
             });
           },
         },
-      },
-    });
-  }
-  render() {
-    const { data: { loading, me } } = this.props;
-    return (
-
-      <Grid>
-        <Loading show={loading} full />
-        <Row className={s.containerTop30}>
-          <Col md={8} xs={12}>
-            {
-              me && me.friendRequests &&
-              <FriendList>
-                <Label label={`Respond to Your ${me.friendRequests.length} Friend Requests`}></Label>
-                {
-                  me.friendRequests.map(friend =>
-                    <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={PENDING} />
-                  )
-                }
-              </FriendList>
-            }
-          </Col>
-          <Col md={4} xs={12}>
-            {
-              me && me.friendSuggestions && me.friendSuggestions.length > 0 &&
-              <FriendList>
-                {
-                  me.friendSuggestions.map(friend =>
-                    <li key={friend._id}>
-                      <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={NONE} />
-                    </li>
-                  )
-                }
-              </FriendList>
-            }
-          </Col>
-        </Row>
-      </Grid>
-
-
-    );
-  }
-}
-
-export default withStyles(s)(Friends);
+      }),
+    }),
+  }),
+  graphql(rejectFriend, {
+    props: ({ mutate }) => ({
+      rejectFriendAction: userId => mutate({
+        variables: { userId },
+        updateQueries: {
+          friendsPageQuery: (previousResult, { mutationResult }) => {
+            const newFriend = mutationResult.data.rejectFriend;
+            return update(previousResult, {
+              me: {
+                friendRequests: {
+                  $unset: [newFriend._id],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(sendFriendRequest, {
+    props: ({ mutate }) => ({
+      sendFriendRequestAction: userId => mutate({
+        variables: { userId },
+        updateQueries: {
+          friendsPageQuery: (previousResult, { mutationResult }) => {
+            const newFriend = mutationResult.data.sendFriendRequest;
+            return update(previousResult, {
+              me: {
+                friendSuggestions: {
+                  $unset: [newFriend._id],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+)(Friends);
