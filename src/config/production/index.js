@@ -17,8 +17,7 @@ export const server = {
 
 export const auth = {
   facebook: {
-    id: process.env.FACEBOOK_APP_ID || '678961598943405',
-    secret: process.env.FACEBOOK_APP_SECRET || '06a4ac09ae386fa9779547a6de5c0dd3',
+    id: process.env.FACEBOOK_APP_ID || '669818893191009',
   },
   firebase: {
     apiKey: 'AIzaSyDgbPU5DuXmvxWprMwc-HxTMae05c6rCPc',
