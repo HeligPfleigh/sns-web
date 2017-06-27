@@ -88,7 +88,12 @@ class NewPost extends React.Component {
 
   onSubmit = () => {
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    this.props.createNewPost(data, this.state.privacy);
+    const { friend } = this.props;
+    if (friend) {
+      this.props.createNewPost(data, this.state.privacy, friend);
+    } else {
+      this.props.createNewPost(data, this.state.privacy);
+    }
     this.setState(prevState => ({
       ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
@@ -155,6 +160,7 @@ const doNothing = (e) => {
 NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
   privacy: PropTypes.array.isRequired,
+  friend: PropTypes.object,
 };
 
 NewPost.defaultProps = {

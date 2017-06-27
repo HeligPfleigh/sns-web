@@ -11,8 +11,7 @@ import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
-
-import { MY_TIME_LINE, MY_INFO } from '../../constants';
+import { PUBLIC, FRIEND, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './User.scss';
 
 const profilePageQuery = gql`query profilePageQuery($_id: String!) {
@@ -27,13 +26,14 @@ const profilePageQuery = gql`query profilePageQuery($_id: String!) {
     posts {
       ...PostView
     }
+    isFriend
   }
   me {
-    _id,
-    username,
+    _id
+    username
     profile {
-      picture,
-      firstName,
+      picture
+      firstName
       lastName
     },
   }
@@ -71,7 +71,10 @@ class User extends Component {
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
                   <div className={s.parent}>
-                    { me && user && <NewPost createNewPost={this.props.createNewPost} friend={user} /> }
+                    { me && user && user.isFriend && <NewPost
+                      createNewPost={this.props.createNewPost} friend={user}
+                      privacy={[PUBLIC, FRIEND]}
+                    /> }
                   </div>
                   { me && posts && <FeedList
                     feeds={posts}
@@ -155,8 +158,8 @@ export default compose(
   }),
   graphql(Feed.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: (message, friend) => mutate({
-        variables: { message, userId: friend._id },
+      createNewPost: (message, privacy, friend) => mutate({
+        variables: { message, privacy, userId: friend._id },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -168,15 +171,14 @@ export default compose(
               _id: friend._id,
               username: friend.username,
               profile: friend.profile,
-              totalNotification: 0,
             },
             author: {
               __typename: 'UserSchemas',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              totalNotification: 0,
             },
+            privacy,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
