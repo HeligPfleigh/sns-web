@@ -26,13 +26,14 @@ const profilePageQuery = gql`query profilePageQuery($_id: String!) {
     posts {
       ...PostView
     }
+    isFriend
   }
   me {
-    _id,
-    username,
+    _id
+    username
     profile {
-      picture,
-      firstName,
+      picture
+      firstName
       lastName
     },
   }
@@ -70,7 +71,7 @@ class User extends Component {
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
                   <div className={s.parent}>
-                    { me && user && <NewPost
+                    { me && user && user.isFriend && <NewPost
                       createNewPost={this.props.createNewPost} friend={user}
                       privacy={[PUBLIC, FRIEND]}
                     /> }
