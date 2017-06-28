@@ -113,7 +113,7 @@ class Building extends Component {
           <Col sm={8} xs={12}>
             <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
               <Tab eventKey={1} title="Posts">
-                <NewPost createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
+                <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
                 { building && building.posts && <FeedList
                   feeds={building ? building.posts : []}
                   likePostEvent={likePost}
