@@ -113,7 +113,7 @@ class NewPost extends React.Component {
 
   render() {
     const { editorState, isSubmit } = this.state;
-    const { privacy } = this.props;
+    const { privacy, displayPrivacy } = this.props;
     return (
       <div className={s.newPostPanel}>
         <Col className={s.newPostEditor}>
@@ -139,11 +139,11 @@ class NewPost extends React.Component {
             <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
           <Col className="pull-right">
-            <FormControl onChange={this.onChangePrivacy} defaultValue={privacy[0]} componentClass="select" placeholder="select">
+            {displayPrivacy && <FormControl onChange={this.onChangePrivacy} defaultValue={privacy[0]} componentClass="select" placeholder="select">
               {privacy.map(item => (
                 <option key={item} value={item}>{item}</option>
               ))}
-            </FormControl>
+            </FormControl>}
           </Col>
 
           <Clearfix />
@@ -161,11 +161,13 @@ NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
   privacy: PropTypes.array.isRequired,
   friend: PropTypes.object,
+  displayPrivacy: PropTypes.bool,
 };
 
 NewPost.defaultProps = {
   createNewPost: doNothing,
   privacy: [PUBLIC, FRIEND, ONLY_ME],
+  displayPrivacy: true,
 };
 
 NewPost.fragments = {};
