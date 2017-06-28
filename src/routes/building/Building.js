@@ -3,15 +3,26 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
-import { Grid, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import {
+  Grid,
+  Row,
+  Col,
+  Tab,
+  Tabs,
+} from 'react-bootstrap';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import NewPost from '../../components/NewPost';
+import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import Errors from './Errors';
 import s from './Building.scss';
+
+const POST_TAB = 'POST_TAB';
+const INFO_TAB = 'INFO_TAB';
+const REQUEST_TAB = 'REQUEST_TAB';
 
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!) {
@@ -77,6 +88,7 @@ class Building extends Component {
     super(props);
     this.state = {
       errorMessage: '',
+      activeTab: POST_TAB,
     };
   }
 
@@ -98,6 +110,11 @@ class Building extends Component {
     });
   }
 
+  handleSelect = (key) => {
+    const { pathname } = history.location;
+    history.push(`${pathname}?tab=${key}`);
+  }
+
   render() {
     const {
       data: { building, me },
@@ -106,13 +123,20 @@ class Building extends Component {
       createNewComment,
       loadMoreComments,
       createNewPostOnBuilding,
+      query,
     } = this.props;
+
+    let tab = POST_TAB;
+    if (query.tab) {
+      tab = query.tab;
+    }
+
     return (
       <Grid>
         <Row>
           <Col sm={8} xs={12}>
-            <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
-              <Tab eventKey={1} title="Posts">
+            <Tabs bsStyle="pills" onSelect={this.handleSelect} activeKey={tab} animation={false} id="noanim-tab-example">
+              <Tab eventKey={POST_TAB} title="Posts">
                 <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
                 { building && building.posts && <FeedList
                   feeds={building ? building.posts : []}
@@ -123,7 +147,7 @@ class Building extends Component {
                   createNewComment={createNewComment}
                 />}
               </Tab>
-              <Tab eventKey={2} title="Information">
+              <Tab eventKey={INFO_TAB} title="Information">
                 { building && <div>
                   name: { building.name } <br />
                   address <br />
@@ -136,7 +160,7 @@ class Building extends Component {
                 </div>
                 }
               </Tab>
-              { building && building.isAdmin && <Tab eventKey={3} title="Requests">
+              { building && building.isAdmin && <Tab eventKey={REQUEST_TAB} title="Requests">
                 <FriendList>
                   <Errors
                     open
@@ -178,6 +202,7 @@ Building.propTypes = {
   createNewPostOnBuilding: PropTypes.func.isRequired,
   acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
   rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
+  query: PropTypes.object.isRequired,
   // buildingId: PropTypes.string.isRequired,
 };
 

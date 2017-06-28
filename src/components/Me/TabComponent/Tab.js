@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Button } from 'react-bootstrap';
 import s from './Tab.scss';
 import Link from '../../Link';
 import { MY_TIME_LINE, MY_INFO } from '../../../constants';
