@@ -10,10 +10,47 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
+import { Field, reduxForm, SubmissionError } from 'redux-form';
 
 import history from '../../core/history';
+import { required, minLength6, maxLength25 } from '../../utils/validator';
 import loginSuccess from '../../actions/user';
 import s from './Login.scss';
+
+const renderField = ({ className, input, placeholder, type, addOn, meta: { touched, error } }) => (
+  <div className="form-group">
+    <input {...input} className={className} placeholder={placeholder} type={type} />
+    { addOn }
+    {touched && error && <span style={{ color: 'white', fontSize: '1.1em' }}><i>*{error}</i></span>}
+  </div>
+);
+
+renderField.propTypes = {
+  className: PropTypes.any,
+  input: PropTypes.any,
+  addOn: PropTypes.node,
+  placeholder: PropTypes.any,
+  type: PropTypes.any,
+  meta: PropTypes.any,
+};
+
+const fetchAPI = async (url, data) => {
+  const response = await fetch(url, {
+    headers: new Headers({
+      'Content-Type': 'application/json',
+    }),
+    credentials: 'same-origin',
+    method: 'post',
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw Error(response.statusText);
+  }
+
+  const user = await response.json();
+  return user;
+};
 
 @connect(null, { loginSuccess })
 class Login extends React.Component {
@@ -21,31 +58,49 @@ class Login extends React.Component {
     loginSuccess: PropTypes.func.isRequired,
   };
 
+  loginAction = (values) => {
+    const { username, password } = values;
+    if (username.trim() === '') {
+      throw new SubmissionError({
+        username: 'Chưa nhập tên tài khoản',
+      });
+    } else if (password.trim() === '') {
+      throw new SubmissionError({
+        password: 'Chưa nhập mật khẩu',
+      });
+    } else {
+      const loginProccess = async () => {
+        try {
+          const user = await fetchAPI('/auth/login', { username, password });
+          this.props.loginSuccess(user);
+          history.push('/');
+        } catch (error) {
+          throw new Error(error);
+        }
+      };
+
+      return loginProccess().catch(() => {
+        throw new SubmissionError({
+          _error: 'Thông tin đăng nhập không đúng',
+        });
+      });
+    }
+  }
+
   fbLoginAction = (evt) => {
     evt.preventDefault();
     const { FB } = window;
     if (FB) {
-      FB.login((res) => {
+      FB.login(async (res) => {
         if (res.authResponse) {
           const { accessToken: access_token } = res.authResponse;
-          fetch('/auth/facebook', {
-            headers: new Headers({
-              'Content-Type': 'application/json',
-            }),
-            credentials: 'same-origin',
-            method: 'post',
-            body: JSON.stringify({ access_token }),
-          }).then((response) => {
-            if (!response.ok) {
-              throw Error(response.statusText);
-            }
-            return response.json();
-          }).then((user) => {
+          try {
+            const user = await fetchAPI('/auth/facebook', { access_token });
             this.props.loginSuccess(user);
             history.push('/');
-          }).catch((err) => {
-            console.log(err); // eslint-disable-line
-          });
+          } catch (error) {
+            alert('Login fail.');
+          }
         } else {
           alert('User cancelled login or did not fully authorize.');
         }
@@ -56,29 +111,40 @@ class Login extends React.Component {
   }
 
   render() {
+    const { error, handleSubmit, submitting } = this.props;
     return (
       <section className={`container ${s.login_form}`}>
         <section>
-          <form>
+          <form autoComplete="off" onSubmit={handleSubmit(this.loginAction)}>
             <img src="/logo2.png" alt="" className="img-responsive" />
+            {error && <div style={{ backgroundColor: '#E53935', color: 'white', fontSize: '1.1em' }}><i>{error}</i></div>}
 
-            <div className="form-group">
-              <input type="text" className="form-control" placeholder="Tên đăng nhập" required />
-              <span className={`glyphicon glyphicon-user ${s.addon}`}></span>
-            </div>
+            <Field
+              name="username"
+              type="text"
+              placeholder="Tên đăng nhập"
+              className="form-control"
+              component={renderField}
+              addOn={<span className={`glyphicon glyphicon-user ${s.addon}`}></span>}
+              validate={[required, maxLength25, minLength6]}
+            />
 
-            <div className="form-group" style={{ marginBottom: 15 }}>
-              <input type="password" className="form-control" placeholder="Mật khẩu" required />
-              <span className={`glyphicon glyphicon-lock ${s.addon}`}></span>
-            </div>
+            <Field
+              name="password"
+              type="password"
+              placeholder="Mật khẩu"
+              className="form-control"
+              component={renderField}
+              addOn={<span className={`glyphicon glyphicon-lock ${s.addon}`}></span>}
+              validate={[required, maxLength25, minLength6]}
+            />
 
-            <div className="form-group" style={{ textAlign: 'left', margin: 0 }}>
+            <div className="form-group" style={{ textAlign: 'left', marginBottom: 10 }}>
               <label className="checkbox-inline">
                 <input className={s.input_normal} type="checkbox" value="true" /> Lưu tài khoản?
               </label>
             </div>
-
-            <span className="btn btn-primary btn-block">Đăng nhập</span>
+            <button className="btn btn-primary btn-block" disabled={submitting}>Đăng nhập</button>
             <a href="#">Reset password</a> or <a href="#">create account</a>
           </form>
         </section>
@@ -102,4 +168,12 @@ class Login extends React.Component {
   }
 }
 
-export default withStyles(s)(Login);
+Login.propTypes = {
+  error: PropTypes.any,
+  handleSubmit: PropTypes.func,
+  submitting: PropTypes.bool,
+};
+
+export default reduxForm({
+  form: 'loginForm',
+})(withStyles(s)(Login));
