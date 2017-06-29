@@ -194,6 +194,7 @@ export default compose(
       variables: {
         buildingId: props.buildingId,
       },
+      fetchPolicy: 'network-only',
       // fetchPolicy: 'cache-and-network', ???
     }),
     props: ({ data }) => {
