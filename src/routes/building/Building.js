@@ -3,15 +3,29 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
-import { Grid, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import {
+  Grid,
+  Row,
+  Col,
+  Tab,
+  NavItem,
+  Nav,
+  Panel,
+} from 'react-bootstrap';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import NewPost from '../../components/NewPost';
+import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import Errors from './Errors';
 import s from './Building.scss';
+import Sponsored from './Sponsored';
+
+const POST_TAB = 'POST_TAB';
+const INFO_TAB = 'INFO_TAB';
+const REQUEST_TAB = 'REQUEST_TAB';
 
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!) {
@@ -77,6 +91,7 @@ class Building extends Component {
     super(props);
     this.state = {
       errorMessage: '',
+      activeTab: POST_TAB,
     };
   }
 
@@ -98,6 +113,11 @@ class Building extends Component {
     });
   }
 
+  handleSelect = (key) => {
+    const { pathname } = history.location;
+    history.push(`${pathname}?tab=${key}`);
+  }
+
   render() {
     const {
       data: { building, me },
@@ -106,59 +126,85 @@ class Building extends Component {
       createNewComment,
       loadMoreComments,
       createNewPostOnBuilding,
+      query,
     } = this.props;
+
+    let tab = POST_TAB;
+    if (query.tab) {
+      tab = query.tab;
+    }
+
     return (
       <Grid>
-        <Row>
-          <Col sm={8} xs={12}>
-            <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
-              <Tab eventKey={1} title="Posts">
-                <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
-                { building && building.posts && <FeedList
-                  feeds={building ? building.posts : []}
-                  likePostEvent={likePost}
-                  unlikePostEvent={unlikePost}
-                  userInfo={me}
-                  loadMoreComments={loadMoreComments}
-                  createNewComment={createNewComment}
-                />}
-              </Tab>
-              <Tab eventKey={2} title="Information">
-                { building && <div>
-                  name: { building.name } <br />
-                  address <br />
-                  <ul>
-                    <li>country: {building.address.country}</li>
-                    <li>city: {building.address.city}</li>
-                    <li>state: {building.address.state}</li>
-                    <li>street: {building.address.street}</li>
-                  </ul>
-                </div>
-                }
-              </Tab>
-              { building && building.isAdmin && <Tab eventKey={3} title="Requests">
-                <FriendList>
-                  <Errors
-                    open
-                    message={this.state.errorMessage}
-                    autoHideDuration={4000}
-                  />
-                  {
-                    building && building.requests.length === 0 && <h3>
-                      you don't have any joining requests
-                    </h3>
+
+        <Tab.Container onSelect={this.handleSelect} activeKey={tab}>
+          <Row className="clearfix">
+            <Col sm={2}>
+              <Nav bsStyle="pills" stacked>
+                <NavItem eventKey={POST_TAB}>
+                  Post
+                </NavItem>
+                <NavItem eventKey={INFO_TAB}>
+                  Information
+                </NavItem>
+                { building && building.isAdmin && <NavItem eventKey={REQUEST_TAB}>
+                  Requests
+                </NavItem>}
+              </Nav>
+            </Col>
+            <Col sm={7}>
+              <Tab.Content animation>
+                <Tab.Pane eventKey={POST_TAB}>
+                  <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
+                  { building && building.posts && <FeedList
+                    feeds={building ? building.posts : []}
+                    likePostEvent={likePost}
+                    unlikePostEvent={unlikePost}
+                    userInfo={me}
+                    loadMoreComments={loadMoreComments}
+                    createNewComment={createNewComment}
+                  />}
+                </Tab.Pane>
+                <Tab.Pane eventKey={INFO_TAB}>
+                  { building &&
+                    <Panel>
+                      <h6>Thông tin</h6>
+                      <ul className="dc ayn">
+                        <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> { building.name }</li>
+                        <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> {building.address.country}</li>
+                        <li> {building.address.city}</li>
+                        <li> {building.address.state}</li>
+                        <li>{building.address.street}</li>
+                      </ul>
+                    </Panel>
                   }
-                  {
-                    building && building.requests.length > 0 && building.requests.map(friend =>
-                      <Friend key={friend._id} friend={friend} onAccept={this.accept(friend)} onCancel={this.cancel(friend)} />,
-                    )
-                  }
-                </FriendList>
-              </Tab> }
-            </Tabs>
-          </Col>
-          <Col sm={4} xs={12}></Col>
-        </Row>
+                </Tab.Pane>
+                { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
+                  <FriendList>
+                    <Errors
+                      open
+                      message={this.state.errorMessage}
+                      autoHideDuration={4000}
+                    />
+                    {
+                      building && building.requests.length === 0 && <h3>
+                        you don't have any joining requests
+                      </h3>
+                    }
+                    {
+                      building && building.requests.length > 0 && building.requests.map(friend =>
+                        <Friend key={friend._id} friend={friend} onAccept={this.accept(friend)} onCancel={this.cancel(friend)} />,
+                      )
+                    }
+                  </FriendList>
+                </Tab.Pane>}
+              </Tab.Content>
+            </Col>
+            <Col sm={3}>
+              <Sponsored />
+            </Col>
+          </Row>
+        </Tab.Container>
       </Grid>
     );
   }
@@ -178,6 +224,7 @@ Building.propTypes = {
   createNewPostOnBuilding: PropTypes.func.isRequired,
   acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
   rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
+  query: PropTypes.object.isRequired,
   // buildingId: PropTypes.string.isRequired,
 };
 
