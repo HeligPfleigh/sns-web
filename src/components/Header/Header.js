@@ -129,8 +129,14 @@ ${userFragment}
 ${NotifyFragment}
 `;
 
-const friendAction = gql`mutation friendAction ($userId: String!, $cmd: String!) {
-  friendAction(userId: $userId, cmd: $cmd) {
+const acceptFriend = gql`mutation acceptFriend ($userId: String!) {
+  acceptFriend(_id: $userId) {
+    _id,
+  }
+}`;
+
+const rejectFriend = gql`mutation rejectFriend ($userId: String!) {
+  rejectFriend(_id: $userId) {
     _id,
   }
 }`;
@@ -155,7 +161,14 @@ class Header extends React.Component {
   }
 
   render() {
-    const { data: { notifications, me, refetch }, loadMoreRows, updateSeen, updateIsRead, handleFriendAction } = this.props;
+    const {
+      data: { notifications, me, refetch },
+      loadMoreRows,
+      updateSeen,
+      updateIsRead,
+      rejectFriendAction,
+      acceptFriendAction,
+    } = this.props;
     const user = me || {};
 
     return (
@@ -183,7 +196,8 @@ class Header extends React.Component {
                   refetch={refetch}
                   friendType={PENDING}
                   friends={user.friendRequests || []}
-                  handleFriendAction={handleFriendAction}
+                  rejectFriendAction={rejectFriendAction}
+                  acceptFriendAction={acceptFriendAction}
                 />
               </MediaQuery>
             </Col>
@@ -199,7 +213,6 @@ class Header extends React.Component {
                 refetch={refetch}
                 friendType={PENDING}
                 friends={user.friendRequests || []}
-                handleFriendAction={handleFriendAction}
                 isMobile
               />
             </div>
@@ -218,7 +231,8 @@ Header.propTypes = {
   loadMoreRows: PropTypes.func.isRequired,
   updateSeen: PropTypes.func.isRequired,
   updateIsRead: PropTypes.func.isRequired,
-  handleFriendAction: PropTypes.func.isRequired,
+  rejectFriendAction: PropTypes.func.isRequired,
+  acceptFriendAction: PropTypes.func.isRequired,
 };
 
 Header.defaultProps = {
@@ -292,13 +306,32 @@ export default compose(
     }),
   }),
   // friendAction
-  graphql(friendAction, {
+  graphql(acceptFriend, {
     props: ({ mutate }) => ({
-      handleFriendAction: (userId, cmd) => mutate({
-        variables: { userId, cmd },
+      acceptFriendAction: userId => mutate({
+        variables: { userId },
         updateQueries: {
           headerQuery: (previousResult, { mutationResult }) => {
-            const newFriend = mutationResult.data.friendAction;
+            const newFriend = mutationResult.data.acceptFriend;
+            return update(previousResult, {
+              me: {
+                friendRequests: {
+                  $unset: [newFriend._id],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(rejectFriend, {
+    props: ({ mutate }) => ({
+      rejectFriendAction: userId => mutate({
+        variables: { userId },
+        updateQueries: {
+          headerQuery: (previousResult, { mutationResult }) => {
+            const newFriend = mutationResult.data.rejectFriend;
             return update(previousResult, {
               me: {
                 friendRequests: {

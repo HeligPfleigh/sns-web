@@ -11,6 +11,8 @@ import { makeNotificationRead } from '../../actions/chat';
 import CustomToggle from '../Common/DropdownMenu/CustomToggle';
 import NotificationList from '../Notification/NotificationList';
 import Friend from '../Friend/Friend';
+import { FriendActionItem } from './FriendsList';
+
 import s from './Navigation.scss';
 
 const getNotificationCount = (chatNotification, current) => {
@@ -123,7 +125,7 @@ class Navigation extends React.Component {
     } = this.props;
 
     const { isOpen } = this.state;
-    const { friends, ...customs } = this.props;
+    const { friends, rejectFriendAction, acceptFriendAction, ...customs } = this.props;
 
     let hasNextPage = false;
     if (!loading && pageInfo) {
@@ -162,7 +164,14 @@ class Navigation extends React.Component {
                   loader={<span style={{ display: 'none' }}>Loading...</span>}
                   endMessage={<span style={{ display: 'none' }}>Loading...</span>}
                 >
-                  { friends && friends.map(friend => <Friend key={`friend-id-${friend._id}`} friend={friend} {...customs} />) }
+                  { friends && friends.map(friend =>
+                    <FriendActionItem
+                      key={`friend-id-${friend._id}`}
+                      friend={friend}
+                      handleAcceptFriendAction={acceptFriendAction}
+                      handleRejectFriendAction={rejectFriendAction}
+                    />
+                  )}
                 </InfiniteScroll>
               </div>
               <Link to="/friends"><div className={s.bottomItem}>Xem tất cả</div></Link>
@@ -270,7 +279,8 @@ Navigation.propTypes = {
   loadMoreRows: React.PropTypes.func,
   updateSeen: React.PropTypes.func.isRequired,
   updateIsRead: React.PropTypes.func.isRequired,
-  handleFriendAction: React.PropTypes.func.isRequired,
+  rejectFriendAction: React.PropTypes.func.isRequired,
+  acceptFriendAction: React.PropTypes.func.isRequired,
   friendType: React.PropTypes.string,
   friends: React.PropTypes.array,
   refetch: React.PropTypes.func.isRequired,
