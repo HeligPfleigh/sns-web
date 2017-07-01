@@ -10,7 +10,6 @@ import history from '../../core/history';
 import { makeNotificationRead } from '../../actions/chat';
 import CustomToggle from '../Common/DropdownMenu/CustomToggle';
 import NotificationList from '../Notification/NotificationList';
-import Friend from '../Friend/Friend';
 import { FriendActionItem } from './FriendsList';
 
 import s from './Navigation.scss';

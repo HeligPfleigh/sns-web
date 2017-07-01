@@ -25,18 +25,8 @@ import { PENDING } from '../../constants';
 // import logoUrl from './logo-small.png';
 // import logoUrl2x from './logo-small@2x.png';
 
-update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
-
 const userFragment = gql`
   fragment HeaderUserView on Me {
-    _id
-    username
-    profile {
-      picture
-      firstName
-      lastName
-    }
-    totalNotification
     friends {
       _id
       username
@@ -122,7 +112,15 @@ const headerQuery = gql`query headerQuery($cursor: String) {
     }
   }
   me {
-    ...HeaderUserView,
+     _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
+    totalNotification
+    ...HeaderUserView
   },
 }
 ${userFragment}
@@ -170,7 +168,6 @@ class Header extends React.Component {
       acceptFriendAction,
     } = this.props;
     const user = me || {};
-
     return (
       <div className={s.root} >
         <Grid>
@@ -213,6 +210,8 @@ class Header extends React.Component {
                 refetch={refetch}
                 friendType={PENDING}
                 friends={user.friendRequests || []}
+                rejectFriendAction={rejectFriendAction}
+                acceptFriendAction={acceptFriendAction}
                 isMobile
               />
             </div>

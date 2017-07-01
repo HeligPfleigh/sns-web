@@ -10,7 +10,7 @@ import { ACCEPTED } from '../../constants';
 import s from './Conversation.scss';
 import { addNewUserToConversation } from '../../actions/chat';
 
-const friendsPageQuery = gql`query friendsPageQuery {
+const newMessageQuery = gql`query newMessageQuery {
   me {
     _id,
     username,
@@ -32,7 +32,7 @@ const friendsPageQuery = gql`query friendsPageQuery {
 }
 `;
 
-@graphql(friendsPageQuery)
+@graphql(newMessageQuery)
 @connect(
   null,
   { addNewUserToConversation })

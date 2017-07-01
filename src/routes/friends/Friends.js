@@ -5,7 +5,6 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { Grid, Row, Col } from 'react-bootstrap';
 import Loading from '../../components/Loading';
-import { PENDING, ACCEPTED, REJECTED } from '../../constants';
 import s from './Friends.scss';
 import Label from '../../components/Friend/Label';
 import FriendsList, { FriendItem, FriendActionItem } from './FriendsList';
@@ -13,19 +12,10 @@ import FriendsList, { FriendItem, FriendActionItem } from './FriendsList';
 const friendsPageQuery = gql`query friendsPageQuery {
   me {
     _id
-    username,
     profile {
       picture
       firstName
       lastName
-    }
-    friends {
-      _id
-      profile {
-        picture
-        firstName
-        lastName
-      }
     }
     friendRequests {
       _id
@@ -49,19 +39,34 @@ const friendsPageQuery = gql`query friendsPageQuery {
 
 const sendFriendRequest = gql`mutation sendFriendRequest ($userId: String!) {
   sendFriendRequest(_id: $userId) {
-    _id,
+    currentUser {
+      _id
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    nextUser {
+      _id
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
   }
 }`;
 
 const acceptFriend = gql`mutation acceptFriend ($userId: String!) {
   acceptFriend(_id: $userId) {
-    _id,
+    _id
   }
 }`;
 
 const rejectFriend = gql`mutation rejectFriend ($userId: String!) {
   rejectFriend(_id: $userId) {
-    _id,
+    _id
   }
 }`;
 
@@ -86,33 +91,7 @@ const mapPropsToOptions = () => ({
 });
 
 class Friends extends React.Component {
-  // handleFriendAction = (userId, cmd) => {
-  //   this.props.friendAction({
-  //     variables: { userId, cmd },
-  //     ...cmd === PENDING && {
-  //       refetchQueries: [{
-  //         query: friendsPageQuery,
-  //       }],
-  //     },
-  //     ...(cmd === ACCEPTED || cmd === REJECTED) && {
-  //       updateQueries: {
-  //         friendsPageQuery: (previousResult, { mutationResult }) => {
-  //           const newFriend = mutationResult.data.friendAction;
-  //           return update(previousResult, {
-  //             me: {
-  //               friends: {
-  //                 $unshift: [newFriend],
-  //               },
-  //               friendRequests: {
-  //                 $unset: [newFriend._id],
-  //               },
-  //             },
-  //           });
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
+
   render() {
     const {
       data: { loading, me },
@@ -170,6 +149,7 @@ Friends.propTypes = {
   rejectFriendAction: PropTypes.func.isRequired,
   data: PropTypes.shape({
     loading: PropTypes.bool.isRequired,
+    refetch: PropTypes.func.isRequired,
   }).isRequired,
 };
 Friends.defaultProps = {};
@@ -222,18 +202,59 @@ export default compose(
     props: ({ mutate }) => ({
       sendFriendRequestAction: userId => mutate({
         variables: { userId },
-        updateQueries: {
-          friendsPageQuery: (previousResult, { mutationResult }) => {
-            const newFriend = mutationResult.data.sendFriendRequest;
-            return update(previousResult, {
-              me: {
-                friendSuggestions: {
-                  $unset: [newFriend._id],
-                },
-              },
-            });
-          },
-        },
+        refetchQueries: [{
+          query: friendsPageQuery,
+          variables: {},
+        }],
+        // update: (store, { data: { sendFriendRequest } }) => {
+        //   // Read the data from our cache for this query.
+        //   let data = store.readQuery({ query: friendsPageQuery });
+        //   if (sendFriendRequest.nextUser) {
+        //     const index = data.me.friendSuggestions.findIndex(item => item._id === sendFriendRequest.currentUser._id);
+        //     data = update(data, {
+        //       me: {
+        //         friendSuggestions: {
+        //           // $unset: [newFriend.currentUser._id],
+        //           $splice: [[index, 1, sendFriendRequest.nextUser]],
+        //         },
+        //       },
+        //     });
+        //   } else {
+        //     data = update(data, {
+        //       me: {
+        //         friendSuggestions: {
+        //           $unset: [sendFriendRequest.currentUser._id],
+        //         },
+        //       },
+        //     });
+        //   }
+        //   // Write our data back to the cache.
+        //   store.writeQuery({ query: friendsPageQuery, data });
+        // },
+        // updateQueries: {
+        //   friendsPageQuery: (previousResult, { mutationResult }) => {
+        //     const newFriend = mutationResult.data.sendFriendRequest;
+        //     if (newFriend.nextUser) {
+        //       const index = previousResult.me.friendSuggestions.findIndex(item => item._id === newFriend.currentUser._id);
+        //       console.log(index);
+        //       return update(previousResult, {
+        //         me: {
+        //           friendSuggestions: {
+        //             // $unset: [newFriend.currentUser._id],
+        //             $splice: [[index, 1, newFriend.nextUser]],
+        //           },
+        //         },
+        //       });
+        //     }
+        //     return update(previousResult, {
+        //       me: {
+        //         friendSuggestions: {
+        //           $unset: [newFriend.currentUser._id],
+        //         },
+        //       },
+        //     });
+        //   },
+        // },
       }),
     }),
   }),

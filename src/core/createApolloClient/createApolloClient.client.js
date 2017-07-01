@@ -30,6 +30,12 @@ networkInterface.use([{
 const client = new ApolloClient({
   networkInterface,
   dataIdFromObject: o => o._id,
+  // dataIdFromObject: (result) => {
+  //   if (result._id && result.__typename) {
+  //     return result.__typename + result._id;
+  //   }
+  //   return null;
+  // },
   queryDeduplication: true,
   reduxRootSelector: state => state.apollo,
   ssrMode: true,
