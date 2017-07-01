@@ -97,8 +97,8 @@ const notificationQuery = gql`query notificationQuery($cursor: String) {
 }
 ${notificationFragment}`;
 
-const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
-  UpdateIsRead(_id: $_id) {
+const updateIsReadQuery = gql`mutation updateRead ($_id: String!) {
+  updateRead(_id: $_id) {
     ...frmNotificationView
   }
 }${notificationFragment}`;
@@ -124,6 +124,7 @@ class Notifications extends Component {
         <Loading show={loading} full>Loading ...</Loading>
         <Row className={s.containerTop30}>
           <Col md={8} sm={12} xs={12}>
+            {/**
             <InfiniteScroll
               loadMore={loadMoreRows}
               hasMore={hasNextPage}
@@ -135,6 +136,12 @@ class Notifications extends Component {
                 updateIsRead={updateIsRead}
               />}
             </InfiniteScroll>
+            */}
+            { notifications && notifications.edges && <NotificationList
+              notifications={notifications ? notifications.edges : []}
+              userInfo={me}
+              updateIsRead={updateIsRead}
+            />}
           </Col>
 
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>

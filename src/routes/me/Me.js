@@ -119,7 +119,8 @@ export default compose(
   withStyles(s),
   graphql(profilePageQuery, {
     options: () => ({
-      // variables: {},
+      variables: {},
+      fetchPolicy: 'network-only',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;

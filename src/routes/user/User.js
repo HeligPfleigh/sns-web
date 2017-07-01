@@ -156,7 +156,7 @@ export default compose(
       };
     },
   }),
-  graphql(Feed.mutation.createNewPost, {
+  graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
       createNewPost: (message, privacy, friend) => mutate({
         variables: { message, privacy, userId: friend._id },

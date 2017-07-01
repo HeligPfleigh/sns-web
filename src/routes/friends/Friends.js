@@ -39,22 +39,7 @@ const friendsPageQuery = gql`query friendsPageQuery {
 
 const sendFriendRequest = gql`mutation sendFriendRequest ($userId: String!) {
   sendFriendRequest(_id: $userId) {
-    currentUser {
-      _id
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    nextUser {
-      _id
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
+    _id
   }
 }`;
 

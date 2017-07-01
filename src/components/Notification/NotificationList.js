@@ -24,7 +24,8 @@ class NotificationList extends React.Component {
         { notifications && notifications.map(item => (
           item.user && item.subject && <NotificationItem
             key={`notification-${header ? 'header' : 'page'}-${item._id}`}
-            data={item} userInfo={userInfo}
+            data={item}
+            userInfo={userInfo}
             updateIsRead={updateIsRead}
             hidePopup={hidePopup}
           />

@@ -146,8 +146,8 @@ const updateSeenQuery = gql`mutation updateSeen {
 }
 ${NotifyFragment}`;
 
-const updateIsReadQuery = gql`mutation updateIsRead ($_id: String!) {
-  updateIsRead(_id: $_id) {
+const updateReadQuery = gql`mutation updateRead ($_id: String!) {
+  updateRead(_id: $_id) {
     ...NotificationView
   }
 }${NotifyFragment}`;
@@ -163,7 +163,7 @@ class Header extends React.Component {
       data: { notifications, me, refetch },
       loadMoreRows,
       updateSeen,
-      updateIsRead,
+      updateRead,
       rejectFriendAction,
       acceptFriendAction,
     } = this.props;
@@ -189,7 +189,7 @@ class Header extends React.Component {
                   data={notifications}
                   loadMoreRows={loadMoreRows}
                   updateSeen={updateSeen}
-                  updateIsRead={updateIsRead}
+                  updateIsRead={updateRead}
                   refetch={refetch}
                   friendType={PENDING}
                   friends={user.friendRequests || []}
@@ -206,7 +206,7 @@ class Header extends React.Component {
                 data={notifications}
                 loadMoreRows={loadMoreRows}
                 updateSeen={updateSeen}
-                updateIsRead={updateIsRead}
+                updateIsRead={updateRead}
                 refetch={refetch}
                 friendType={PENDING}
                 friends={user.friendRequests || []}
@@ -229,7 +229,7 @@ Header.propTypes = {
   }).isRequired,
   loadMoreRows: PropTypes.func.isRequired,
   updateSeen: PropTypes.func.isRequired,
-  updateIsRead: PropTypes.func.isRequired,
+  updateRead: PropTypes.func.isRequired,
   rejectFriendAction: PropTypes.func.isRequired,
   acceptFriendAction: PropTypes.func.isRequired,
 };
@@ -284,13 +284,13 @@ export default compose(
       }),
     }),
   }),
-  graphql(updateIsReadQuery, {
+  graphql(updateReadQuery, {
     props: ({ mutate }) => ({
-      updateIsRead: _id => mutate({
+      updateRead: _id => mutate({
         variables: { _id },
         updateQueries: {
           headerQuery: (previousResult, { mutationResult }) => {
-            const result = mutationResult.data.UpdateIsRead;
+            const result = mutationResult.data.updateRead;
             const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
             return update(previousResult, {
               notifications: {
