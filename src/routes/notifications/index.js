@@ -9,14 +9,17 @@
 
 import React from 'react';
 import Layout from '../../components/Layout';
+import { checkAuth } from '../../utils/role';
 
 export default {
   path: '/notifications',
-  async action() {
+  async action({ store }) {
+    const redirect = checkAuth(store);
+    if (redirect) return redirect;
     const Notifications = await require.ensure([], require => require('./Notifications').default, 'notifications');
 
     return {
-      title: 'SNS - Thông báo ngơời dùng',
+      title: 'SNS - Thông báo người dùng',
       component: <Layout><Notifications /></Layout>,
     };
   },
