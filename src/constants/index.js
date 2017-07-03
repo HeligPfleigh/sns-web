@@ -10,7 +10,11 @@ export const SET_RUNTIME_VARIABLE = 'SET_RUNTIME_VARIABLE';
 
 export const POST_TYPES = ['STATUS', 'EVENT'];
 
-export const NOTIFY_TYPES = ['LIKES', 'COMMENTS', 'NEW_POST'];
+export const LIKES = 'LIKES';
+export const COMMENTS = 'COMMENTS';
+export const NEW_POST = 'NEW_POST';
+export const ACCEPTED_FRIEND = 'ACCEPTED_FRIEND';
+export const NOTIFY_TYPES = [LIKES, COMMENTS, NEW_POST, ACCEPTED_FRIEND];
 
 export const PENDING = 'PENDING';
 export const ACCEPTED = 'ACCEPTED';
