@@ -8,7 +8,7 @@ class Friend extends React.Component {
   handleClickFriend = () => {
     const { friend, handleFriendAction, friendType } = this.props;
     if (friendType === ACCEPTED) {
-      handleFriendAction(friend._id);
+      handleFriendAction(friend);
     }
   }
   render() {
