@@ -30,7 +30,7 @@ class ConversationItem extends React.Component {
             <span>{name || 'New message'}</span>
             {
               meta && meta.lastMessage &&
-              <span dangerouslySetInnerHTML={{ __html: meta.lastMessage }} />
+              <span dangerouslySetInnerHTML={{ __html: `${meta.lastMessage.substring(0, 30).replace(/<(?:.|\n)*?>/gm, '')}...` }} />
             }
           </div>
           {
