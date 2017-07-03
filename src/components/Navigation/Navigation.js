@@ -144,7 +144,7 @@ class Navigation extends React.Component {
           <Dropdown id="dropdown-custom-1" pullRight onToggle={this.onToggleClick} >
 
             <CustomToggle bsRole="toggle" refs="child">
-              <Link className={s.link} to="/">
+              <Link className={s.link} to="#">
                 <i className="fa fa-users"></i>
                 {isMobile ? '' : <span>Nhóm</span>}
               </Link>
@@ -169,7 +169,7 @@ class Navigation extends React.Component {
                       friend={friend}
                       handleAcceptFriendAction={acceptFriendAction}
                       handleRejectFriendAction={rejectFriendAction}
-                    />
+                    />,
                   )}
                 </InfiniteScroll>
               </div>
