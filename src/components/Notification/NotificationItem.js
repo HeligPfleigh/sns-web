@@ -24,7 +24,7 @@ const collectionNotifyMessages = {
   [ACCEPTED_FRIEND]: () => ' đã chấp nhận lời mời kết bạn của bạn',
 };
 
-const getNotifyContent = (currentUser, author, type, actors) => {
+export const getNotifyContent = (currentUser, author, type, actors) => {
   if (actors && actors.length > 0) {
     const {
       _id: userId,
