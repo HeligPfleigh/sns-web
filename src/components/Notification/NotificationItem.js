@@ -5,7 +5,7 @@ import { Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import _ from 'lodash';
 
-import { LIKES, COMMENTS, NEW_POST, ACCEPTED_FRIEND } from '../../constants';
+import { LIKES, COMMENTS, NEW_POST, ACCEPTED_FRIEND, FRIEND_REQUEST } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
 import history from '../../core/history';
@@ -22,6 +22,7 @@ const collectionNotifyMessages = {
   [COMMENTS]: lastContent => ` vừa bình luận bài viết ${lastContent}.`,
   [NEW_POST]: () => ' vừa viết lên tường nhà bạn.',
   [ACCEPTED_FRIEND]: () => ' đã chấp nhận lời mời kết bạn của bạn',
+  [FRIEND_REQUEST]: () => ' đã gửi cho bạn 1 lời mời kết bạn',
 };
 
 export const getNotifyContent = (currentUser, author, type, actors) => {
@@ -78,6 +79,10 @@ class NotificationItem extends React.Component {
 
     if (ACCEPTED_FRIEND === type) {
       history.push(`/user/${actors[0]._id}`);
+    }
+
+    if (FRIEND_REQUEST === type) {
+      history.push('/friends');
     }
 
     // redirect to PostDetail Page
