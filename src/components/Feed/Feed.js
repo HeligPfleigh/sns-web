@@ -60,7 +60,7 @@ export const Feed = ({
             </span>
           }
 
-          { user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
+          { !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
             <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
           </Link>
           }
