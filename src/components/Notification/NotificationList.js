@@ -19,10 +19,11 @@ class NotificationList extends React.Component {
   render() {
     const { notifications, userInfo, isHeader, updateIsRead, hidePopup } = this.props;
     const header = isHeader || false;
+
     return (
       <span>
         { notifications && notifications.map(item => (
-          item.user && item.subject && <NotificationItem
+          item.user && <NotificationItem
             key={`notification-${header ? 'header' : 'page'}-${item._id}`}
             data={item}
             userInfo={userInfo}

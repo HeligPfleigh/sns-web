@@ -5,7 +5,7 @@ import { Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import _ from 'lodash';
 
-import { NOTIFY_TYPES } from '../../constants';
+import { LIKES, COMMENTS, NEW_POST, ACCEPTED_FRIEND } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
 import history from '../../core/history';
@@ -19,8 +19,9 @@ const getActorsContent = (actors) => {
 };
 
 const collectionNotifyMessages = {
-  [NOTIFY_TYPES[1]]: lastContent => ` vừa bình luận bài viết ${lastContent}.`,
-  [NOTIFY_TYPES[2]]: () => ' vừa viết lên tường nhà bạn.',
+  [COMMENTS]: lastContent => ` vừa bình luận bài viết ${lastContent}.`,
+  [NEW_POST]: () => ' vừa viết lên tường nhà bạn.',
+  [ACCEPTED_FRIEND]: () => ' đã chấp nhận lời mời kết bạn của bạn',
 };
 
 const getNotifyContent = (currentUser, author, type, actors) => {
@@ -60,10 +61,10 @@ class NotificationItem extends React.Component {
     const {
       data: {
         _id,
-        subject: {
-          _id: subjectId,
-        },
+        subject,
         isRead,
+        type,
+        actors,
       },
       updateIsRead,
       hidePopup,
@@ -75,17 +76,23 @@ class NotificationItem extends React.Component {
     // Change state dropdown open=false;
     if (hidePopup) hidePopup();
 
+    if (ACCEPTED_FRIEND === type) {
+      history.push(`/user/${actors[0]._id}`);
+    }
+
     // redirect to PostDetail Page
-    history.push(`/post/${subjectId}`);
+    if (subject) {
+      history.push(`/post/${subject._id}`);
+    }
   }
 
   render() {
     const {
       data: {
-        subject: {
-          message,
-          user: author,
-        },
+        // subject: {
+        //   user: author,
+        // },
+        user,
         isRead,
         type,
         actors,
@@ -93,10 +100,9 @@ class NotificationItem extends React.Component {
       },
       userInfo,
     } = this.props;
-
     const readStyle = isRead ? '' : s.readStyle;
     const fisrtContent = getActorsContent(actors);
-    const lastContent = getNotifyContent(userInfo, author, type, actors, message);
+    const lastContent = getNotifyContent(userInfo, user, type, actors);
 
     return (
       <div className={`${s.boxNotificationItem} ${readStyle}`}>
