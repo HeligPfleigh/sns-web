@@ -3,6 +3,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { connect } from 'react-redux';
+import { generate as idRandom } from 'shortid';
 import Loading from '../../components/Loading';
 import FriendList from '../../components/Friend/FriendList';
 import Friend from '../../components/Friend/Friend';
@@ -66,8 +67,8 @@ class NewMessage extends React.Component {
     return (
       <div className={s.toNewMess}>
         <div className={s.searchBox}>
-          <label htmlFor="searchToMess">To:</label>
-          <input id="searchToMess" ref={(node) => { this.input = node; }} onChange={this.handleChangeSearch} placeholder="Type a name of friend..." />
+          <label htmlFor="searchToMess">Chát với: </label>
+          <input id="searchToMess" ref={(node) => { this.input = node; }} onChange={this.handleChangeSearch} placeholder="Nhập tên một người bạn..." />
         </div>
         {
           searchText &&
@@ -77,9 +78,12 @@ class NewMessage extends React.Component {
               me && me.friends &&
               <FriendList className={s.listPeople}>
                 {
-                  me.friends.map(friend =>
-                    <Friend friend={friend} handleFriendAction={this.handleFriendAction} friendType={ACCEPTED} />
-                  )
+                  me.friends.map(friend => <Friend
+                    key={idRandom()}
+                    friend={friend}
+                    friendType={ACCEPTED}
+                    handleFriendAction={this.handleFriendAction}
+                  />)
                 }
               </FriendList>
             }
