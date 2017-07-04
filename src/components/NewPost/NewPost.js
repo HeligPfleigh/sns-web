@@ -82,7 +82,7 @@ class NewPost extends React.Component {
     this.setState(prevState => ({
       ...prevState,
       editorState,
-      isSubmit: !editorState.getCurrentContent().hasText(),
+      isSubmit: !editorState.getCurrentContent().getPlainText().trim(),
     }));
   }
 
