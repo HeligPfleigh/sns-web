@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import _ from 'lodash';
 import classnames from 'classnames';
+import Link from '../Link';
 import s from './Message.scss';
 
 class Message extends React.Component {
@@ -19,7 +20,9 @@ class Message extends React.Component {
     return (
       <div className={classnames(s.root, { [s.rootOwner]: isOwner })} >
         <div className={s.chatUser}>
-          <img alt="Message" src={picture || '/tile.png'} />
+          <Link to={`/user/${user.id}`}>
+            <img alt="Message" src={picture || '/tile.png'} />
+          </Link>
         </div>
         <div className={s.message}>
           <div dangerouslySetInnerHTML={{ __html: messageValues && messageValues.message }} />

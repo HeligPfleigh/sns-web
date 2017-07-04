@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classnames from 'classnames';
 import formatTime from '../../utils/time';
+import Link from '../Link';
 import s from './Conversation.scss';
 
 class ConversationItem extends React.Component {
@@ -21,11 +22,16 @@ class ConversationItem extends React.Component {
     const name = receiver && `${receiver.profile.firstName} ${receiver.profile.lastName}`;
     const picture = receiver && receiver.profile && receiver.profile.picture;
     return (
-      <div onClick={onClick} className={classnames(s.conversationItem, { [s.activeNew]: active })}>
+      <div className={classnames(s.conversationItem, { [s.activeNew]: active })}>
         <div className={s.friendAvata}>
-          <img alt={name} src={picture || '/tile.png'} />
+          { receiver &&
+            <Link to={`/user/${receiver.id}`}>
+              <img alt={name} src={picture || '/tile.png'} />
+            </Link>
+          }
+          { !picture && <img alt={name} src={'/tile.png'} /> }
         </div>
-        <div className={s.friendInfo}>
+        <div onClick={onClick} className={s.friendInfo}>
           <div className={s.friendName}>
             <span>{name || 'New message'}</span>
             {
