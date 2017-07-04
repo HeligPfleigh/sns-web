@@ -36,7 +36,11 @@ class Navigation extends React.Component {
   constructor(props) {
     super(props);
     const { friends } = props;
-    this.state = { friends, isOpen: false };
+    this.state = {
+      friends,
+      isOpen: false,
+      isOpenGroup: false,
+    };
   }
 
   componentDidMount() {
@@ -60,6 +64,12 @@ class Navigation extends React.Component {
     this.handleUpdateTitle();
   }
 
+  onToggleClick = (isOpenGroup) => {
+    this.setState({
+      isOpenGroup,
+    });
+  }
+
   handleUpdateTitle = () => {
     const { chatNotification, current, user: { totalNotification } } = this.props;
     const countChatNotification = getNotificationCount(chatNotification, current);
@@ -75,6 +85,9 @@ class Navigation extends React.Component {
   }
 
   navEventHandler = (path) => {
+    this.setState({
+      isOpenGroup: false,
+    });
     history.push(path);
   };
 
@@ -121,10 +134,12 @@ class Navigation extends React.Component {
       data: { loading, edges, pageInfo },
       loadMoreRows,
       updateIsRead,
+      friends,
+      rejectFriendAction,
+      acceptFriendAction,
     } = this.props;
 
-    const { isOpen } = this.state;
-    const { friends, rejectFriendAction, acceptFriendAction, ...customs } = this.props;
+    const { isOpen, isOpenGroup } = this.state;
 
     let hasNextPage = false;
     if (!loading && pageInfo) {
@@ -141,7 +156,7 @@ class Navigation extends React.Component {
           {isMobile ? '' : <span>Trang chủ</span>}
         </Link>
         <div className={s.userDropdown}>
-          <Dropdown id="dropdown-custom-1" pullRight onToggle={this.onToggleClick} >
+          <Dropdown id="dropdown-custom-1" pullRight onToggle={this.onToggleClick} open={isOpenGroup} >
 
             <CustomToggle bsRole="toggle" refs="child">
               <Link className={s.link} to="#">
@@ -173,7 +188,9 @@ class Navigation extends React.Component {
                   )}
                 </InfiniteScroll>
               </div>
-              <Link to="/friends"><div className={s.bottomItem}>Xem tất cả</div></Link>
+              <Link to="#" onClick={() => this.navEventHandler('/friends')}>
+                <div className={s.bottomItem}>Xem tất cả</div>
+              </Link>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -280,9 +297,7 @@ Navigation.propTypes = {
   updateIsRead: React.PropTypes.func.isRequired,
   rejectFriendAction: React.PropTypes.func.isRequired,
   acceptFriendAction: React.PropTypes.func.isRequired,
-  friendType: React.PropTypes.string,
   friends: React.PropTypes.array,
-  refetch: React.PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(Navigation);
