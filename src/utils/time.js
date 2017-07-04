@@ -12,8 +12,8 @@ export const prettyDate = (time) => {
   return date.format('dd-MM-YYYY');
 };
 export const formatStatus = (time) => {
-  if (!time) return 'Offline';
-  return `Last active ${prettyDate(time)}`;
+  if (!time) return 'Ngoại tuyến';
+  return `Lần truy cập cuối ${prettyDate(time)}`;
 };
 
 export default prettyDate;

@@ -33,7 +33,7 @@ class ConversationItem extends React.Component {
         </div>
         <div onClick={onClick} className={s.friendInfo}>
           <div className={s.friendName}>
-            <span>{name || 'New message'}</span>
+            <span>{name || 'Hội thoại mới'}</span>
             {
               meta && meta.lastMessage &&
               <span dangerouslySetInnerHTML={{ __html: `${meta.lastMessage.substring(0, 30).replace(/<(?:.|\n)*?>/gm, '')}...` }} />
