@@ -3,35 +3,24 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button } from 'react-bootstrap';
 import s from './Info.scss';
 
-function editProfile() {
-      // move to edit profile screen
-}
-
-const Info = ({ profile: { birthday, phone, address, gender, email }, isMe }) => (
+const Info = ({ profile: { firstName, lastName, gender }, isMe, openInfoUpdate }) => (
   <div className={s.root}>
     <ul className={s.profile}>
-      <li className={s.fixfont}>
-        <i className="fa fa-mobile fa-3x " aria-hidden="true"></i><span>Số điện thoại</span> {phone || ''}
-      </li>
       <li>
         <i className="fa fa-address-book-o fa-2x" aria-hidden="true"></i>
-        <span>Địa Chỉ</span> {address || ''}
+        <span>Họ</span> {lastName || ''}
       </li>
       <li>
         <i className="fa fa-envelope-o fa-2x" aria-hidden="true"></i>
-        <span>Email </span> { email || ''}
+        <span>Tên </span> { firstName || ''}
       </li>
       <li>
         <i className="fa fa-venus-mars fa-2x" aria-hidden="true"></i>
         <span>Giới tính</span>
-        {gender || ''}
-      </li>
-      <li>
-        <i className="fa fa-birthday-cake fa-2x" aria-hidden="true"></i>
-        <span>Ngày Sinh</span> {birthday || ''}
+        {gender === 'male' ? 'Nam' : 'Nữ'}
       </li>
       { isMe && <li>
-        <Button className={s.button} >
+        <Button className={s.button} onClick={openInfoUpdate}>
           Thay đổi
         </Button></li>
          }
@@ -46,6 +35,7 @@ Info.propTypes = {
     phone: PropTypes.string.isRequired,
   }).isRequired,
   isMe: PropTypes.bool.isRequired,
+  openInfoUpdate: PropTypes.func.isRequired,
 };
 Info.defaultProps = {
   birthday: '',

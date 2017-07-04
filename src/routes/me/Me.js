@@ -9,9 +9,11 @@ import CommentList from '../../components/Comments/CommentList';
 import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
+import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
+import _ from 'lodash';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
 const profilePageQuery = gql`query profilePageQuery {
@@ -31,7 +33,47 @@ const profilePageQuery = gql`query profilePageQuery {
 ${Feed.fragments.post}
 `;
 
+const updateProfileQuery = gql`mutation updateProfile ($profile: ProfileInput!) {
+  updateProfile (profile: $profile) {
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+      gender
+    }
+  }
+}`;
+
 class Me extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isInfoUpdate: false,
+    };
+  }
+
+  openInfoUpdate = () => {
+    this.setState({
+      isInfoUpdate: true,
+    });
+  }
+
+  closeInfoUpdate = () => {
+    this.setState({
+      isInfoUpdate: false,
+    });
+  }
+
+  handleUpdate = (values) => {
+    const profile = _.pick(values, ['firstName', 'lastName', 'gender', 'picture']);
+    console.log('profile:', profile);
+    this.props.updateProfile({
+      variables: { profile },
+    }).then(res => console.log(res)).catch(err => console.log(err));
+  }
 
   render() {
     const { data: { me }, query, createNewComment, loadMoreComments } = this.props;
@@ -54,7 +96,7 @@ class Me extends React.Component {
                 <Image className={s.image} src={imageSrc} />
                 <div className={s.userName} >
                   <Image className={s.avartar} src={avatar} />
-                  { profile && (<h1> {profile.lastName} {profile.firstName}</h1>) }
+                  {profile && (<h1> {profile.lastName} {profile.firstName}</h1>)}
                 </div>
               </div>
               <div className={s.infors}>
@@ -65,7 +107,7 @@ class Me extends React.Component {
                   <div className={s.parent}>
                     <NewPost createNewPost={this.props.createNewPost} />
                   </div>
-                  { posts.map(data => (
+                  {posts.map(data => (
                     <Feed
                       key={data._id}
                       data={data}
@@ -75,10 +117,13 @@ class Me extends React.Component {
                       createNewComment={createNewComment}
                       loadMoreComments={loadMoreComments}
                     />
-                ))}
+                  ))}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile && <Info profile={profile} isMe />}
+                  {profile &&
+                    (this.state.isInfoUpdate ?
+                      <InfoUpdate initialValues={profile} profile={profile} closeInfoUpdate={this.closeInfoUpdate} onSubmit={this.handleUpdate} />
+                      : <Info profile={profile} isMe openInfoUpdate={this.openInfoUpdate} />)}
                 </div>
               </Grid>
             </div>
@@ -103,6 +148,7 @@ Me.propTypes = {
   }).isRequired,
   createNewComment: PropTypes.func.isRequired,
   createNewPost: PropTypes.func.isRequired,
+  updateProfile: PropTypes.func.isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
@@ -341,5 +387,9 @@ export default compose(
         },
       }),
     }),
+  }),
+
+  graphql(updateProfileQuery, {
+    name: 'updateProfile',
   }),
 )(Me);
