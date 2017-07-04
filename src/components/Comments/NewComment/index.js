@@ -83,7 +83,7 @@ class NewPost extends Component {
   onChange = (editorState) => {
     this.setState({
       editorState,
-      isSubmit: editorState.getCurrentContent().hasText(),
+      isSubmit: !!editorState.getCurrentContent().getPlainText().trim(),
     });
   }
 
