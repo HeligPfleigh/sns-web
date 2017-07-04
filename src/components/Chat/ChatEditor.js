@@ -23,10 +23,10 @@ class ChatEditor extends React.Component {
   handleKeyCommand = (command) => {
     const { editorState } = this.state;
     if (command === 'send-message') {
-      if (editorState.getCurrentContent().hasText()) {
+      if (editorState.getCurrentContent().getPlainText().trim()) {
         this.props.handleAction(stateToHTML(editorState.getCurrentContent()));
+        this.setState({ editorState: EditorState.createEmpty() });
       }
-      this.setState({ editorState: EditorState.createEmpty() });
     }
   }
   render() {
