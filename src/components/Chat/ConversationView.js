@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import moment from 'moment';
+
 import { Scrollbars } from 'react-custom-scrollbars';
 import s from './Conversation.scss';
 import ChatEditor from './ChatEditor';
@@ -63,6 +65,8 @@ class ConversationView extends React.Component {
     let receiver = activeConversation && Object.values(activeConversation)[0] && Object.values(activeConversation)[0].receiver;
     const members = [user, receiver];
     const messagesOnChat = messages && messages[current];
+    const days = [];
+
     if (!receiver) {
       receiver = newChat && newChat.receiver;
     }
@@ -86,7 +90,7 @@ class ConversationView extends React.Component {
                   </span>
                 }
               </div>
-              : <span>New message</span>
+              : <span>Hội thoại mới</span>
             }
           </div>
           {
@@ -121,7 +125,16 @@ class ConversationView extends React.Component {
             ref={(node) => { this.scrollMessages = node; }}
           >
             {
-              messagesOnChat && messagesOnChat.map(message => <Message key={Object.keys(message)[0]} members={members} message={message} />)
+              messagesOnChat && messagesOnChat.map((message) => {
+                let isShowDate = false;
+                const messageObj = Object.values(message)[0];
+                const { timestamp } = messageObj;
+                if (timestamp && days.indexOf(moment(timestamp).format('DD/MM/YYYY')) === -1) {
+                  days.push(moment(timestamp).format('DD/MM/YYYY'));
+                  isShowDate = true;
+                }
+                return (<Message key={Object.keys(message)[0]} members={members} message={message} isShowDate={isShowDate} />);
+              })
             }
           </Scrollbars>
         </div>

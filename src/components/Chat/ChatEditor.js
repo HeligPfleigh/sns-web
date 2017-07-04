@@ -38,7 +38,7 @@ class ChatEditor extends React.Component {
         spellCheck
         handleKeyCommand={this.handleKeyCommand}
         keyBindingFn={this.keyBindingFn}
-        placeholder="Type a message..."
+        placeholder="Nội dung trò chuyện..."
       />
     );
   }
