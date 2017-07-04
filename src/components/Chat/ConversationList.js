@@ -64,7 +64,7 @@ class ConversationList extends React.Component {
           <span>
             <i className="fa fa-sliders" />
           </span>
-          <span>Messenger</span>
+          <span>Tin nhắn</span>
           <span>
             <i className="fa fa-pencil-square-o" onClick={this.handleActiveNewChat} />
           </span>
@@ -72,7 +72,7 @@ class ConversationList extends React.Component {
         <div className={s.search}>
           <span>
             <label htmlFor="search">
-              <input id="search" placeholder="Search Messenger" />
+              <input id="search" placeholder="Tìm kiếm" />
             </label>
           </span>
         </div>
