@@ -188,7 +188,7 @@ class Building extends Component {
                     />
                     {
                       building && building.requests.length === 0 && <h3>
-                        you don't have any joining requests
+                        Bạn không có bất kì yêu cầu nào
                       </h3>
                     }
                     {

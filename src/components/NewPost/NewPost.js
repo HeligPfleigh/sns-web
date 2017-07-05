@@ -135,7 +135,7 @@ class NewPost extends React.Component {
           <Col className="pull-left">
             <Button bsStyle="link" className={s.addPhoto} title="Đính kèm ảnh">
               <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
-              <strong>Photo</strong>
+              <strong>Ảnh</strong>
             </Button>
           </Col>
 
@@ -150,7 +150,7 @@ class NewPost extends React.Component {
               title="Ai có thể đọc bài viết của bạn"
             >
               {privacy.map(item => (
-                <option key={item} value={item}>{item}</option>
+                <option key={item} value={item}>{item === 'PUBLIC' ? 'Công khai' : (item === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}</option>
               ))}
             </FormControl>}
           </Col>
