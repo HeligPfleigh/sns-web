@@ -27,6 +27,7 @@ const Info = ({ profile: { firstName, lastName, gender }, isMe, openInfoUpdate }
     </ul>
   </div>
 );
+
 Info.propTypes = {
   profile: PropTypes.shape({
     birthday: PropTypes.string.isRequired,

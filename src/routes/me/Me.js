@@ -23,7 +23,8 @@ const profilePageQuery = gql`query profilePageQuery {
     profile {
       picture,
       firstName,
-      lastName
+      lastName,
+      gender
     }
     posts {
       ...PostView
@@ -69,10 +70,10 @@ class Me extends React.Component {
 
   handleUpdate = (values) => {
     const profile = _.pick(values, ['firstName', 'lastName', 'gender', 'picture']);
-    console.log('profile:', profile);
     this.props.updateProfile({
       variables: { profile },
     }).then(res => console.log(res)).catch(err => console.log(err));
+    this.closeInfoUpdate();
   }
 
   render() {
