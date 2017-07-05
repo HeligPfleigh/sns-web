@@ -78,7 +78,9 @@ class NewMessage extends React.Component {
               me && me.friends &&
               <FriendList className={s.listPeople}>
                 {
-                  me.friends.map(friend => <Friend
+                  me.friends.filter(friend => friend.profile.firstName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+                  || friend.profile.lastName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)
+                  .map(friend => <Friend
                     key={idRandom()}
                     friend={friend}
                     friendType={ACCEPTED}
