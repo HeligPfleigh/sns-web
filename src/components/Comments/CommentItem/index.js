@@ -22,19 +22,26 @@ class CommentItem extends Component {
     return (
       <div className={s.commentPanel}>
         <Col className={s.commentAvarta}>
-          <Link to={`/user/${comment.user._id}`}>
+          <Link
+            to={`/user/${comment.user._id}`}
+            title={`${comment.user.profile.firstName} ${comment.user.profile.lastName}`}
+          >
             <Image src={comment.user.profile.picture} circle />
           </Link>
         </Col>
         <Col className={s.commentContent}>
           <Col
             dangerouslySetInnerHTML={{
-              __html: `<p><a href=${link}>${comment.user.profile.firstName} ${comment.user.profile.lastName}<a/></p>
-              ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}`,
+              __html: `<p>
+                <a title="${comment.user.profile.firstName} ${comment.user.profile.lastName}" href=${link}>
+                  ${comment.user.profile.firstName} ${comment.user.profile.lastName}
+                <a/></p>
+                ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}
+              `,
             }}
           />
           <Col className={s.commentControl}>
-            <a href="#" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
+            <a href="#" title="Trả lời" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
               <TimeAgo time={comment.updatedAt} />
             </a>
           </Col>

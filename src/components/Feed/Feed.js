@@ -41,7 +41,7 @@ export const Feed = ({
       avatar={
         <span>
           { author &&
-            <Link to={`/user/${author._id}`}>
+            <Link title={`${author.profile.firstName} ${author.profile.lastName}`} to={`/user/${author._id}`}>
               <Image src={author.profile.picture} circle />
             </Link>
           }

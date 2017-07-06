@@ -7,7 +7,7 @@ function defaultClick(e) {
 }
 
 const Icon = ({ onClick = defaultClick, title, icons }) => (
-  <a href="#" onClick={onClick}>
+  <a title={title} href="#" onClick={onClick}>
     <i className={icons} aria-hidden="true"></i>&nbsp;
     <span>{title}</span>
   </a>

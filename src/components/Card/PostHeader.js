@@ -17,7 +17,7 @@ const PostHeader = ({ avatar, title, subtitle }) => (
       </div>
     </Col>
     <Col className={s.postHeaderRight}>
-      <span>
+      <span title="Tùy chọn">
         <i className="fa fa-circle-o" aria-hidden="true"></i>
         <i className="fa fa-circle-o" aria-hidden="true"></i>
         <i className="fa fa-circle-o" aria-hidden="true"></i>

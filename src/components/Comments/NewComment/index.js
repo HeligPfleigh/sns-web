@@ -123,7 +123,7 @@ class NewPost extends Component {
     return (
       <div className={s.newCommentPanel}>
         <Col className={`pull-left ${s.newCommentAvarta}`}>
-          <a href="#">
+          <a title={`${user.profile.firstName} ${user.profile.lastName}`} href="#">
             <Image src={user.profile.picture} circle />
           </a>
         </Col>
