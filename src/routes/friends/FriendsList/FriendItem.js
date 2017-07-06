@@ -17,16 +17,19 @@ class FriendItem extends React.Component {
       <li>
         <div className={s.friend} onClick={this.handleClickFriend}>
           <div className={s.friendAvatar}>
-            <img alt={friend.profile && friend.profile.firstName} src={friend.profile && friend.profile.picture} />
+            <img
+              alt={friend.profile && friend.profile.firstName}
+              src={friend.profile && friend.profile.picture}
+              title={friend.profile && `${friend.profile.firstName} ${friend.profile.lastName}`}
+            />
           </div>
           <div className={s.friendInfo}>
             <div className={s.friendName}>
               <span>{friend.profile.firstName} {friend.profile.lastName}</span>
             </div>
             <ButtonToolbar className={s.addFriend}>
-              <Button onClick={this.onCLick} bsStyle="primary" bsSize="xsmall">
-                <i className="fa fa-user-plus" />
-                Add Friend
+              <Button title="Thêm bạn mới" onClick={this.onCLick} bsStyle="primary" bsSize="xsmall">
+                <i className="fa fa-user-plus" />Thêm bạn
               </Button>
             </ButtonToolbar>
           </div>

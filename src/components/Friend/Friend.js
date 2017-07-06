@@ -17,7 +17,11 @@ class Friend extends React.Component {
       <li key={friend._id}>
         <div className={s.friend} onClick={this.handleClickFriend}>
           <div className={s.friendAvatar}>
-            <img alt={friend.profile && friend.profile.firstName} src={friend.profile && friend.profile.picture} />
+            <img
+              alt={friend.profile && friend.profile.firstName}
+              src={friend.profile && friend.profile.picture}
+              title={friend.profile && `${friend.profile.firstName} ${friend.profile.lastName}`}
+            />
           </div>
           <div className={s.friendInfo}>
             <div className={s.friendName}>
@@ -30,16 +34,16 @@ class Friend extends React.Component {
             {
               friendType === PENDING &&
               <ButtonToolbar>
-                <Button onClick={() => handleFriendAction(friend._id, ACCEPTED)} bsStyle="primary">Confirm</Button>
-                <Button onClick={() => handleFriendAction(friend._id, REJECTED)} >Delete Request</Button>
+                <Button title="Đồng ý kết bạn" onClick={() => handleFriendAction(friend._id, ACCEPTED)} bsStyle="primary">Đồng ý</Button>
+                <Button title="Hủy kết bạn" onClick={() => handleFriendAction(friend._id, REJECTED)} >Hủy kết bạn</Button>
               </ButtonToolbar>
             }
             {
               friendType === NONE &&
               <ButtonToolbar className={s.addFriend}>
-                <Button onClick={() => handleFriendAction(friend._id, PENDING)} bsStyle="primary" bsSize="xsmall">
+                <Button title="Thêm bạn mới" onClick={() => handleFriendAction(friend._id, PENDING)} bsStyle="primary" bsSize="xsmall">
                   <i className="fa fa-user-plus" />
-                  Add Friend
+                  Thêm bạn
                 </Button>
               </ButtonToolbar>
             }

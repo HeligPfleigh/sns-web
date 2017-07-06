@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { generate as idRandom } from 'shortid';
 import Feed from './Feed';
 
 const FeedList = ({
@@ -12,7 +13,7 @@ const FeedList = ({
   <div>
     {feeds.map(item => (
       <Feed
-        key={item._id}
+        key={idRandom()}
         data={item}
         likePostEvent={likePostEvent}
         unlikePostEvent={unlikePostEvent}

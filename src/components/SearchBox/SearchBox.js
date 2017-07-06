@@ -45,7 +45,7 @@ class SearchBox extends React.Component {
     if (!isMobile || showForm === true) {
       return (
         <div className={s.root} onBlur={this.onBlur}>
-          <form className={s.formSearch}>
+          <form title="Tìm kiếm" className={s.formSearch}>
             <input
               autoFocus
               type="text"

@@ -15,12 +15,13 @@
 
 
 .commentContent {
+  text-decoration: none;
   word-wrap: break-word;
   width:100%;
   padding-left: 10px;
   img {
     max-width: 100%;
-  }  
+  }
 
   p {
     margin: 0;
@@ -35,7 +36,6 @@
     &:first-child, &:first-child + p {
       margin: 0 0 10px;
       padding-right: 25px;
-     
     }
   }
   a {

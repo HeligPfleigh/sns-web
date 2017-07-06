@@ -117,7 +117,11 @@ class NewPost extends React.Component {
     return (
       <div className={s.newPostPanel}>
         <Col className={s.newPostEditor}>
-          <div style={styles.editor} onClick={this.focus}>
+          <div
+            style={styles.editor}
+            onClick={this.focus}
+            title="Nội dung bài viết, chia sẻ hoặc cập nhật trạng thái của bạn"
+          >
             <Editor
               editorState={editorState}
               onChange={this.onChange}
@@ -129,17 +133,22 @@ class NewPost extends React.Component {
         </Col>
         <Col className={s.newPostControl}>
           <Col className="pull-left">
-            <Button bsStyle="link" className={s.addPhoto}>
+            <Button bsStyle="link" className={s.addPhoto} title="Đính kèm ảnh">
               <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
               <strong>Photo</strong>
             </Button>
           </Col>
 
           <Col className="pull-right">
-            <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
+            <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
-          <Col className="pull-right">
-            {displayPrivacy && <FormControl onChange={this.onChangePrivacy} defaultValue={privacy[0]} componentClass="select" placeholder="select">
+          <Col className="pull-right" style={{ marginRight: '5px' }}>
+            {displayPrivacy && <FormControl
+              onChange={this.onChangePrivacy}
+              defaultValue={privacy[0]}
+              componentClass="select"
+              title="Ai có thể đọc bài viết của bạn"
+            >
               {privacy.map(item => (
                 <option key={item} value={item}>{item}</option>
               ))}

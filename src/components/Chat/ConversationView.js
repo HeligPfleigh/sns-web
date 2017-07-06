@@ -138,7 +138,7 @@ class ConversationView extends React.Component {
             }
           </Scrollbars>
         </div>
-        <div className={s.editor}>
+        <div title="Nội dung tin nhắn" className={s.editor}>
           <ChatEditor handleAction={this.handleSend} />
         </div>
       </div>

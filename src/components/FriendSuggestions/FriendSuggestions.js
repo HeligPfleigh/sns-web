@@ -52,7 +52,7 @@ class FriendSuggestions extends React.Component {
     const hasFriendSuggest = me && me.friendSuggestions && me.friendSuggestions.length > 0;
     return (
       <div className={hasFriendSuggest ? '' : s.friendSuggestionHide}>
-        {loading && <h1 style={{ textAlign: 'center' }}>LOADING</h1>}
+        {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
         {!loading && <FriendList friends={me.friendSuggestions} friendType={NONE} handleFriendAction={this.props.sendFriendRequest} />}
       </div>
     );

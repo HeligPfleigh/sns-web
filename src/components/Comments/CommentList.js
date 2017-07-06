@@ -53,7 +53,7 @@ class CommentList extends React.Component {
 
     return (
       <div className={s.commentContent}>
-        {this.hasMore() && <a onClick={this.loadMoreComments}>
+        {this.hasMore() && <a title="Xem thêm" onClick={this.loadMoreComments}>
           <i className="fa fa-hand-o-right" aria-hidden="true"></i> Xem thêm
         </a>}
         { comments && comments.map(item => (

@@ -151,7 +151,7 @@ class Navigation extends React.Component {
 
     return (
       <div className={isMobile ? s.navbarSecond : s.navigation} role="navigation">
-        <Link className={s.link} to="/">
+        <Link title="Trang chủ" className={s.link} to="/">
           <i className="fa fa-home"></i>
           {isMobile ? '' : <span>Trang chủ</span>}
         </Link>
@@ -159,7 +159,7 @@ class Navigation extends React.Component {
           <Dropdown id="dropdown-custom-1" pullRight onToggle={this.onToggleClick} open={isOpenGroup} >
 
             <CustomToggle bsRole="toggle" refs="child">
-              <Link className={s.link} to="#">
+              <Link title="Nhóm" className={s.link} to="#">
                 <i className="fa fa-users"></i>
                 {isMobile ? '' : <span>Nhóm</span>}
               </Link>
@@ -188,19 +188,19 @@ class Navigation extends React.Component {
                   )}
                 </InfiniteScroll>
               </div>
-              <Link to="#" onClick={() => this.navEventHandler('/friends')}>
+              <Link title="xem tất cả" to="#" onClick={() => this.navEventHandler('/friends')}>
                 <div className={s.bottomItem}>Xem tất cả</div>
               </Link>
             </Dropdown.Menu>
           </Dropdown>
         </div>
 
-        <Link className={s.link} to={`/building/${buildingId}`}>
-          <i className="fa fa-address-book-o"></i>
+        <Link title="Tòa nhà" className={s.link} to={`/building/${buildingId}`}>
+          <i className="fa fa-building"></i>
           {isMobile ? '' : <span>Tòa nhà</span>}
         </Link>
 
-        <Link className={s.link} to="/messages">
+        <Link title="Tin nhắn" className={s.link} to="/messages">
           {
             countChatNotification > 0 &&
             <i className="fa fa-comment-o" data-badge={countChatNotification}></i>
@@ -210,11 +210,11 @@ class Navigation extends React.Component {
             countChatNotification < 1 &&
             <i className="fa fa-comment"></i>
           }
-          { isMobile ? '' : <span>Tinh nhắn</span> }
+          { isMobile ? '' : <span>Tin nhắn</span> }
         </Link>
 
         <MediaQuery query="(max-width: 992px)">
-          <Link className={s.link} to="/notifications">
+          <Link title="Thông báo" className={s.link} to="/notifications">
             {
               totalNotification > 0 &&
               <i className="fa fa-bell-o" data-badge={totalNotification}></i>
@@ -229,6 +229,7 @@ class Navigation extends React.Component {
 
         <MediaQuery query="(min-width: 992px)">
           <Dropdown
+            title="Thông báo"
             className={s.link} id="dropdown-notification"
             componentClass="div" pullRight onToggle={this.dropEventHandler}
             open={isOpen}
@@ -264,7 +265,11 @@ class Navigation extends React.Component {
                   /> }
                 </InfiniteScroll>
               </div>
-              <MenuItem className={s.showAllItem} onClick={() => this.navEventHandler('/notifications')}>
+              <MenuItem
+                title="Xem toàn bộ thông báo"
+                className={s.showAllItem}
+                onClick={() => this.navEventHandler('/notifications')}
+              >
                 Xem toàn bộ thông báo
               </MenuItem>
             </Dropdown.Menu>

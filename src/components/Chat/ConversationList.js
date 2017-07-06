@@ -62,11 +62,11 @@ class ConversationList extends React.Component {
       <div className={s.conversations}>
         <div className={s.header}>
           <span>
-            <i className="fa fa-sliders" />
+            <i title="Danh sách bạn chát" className="fa fa-sliders" />
           </span>
           <span>Tin nhắn</span>
           <span>
-            <i className="fa fa-pencil-square-o" onClick={this.handleActiveNewChat} />
+            <i title="Hội thoại mới" className="fa fa-pencil-square-o" onClick={this.handleActiveNewChat} />
           </span>
         </div>
         <div className={s.search}>

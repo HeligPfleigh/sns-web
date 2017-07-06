@@ -141,15 +141,15 @@ class Building extends Component {
           <Row className="clearfix">
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
-                <NavItem eventKey={POST_TAB}>
-                  Post
+                <NavItem title="Tất cả bài viết" eventKey={POST_TAB}>
+                  Bài viết
                 </NavItem>
-                <NavItem eventKey={INFO_TAB}>
-                  Information
+                <NavItem title="Thông tin tòa nhà" eventKey={INFO_TAB}>
+                  Thông tin chung
                 </NavItem>
-                { building && building.isAdmin && <NavItem eventKey={REQUEST_TAB}>
-                  Requests
-                </NavItem>}
+                { building && building.isAdmin && <NavItem
+                  title="Yêu cầu kết nối" eventKey={REQUEST_TAB}
+                > Yêu cầu </NavItem>}
               </Nav>
             </Col>
             <Col sm={7}>
