@@ -196,7 +196,7 @@ class Navigation extends React.Component {
         </div>
 
         <Link title="Tòa nhà" className={s.link} to={`/building/${buildingId}`}>
-          <i className="fa fa-address-book-o"></i>
+          <i className="fa fa-building"></i>
           {isMobile ? '' : <span>Tòa nhà</span>}
         </Link>
 
