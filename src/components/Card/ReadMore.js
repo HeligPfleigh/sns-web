@@ -70,7 +70,7 @@ ReadMore.defaultProps = {
 };
 
 ReadMore.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   more: PropTypes.node,
   less: PropTypes.node,
   lines: PropTypes.number,
