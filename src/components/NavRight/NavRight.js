@@ -29,7 +29,7 @@ class NavRight extends React.Component {
     return (
       <div className={s.navRight}>
         <div className={s.userDropdown}>
-          <Dropdown id="dropdown-custom-1" pullRight>
+          <Dropdown title="Trang cá nhân" id="dropdown-custom-1" pullRight>
             <Link to="/me">
               <Image src={profile && profile.picture} circle width={32} height={32} />
             </Link>
@@ -43,29 +43,39 @@ class NavRight extends React.Component {
                   <div className={s.name}>
                     <h2>
                       { profile && <strong>{`${profile.firstName} ${profile.lastName}`}</strong> }
-                      <p>View profile</p>
+                      <p>Trang cá nhân</p>
                     </h2>
                   </div>
                 </div>
               </MenuItem>
               <MenuItem header className={s.headerItem}>TÀI KHOẢN</MenuItem>
-              <MenuItem onClick={() => this.navEventHandler('/settings')}>Cài đặt</MenuItem>
-              <MenuItem onClick={() => this.navEventHandler('/helps')}>Trợ giúp</MenuItem>
-              <MenuItem href="/auth/logout">Đăng xuất</MenuItem>
+              <MenuItem title="Cài đặt" onClick={() => this.navEventHandler('/settings')}>Cài đặt</MenuItem>
+              <MenuItem title="Trợ giúp" onClick={() => this.navEventHandler('/helps')}>Trợ giúp</MenuItem>
+              <MenuItem title="Đăng xuất" href="/auth/logout">Đăng xuất</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
         </div>
         <div className={s.menuDropdown}>
-          <Dropdown id="dropdown-custom-2" pullRight>
+          <Dropdown title="Tùy chọn" id="dropdown-custom-2" pullRight>
             <CustomToggle styles={s.menuToggleBtn} bsRole="toggle">
               <i className="fa fa-bars" aria-hidden="true"></i>
             </CustomToggle>
             <Dropdown.Menu className={s.itemDropdownMenu}>
-              <MenuItem eventKey="1">Chung cư của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i></MenuItem>
-              <MenuItem eventKey="2">Hàng xóm <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i></MenuItem>
-              <MenuItem eventKey="3">Nhóm trao đổi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i></MenuItem>
-              <MenuItem eventKey="4">Cửa hàng quanh tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i></MenuItem>
-              <MenuItem eventKey="4">Sự kiện sắp tới <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i></MenuItem>
+              <MenuItem title="Chung cư của tôi" eventKey="1">
+                Chung cư của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
+              </MenuItem>
+              <MenuItem title="Hàng xóm" eventKey="2">
+                Hàng xóm <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+              </MenuItem>
+              <MenuItem title="Nhóm trao đổi" eventKey="3">
+                Nhóm trao đổi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+              </MenuItem>
+              <MenuItem title="Cửa hàng quanh tôi" eventKey="4">
+                Cửa hàng quanh tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+              </MenuItem>
+              <MenuItem title="Sự kiện sắp tới" eventKey="4">
+                Sự kiện sắp tới <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+              </MenuItem>
             </Dropdown.Menu>
           </Dropdown>
         </div>
