@@ -92,7 +92,9 @@ class Friends extends React.Component {
             {
               me && me.friendRequests &&
               <FriendsList>
-                <Label label={`Respond to Your ${me.friendRequests.length} Friend Requests`}></Label>
+                <li style={{ paddingLeft: '10px' }}>
+                  <Label label={`Bạn có ${me.friendRequests.length} yêu cầu kết bạn`} />
+                </li>
                 {
                   me.friendRequests.map(friend =>
                     <FriendActionItem

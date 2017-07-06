@@ -23,15 +23,19 @@ class FriendActionItem extends React.Component {
       <li>
         <div className={s.friend} onClick={this.handleClickFriend}>
           <div className={s.friendAvatar}>
-            <img alt={friend.profile && friend.profile.firstName} src={friend.profile && friend.profile.picture} />
+            <img
+              alt={friend.profile && friend.profile.firstName}
+              src={friend.profile && friend.profile.picture}
+              title={friend.profile && `${friend.profile.firstName} ${friend.profile.lastName}`}
+            />
           </div>
           <div className={s.friendInfo}>
             <div className={s.friendName}>
               <span>{friend.profile.firstName} {friend.profile.lastName}</span>
             </div>
             <ButtonToolbar>
-              <Button onClick={this.onAcceptCLick} bsStyle="primary">Confirm</Button>
-              <Button onClick={this.onRejectCLick} >Delete Request</Button>
+              <Button title="Đồng ý kết bạn" onClick={this.onAcceptCLick} bsStyle="primary">Đồng ý</Button>
+              <Button title="Hủy kết bạn" onClick={this.onRejectCLick} >Hủy kết bạn</Button>
             </ButtonToolbar>
           </div>
         </div>
