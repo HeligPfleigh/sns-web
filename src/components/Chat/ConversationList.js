@@ -26,6 +26,14 @@ class ConversationList extends React.Component {
     activeConversation: PropTypes.func.isRequired,
     handleToggleChatView: PropTypes.func.isRequired,
   }
+
+  constructor() {
+    super();
+    this.state = {
+      searchText: null,
+    };
+  }
+
   componentWillMount() {
     const { user, getConversations, current, newChat, activeConversation, conversations } = this.props;
     if (user && user.uid) {
@@ -48,16 +56,26 @@ class ConversationList extends React.Component {
   componentWillUnmount() {
     this.props.activeConversation({});
   }
+
   handleActiveConversation = conversation => () => {
     this.props.handleToggleChatView();
     this.props.activeConversation(conversation);
   }
+
   handleActiveNewChat = () => {
     this.props.handleToggleChatView();
     this.props.activeNewChat(true);
   }
+
+  handleChangeSearch = (e) => {
+    this.setState({
+      searchText: e.target.value,
+    });
+  }
+
   render() {
     const { newChat, conversations, current, user } = this.props;
+    const { searchText } = this.state;
     return (
       <div className={s.conversations}>
         <div className={s.header}>
@@ -72,7 +90,7 @@ class ConversationList extends React.Component {
         <div className={s.search}>
           <span>
             <label htmlFor="search">
-              <input id="search" placeholder="Tìm kiếm" />
+              <input className={s.searchInput} id="search" placeholder="Tìm kiếm" ref={(node) => { this.input = node; }} onChange={this.handleChangeSearch} />
             </label>
           </span>
         </div>
@@ -83,13 +101,17 @@ class ConversationList extends React.Component {
             <ConversationItem conversation={newChat} active />
           }
           {
-            conversations && conversations.map(conversation =>
-              <ConversationItem
-                key={Object.keys(conversation)[0]}
-                onClick={this.handleActiveConversation({ conversation })}
-                conversation={conversation}
-                active={Object.keys(conversation)[0] === current}
-              />,
+            conversations && conversations.filter(conversation =>
+              searchText == null ||
+              conversation.receiver.profile.firstName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+                  || conversation.receiver.profile.lastName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)
+                  .map(conversation =>
+                    <ConversationItem
+                      key={Object.keys(conversation)[0]}
+                      onClick={this.handleActiveConversation({ conversation })}
+                      conversation={conversation}
+                      active={Object.keys(conversation)[0] === current}
+                    />,
             )
           }
         </div>
