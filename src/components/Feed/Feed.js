@@ -1,6 +1,10 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Image } from 'react-bootstrap';
+import {
+  Image,
+  MenuItem,
+  Dropdown,
+} from 'react-bootstrap';
 import gql from 'graphql-tag';
 import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
 import Icon from '../Icon';
@@ -8,8 +12,7 @@ import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
 import Link from '../Link';
 import CommentList from '../Comments/CommentList';
-import { PUBLIC, FRIEND, ONLY_ME } from '../../constants';
-
+import { PUBLIC, FRIEND, ONLY_ME, DELETE_POST_ACTION } from '../../constants';
 import s from './Feed.scss';
 
 function doNothing(e) {
@@ -31,7 +34,8 @@ export const Feed = ({
     building,
   },
   likePostEvent = doNothing,
-  unlikePostEvent,
+  unlikePostEvent = doNothing,
+  onSelectRightEvent = doNothing,
   userInfo,
   loadMoreComments,
   createNewComment,
@@ -76,6 +80,13 @@ export const Feed = ({
         { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
         <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
       </div>}
+      menuRight={
+        <Dropdown.Menu onSelect={onSelectRightEvent}>
+          <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
+          <MenuItem divider />
+          <MenuItem eventKey="2">Chỉnh sửa bài viết</MenuItem>
+        </Dropdown.Menu>
+      }
     />
     <PostText html={message} />
     <PostText className={s.postStatistic}>
@@ -127,6 +138,7 @@ Feed.propTypes = {
   }),
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,
+  onSelectRightEvent: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   userInfo: PropTypes.shape({

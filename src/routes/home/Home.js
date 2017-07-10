@@ -12,6 +12,7 @@ import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import { DELETE_POST_ACTION } from '../../constants';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -50,13 +51,31 @@ class Home extends Component {
     createNewComment: PropTypes.func.isRequired,
   };
 
+  onSelectRightEvent = (eventKey, event) => {
+    event.preventDefault();
+    if (DELETE_POST_ACTION === eventKey) {
+      console.log(eventKey);
+    }
+  }
+
   render() {
     // Pre-fetch data
-    const { data: { loading, feeds, me }, loadMoreRows, loadMoreComments, createNewComment } = this.props;
+    const {
+      data: {
+        loading,
+        feeds,
+        me,
+      },
+      loadMoreRows,
+      loadMoreComments,
+      createNewComment,
+    } = this.props;
+
     let hasNextPage = false;
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
         <Row className={s.containerTop30}>
@@ -74,6 +93,7 @@ class Home extends Component {
                 userInfo={me}
                 loadMoreComments={loadMoreComments}
                 createNewComment={createNewComment}
+                onSelectRightEvent={this.onSelectRightEvent}
               />}
             </InfiniteScroll>
           </Col>

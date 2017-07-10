@@ -9,6 +9,7 @@ const FeedList = ({
   userInfo,
   loadMoreComments,
   createNewComment,
+  onSelectRightEvent,
 }) => (
   <div>
     {feeds.map(item => (
@@ -17,6 +18,7 @@ const FeedList = ({
         data={item}
         likePostEvent={likePostEvent}
         unlikePostEvent={unlikePostEvent}
+        onSelectRightEvent={onSelectRightEvent}
         userInfo={userInfo}
         loadMoreComments={loadMoreComments}
         createNewComment={createNewComment}
@@ -33,6 +35,7 @@ FeedList.propTypes = {
   ).isRequired,
   likePostEvent: PropTypes.func.isRequired,
   unlikePostEvent: PropTypes.func.isRequired,
+  onSelectRightEvent: PropTypes.func.isRequired,
   userInfo: PropTypes.object.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,

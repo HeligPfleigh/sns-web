@@ -47,3 +47,6 @@ export const PUBLIC = 'PUBLIC';
 export const FRIEND = 'FRIEND';
 export const ONLY_ME = 'ONLY_ME';
 export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME];
+
+// Feed Actions
+export const DELETE_POST_ACTION = 'DELETE_POST_ACTION';
