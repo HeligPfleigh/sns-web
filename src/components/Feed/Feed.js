@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import {
   Image,
@@ -19,100 +19,130 @@ function doNothing(e) {
   e.preventDefault();
 }
 
-export const Feed = ({
-  data: {
-    _id,
-    message,
-    user,
-    author,
-    totalLikes,
-    isLiked,
-    totalComments = 0,
-    createdAt,
-    comments = [],
-    privacy,
-    building,
-  },
-  likePostEvent = doNothing,
-  unlikePostEvent = doNothing,
-  onSelectRightEvent = doNothing,
-  userInfo,
-  loadMoreComments,
-  createNewComment,
-}) => (
-  <Post>
-    <PostHeader
-      avatar={
-        <span>
-          { author &&
-            <Link title={`${author.profile.firstName} ${author.profile.lastName}`} to={`/user/${author._id}`}>
-              <Image src={author.profile.picture} circle />
-            </Link>
-          }
-        </span>
-      }
-      title={
-        <span>
-          { author && <Link to={`/user/${author._id}`}>
-            <strong>{`${author.profile.firstName} ${author.profile.lastName}`}</strong>
-            </Link>
-          }
+class Feed extends Component {
 
-          { ((user && (user._id !== author._id)) || building) &&
-            <span style={{ margin: '0 6px' }}>
-              <i className="fa fa-caret-right" aria-hidden="true"></i>
+  onLikeCLick = (evt) => {
+    evt.preventDefault();
+    const {
+      data: {
+        _id,
+        message,
+        user,
+        totalLikes,
+        isLiked,
+        totalComments = 0,
+      },
+      likePostEvent = doNothing,
+      unlikePostEvent = doNothing,
+    } = this.props;
+    if (!isLiked) {
+      likePostEvent(_id, message, totalLikes, totalComments, user);
+    } else {
+      unlikePostEvent(_id, message, totalLikes, totalComments, user);
+    }
+  }
+
+  onSelectRightEvent = (eventKey, event) => {
+    event.preventDefault();
+    const {
+      data: {
+        _id,
+      },
+      onSelectRightEvent = doNothing,
+    } = this.props;
+    onSelectRightEvent(eventKey, _id);
+  }
+
+  render() {
+    const {
+      data: {
+        _id,
+        message,
+        user,
+        author,
+        totalLikes,
+        isLiked,
+        totalComments = 0,
+        createdAt,
+        comments = [],
+        privacy,
+        building,
+      },
+      userInfo,
+      loadMoreComments,
+      createNewComment,
+    } = this.props;
+    return (
+      <Post>
+        <PostHeader
+          avatar={
+            <span>
+              { author &&
+                <Link title={`${author.profile.firstName} ${author.profile.lastName}`} to={`/user/${author._id}`}>
+                  <Image src={author.profile.picture} circle />
+                </Link>
+              }
             </span>
           }
+          title={
+            <span>
+              { author && <Link to={`/user/${author._id}`}>
+                <strong>{`${author.profile.firstName} ${author.profile.lastName}`}</strong>
+                </Link>
+              }
 
-          { !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
-            <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
-          </Link>
+              { ((user && (user._id !== author._id)) || building) &&
+                <span style={{ margin: '0 6px' }}>
+                  <i className="fa fa-caret-right" aria-hidden="true"></i>
+                </span>
+              }
+
+              { !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
+                <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+              </Link>
+              }
+              { building && <Link to={`/building/${building._id}`}>
+                <strong>{building.name}</strong>
+              </Link>
+              }
+            </span>
           }
-          { building && <Link to={`/building/${building._id}`}>
-            <strong>{building.name}</strong>
-          </Link>
+          subtitle={<div>
+            { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
+            { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
+            { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
+            <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
+          </div>}
+          menuRight={
+            <Dropdown.Menu onSelect={this.onSelectRightEvent}>
+              <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
+              <MenuItem divider />
+              <MenuItem eventKey="2">Chỉnh sửa bài viết</MenuItem>
+            </Dropdown.Menu>
           }
-        </span>
-      }
-      subtitle={<div>
-        { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
-        { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
-        { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
-        <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
-      </div>}
-      menuRight={
-        <Dropdown.Menu onSelect={onSelectRightEvent}>
-          <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
-          <MenuItem divider />
-          <MenuItem eventKey="2">Chỉnh sửa bài viết</MenuItem>
-        </Dropdown.Menu>
-      }
-    />
-    <PostText html={message} />
-    <PostText className={s.postStatistic}>
-      <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
-      <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
-    </PostText>
-    <Divider />
-    <PostActions>
-      <Icon
-        onClick={(e) => {
-          e.preventDefault();
-          if (!isLiked) {
-            likePostEvent(_id, message, totalLikes, totalComments, user);
-          } else {
-            unlikePostEvent(_id, message, totalLikes, totalComments, user);
-          }
-        }} title="Thích" icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
-      />
-      <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-      <Icon onClick={doNothing} title="Chia sẻ" icons="fa fa-share fa-lg" />
-    </PostActions>
-    <PostContent className={s.commentPanel}>
-      <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
-    </PostContent>
-  </Post>
-);
+        />
+        <PostText html={message} />
+        <PostText className={s.postStatistic}>
+          <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
+          <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
+        </PostText>
+        <Divider />
+        <PostActions>
+          <Icon
+            onClick={this.onLikeCLick}
+            title="Thích"
+            icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
+          />
+          <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
+          <Icon onClick={doNothing} title="Chia sẻ" icons="fa fa-share fa-lg" />
+        </PostActions>
+        <PostContent className={s.commentPanel}>
+          <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
+        </PostContent>
+      </Post>
+    );
+  }
+}
 
 Feed.propTypes = {
   data: PropTypes.shape({
