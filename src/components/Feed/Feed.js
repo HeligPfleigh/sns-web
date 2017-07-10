@@ -298,6 +298,12 @@ Feed.mutation = {
   }
   ${Feed.fragments.post}
   `,
+  deletePost: gql`mutation deletePost ($_id: String!) {
+    deletePost(_id: $_id) {
+      _id
+    }
+  }
+  `,
 };
 
 export default withStyles(s)(Feed);

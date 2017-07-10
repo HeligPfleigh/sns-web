@@ -30,7 +30,7 @@ class FeedList extends Component {
   onClickModal = (evt) => {
     evt.preventDefault();
     this.closeModal();
-    console.log(this.state.idDeletedPost, 'this.state.idDeletedPost');
+    this.props.deletePost(this.state.idDeletedPost);
   }
 
   onSelectRightEvent = (eventKey, id) => {
@@ -90,6 +90,7 @@ FeedList.propTypes = {
   userInfo: PropTypes.object.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
+  deletePost: PropTypes.func.isRequired,
 };
 
 export default FeedList;
