@@ -12,7 +12,7 @@ import Info from '../../components/Me/InfoComponent/Info';
 import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
-import { Feed } from '../../components/Feed';
+import FeedList, { Feed } from '../../components/Feed';
 import _ from 'lodash';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
@@ -108,17 +108,15 @@ class Me extends React.Component {
                   <div className={s.parent}>
                     <NewPost createNewPost={this.props.createNewPost} />
                   </div>
-                  {posts.map(data => (
-                    <Feed
-                      key={data._id}
-                      data={data}
-                      userInfo={me}
-                      likePostEvent={this.props.likePost}
-                      unlikePostEvent={this.props.unlikePost}
-                      createNewComment={createNewComment}
-                      loadMoreComments={loadMoreComments}
-                    />
-                  ))}
+                  { me && me.posts && <FeedList
+                    feeds={me ? me.posts : []}
+                    likePostEvent={this.props.likePost}
+                    unlikePostEvent={this.props.unlikePost}
+                    userInfo={me}
+                    loadMoreComments={loadMoreComments}
+                    createNewComment={createNewComment}
+                    deletePost={this.props.deletePost}
+                  />}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
                   {profile &&
@@ -152,6 +150,7 @@ Me.propTypes = {
   updateProfile: PropTypes.func.isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
+  deletePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   query: PropTypes.shape({
     tab: PropTypes.string,
@@ -313,6 +312,32 @@ export default compose(
               me: {
                 posts: {
                   $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.deletePost, {
+    props: ({ mutate }) => ({
+      deletePost: postId => mutate({
+        variables: { _id: postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deletePost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        updateQueries: {
+          profilePageQuery: (previousResult, { mutationResult }) => {
+            const post = mutationResult.data.deletePost;
+            return update(previousResult, {
+              me: {
+                posts: {
+                  $unset: [post._id],
                 },
               },
             });
