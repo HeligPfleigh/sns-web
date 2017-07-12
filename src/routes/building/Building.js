@@ -70,7 +70,12 @@ const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($m
 }
 ${Feed.fragments.post}
 `;
-
+const deletePostOnBuildingMutation = gql`mutation deletePostOnBuilding ($postId: String!, $buildingId: String!) {
+  deletePostOnBuilding(postId: $postId, buildingId: $buildingId) {
+    _id
+  }
+}
+`;
 const acceptRequestForJoiningBuildingMutation = gql`mutation acceptRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
   acceptRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
     _id
@@ -126,6 +131,7 @@ class Building extends Component {
       createNewComment,
       loadMoreComments,
       createNewPostOnBuilding,
+      deletePostOnBuilding,
       query,
     } = this.props;
 
@@ -163,6 +169,7 @@ class Building extends Component {
                     userInfo={me}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
+                    deletePost={deletePostOnBuilding}
                   />}
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
@@ -220,8 +227,9 @@ Building.propTypes = {
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
-  loadMoreComments: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,  
   createNewPostOnBuilding: PropTypes.func.isRequired,
+  deletePostOnBuilding: PropTypes.func.isRequired,
   acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
   rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
@@ -391,6 +399,35 @@ export default compose(
               building: {
                 posts: {
                   $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(deletePostOnBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      deletePostOnBuilding: postId => mutate({
+        variables: { 
+          postId,
+          buildingId: ownProps.buildingId
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deletePostOnBuilding: {
+            __typename: 'Post',
+            _id: postId
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            const post = mutationResult.data.deletePostOnBuilding;
+            return update(previousResult, {
+              building: {
+                posts: {
+                  $unset: [post._id],
                 },
               },
             });

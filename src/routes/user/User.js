@@ -14,7 +14,7 @@ import FeedList, { Feed } from '../../components/Feed';
 import { PUBLIC, FRIEND, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './User.scss';
 
-const profilePageQuery = gql`query profilePageQuery($_id: String!) {
+const usersPageQuery = gql`query usersPageQuery($_id: String!) {
   user(_id : $_id){
     _id
     username
@@ -120,7 +120,7 @@ User.defaultProps = {
 
 export default compose(
   withStyles(s),
-  graphql(profilePageQuery, {
+  graphql(usersPageQuery, {
     options: props => ({
       variables: { _id: props.id },
     }),
@@ -187,7 +187,7 @@ export default compose(
           },
         },
         updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
+          usersPageQuery: (previousResult, { mutationResult }) => {
             const newPost = mutationResult.data.createNewPost;
             return update(previousResult, {
               user: {
@@ -223,7 +223,7 @@ export default compose(
           },
         },
         updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
+          usersPageQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.likePost;
             const index = previousResult.user.posts.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
@@ -260,7 +260,7 @@ export default compose(
           },
         },
         updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
+          usersPageQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.user.posts.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
@@ -297,7 +297,7 @@ export default compose(
           },
         },
         updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
+          usersPageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
             const index = previousResult.user.posts.findIndex(item => item._id === postId);
             const currentPost = previousResult.user.posts[index];

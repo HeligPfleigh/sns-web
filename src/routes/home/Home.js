@@ -48,15 +48,28 @@ class Home extends Component {
     unlikePost: PropTypes.func.isRequired,
     loadMoreComments: PropTypes.func.isRequired,
     createNewComment: PropTypes.func.isRequired,
+    deletePost: PropTypes.func.isRequired,
   };
 
   render() {
     // Pre-fetch data
-    const { data: { loading, feeds, me }, loadMoreRows, loadMoreComments, createNewComment } = this.props;
+    const {
+      data: {
+        loading,
+        feeds,
+        me,
+      },
+      loadMoreRows,
+      loadMoreComments,
+      createNewComment,
+      deletePost,
+    } = this.props;
+
     let hasNextPage = false;
     if (!loading && feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
         <Row className={s.containerTop30}>
@@ -74,6 +87,7 @@ class Home extends Component {
                 userInfo={me}
                 loadMoreComments={loadMoreComments}
                 createNewComment={createNewComment}
+                deletePost={deletePost}
               />}
             </InfiniteScroll>
           </Col>
@@ -262,6 +276,32 @@ export default compose(
               feeds: {
                 edges: {
                   $splice: [[index, 1, updatedPost]],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.deletePost, {
+    props: ({ mutate }) => ({
+      deletePost: postId => mutate({
+        variables: { _id: postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deletePost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        updateQueries: {
+          homePageQuery: (previousResult, { mutationResult }) => {
+            const post = mutationResult.data.deletePost;
+            return update(previousResult, {
+              feeds: {
+                edges: {
+                  $unset: [post._id],
                 },
               },
             });

@@ -30,10 +30,10 @@ const Info = ({ profile: { firstName, lastName, gender }, isMe, openInfoUpdate }
 
 Info.propTypes = {
   profile: PropTypes.shape({
-    birthday: PropTypes.string.isRequired,
-    gender: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
-    phone: PropTypes.string.isRequired,
+    birthday: PropTypes.string,
+    gender: PropTypes.string,
+    email: PropTypes.string,
+    phone: PropTypes.string,
   }).isRequired,
   isMe: PropTypes.bool.isRequired,
   openInfoUpdate: PropTypes.func.isRequired,

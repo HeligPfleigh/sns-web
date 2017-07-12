@@ -13,7 +13,7 @@ export const analytics = {
 // const browserIp = 'http://api-sns.mttjsc.com';
 
 // local run dev config
-const serverIp = 'http://server:3005';
+const serverIp = 'http://localhost:3005';
 const browserIp = 'http://localhost:3005';
 
 export const server = {

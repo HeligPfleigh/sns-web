@@ -25,7 +25,13 @@ export default function createApolloClient(options) {
     reduxRootSelector: state => state.apollo,
     // networkInterface: new ServerInterface(options),
     networkInterface,
-    dataIdFromObject: o => o._id,
+    // dataIdFromObject: o => o._id,
+    dataIdFromObject: (result) => {
+      if (result._id && result.__typename) {
+        return result.__typename + result._id;
+      }
+      return null;
+    },
     queryDeduplication: true,
     ssrMode: true,
   });
