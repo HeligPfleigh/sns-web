@@ -6,6 +6,7 @@ import {
   Dropdown,
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
+import { generate as idRandom } from 'shortid';
 import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -18,6 +19,17 @@ import s from './Feed.scss';
 function doNothing(e) {
   e.preventDefault();
 }
+
+const CustomToggle = ({ onClick, children }) => (
+  <a onClick={onClick}>
+    { children }
+  </a>
+);
+
+CustomToggle.propTypes = {
+  onClick: PropTypes.func,
+  children: PropTypes.node,
+};
 
 class Feed extends Component {
 
@@ -114,11 +126,21 @@ class Feed extends Component {
             <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
           </div>}
           menuRight={
-            <Dropdown.Menu onSelect={this.onSelectRightEvent}>
-              <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
-              <MenuItem divider />
-              <MenuItem eventKey="2">Chỉnh sửa bài viết</MenuItem>
-            </Dropdown.Menu>
+            (author && userInfo && author._id === userInfo._id) ?
+            <Dropdown id={idRandom()} pullRight>
+              <CustomToggle bsRole="toggle">
+                <span title="Tùy chọn">
+                  <i className="fa fa-circle-o" aria-hidden="true"></i>
+                  <i className="fa fa-circle-o" aria-hidden="true"></i>
+                  <i className="fa fa-circle-o" aria-hidden="true"></i>
+                </span>
+              </CustomToggle>
+              <Dropdown.Menu onSelect={this.onSelectRightEvent}>
+                <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
+                <MenuItem divider />
+                <MenuItem eventKey="2">Chỉnh sửa bài viết</MenuItem>
+              </Dropdown.Menu>
+            </Dropdown>:<div></div>
           }
         />
         <PostText html={message} />

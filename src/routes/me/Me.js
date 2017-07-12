@@ -231,18 +231,32 @@ export default compose(
             isLiked: false,
           },
         },
-        updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
-            const newPost = mutationResult.data.createNewPost;
-            return update(previousResult, {
-              me: {
-                posts: {
-                  $unshift: [newPost],
-                },
+        update: (store, { data: { createNewPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: profilePageQuery });
+           data = update(data, {
+            me: {
+              posts: {
+                $unshift: [createNewPost],
               },
-            });
-          },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: profilePageQuery, data });
         },
+        // updateQueries: {
+        //   profilePageQuery: (previousResult, { mutationResult }) => {
+        //     const newPost = mutationResult.data.createNewPost;
+        //     console.log(previousResult, mutationResult.data, ' mutationResult.data.');
+        //     return update(previousResult, {
+        //       me: {
+        //         posts: {
+        //           $unshift: [newPost],
+        //         },
+        //       },
+        //     });
+        //   },
+        // },
       }),
     }),
   }),
@@ -331,18 +345,31 @@ export default compose(
             _id: postId,
           },
         },
-        updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
-            const post = mutationResult.data.deletePost;
-            return update(previousResult, {
-              me: {
-                posts: {
-                  $unset: [post._id],
-                },
+        update: (store, { data: { deletePost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: profilePageQuery });
+           data = update(data, {
+            me: {
+              posts: {
+                $unset: [deletePost._id],
               },
-            });
-          },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: profilePageQuery, data });
         },
+      //   updateQueries: {
+      //     profilePageQuery: (previousResult, { mutationResult }) => {
+      //       const post = mutationResult.data.deletePost;
+      //       return update(previousResult, {
+      //         me: {
+      //           posts: {
+      //             $unset: [post._id],
+      //           },
+      //         },
+      //       });
+      //     },
+      //   },
       }),
     }),
   }),
