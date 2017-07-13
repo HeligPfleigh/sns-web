@@ -8,9 +8,8 @@
  */
 
 import React from 'react';
-import Layout from '../../components/Layout';
 
-const title = 'New User Registration';
+const title = 'Đăng kí tài khoản';
 
 export default {
 
@@ -21,7 +20,7 @@ export default {
 
     return {
       title,
-      component: <Layout><Register title={title} /></Layout>,
+      component: <Register title={title} />,
     };
   },
 

@@ -14,6 +14,8 @@ import UniversalRouter from 'universal-router';
 import queryString from 'query-string';
 import update from 'immutability-helper';
 import { createPath } from 'history/PathUtils';
+import moment from 'moment';
+
 import history from './core/history';
 import App from './components/App';
 import configureStore from './store/configureStore';
@@ -22,6 +24,11 @@ import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 import createApolloClient from './core/createApolloClient';
 import chat from './core/chat';
 import { setRuntimeVariable } from './actions/runtime';
+
+moment.defineLocale('vi', {
+  parentLocale: 'vi',
+  monthsShort: 'T01_T02_T03_T04_T05_T06_T07_T08_T09_T10_T11_T12'.split('_'),
+});
 
 update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
 
