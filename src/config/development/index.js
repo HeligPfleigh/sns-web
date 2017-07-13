@@ -1,5 +1,5 @@
 export const port = 3004;
-export const host = `localhost:${port}`;
+export const host = `localhost:${process.env.PORT || port}`;
 
 export const analytics = {
   google: {
@@ -13,7 +13,7 @@ export const analytics = {
 // const browserIp = 'http://api-sns.mttjsc.com';
 
 // local run dev config
-const serverIp = 'http://localhost:3005';
+const serverIp = process.env.APP_IP || 'http://localhost:3005';
 const browserIp = 'http://localhost:3005';
 
 export const server = {
