@@ -54,7 +54,7 @@ class Html extends React.Component {
           <style
             type="text/css"
             // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: 
+            dangerouslySetInnerHTML={{ __html:
             `.react-autosuggest__container {
                 position: relative;
                 display: inline-block;
@@ -80,7 +80,8 @@ class Html extends React.Component {
                 border-bottom-right-radius: 0;
             }
             .react-autosuggest__suggestions-container--open {
-                display: block;position: absolute;
+                display: block;
+                position: absolute;
                 width: 98%;
                 border: 1px solid #aaa;
                 background-color: #fff;
