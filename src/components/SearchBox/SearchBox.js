@@ -3,14 +3,13 @@ import { withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import debounce from 'lodash/debounce';
-import s from './SearchBox.scss';
 import Autosuggest from 'react-autosuggest';
-import AutosuggestHighlightMatch from 'autosuggest-highlight/match';
 import AutosuggestHighlightParse from 'autosuggest-highlight/parse';
+import s from './SearchBox.scss';
 import Link from '../Link';
 import history from '../../core/history';
 
-//const wordCharacterRegex = /[a-z0-9_]/i;
+// const wordCharacterRegex = /[a-z0-9_]/i;
 const whitespacesRegex = /\s+/;
 
 function escapeRegexCharacters(str) {
@@ -18,16 +17,14 @@ function escapeRegexCharacters(str) {
 }
 
 function match(text, query) {
-  //text = removeDiacritics(text);
+  // text = removeDiacritics(text);
   return (
     query
       .trim()
       .split(whitespacesRegex)
       // If query is blank, we'll get empty string here, so let's filter it out.
-      .filter(function(word) {
-        return word.length > 0;
-      })
-      .reduce(function(result, word) {
+      .filter(word => word.length > 0)
+      .reduce((result, word) => {
         const wordLen = word.length;
         // var prefix = wordCharacterRegex.test(word[0]) ? '\\b' : '';
         // var regex = new RegExp(prefix + escapeRegexCharacters(word), 'i');
@@ -43,11 +40,9 @@ function match(text, query) {
         }
         return result;
       }, [])
-      .sort(function(match1, match2) {
-        return match1[0] - match2[0];
-      })
+      .sort((match1, match2) => match1[0] - match2[0])
   );
-};
+}
 
 function getSuggestionValue(suggestion) {
   return `${suggestion.firstName} ${suggestion.lastName}`;
@@ -58,10 +53,10 @@ function renderSuggestion(suggestion, { query }) {
   const matches = match(suggestionText, query);
   const parts = AutosuggestHighlightParse(suggestionText, matches);
   return (
-    <Link to={`/user/${suggestion.userId}`} style={{textDecoration: 'none'}}>
+    <Link to={`/user/${suggestion.userId}`} style={{ textDecoration: 'none' }}>
       <span className={'suggestion-content '}>
         <img className={'suggestion-avatar'} src={suggestion.picture} />
-        <span className="name">        
+        <span className="name">
           {
             parts.map((part, index) => {
               const className = part.highlight ? 'highlight' : null;
@@ -69,7 +64,7 @@ function renderSuggestion(suggestion, { query }) {
                 <span className={className} key={index}>{part.text}</span>
               );
             })
-          }        
+          }
         </span>
       </span>
     </Link>
@@ -91,7 +86,7 @@ class SearchBox extends React.Component {
 
   handerSearchAPI = debounce(() => {
     const { value } = this.state;
-    if(!value) return;
+    if (!value) return;
     this.props.client.query({
       query: gql`query searchBoxQuery ($keyword: String!) {
         search (keyword: $keyword){
@@ -106,16 +101,14 @@ class SearchBox extends React.Component {
       variables: {
         keyword: value,
       },
-    }).then((result) => {      
+    }).then((result) => {
       this.setState({
-        suggestions: result.data.search.map((item) => {
-          return {
-            userId: item._id,
-            firstName: item.profile.firstName,
-            lastName: item.profile.lastName,
-            picture: item.profile.picture,
-          };
-        }),
+        suggestions: result.data.search.map(item => ({
+          userId: item._id,
+          firstName: item.profile.firstName,
+          lastName: item.profile.lastName,
+          picture: item.profile.picture,
+        })),
       });
     });
   }, 300);
@@ -131,12 +124,12 @@ class SearchBox extends React.Component {
     }
   }
 
-  onChange = (event, { newValue, method }) => {
+  onChange = (event, { newValue }) => {
     this.setState({
-      value: newValue
+      value: newValue,
     });
   };
-  
+
   onSuggestionsFetchRequested = ({ value }) => {
     this.setState({
       value,
@@ -145,42 +138,43 @@ class SearchBox extends React.Component {
 
   onSuggestionsClearRequested = () => {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   };
 
   render() {
     const { isMobile, showForm, value, suggestions } = this.state;
     const inputProps = {
-      placeholder: "Tìm kiếm...",
+      placeholder: 'Tìm kiếm...',
       value,
       onChange: this.onChange,
       onBlur: this.onBlur,
     };
     const theme = {
-      container:                'react-autosuggest__container',
-      containerOpen:            'react-autosuggest__container--open',
-      input:                    'react-autosuggest__input',
-      inputOpen:                'react-autosuggest__input--open',
-      inputFocused:             'react-autosuggest__input--focused',
-      suggestionsContainer:     'react-autosuggest__suggestions-container',
+      container: 'react-autosuggest__container',
+      containerOpen: 'react-autosuggest__container--open',
+      input: 'react-autosuggest__input',
+      inputOpen: 'react-autosuggest__input--open',
+      inputFocused: 'react-autosuggest__input--focused',
+      suggestionsContainer: 'react-autosuggest__suggestions-container',
       suggestionsContainerOpen: 'react-autosuggest__suggestions-container--open',
-      suggestionsList:          'react-autosuggest__suggestions-list',
-      suggestion:               'react-autosuggest__suggestion',
-      suggestionFirst:          'react-autosuggest__suggestion--first',
-      suggestionHighlighted:    'react-autosuggest__suggestion--highlighted',
-      suggestionFocused:        'react-autosuggest__suggestion--focused',
+      suggestionsList: 'react-autosuggest__suggestions-list',
+      suggestion: 'react-autosuggest__suggestion',
+      suggestionFirst: 'react-autosuggest__suggestion--first',
+      suggestionHighlighted: 'react-autosuggest__suggestion--highlighted',
+      suggestionFocused: 'react-autosuggest__suggestion--focused',
     };
     if (!isMobile || showForm === true) {
       return (
         <Autosuggest
-        theme={theme} 
-        suggestions={suggestions}
-        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-        getSuggestionValue={getSuggestionValue}
-        renderSuggestion={renderSuggestion}
-        inputProps={inputProps} />
+          theme={theme}
+          suggestions={suggestions}
+          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={renderSuggestion}
+          inputProps={inputProps}
+        />
       );
     }
     return (

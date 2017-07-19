@@ -12,8 +12,9 @@ import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
 import Link from '../Link';
+import EditPost from './EditPost';
 import CommentList from '../Comments/CommentList';
-import { PUBLIC, FRIEND, ONLY_ME, DELETE_POST_ACTION } from '../../constants';
+import { PUBLIC, FRIEND, ONLY_ME, DELETE_POST_ACTION, EDIT_POST_ACTION } from '../../constants';
 import s from './Feed.scss';
 
 function doNothing(e) {
@@ -32,6 +33,12 @@ CustomToggle.propTypes = {
 };
 
 class Feed extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isEdit: false,
+    };
+  }
 
   onLikeCLick = (evt) => {
     evt.preventDefault();
@@ -62,7 +69,28 @@ class Feed extends Component {
       },
       onSelectRightEvent = doNothing,
     } = this.props;
-    onSelectRightEvent(eventKey, _id);
+    if (eventKey === EDIT_POST_ACTION) {
+      this.setState({
+        isEdit: true,
+      });
+    } else {
+      onSelectRightEvent(eventKey, _id);
+    }
+  }
+
+  editPostHandler = (value) => {
+    const {
+      data: {
+        _id,
+      },
+      editPostEvent,
+    } = this.props;
+    editPostEvent(_id, value);
+  }
+  closeEditPost = () => {
+    this.setState({
+      isEdit: false,
+    });
   }
 
   render() {
@@ -84,6 +112,7 @@ class Feed extends Component {
       loadMoreComments,
       createNewComment,
     } = this.props;
+    const { isEdit } = this.state;
     return (
       <Post>
         <PostHeader
@@ -127,23 +156,30 @@ class Feed extends Component {
           </div>}
           menuRight={
             (author && userInfo && author._id === userInfo._id) ?
-            <Dropdown id={idRandom()} pullRight>
-              <CustomToggle bsRole="toggle">
-                <span title="Tùy chọn">
-                  <i className="fa fa-circle-o" aria-hidden="true"></i>
-                  <i className="fa fa-circle-o" aria-hidden="true"></i>
-                  <i className="fa fa-circle-o" aria-hidden="true"></i>
-                </span>
-              </CustomToggle>
-              <Dropdown.Menu onSelect={this.onSelectRightEvent}>
-                <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
-                <MenuItem divider />
-                <MenuItem eventKey="2">Chỉnh sửa bài viết</MenuItem>
-              </Dropdown.Menu>
-            </Dropdown>:<div></div>
+              <Dropdown id={idRandom()} pullRight>
+                <CustomToggle bsRole="toggle">
+                  <span title="Tùy chọn">
+                    <i className="fa fa-circle-o" aria-hidden="true"></i>
+                    <i className="fa fa-circle-o" aria-hidden="true"></i>
+                    <i className="fa fa-circle-o" aria-hidden="true"></i>
+                  </span>
+                </CustomToggle>
+                <Dropdown.Menu onSelect={this.onSelectRightEvent}>
+                  <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>
+                </Dropdown.Menu>
+              </Dropdown> : <div></div>
           }
         />
-        <PostText html={message} />
+        {!isEdit && <PostText html={message} />}
+        {isEdit &&
+          <EditPost
+            message={message}
+            onChange={this.editPostHandler}
+            closeEditPost={this.closeEditPost}
+          />
+        }
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
@@ -201,6 +237,7 @@ Feed.propTypes = {
       lastName: PropTypes.string,
     }),
   }),
+  editPostEvent: PropTypes.func.isRequired,
 };
 
 Feed.defaultProps = {
@@ -306,6 +343,12 @@ Feed.mutation = {
   }
   ${Feed.fragments.post}
   `,
+  editPost: gql`mutation editPost ($postId: String!, $message: String!) {
+    editPost(_id: $postId, message: $message) {
+      _id
+      message
+    }
+  }`,
   likePost: gql`mutation likePost ($postId: String!) {
     likePost(_id: $postId) {
       ...PostView

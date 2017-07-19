@@ -49,6 +49,7 @@ class Home extends Component {
     loadMoreComments: PropTypes.func.isRequired,
     createNewComment: PropTypes.func.isRequired,
     deletePost: PropTypes.func.isRequired,
+    editPost: PropTypes.func.isRequired,
   };
 
   render() {
@@ -63,6 +64,7 @@ class Home extends Component {
       loadMoreComments,
       createNewComment,
       deletePost,
+      editPost,
     } = this.props;
 
     let hasNextPage = false;
@@ -88,6 +90,7 @@ class Home extends Component {
                 loadMoreComments={loadMoreComments}
                 createNewComment={createNewComment}
                 deletePost={deletePost}
+                editPost={editPost}
               />}
             </InfiniteScroll>
           </Col>
@@ -302,6 +305,38 @@ export default compose(
               feeds: {
                 edges: {
                   $unset: [post._id],
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.editPost, {
+    props: ({ mutate }) => ({
+      editPost: (postId, message) => mutate({
+        variables: { postId, message },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          editPost: {
+            __typename: 'Post',
+            _id: postId,
+            message,
+          },
+        },
+        updateQueries: {
+          homePageQuery: (previousResult, { mutationResult }) => {
+            const newMessage = mutationResult.data.editPost.message;
+            const index = previousResult.feeds.edges.findIndex(item => item._id === postId);
+            const currentPost = previousResult.feeds.edges[index];
+            const updatedPost = Object.assign({}, currentPost, {
+              message: newMessage,
+            });
+            return update(previousResult, {
+              feeds: {
+                edges: {
+                  $splice: [[index, 1, updatedPost]],
                 },
               },
             });

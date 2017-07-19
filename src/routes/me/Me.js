@@ -234,13 +234,13 @@ export default compose(
         update: (store, { data: { createNewPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
-           data = update(data, {
-            me: {
+          data = update(data, {
+             me: {
               posts: {
                 $unshift: [createNewPost],
               },
             },
-          });
+           });
           // Write our data back to the cache.
           store.writeQuery({ query: profilePageQuery, data });
         },
@@ -348,7 +348,7 @@ export default compose(
         update: (store, { data: { deletePost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
-           data = update(data, {
+          data = update(data, {
             me: {
               posts: {
                 $unset: [deletePost._id],

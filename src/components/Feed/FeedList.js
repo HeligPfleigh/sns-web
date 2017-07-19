@@ -14,19 +14,6 @@ class FeedList extends Component {
     };
   }
 
-  updateStateModal = (value) => {
-    this.setState(() => ({
-      show: value,
-    }));
-  }
-
-  closeModal = () => {
-    this.updateStateModal(false);
-    this.setState(() => ({
-      idDeletedPost: null,
-    }));
-  }
-
   onClickModal = (evt) => {
     evt.preventDefault();
     this.closeModal();
@@ -42,6 +29,20 @@ class FeedList extends Component {
     }
   }
 
+  updateStateModal = (value) => {
+    this.setState(() => ({
+      show: value,
+    }));
+  }
+
+
+  closeModal = () => {
+    this.updateStateModal(false);
+    this.setState(() => ({
+      idDeletedPost: null,
+    }));
+  }
+
   openModal = () => {
     this.updateStateModal(true);
   }
@@ -54,6 +55,7 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
+      editPost,
     } = this.props;
     return (
       <div>
@@ -67,6 +69,7 @@ class FeedList extends Component {
             userInfo={userInfo}
             loadMoreComments={loadMoreComments}
             createNewComment={createNewComment}
+            editPostEvent={editPost}
           />
         ))}
         <DeletePostModal
@@ -91,6 +94,7 @@ FeedList.propTypes = {
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
+  editPost: PropTypes.func.isRequired,
 };
 
 export default FeedList;
