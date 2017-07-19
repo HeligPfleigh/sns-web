@@ -120,7 +120,6 @@ class Building extends Component {
 
   handleSelect = (key) => {
     const { pathname } = history.location;
-    console.log(pathname);
     history.push(`${pathname}?tab=${key}`);
   }
 
