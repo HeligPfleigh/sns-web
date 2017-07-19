@@ -325,22 +325,24 @@ export default compose(
             message,
           },
         },
-        updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
-            const newMessage = mutationResult.data.editPost.message;
-            const index = previousResult.feeds.edges.findIndex(item => item._id === postId);
-            const currentPost = previousResult.feeds.edges[index];
-            const updatedPost = Object.assign({}, currentPost, {
-              message: newMessage,
-            });
-            return update(previousResult, {
-              feeds: {
-                edges: {
-                  $splice: [[index, 1, updatedPost]],
-                },
+        update: (store, { data: { editPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: homePageQuery });
+          const newMessage = editPost.message;
+          const index = data.feeds.edges.findIndex(item => item._id === postId);
+          const currentPost = data.feeds.edges[index];
+          const updatedPost = Object.assign({}, currentPost, {
+            message: newMessage,
+          });
+          data = update(data, {
+            feeds: {
+              edges: {
+                $splice: [[index, 1, updatedPost]],
               },
-            });
-          },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: homePageQuery, data });
         },
       }),
     }),

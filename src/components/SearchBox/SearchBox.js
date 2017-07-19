@@ -6,7 +6,6 @@ import debounce from 'lodash/debounce';
 import Autosuggest from 'react-autosuggest';
 // import queryString from 'query-string';
 import AutosuggestHighlightParse from 'autosuggest-highlight/parse';
-import s from './SearchBox.scss';
 import Link from '../Link';
 import history from '../../core/history';
 import s from './SearchBox.scss';

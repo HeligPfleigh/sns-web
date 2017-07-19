@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import pick from 'lodash/pick';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
@@ -13,7 +14,6 @@ import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import FeedList, { Feed } from '../../components/Feed';
-import _ from 'lodash';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
 const profilePageQuery = gql`query profilePageQuery {
@@ -69,7 +69,7 @@ class Me extends React.Component {
   }
 
   handleUpdate = (values) => {
-    const profile = _.pick(values, ['firstName', 'lastName', 'gender', 'picture']);
+    const profile = pick(values, ['firstName', 'lastName', 'gender', 'picture']);
     this.props.updateProfile({
       variables: { profile },
     }).then(res => console.log(res)).catch(err => console.log(err));
@@ -77,8 +77,7 @@ class Me extends React.Component {
   }
 
   render() {
-    const { data: { me }, query, createNewComment, loadMoreComments } = this.props;
-    const posts = me ? me.posts : [];
+    const { data: { me }, query, createNewComment, loadMoreComments, editPost } = this.props;
     const avatar = (me && me.profile && me.profile.picture) || '';
     const profile = me && me.profile;
 
@@ -116,6 +115,7 @@ class Me extends React.Component {
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePost={this.props.deletePost}
+                    editPost={editPost}
                   />}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
@@ -155,6 +155,7 @@ Me.propTypes = {
   query: PropTypes.shape({
     tab: PropTypes.string,
   }),
+  editPost: PropTypes.func.isRequired,
 };
 
 Me.defaultProps = {
@@ -235,28 +236,49 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           data = update(data, {
-             me: {
+            me: {
               posts: {
                 $unshift: [createNewPost],
               },
             },
-           });
+          });
           // Write our data back to the cache.
           store.writeQuery({ query: profilePageQuery, data });
         },
-        // updateQueries: {
-        //   profilePageQuery: (previousResult, { mutationResult }) => {
-        //     const newPost = mutationResult.data.createNewPost;
-        //     console.log(previousResult, mutationResult.data, ' mutationResult.data.');
-        //     return update(previousResult, {
-        //       me: {
-        //         posts: {
-        //           $unshift: [newPost],
-        //         },
-        //       },
-        //     });
-        //   },
-        // },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.editPost, {
+    props: ({ mutate }) => ({
+      editPost: (postId, message) => mutate({
+        variables: { postId, message },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          editPost: {
+            __typename: 'Post',
+            _id: postId,
+            message,
+          },
+        },
+        update: (store, { data: { editPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: profilePageQuery });
+          const newMessage = editPost.message;
+          const index = data.me.posts.findIndex(item => item._id === postId);
+          const currentPost = data.me.posts[index];
+          const updatedPost = Object.assign({}, currentPost, {
+            message: newMessage,
+          });
+          data = update(data, {
+            me: {
+              posts: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: profilePageQuery, data });
+        },
       }),
     }),
   }),
