@@ -120,6 +120,7 @@ class Building extends Component {
 
   handleSelect = (key) => {
     const { pathname } = history.location;
+    console.log(pathname);
     history.push(`${pathname}?tab=${key}`);
   }
 
@@ -227,7 +228,7 @@ Building.propTypes = {
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
-  loadMoreComments: PropTypes.func.isRequired,  
+  loadMoreComments: PropTypes.func.isRequired,
   createNewPostOnBuilding: PropTypes.func.isRequired,
   deletePostOnBuilding: PropTypes.func.isRequired,
   acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
@@ -410,15 +411,15 @@ export default compose(
   graphql(deletePostOnBuildingMutation, {
     props: ({ ownProps, mutate }) => ({
       deletePostOnBuilding: postId => mutate({
-        variables: { 
+        variables: {
           postId,
-          buildingId: ownProps.buildingId
+          buildingId: ownProps.buildingId,
         },
         optimisticResponse: {
           __typename: 'Mutation',
           deletePostOnBuilding: {
             __typename: 'Post',
-            _id: postId
+            _id: postId,
           },
         },
         updateQueries: {

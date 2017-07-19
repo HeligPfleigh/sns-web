@@ -15,7 +15,12 @@ export default {
 
   path: '/register',
 
-  async action() {
+  async action({ store }) {
+    const state = store.getState();
+    if (state.user) {
+      return { redirect: '/' };
+    }
+
     const Register = await require.ensure([], require => require('./Register').default, 'register');
 
     return {

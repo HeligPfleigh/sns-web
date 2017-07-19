@@ -4,10 +4,12 @@ import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import debounce from 'lodash/debounce';
 import Autosuggest from 'react-autosuggest';
+// import queryString from 'query-string';
 import AutosuggestHighlightParse from 'autosuggest-highlight/parse';
 import s from './SearchBox.scss';
 import Link from '../Link';
 import history from '../../core/history';
+import s from './SearchBox.scss';
 
 // const wordCharacterRegex = /[a-z0-9_]/i;
 const whitespacesRegex = /\s+/;
@@ -81,37 +83,16 @@ class SearchBox extends React.Component {
       showForm: false,
     };
     this.handerSearchAPI = this.handerSearchAPI.bind(this);
-    this.onBlur = this.onBlur.bind(this);
   }
 
-  handerSearchAPI = debounce(() => {
-    const { value } = this.state;
-    if (!value) return;
-    this.props.client.query({
-      query: gql`query searchBoxQuery ($keyword: String!) {
-        search (keyword: $keyword){
-          _id
-          profile {
-            picture
-            firstName
-            lastName
-          }
-        }
-      }`,
-      variables: {
-        keyword: value,
-      },
-    }).then((result) => {
-      this.setState({
-        suggestions: result.data.search.map(item => ({
-          userId: item._id,
-          firstName: item.profile.firstName,
-          lastName: item.profile.lastName,
-          picture: item.profile.picture,
-        })),
-      });
-    });
-  }, 300);
+  // componentDidMount = () => {
+    // console.log(queryString(history.location.search));
+    // const { keyword } = queryString(history.location.search);
+    // console.log(keyword);
+    // this.setState({
+    //   value: keyword || '',
+    // });
+  // }
 
   onClick = () => {
     this.setState({ showForm: true });
@@ -130,6 +111,13 @@ class SearchBox extends React.Component {
     });
   };
 
+  onKeyDown = (event) => {
+    const { value } = this.state;
+    if (event.key === 'Enter' && value !== '') {
+      history.push(`/search?keyword=${value}`);
+    }
+  };
+
   onSuggestionsFetchRequested = ({ value }) => {
     this.setState({
       value,
@@ -142,6 +130,36 @@ class SearchBox extends React.Component {
     });
   };
 
+  handerSearchAPI = debounce(() => {
+    const { value } = this.state;
+    if (!value) return;
+    this.props.client.query({
+      query: gql`query searchBoxQuery ($keyword: String!, $numberOfFriends: Int) {
+        search (keyword: $keyword, numberOfFriends: $numberOfFriends){
+          _id
+          profile {
+            picture
+            firstName
+            lastName
+          }
+        }
+      }`,
+      variables: {
+        keyword: value,
+        numberOfFriends: 5,
+      },
+    }).then((result) => {
+      this.setState({
+        suggestions: result.data.search.map(item => ({
+          userId: item._id,
+          firstName: item.profile.firstName,
+          lastName: item.profile.lastName,
+          picture: item.profile.picture,
+        })),
+      });
+    });
+  }, 300);
+
   render() {
     const { isMobile, showForm, value, suggestions } = this.state;
     const inputProps = {
@@ -149,6 +167,7 @@ class SearchBox extends React.Component {
       value,
       onChange: this.onChange,
       onBlur: this.onBlur,
+      onKeyDown: this.onKeyDown,
     };
     const theme = {
       container: 'react-autosuggest__container',

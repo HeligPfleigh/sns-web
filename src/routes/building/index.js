@@ -6,6 +6,7 @@ export default {
   path: '/building/:buildingId',
 
   async action({ store, params, query }) {
+    console.log(query);
     const redirect = checkAuth(store);
     if (redirect) return redirect;
     const Building = await require.ensure([], require => require('./Building').default, 'building');

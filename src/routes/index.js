@@ -20,6 +20,7 @@ export default {
     require('./post').default,
     require('./user').default,
     require('./me').default,
+    require('./search').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],
