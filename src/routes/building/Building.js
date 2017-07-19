@@ -120,7 +120,6 @@ class Building extends Component {
 
   handleSelect = (key) => {
     const { pathname } = history.location;
-    console.log(pathname);
     history.push(`${pathname}?tab=${key}`);
   }
 
@@ -134,6 +133,7 @@ class Building extends Component {
       createNewPostOnBuilding,
       deletePostOnBuilding,
       query,
+      editPost,
     } = this.props;
 
     let tab = POST_TAB;
@@ -171,6 +171,7 @@ class Building extends Component {
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePost={deletePostOnBuilding}
+                    editPost={editPost}
                   />}
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
@@ -235,6 +236,7 @@ Building.propTypes = {
   rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
   // buildingId: PropTypes.string.isRequired,
+  editPost: PropTypes.func.isRequired,
 };
 
 Building.defaultProps = {
@@ -404,6 +406,40 @@ export default compose(
               },
             });
           },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.editPost, {
+    props: ({ mutate }) => ({
+      editPost: (postId, message) => mutate({
+        variables: { postId, message },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          editPost: {
+            __typename: 'Post',
+            _id: postId,
+            message,
+          },
+        },
+        update: (store, { data: { editPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: loadBuildingQuery });
+          const newMessage = editPost.message;
+          const index = data.building.posts.findIndex(item => item._id === postId);
+          const currentPost = data.building.posts[index];
+          const updatedPost = Object.assign({}, currentPost, {
+            message: newMessage,
+          });
+          data = update(data, {
+            building: {
+              posts: {
+                $splice: [[index, 1, updatedPost]],
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: loadBuildingQuery, data });
         },
       }),
     }),
