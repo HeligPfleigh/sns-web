@@ -198,17 +198,18 @@ export default compose(
             isLiked: false,
           },
         },
-        updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
-            const newPost = mutationResult.data.createNewPost;
-            return update(previousResult, {
-              feeds: {
-                edges: {
-                  $unshift: [newPost],
-                },
+        update: (store, { data: { createNewPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: homePageQuery });
+          data = update(data, {
+            feeds: {
+              edges: {
+                $unshift: [createNewPost],
               },
-            });
-          },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: homePageQuery, data });
         },
       }),
     }),
@@ -298,17 +299,18 @@ export default compose(
             _id: postId,
           },
         },
-        updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
-            const post = mutationResult.data.deletePost;
-            return update(previousResult, {
-              feeds: {
-                edges: {
-                  $unset: [post._id],
-                },
+        update: (store, { data: { deletePost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: homePageQuery });
+          data = update(data, {
+            feeds: {
+              edges: {
+                $unset: [deletePost._id],
               },
-            });
-          },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: homePageQuery, data });
         },
       }),
     }),
