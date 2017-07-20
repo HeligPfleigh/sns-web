@@ -59,7 +59,7 @@ class FeedList extends Component {
     } = this.props;
     return (
       <div>
-        {feeds.map(item => (
+        {feeds && feeds.map(item => (
           <Feed
             key={idRandom()}
             data={item}
