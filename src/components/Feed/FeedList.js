@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
+import SharingPostModal from './SharingPostModal';
 import { DELETE_POST_ACTION } from '../../constants';
 import Feed from './Feed';
 
@@ -10,14 +11,22 @@ class FeedList extends Component {
     super(props);
     this.state = {
       show: false,
+      showSharingPost: false,
       idDeletedPost: null,
+      idSharingPost: null,
     };
   }
 
   onClickModal = (evt) => {
     evt.preventDefault();
+    const { idDeletedPost, idSharingPost } = this.state;
     this.closeModal();
-    this.props.deletePost(this.state.idDeletedPost);
+    if (idDeletedPost) {
+      this.props.deletePost(idDeletedPost);
+    }
+    if (idSharingPost) {
+      this.props.sharingPost(idSharingPost);
+    }
   }
 
   onSelectRightEvent = (eventKey, id) => {
@@ -38,13 +47,29 @@ class FeedList extends Component {
 
   closeModal = () => {
     this.updateStateModal(false);
-    this.setState(() => ({
-      idDeletedPost: null,
-    }));
+    const { idDeletedPost, idSharingPost } = this.state;
+    if (idDeletedPost) {
+      this.setState(() => ({
+        idDeletedPost: null,
+      }));
+    }
+    if (idSharingPost) {
+      this.setState(() => ({
+        showSharingPost: false,
+        idSharingPost: null,
+      }));
+    }
   }
 
   openModal = () => {
     this.updateStateModal(true);
+  }
+
+  sharingPostEvent = (id) => {
+    this.setState(() => ({
+      showSharingPost: true,
+      idSharingPost: id,
+    }));
   }
 
   render() {
@@ -70,10 +95,16 @@ class FeedList extends Component {
             loadMoreComments={loadMoreComments}
             createNewComment={createNewComment}
             editPostEvent={editPost}
+            sharingPostEvent={this.sharingPostEvent}
           />
         ))}
         <DeletePostModal
           show={this.state.show}
+          closeModal={this.closeModal}
+          clickModal={this.onClickModal}
+        />
+        <SharingPostModal
+          show={this.state.showSharingPost}
           closeModal={this.closeModal}
           clickModal={this.onClickModal}
         />
@@ -95,6 +126,7 @@ FeedList.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
   editPost: PropTypes.func.isRequired,
+  sharingPost: PropTypes.func.isRequired,
 };
 
 export default FeedList;
