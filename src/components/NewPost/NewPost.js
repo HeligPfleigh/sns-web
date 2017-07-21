@@ -142,7 +142,7 @@ class NewPost extends React.Component {
           <Col className="pull-right">
             <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
-          <Col className="pull-right" style={{ marginRight: '5px' }}>
+          <Col className="pull-right" style={{ marginRight: '5px', maxWidth: '94px' }}>
             {displayPrivacy && <FormControl
               onChange={this.onChangePrivacy}
               defaultValue={privacy[0]}
