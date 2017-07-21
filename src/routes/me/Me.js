@@ -87,6 +87,7 @@ class Me extends React.Component {
       unlikePost,
       createNewPost,
       deletePost,
+      sharingPost,
     } = this.props;
     const avatar = (me && me.profile && me.profile.picture) || '';
     const profile = me && me.profile;
@@ -126,6 +127,7 @@ class Me extends React.Component {
                     createNewComment={createNewComment}
                     deletePost={deletePost}
                     editPost={editPost}
+                    sharingPost={sharingPost}
                   />}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
@@ -166,6 +168,7 @@ Me.propTypes = {
     tab: PropTypes.string,
   }),
   editPost: PropTypes.func.isRequired,
+  sharingPost: PropTypes.func.isRequired,
 };
 
 Me.defaultProps = {
@@ -388,6 +391,32 @@ export default compose(
             },
           });
           // Write our data back to the cache.
+          store.writeQuery({ query: profilePageQuery, data });
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.sharingPost, {
+    props: ({ mutate }) => ({
+      sharingPost: postId => mutate({
+        variables: { _id: postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          sharingPost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        update: (store, { data: { sharingPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: profilePageQuery });
+          data = update(data, {
+            me: {
+              posts: {
+                $unshift: [sharingPost],
+              },
+            },
+          });
           store.writeQuery({ query: profilePageQuery, data });
         },
       }),

@@ -13,6 +13,7 @@ import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
 import Link from '../Link';
 import EditPost from './EditPost';
+import SharingPost from './SharingPost';
 import CommentList from '../Comments/CommentList';
 import { PUBLIC, FRIEND, ONLY_ME, DELETE_POST_ACTION, EDIT_POST_ACTION } from '../../constants';
 import s from './Feed.scss';
@@ -87,10 +88,22 @@ class Feed extends Component {
     } = this.props;
     editPostEvent(_id, value);
   }
+
   closeEditPost = () => {
     this.setState({
       isEdit: false,
     });
+  }
+
+  sharingPostEvent = (evt) => {
+    evt.preventDefault();
+    const {
+      data: {
+        _id,
+      },
+      sharingPostEvent,
+    } = this.props;
+    sharingPostEvent(_id);
   }
 
   render() {
@@ -107,6 +120,7 @@ class Feed extends Component {
         comments = [],
         privacy,
         building,
+        sharing,
       },
       userInfo,
       loadMoreComments,
@@ -148,6 +162,18 @@ class Feed extends Component {
               }
             </span>
           }
+          sharingPostTitle={
+            <span>
+              {sharing && author._id !== sharing.author._id &&
+                <Link to={`/user/${sharing.author._id}`}>
+                đã chia sẻ bài viết của <strong>{`${sharing.author.profile.firstName} ${sharing.author.profile.lastName}`}</strong>
+                </Link>
+              }
+              { sharing && author._id === sharing.author._id &&
+                <span>đã chia sẻ bài viết của mình</span>
+              }
+            </span>
+          }
           subtitle={<div>
             { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
             { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
@@ -166,13 +192,24 @@ class Feed extends Component {
                 </CustomToggle>
                 <Dropdown.Menu onSelect={this.onSelectRightEvent}>
                   <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
-                  <MenuItem divider />
-                  <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>
+                  {!sharing && <MenuItem divider /> }
+                  {!sharing && <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>}
                 </Dropdown.Menu>
               </Dropdown> : <div></div>
           }
         />
-        {!isEdit && <PostText html={message} />}
+        {sharing && !isEdit &&
+          <SharingPost
+            id={sharing._id}
+            message={sharing.message}
+            author={sharing.author}
+            user={sharing.user}
+            building={sharing.building}
+            privacy={sharing.privacy}
+            createdAt={sharing.createdAt}
+          />
+        }
+        {!sharing && !isEdit && <PostText html={message} /> }
         {isEdit &&
           <EditPost
             message={message}
@@ -192,7 +229,7 @@ class Feed extends Component {
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
           <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-          <Icon onClick={doNothing} title="Chia sẻ" icons="fa fa-share fa-lg" />
+          <Icon onClick={this.sharingPostEvent} title="Chia sẻ" icons="fa fa-share fa-lg" />
         </PostActions>
         <PostContent className={s.commentPanel}>
           <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
@@ -218,6 +255,32 @@ Feed.propTypes = {
       _id: PropTypes.string,
       name: PropTypes.string,
     }),
+    sharing: PropTypes.shape({
+      _id: PropTypes.string,
+      message: PropTypes.string,
+      author: PropTypes.shape({
+        _id: PropTypes.string,
+        profile: PropTypes.shape({
+          picture: PropTypes.string,
+          firstName: PropTypes.string,
+          lastName: PropTypes.string,
+        }),
+      }),
+      user: PropTypes.shape({
+        _id: PropTypes.string,
+        profile: PropTypes.shape({
+          picture: PropTypes.string,
+          firstName: PropTypes.string,
+          lastName: PropTypes.string,
+        }),
+      }),
+      building: PropTypes.shape({
+        _id: PropTypes.string,
+        name: PropTypes.string,
+      }),
+      privacy: PropTypes.string,
+      createdAt: PropTypes.string,
+    }),
     privacy: PropTypes.string,
     totalLikes: PropTypes.number,
     totalComments: PropTypes.number,
@@ -238,6 +301,7 @@ Feed.propTypes = {
     }),
   }),
   editPostEvent: PropTypes.func.isRequired,
+  sharingPostEvent: PropTypes.func.isRequired,
 };
 
 Feed.defaultProps = {
@@ -283,7 +347,7 @@ Feed.fragments = {
   // user: userFragment,
   post: gql`
     fragment PostView on Post {
-      _id,
+      _id
       message
       user {
         _id
@@ -293,6 +357,34 @@ Feed.fragments = {
           firstName
           lastName
         }
+      }
+      sharing {
+        _id
+        message
+        author {
+          _id
+          username
+          profile {
+            picture
+            firstName
+            lastName
+          }
+        }
+        user {
+          _id
+          username
+          profile {
+            picture
+            firstName
+            lastName
+          }
+        }
+        building {
+          _id
+          name
+        }
+        privacy
+        createdAt
       }
       author {
         _id
@@ -368,6 +460,13 @@ Feed.mutation = {
       _id
     }
   }
+  `,
+  sharingPost: gql`mutation sharingPost ($_id: String!) {
+    sharingPost(_id: $_id) {
+      ...PostView
+    }
+  }
+  ${Feed.fragments.post}
   `,
 };
 

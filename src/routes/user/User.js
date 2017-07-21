@@ -83,6 +83,7 @@ class User extends Component {
                     userInfo={me}
                     loadMoreComments={this.props.loadMoreComments}
                     createNewComment={this.props.createNewComment}
+                    sharingPost={this.props.sharingPost}
                   />}
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
@@ -110,6 +111,7 @@ User.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   query: PropTypes.object.isRequired,
+  sharingPost: PropTypes.func.isRequired,
 };
 
 User.defaultProps = {
@@ -271,6 +273,32 @@ export default compose(
               },
             });
           },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.sharingPost, {
+    props: ({ mutate }) => ({
+      sharingPost: postId => mutate({
+        variables: { _id: postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          sharingPost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        update: (store, { data: { sharingPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: usersPageQuery });
+          data = update(data, {
+            feeds: {
+              edges: {
+                $unshift: [sharingPost],
+              },
+            },
+          });
+          store.writeQuery({ query: usersPageQuery, data });
         },
       }),
     }),

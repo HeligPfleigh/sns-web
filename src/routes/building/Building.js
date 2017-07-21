@@ -134,6 +134,7 @@ class Building extends Component {
       deletePostOnBuilding,
       query,
       editPost,
+      sharingPost,
     } = this.props;
 
     let tab = POST_TAB;
@@ -172,6 +173,7 @@ class Building extends Component {
                     createNewComment={createNewComment}
                     deletePost={deletePostOnBuilding}
                     editPost={editPost}
+                    sharingPost={sharingPost}
                   />}
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
@@ -237,6 +239,7 @@ Building.propTypes = {
   query: PropTypes.object.isRequired,
   // buildingId: PropTypes.string.isRequired,
   editPost: PropTypes.func.isRequired,
+  sharingPost: PropTypes.func.isRequired,
 };
 
 Building.defaultProps = {
@@ -469,6 +472,32 @@ export default compose(
               },
             });
           },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.sharingPost, {
+    props: ({ mutate }) => ({
+      sharingPost: postId => mutate({
+        variables: { _id: postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          sharingPost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        update: (store, { data: { sharingPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: loadBuildingQuery });
+          data = update(data, {
+            feeds: {
+              edges: {
+                $unshift: [sharingPost],
+              },
+            },
+          });
+          store.writeQuery({ query: loadBuildingQuery, data });
         },
       }),
     }),

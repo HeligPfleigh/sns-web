@@ -50,6 +50,7 @@ class Home extends Component {
     createNewComment: PropTypes.func.isRequired,
     deletePost: PropTypes.func.isRequired,
     editPost: PropTypes.func.isRequired,
+    sharingPost: PropTypes.func.isRequired,
   };
 
   render() {
@@ -65,6 +66,7 @@ class Home extends Component {
       createNewComment,
       deletePost,
       editPost,
+      sharingPost,
     } = this.props;
 
     let hasNextPage = false;
@@ -91,6 +93,7 @@ class Home extends Component {
                 createNewComment={createNewComment}
                 deletePost={deletePost}
                 editPost={editPost}
+                sharingPost={sharingPost}
               />}
             </InfiniteScroll>
           </Col>
@@ -344,6 +347,32 @@ export default compose(
             },
           });
           // Write our data back to the cache.
+          store.writeQuery({ query: homePageQuery, data });
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.sharingPost, {
+    props: ({ mutate }) => ({
+      sharingPost: postId => mutate({
+        variables: { _id: postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          sharingPost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        update: (store, { data: { sharingPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: homePageQuery });
+          data = update(data, {
+            feeds: {
+              edges: {
+                $unshift: [sharingPost],
+              },
+            },
+          });
           store.writeQuery({ query: homePageQuery, data });
         },
       }),

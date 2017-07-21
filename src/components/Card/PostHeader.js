@@ -5,14 +5,14 @@ import {
 } from 'react-bootstrap';
 import s from './PostHeader.scss';
 
-const PostHeader = ({ avatar, title, subtitle, menuRight }) => (
+const PostHeader = ({ avatar, title, sharingPostTitle, subtitle, menuRight }) => (
   <div>
     <Col className={s.postHeaderLeft}>
       <div className={s.avarta}>
         { avatar }
       </div>
       <div className={s.userInfo}>
-        { title }
+        { title } { sharingPostTitle }
         <br />
         { subtitle }
         <br />
@@ -29,6 +29,7 @@ PostHeader.propTypes = {
   title: PropTypes.node,
   subtitle: PropTypes.node,
   menuRight: PropTypes.node,
+  sharingPostTitle: PropTypes.node,
 };
 
 export default withStyles(s)(PostHeader);
