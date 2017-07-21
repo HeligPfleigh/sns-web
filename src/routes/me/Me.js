@@ -77,7 +77,18 @@ class Me extends React.Component {
   }
 
   render() {
-    const { data: { me }, query, createNewComment, loadMoreComments, editPost, sharingPost } = this.props;
+    const {
+      data: { me },
+      query,
+      createNewComment,
+      loadMoreComments,
+      editPost,
+      likePost,
+      unlikePost,
+      createNewPost,
+      deletePost,
+      sharingPost,
+    } = this.props;
     const avatar = (me && me.profile && me.profile.picture) || '';
     const profile = me && me.profile;
 
@@ -105,16 +116,16 @@ class Me extends React.Component {
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
                   <div className={s.parent}>
-                    <NewPost createNewPost={this.props.createNewPost} />
+                    <NewPost createNewPost={createNewPost} />
                   </div>
                   { me && me.posts && <FeedList
-                    feeds={me ? me.posts : []}
-                    likePostEvent={this.props.likePost}
-                    unlikePostEvent={this.props.unlikePost}
+                    feeds={me.posts}
+                    likePostEvent={likePost}
+                    unlikePostEvent={unlikePost}
                     userInfo={me}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
-                    deletePost={this.props.deletePost}
+                    deletePost={deletePost}
                     editPost={editPost}
                     sharingPost={sharingPost}
                   />}
