@@ -111,6 +111,12 @@ class Html extends React.Component {
             .name {margin-left: 15px;line-height: 45px;}
             .highlight {color: #ee0000;font-weight: bold;}
             .react-autosuggest__suggestion--focused .highlight {color: #120000;}
+            .react-autosuggest_footer {
+                border-top: 1px solid #ddd;
+                cursor: pointer;
+                padding: 10px 20px;
+                text-align: center;
+            }
             @media (max-width: 992px) {
               .react-autosuggest__container{
                 margin: 0px;
