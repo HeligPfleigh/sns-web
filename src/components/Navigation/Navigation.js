@@ -175,8 +175,8 @@ class Navigation extends React.Component {
                 <InfiniteScroll
                   next={this.generateDivs}
                   hasMore
-                  loader={<span style={{ display: 'none' }}>Loading...</span>}
-                  endMessage={<span style={{ display: 'none' }}>Loading...</span>}
+                  loader={<span style={{ display: 'none' }}>Đang tải...</span>}
+                  endMessage={<span style={{ display: 'none' }}>Đang tải...</span>}
                 >
                   { friends && friends.map(friend =>
                     <FriendActionItem

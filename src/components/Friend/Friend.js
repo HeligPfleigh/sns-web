@@ -28,7 +28,7 @@ class Friend extends React.Component {
               <span>{friend.profile.firstName} {friend.profile.lastName}</span>
               {
                 friendType !== ACCEPTED &&
-                <span>10 other mutual friends</span>
+                <span>10 bạn chung</span>
               }
             </div>
             {
@@ -43,7 +43,7 @@ class Friend extends React.Component {
               <ButtonToolbar className={s.addFriend}>
                 <Button title="Thêm bạn mới" onClick={() => handleFriendAction(friend._id, PENDING)} bsStyle="primary" bsSize="xsmall">
                   <i className="fa fa-user-plus" />
-                  Thêm bạn
+                  Kết bạn
                 </Button>
               </ButtonToolbar>
             }

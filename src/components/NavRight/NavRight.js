@@ -43,7 +43,7 @@ class NavRight extends React.Component {
                   <div className={s.name}>
                     <h2>
                       { profile && <strong>{`${profile.firstName} ${profile.lastName}`}</strong> }
-                      <p>Trang cá nhân</p>
+                      <p>Hồ sơ</p>
                     </h2>
                   </div>
                 </div>
