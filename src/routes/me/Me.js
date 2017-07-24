@@ -114,7 +114,7 @@ class Me extends React.Component {
                 <Tab numbers={numbers} stateChildShow={tab} isMe />
               </div>
               <Grid fluid>
-                <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
+                <div className={tab === MY_TIME_LINE ? s.active : s.inactive} style={{ marginTop: '-8px' }}>
                   <div className={s.parent}>
                     <NewPost createNewPost={createNewPost} />
                   </div>

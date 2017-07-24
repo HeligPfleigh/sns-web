@@ -179,7 +179,7 @@ class SearchBox extends React.Component {
           onClick={this.onClickAutoSuggestFooter}
         >
           <Link to={`/search?keyword=${query}`} style={{ textDecoration: 'none', color: '#337ab7' }}>
-            Hiển thị thêm kết quả
+            Xem thêm
           </Link>
         </div>
       }
@@ -188,6 +188,7 @@ class SearchBox extends React.Component {
 
   render() {
     const { isMobile, showForm, value, suggestions } = this.state;
+    console.log(isMobile);
     const inputProps = {
       placeholder: 'Tìm kiếm...',
       value,

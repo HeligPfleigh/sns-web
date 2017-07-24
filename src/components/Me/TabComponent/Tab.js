@@ -18,13 +18,13 @@ class Tab extends Component {
       <ul className={s.tab}>
         <li className={this.props.stateChildShow === MY_TIME_LINE ? s.active : ''}>
           <Link to={isMe ? '/me' : `/user/${id}`} className={s.button}>
-            Dòng thời gian
+            DÒNG THỜI GIAN
             <i className="fa fa-sort-asc"></i>
           </Link>
         </li>
         <li className={this.props.stateChildShow === MY_INFO ? s.active : ''}>
           <Link to={isMe ? `/me?tab=${MY_INFO}` : `/user/${id}?tab=${MY_INFO}`} className={s.button}>
-            Thông tin <i className="fa fa-sort-asc"></i>
+            THÔNG TIN <i className="fa fa-sort-asc"></i>
           </Link>
         </li>
       </ul>
