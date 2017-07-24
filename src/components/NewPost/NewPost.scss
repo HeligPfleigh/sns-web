@@ -2,11 +2,11 @@
 @import "../../theme/resources.scss";
 
 .newPostPanel {
-  border: 1px solid #cdcdcd;
+  // border: 1px solid #cdcdcd;
   background-color: #fff;
   padding: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 1px 0 rgba(12,13,14,0.1), 0 1px 3px rgba(12,13,14,0.1), 0 4px 20px rgba(12,13,14,0.035), 0 1px 1px rgba(12,13,14,0.025);
+  // box-shadow: 0 1px 0 rgba(12,13,14,0.1), 0 1px 3px rgba(12,13,14,0.1), 0 4px 20px rgba(12,13,14,0.035), 0 1px 1px rgba(12,13,14,0.025);
 }
 
 .newPostEditor {
@@ -26,4 +26,8 @@ button.addPhoto, button.addPhoto:hover, button.addPhoto:active {
 
 .newPostControl i {
   color: #5c6f7c;
+}
+
+.glyphicon {
+  margin-right: 10px
 }

@@ -72,6 +72,22 @@ function renderSuggestion(suggestion, { query }) {
   );
 }
 
+// function renderSuggestionsContainer({ containerProps, children, query }) {
+
+//   return (
+//     <div {... containerProps} onClick={handleClick}>
+//       {children}
+//       {query && children &&
+//         <div className="react-autosuggest_footer">
+//           <Link to={`/search?keyword=${query}`} style={{ textDecoration: 'none', color: '#337ab7' }}>
+//             Hiển thị thêm kết quả
+//           </Link>
+//         </div>
+//       }
+//     </div>
+//   );
+// }
+
 class SearchBox extends React.Component {
   constructor(props) {
     super(props);
@@ -83,15 +99,6 @@ class SearchBox extends React.Component {
     };
     this.handerSearchAPI = this.handerSearchAPI.bind(this);
   }
-
-  // componentDidMount = () => {
-    // console.log(queryString(history.location.search));
-    // const { keyword } = queryString(history.location.search);
-    // console.log(keyword);
-    // this.setState({
-    //   value: keyword || '',
-    // });
-  // }
 
   onClick = () => {
     this.setState({ showForm: true });
@@ -159,8 +166,29 @@ class SearchBox extends React.Component {
     });
   }, 300);
 
+  onClickAutoSuggestFooter = () => {
+    this.setState({ suggestions: [] });
+  };
+
+  renderSuggestionsContainer = ({ containerProps, children, query }) => (
+    <div {... containerProps}>
+      {children}
+      {query && children &&
+        <div
+          className="react-autosuggest_footer"
+          onClick={this.onClickAutoSuggestFooter}
+        >
+          <Link to={`/search?keyword=${query}`} style={{ textDecoration: 'none', color: '#337ab7' }}>
+            Xem thêm
+          </Link>
+        </div>
+      }
+    </div>
+  );
+
   render() {
     const { isMobile, showForm, value, suggestions } = this.state;
+    console.log(isMobile);
     const inputProps = {
       placeholder: 'Tìm kiếm...',
       value,
@@ -190,6 +218,7 @@ class SearchBox extends React.Component {
           onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
           onSuggestionsClearRequested={this.onSuggestionsClearRequested}
           getSuggestionValue={getSuggestionValue}
+          renderSuggestionsContainer={this.renderSuggestionsContainer}
           renderSuggestion={renderSuggestion}
           inputProps={inputProps}
         />

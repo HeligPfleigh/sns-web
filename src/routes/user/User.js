@@ -73,7 +73,16 @@ class User extends Component {
                   <div className={s.parent}>
                     { me && user && user.isFriend && <NewPost
                       createNewPost={this.props.createNewPost} friend={user}
-                      privacy={[PUBLIC, FRIEND]}
+                      privacy={[
+                        {
+                          name: PUBLIC,
+                          glyph: 'globe',
+                        },
+                        {
+                          name: FRIEND,
+                          glyph: 'user',
+                        },
+                      ]}
                     /> }
                   </div>
                   { me && posts && <FeedList

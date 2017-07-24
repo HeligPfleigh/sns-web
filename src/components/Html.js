@@ -58,13 +58,13 @@ class Html extends React.Component {
             `.react-autosuggest__container {
                 position: relative;
                 display: inline-block;
-                margin: 3px auto;
-                padding: 4px 0 0 12px;
+                margin: auto;
+                padding: 10px 0 0 30px;
                 width: 90%;
             }
             .react-autosuggest__input {
                 width: 100%;
-                height: 34px;
+                height: 33px;
                 padding: 10px 20px;
                 font-family: Helvetica, sans-serif;
                 font-weight: 300;
@@ -82,7 +82,7 @@ class Html extends React.Component {
             .react-autosuggest__suggestions-container--open {
                 display: block;
                 position: absolute;
-                width: 98%;
+                width: 94%;
                 border: 1px solid #aaa;
                 background-color: #fff;
                 font-family: Helvetica, sans-serif;font-weight: 300;
@@ -111,6 +111,15 @@ class Html extends React.Component {
             .name {margin-left: 15px;line-height: 45px;}
             .highlight {color: #ee0000;font-weight: bold;}
             .react-autosuggest__suggestion--focused .highlight {color: #120000;}
+            .react-autosuggest_footer {
+                border-top: 1px solid #ddd;
+                cursor: pointer;
+                padding: 10px 20px;
+                text-align: center;
+            }
+            .dropdown-menu>li>a {
+              padding: 5px 20px !important;;
+            }
             @media (max-width: 992px) {
               .react-autosuggest__container{
                 margin: 0px;

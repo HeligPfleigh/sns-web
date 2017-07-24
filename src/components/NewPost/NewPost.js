@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
+import { generate as idRandom } from 'shortid';
 
 import {
   Editor,
@@ -13,7 +14,9 @@ import {
   Col,
   Clearfix,
   Button,
-  FormControl,
+  Dropdown,
+  MenuItem,
+  Glyphicon,
 } from 'react-bootstrap';
 
 import {
@@ -76,6 +79,7 @@ class NewPost extends React.Component {
     editorState: EditorState.createEmpty(compositeDecorator),
     isSubmit: true,
     privacy: PUBLIC,
+    glyph: 'globe',
   };
 
   onChange = (editorState) => {
@@ -102,18 +106,33 @@ class NewPost extends React.Component {
     }));
   }
 
-  onChangePrivacy = (evt) => {
+  onChangePrivacy = (eventKey, evt) => {
     evt.preventDefault();
-    this.setState({
-      privacy: evt.target.value,
-    });
+    if (eventKey === PUBLIC) {
+      this.setState({
+        privacy: PUBLIC,
+        glyph: 'globe',
+      });
+    }
+    if (eventKey === FRIEND) {
+      this.setState({
+        privacy: FRIEND,
+        glyph: 'user',
+      });
+    }
+    if (eventKey === ONLY_ME) {
+      this.setState({
+        privacy: ONLY_ME,
+        glyph: 'lock',
+      });
+    }
   }
 
   focus = () => this.editor.focus();
 
   render() {
-    const { editorState, isSubmit } = this.state;
-    const { privacy, displayPrivacy } = this.props;
+    const { editorState, isSubmit, glyph } = this.state;
+    const { displayPrivacy, privacy } = this.props;
     return (
       <div className={s.newPostPanel}>
         <Col className={s.newPostEditor}>
@@ -142,8 +161,8 @@ class NewPost extends React.Component {
           <Col className="pull-right">
             <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
-          <Col className="pull-right" style={{ marginRight: '5px' }}>
-            {displayPrivacy && <FormControl
+          <Col className="pull-right" style={{ marginRight: '15px' }}>
+            {/* {displayPrivacy && <FormControl
               onChange={this.onChangePrivacy}
               defaultValue={privacy[0]}
               componentClass="select"
@@ -152,7 +171,19 @@ class NewPost extends React.Component {
               {privacy.map(item => (
                 <option key={item} value={item}>{item === 'PUBLIC' ? 'Công khai' : (item === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}</option>
               ))}
-            </FormControl>}
+            </FormControl>} */}
+            {displayPrivacy && <Dropdown id={idRandom()}>
+              <Dropdown.Toggle>
+                <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu onSelect={this.onChangePrivacy}>
+                {privacy.map(item => (
+                  <MenuItem eventKey={item.name}>
+                    <Glyphicon className={s.glyphicon} glyph={item.glyph} />{item.name}
+                  </MenuItem>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>}
           </Col>
 
           <Clearfix />
@@ -168,15 +199,29 @@ const doNothing = (e) => {
 
 NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
-  privacy: PropTypes.array.isRequired,
   friend: PropTypes.object,
   displayPrivacy: PropTypes.bool,
+  privacy: PropTypes.array,
 };
 
 NewPost.defaultProps = {
   createNewPost: doNothing,
-  privacy: [PUBLIC, FRIEND, ONLY_ME],
   displayPrivacy: true,
+  privacy: [
+    {
+      name: PUBLIC,
+      glyph: 'globe',
+    },
+    {
+      name: FRIEND,
+      glyph: 'user',
+    },
+    {
+      name: ONLY_ME,
+      glyph: 'lock',
+    },
+
+  ],
 };
 
 NewPost.fragments = {};
