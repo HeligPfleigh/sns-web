@@ -63,7 +63,7 @@ class SharingPost extends Component {
             />
           </div>
           <PostText
-            html={`${message}`}
+            html={`${message || {}}`}
           />
         </Post>
       </div>
