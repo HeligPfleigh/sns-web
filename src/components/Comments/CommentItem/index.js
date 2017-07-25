@@ -35,7 +35,7 @@ class CommentItem extends Component {
               __html: `<p>
                 <a title="${comment.user.profile.firstName} ${comment.user.profile.lastName}" href=${link}>
                   ${comment.user.profile.firstName} ${comment.user.profile.lastName}
-                <a/></p>
+                </a></p>
                 ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}
               `,
             }}
