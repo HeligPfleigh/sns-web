@@ -209,7 +209,7 @@ class Feed extends Component {
             createdAt={sharing.createdAt}
           />
         }
-        {!sharing && !isEdit && <PostText html={message} /> }
+        {!sharing && !isEdit && <PostText html={message || {}} /> }
         {isEdit &&
           <EditPost
             message={message}
