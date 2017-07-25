@@ -145,9 +145,15 @@ class Login extends React.Component {
               </label>
             </div>
             <button className="btn btn-primary btn-block" disabled={submitting}>Đăng nhập</button>
-            <a href="#">Reset password</a> or <a href="#">create account</a>
           </form>
         </section>
+        <div style={{ padding: '5px 35px 35px 35px' }}>
+          <a className="pull-left" href="#" onClick={() => history.push('/register')}>
+            <strong>Đăng kí</strong>
+          </a>
+          <a className="pull-right" href="#">Quên mật khẩu?</a>
+        </div>
+        <div className="clearfix" />
         <div>
           <a
             href="#"
