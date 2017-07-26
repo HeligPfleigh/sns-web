@@ -1,23 +1,30 @@
 import React, { PropTypes } from 'react';
 import pick from 'lodash/pick';
+import throttle from 'lodash/throttle';
+import { connect } from 'react-redux';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
+
 import Info from '../../components/Me/InfoComponent/Info';
 import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
+import InfoTab from './InfoTab';
+
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
-import FeedList, { Feed } from '../../components/Feed';
+import { Feed } from '../../components/Feed';
+import FeedList from './FeedList';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
 
-const profilePageQuery = gql`query profilePageQuery {
-  me {
+const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
+  userTest(_id: $_id) {
     _id,
     username,
     profile {
@@ -26,8 +33,34 @@ const profilePageQuery = gql`query profilePageQuery {
       lastName,
       gender
     }
-    posts {
-      ...PostView
+    posts (cursor: $cursor) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        ...PostView
+      }
+    }
+  },
+}
+${Feed.fragments.post}
+`;
+
+const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: String!, $cursor: String) {
+  userTest(_id: $_id) {
+    posts (cursor: $cursor) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        ...PostView
+      }
     }
   },
 }
@@ -76,19 +109,42 @@ class Me extends React.Component {
     this.closeInfoUpdate();
   }
 
-  render() {
+  updatePostInList = (data, index, post) => (update(data, {
+    userTest: {
+      posts: {
+        edges: {
+          $splice: [[index, 1, post]],
+        },
+      },
+    },
+  }));
+
+  loadMoreRows = () => {
     const {
-      data: { me },
+      loadMoreRows,
+      query,
+    } = this.props;
+    if (query && query.tab !== MY_INFO) {
+      loadMoreRows();
+    }
+  }
+
+  render() {
+    console.log(this.props);
+    const {
+      data: {
+        userTest,
+        loading,
+      },
       query,
       createNewComment,
       loadMoreComments,
       editPost,
-      likePost,
-      unlikePost,
       createNewPost,
       deletePost,
       sharingPost,
     } = this.props;
+    const me = userTest;
     const avatar = (me && me.profile && me.profile.picture) || '';
     const profile = me && me.profile;
 
@@ -97,7 +153,10 @@ class Me extends React.Component {
     if (query.tab) {
       tab = MY_INFO;
     }
-
+    let hasNextPage = false;
+    if (!loading && me.posts && me.posts.pageInfo) {
+      hasNextPage = me.posts.pageInfo.hasNextPage;
+    }
     return (
       <Grid className={s.margintop30}>
         <Row>
@@ -118,19 +177,39 @@ class Me extends React.Component {
                   <div className={s.parent}>
                     <NewPost createNewPost={createNewPost} />
                   </div>
-                  { me && me.posts && <FeedList
-                    feeds={me.posts}
-                    likePostEvent={likePost}
-                    unlikePostEvent={unlikePost}
-                    userInfo={me}
-                    loadMoreComments={loadMoreComments}
-                    createNewComment={createNewComment}
-                    deletePost={deletePost}
-                    editPost={editPost}
-                    sharingPost={sharingPost}
-                  />}
+                  <InfiniteScroll
+                    loadMore={this.loadMoreRows}
+                    hasMore={hasNextPage}
+                    loader={<div className="loader">Loading ...</div>}
+                  >
+                    { me && me.posts && <FeedList
+                      feeds={me.posts.edges}
+                      userInfo={me}
+                      loadMoreComments={loadMoreComments}
+                      createNewComment={createNewComment}
+                      deletePost={deletePost}
+                      editPost={editPost}
+                      sharingPost={sharingPost}
+                      queryData={profilePageQuery}
+                      paramData={{
+                        _id: userTest._id,
+                        cursor: null,
+                      }}
+                      updatePost={this.updatePostInList}
+                    />}
+                  </InfiniteScroll>
+
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
+                  {profile && <InfoTab
+                    userId={me._id}
+                    profile={profile}
+                    queryData={profilePageQuery}
+                    paramData={{
+                      _id: userTest._id,
+                      cursor: null,
+                    }}
+                  />}
                   {profile &&
                     (this.state.isInfoUpdate ?
                       <InfoUpdate initialValues={profile} profile={profile} closeInfoUpdate={this.closeInfoUpdate} onSubmit={this.handleUpdate} />
@@ -159,9 +238,8 @@ Me.propTypes = {
   }).isRequired,
   createNewComment: PropTypes.func.isRequired,
   createNewPost: PropTypes.func.isRequired,
+  loadMoreRows: PropTypes.func.isRequired,
   updateProfile: PropTypes.func.isRequired,
-  likePost: PropTypes.func.isRequired,
-  unlikePost: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   query: PropTypes.shape({
@@ -177,13 +255,42 @@ Me.defaultProps = {
 
 export default compose(
   withStyles(s),
+  connect(state => ({
+    user: state.user,
+  })),
   graphql(profilePageQuery, {
-    options: () => ({
-      variables: {},
+    options: ownProps => ({
+      variables: {
+        _id: ownProps.user.id,
+        cursor: null,
+      },
       fetchPolicy: 'network-only',
     }),
-    props: ({ data }) => {
+    props: ({ ownProps, data }) => {
       const { fetchMore } = data;
+      const loadMoreRows = throttle(() => fetchMore({
+        variables: {
+          _id: ownProps.user.id,
+          cursor: data.userTest.posts.pageInfo.endCursor,
+        },
+        query: morePostsProfilePageQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newEdges = fetchMoreResult.userTest.posts.edges;
+          const pageInfo = fetchMoreResult.userTest.posts.pageInfo;
+          return update(previousResult, {
+            userTest: {
+              posts: {
+                edges: {
+                  $push: newEdges,
+                },
+                pageInfo: {
+                  $set: pageInfo,
+                },
+              },
+            },
+          });
+        },
+      }), 300);
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {
           commentId,
@@ -192,15 +299,15 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const index = previousResult.me.posts.findIndex(item => item._id === fetchMoreResult.post._id);
+          const index = previousResult.userTest.posts.findIndex(item => item._id === fetchMoreResult.post._id);
 
-          const updatedPost = update(previousResult.me.posts[index], {
+          const updatedPost = update(previousResult.userTest.posts[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
             },
           });
           return update(previousResult, {
-            me: {
+            userTest: {
               posts: {
                 $splice: [[index, 1, updatedPost]],
               },
@@ -210,6 +317,7 @@ export default compose(
       });
       return {
         data,
+        loadMoreRows,
         loadMoreComments,
       };
     },
@@ -226,17 +334,18 @@ export default compose(
             message,
             user: {
               __typename: 'UserSchemas',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
+              _id: ownProps.data.userTest._id,
+              username: ownProps.data.userTest.username,
+              profile: ownProps.data.userTest.profile,
             },
             author: {
               __typename: 'UserSchemas',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
+              _id: ownProps.data.userTest._id,
+              username: ownProps.data.userTest.username,
+              profile: ownProps.data.userTest.profile,
             },
             building: null,
+            sharing: null,
             privacy,
             comments: [],
             createdAt: (new Date()).toString(),
@@ -247,16 +356,31 @@ export default compose(
         },
         update: (store, { data: { createNewPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+          });
           data = update(data, {
-            me: {
+            userTest: {
               posts: {
-                $unshift: [createNewPost],
+                edges: {
+                  $unshift: [createNewPost],
+                },
               },
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: profilePageQuery, data });
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+            data,
+          });
         },
       }),
     }),
@@ -277,13 +401,13 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           const newMessage = editPost.message;
-          const index = data.me.posts.findIndex(item => item._id === postId);
-          const currentPost = data.me.posts[index];
+          const index = data.userTest.posts.findIndex(item => item._id === postId);
+          const currentPost = data.userTest.posts[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
           });
           data = update(data, {
-            me: {
+            userTest: {
               posts: {
                 $splice: [[index, 1, updatedPost]],
               },
@@ -291,80 +415,6 @@ export default compose(
           });
           // Write our data back to the cache.
           store.writeQuery({ query: profilePageQuery, data });
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.likePost, {
-    props: ({ ownProps, mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          likePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-            message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
-            totalLikes: totalLikes + 1,
-            totalComments,
-            isLiked: true,
-          },
-        },
-        updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.likePost;
-            const index = previousResult.me.posts.findIndex(item => item._id === updatedPost._id);
-            return update(previousResult, {
-              me: {
-                posts: {
-                  $splice: [[index, 1, updatedPost]],
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.unlikePost, {
-    props: ({ ownProps, mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          unlikePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-            message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
-            totalLikes: totalLikes - 1,
-            totalComments,
-            isLiked: false,
-          },
-        },
-        updateQueries: {
-          profilePageQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.unlikePost;
-            const index = previousResult.me.posts.findIndex(item => item._id === updatedPost._id);
-            return update(previousResult, {
-              me: {
-                posts: {
-                  $splice: [[index, 1, updatedPost]],
-                },
-              },
-            });
-          },
         },
       }),
     }),
@@ -384,7 +434,7 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           data = update(data, {
-            me: {
+            userTest: {
               posts: {
                 $unset: [deletePost._id],
               },
@@ -411,7 +461,7 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           data = update(data, {
-            me: {
+            userTest: {
               posts: {
                 $unshift: [sharingPost],
               },
@@ -446,8 +496,8 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            const index = previousResult.me.posts.findIndex(item => item._id === postId);
-            const currentPost = previousResult.me.posts[index];
+            const index = previousResult.userTest.posts.findIndex(item => item._id === postId);
+            const currentPost = previousResult.userTest.posts[index];
 
             let updatedPost = null;
             if (currentPost._id !== postId) {
@@ -479,7 +529,7 @@ export default compose(
               });
             }
             return update(previousResult, {
-              me: {
+              userTest: {
                 posts: {
                   $splice: [[index, 1, updatedPost]],
                 },

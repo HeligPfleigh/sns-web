@@ -136,6 +136,10 @@ class SearchBox extends React.Component {
     });
   };
 
+  onClickAutoSuggestFooter = () => {
+    this.setState({ suggestions: [] });
+  };
+
   handerSearchAPI = debounce(() => {
     const { value } = this.state;
     if (!value) return;
@@ -166,10 +170,6 @@ class SearchBox extends React.Component {
     });
   }, 300);
 
-  onClickAutoSuggestFooter = () => {
-    this.setState({ suggestions: [] });
-  };
-
   renderSuggestionsContainer = ({ containerProps, children, query }) => (
     <div {... containerProps}>
       {children}
@@ -188,7 +188,6 @@ class SearchBox extends React.Component {
 
   render() {
     const { isMobile, showForm, value, suggestions } = this.state;
-    console.log(isMobile);
     const inputProps = {
       placeholder: 'Tìm kiếm...',
       value,
@@ -226,9 +225,7 @@ class SearchBox extends React.Component {
     }
     return (
       <div className={s.mSearchRoot}>
-        {
-          //eslint-disable-next-line
-        }<span onClick={this.onClick}>
+        <span onClick={this.onClick}>
           <i className="fa fa-search fa-lg" aria-hidden="true"></i>
         </span>
       </div>

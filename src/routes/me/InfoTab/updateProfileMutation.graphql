@@ -1,0 +1,12 @@
+mutation updateUserProfile ($input: UpdateUserProfileInput!) {
+  updateUserProfile (input: $input) {
+    user {
+      _id
+      profile {
+        firstName
+        lastName
+        gender
+      }
+    }
+  }
+}

@@ -190,6 +190,8 @@ export default compose(
               profile: ownProps.data.me.profile,
             },
             privacy,
+            building: null,
+            sharing: null,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
