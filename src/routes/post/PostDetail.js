@@ -8,10 +8,12 @@ import MediaQuery from 'react-responsive';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
 import FeedList, { Feed } from '../../components/Feed';
-
+import likePostMutation from './likePostMutation.graphql';
+import unlikePostMutation from './unlikePostMutation.graphql';
+import editPostMutation from './editPostMutation.graphql';
 import s from './PostDetail.scss';
 
-const PostDetailQuery = gql`query PostDetailQuery ($postId: String!) {
+const postDetailQuery = gql`query postDetailQuery ($postId: String!) {
   post (_id: $postId) {
     ...PostView
   }
@@ -23,20 +25,6 @@ const PostDetailQuery = gql`query PostDetailQuery ($postId: String!) {
       firstName
       lastName
     }
-  }
-}
-${Feed.fragments.post}`;
-
-const likePostQuery = gql`mutation likePost ($postId: String!) {
-  likePost(_id: $postId) {
-    ...PostView
-  }
-}
-${Feed.fragments.post}`;
-
-const unlikePostQuery = gql`mutation unlikePost ($postId: String!) {
-  unlikePost(_id: $postId) {
-    ...PostView
   }
 }
 ${Feed.fragments.post}`;
@@ -97,6 +85,7 @@ class PostDetail extends Component {
       },
       likePost,
       unlikePost,
+      editPost,
       loadMoreComments,
       createNewComment,
     } = this.props;
@@ -116,7 +105,7 @@ class PostDetail extends Component {
                   loadMoreComments={loadMoreComments}
                   createNewComment={createNewComment}
                   // deletePost={deletePost}
-                  // editPost={editPost}
+                  editPost={editPost}
                   // sharingPost={sharingPost}
                 />}
               </Col>
@@ -153,11 +142,12 @@ PostDetail.propTypes = {
   unlikePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
+  editPost: PropTypes.func.isRequired,
 };
 
 export default compose(
   withStyles(s),
-  graphql(PostDetailQuery, {
+  graphql(postDetailQuery, {
     options: props => ({
       variables: {
         postId: props.postId,
@@ -186,68 +176,102 @@ export default compose(
       };
     },
   }),
-  graphql(likePostQuery, {
+  graphql(likePostMutation, {
     props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments, user) => mutate({
-        variables: {
-          postId,
-        },
+      likePost: (postId, message, totalLikes) => mutate({
+        variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
             __typename: 'PostSchemas',
             _id: postId,
-            message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
-            },
-            totalLikes: totalLikes + 1,
-            totalComments,
-            isLiked: true,
           },
         },
-        updateQueries: {
-          PostDetailQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.likePost;
-            return update(previousResult, {
-              post: { $set: updatedPost },
-            });
-          },
+        update: (store) => {
+          // Read the data from our cache for this query.
+          const data = store.readQuery({
+            query: postDetailQuery,
+            variables: {
+              postId,
+            },
+          });
+          // Do we need create new Object ?
+          data.post.totalLikes = totalLikes + 1;
+          data.post.isLiked = true;
+          store.writeQuery({
+            query: postDetailQuery,
+            variables: {
+              postId,
+            },
+            data,
+          });
         },
       }),
     }),
   }),
-  graphql(unlikePostQuery, {
+  graphql(unlikePostMutation, {
     props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
+      unlikePost: (postId, message, totalLikes) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           unlikePost: {
             __typename: 'PostSchemas',
             _id: postId,
-            message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
-            },
-            totalLikes: totalLikes - 1,
-            totalComments,
-            isLiked: false,
           },
         },
-        updateQueries: {
-          PostDetailQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.unlikePost;
-            return update(previousResult, {
-              post: { $set: updatedPost },
-            });
+        update: (store) => {
+          // Read the data from our cache for this query.
+          const data = store.readQuery({
+            query: postDetailQuery,
+            variables: {
+              postId,
+            },
+          });
+          // Do we need create new Object ?
+          data.post.totalLikes = totalLikes - 1;
+          data.post.isLiked = false;
+          store.writeQuery({
+            query: postDetailQuery,
+            variables: {
+              postId,
+            },
+            data,
+          });
+        },
+      }),
+    }),
+  }),
+  graphql(editPostMutation, {
+    props: ({ mutate }) => ({
+      editPost: (postId, message) => mutate({
+        variables: { postId, message },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          editPost: {
+            __typename: 'Post',
+            _id: postId,
+            message,
           },
+        },
+        update: (store, { data: { editPost } }) => {
+          // Read the data from our cache for this query.
+          const data = store.readQuery({
+            query: postDetailQuery,
+            variables: {
+              postId,
+            },
+          });
+          // Do we need create new Object ?
+          data.post.message = editPost.message;
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: postDetailQuery,
+            variables: {
+              postId,
+            },
+            data,
+          });
         },
       }),
     }),
@@ -274,7 +298,7 @@ export default compose(
           },
         },
         updateQueries: {
-          PostDetailQuery: (previousResult, { mutationResult }) => {
+          postDetailQuery: (previousResult, { mutationResult }) => {
             const { post } = previousResult;
             const newComment = mutationResult.data.createNewComment;
             let updatedPost = null;
