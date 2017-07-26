@@ -188,7 +188,7 @@ class SearchBox extends React.Component {
 
   render() {
     const { isMobile, showForm, value, suggestions } = this.state;
-    console.log(isMobile);
+
     const inputProps = {
       placeholder: 'Tìm kiếm...',
       value,

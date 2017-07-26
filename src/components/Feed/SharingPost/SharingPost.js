@@ -1,8 +1,7 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import {
-  Image,
-} from 'react-bootstrap';
+import { Image } from 'react-bootstrap';
 import Post, { PostHeader, PostText } from '../../Card';
 import Icon from '../../Icon';
 import TimeAgo from '../../TimeAgo';
