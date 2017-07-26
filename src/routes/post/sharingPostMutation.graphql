@@ -1,0 +1,5 @@
+mutation sharingPost ($_id: String!) {
+  sharingPost(_id: $_id) {
+    _id
+  }
+}
