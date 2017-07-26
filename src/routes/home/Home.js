@@ -195,6 +195,7 @@ export default compose(
             },
             sharing: null,
             building: null,
+            sharing: null,
             privacy,
             comments: [],
             createdAt: (new Date()).toString(),
@@ -220,7 +221,7 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.likePost, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       likePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
@@ -229,12 +230,6 @@ export default compose(
             __typename: 'Post',
             _id: postId,
             message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
             totalLikes: totalLikes + 1,
             totalComments,
             isLiked: true,
@@ -257,7 +252,7 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.unlikePost, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       unlikePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
@@ -266,12 +261,6 @@ export default compose(
             __typename: 'Post',
             _id: postId,
             message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
             totalLikes: totalLikes - 1,
             totalComments,
             isLiked: false,
