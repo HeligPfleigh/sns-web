@@ -43,14 +43,18 @@ class InfoTab extends Component {
       queryData,
       paramData,
     } = this.props;
+    const {
+      firstName,
+      lastName,
+    } = this.state;
     this.props.client.mutate({
       mutation: updateProfileMutation,
       variables: {
         input: {
           userId,
           profile: {
-            firstName: 'firstName234',
-            lastName: 'lastName234',
+            firstName,
+            lastName,
             gender: MALE,
           },
         },
