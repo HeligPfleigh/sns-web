@@ -7,14 +7,14 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
-import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import FeedList, { Feed } from '../../components/Feed';
-import { MY_TIME_LINE, MY_INFO } from '../../constants';
+import { MY_TIME_LINE, MY_INFO, PUBLIC } from '../../constants';
+import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
@@ -400,16 +400,9 @@ export default compose(
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
         variables: { _id: postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          sharingPost: {
-            __typename: 'Post',
-            _id: postId,
-          },
-        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
+          let data = store.readQuery({ query: profilePageQuery, variables: {} });
           data = update(data, {
             me: {
               posts: {
@@ -417,7 +410,7 @@ export default compose(
               },
             },
           });
-          store.writeQuery({ query: profilePageQuery, data });
+          store.writeQuery({ query: profilePageQuery, variables: {}, data });
         },
       }),
     }),

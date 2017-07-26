@@ -5,6 +5,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
+import history from '../../core/history';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
@@ -290,24 +291,8 @@ export default compose(
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
         variables: { _id: postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          sharingPost: {
-            __typename: 'Post',
-            _id: postId,
-          },
-        },
-        update: (store, { data: { sharingPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: usersPageQuery });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $unshift: [sharingPost],
-              },
-            },
-          });
-          store.writeQuery({ query: usersPageQuery, data });
+        update: () => {
+          history.push('/');
         },
       }),
     }),

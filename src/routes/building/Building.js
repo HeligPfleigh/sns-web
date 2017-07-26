@@ -480,24 +480,10 @@ export default compose(
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
         variables: { _id: postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          sharingPost: {
-            __typename: 'Post',
-            _id: postId,
-          },
-        },
-        update: (store, { data: { sharingPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: loadBuildingQuery });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $unshift: [sharingPost],
-              },
-            },
-          });
-          store.writeQuery({ query: loadBuildingQuery, data });
+        update: () => {
+          setTimeout(() => {
+            history.push('/');
+          }, 350);
         },
       }),
     }),
