@@ -12,6 +12,7 @@ import FriendSuggestions from '../../components/FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import { PUBLIC } from '../../constants';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -192,6 +193,7 @@ export default compose(
               profile: ownProps.data.me.profile,
               // totalNotification: 0,
             },
+            sharing: null,
             building: null,
             privacy,
             comments: [],
@@ -353,14 +355,37 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
+    props: ({ ownProps, mutate }) => ({
+      sharingPost: (postId, message) => mutate({
         variables: { _id: postId },
         optimisticResponse: {
           __typename: 'Mutation',
           sharingPost: {
             __typename: 'Post',
-            _id: postId,
+            _id: idRandom(),
+            message,
+            user: {
+              __typename: 'Friend',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              // totalNotification: 0,
+            },
+            author: {
+              __typename: 'Author',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              // totalNotification: 0,
+            },
+            sharing: null,
+            building: null,
+            privacy: PUBLIC,
+            comments: [],
+            createdAt: (new Date()).toString(),
+            totalLikes: 0,
+            totalComments: 0,
+            isLiked: false,
           },
         },
         update: (store, { data: { sharingPost } }) => {

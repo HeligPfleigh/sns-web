@@ -477,14 +477,37 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
+    props: ({ ownProps, mutate }) => ({
+      sharingPost: (postId, message) => mutate({
         variables: { _id: postId },
         optimisticResponse: {
           __typename: 'Mutation',
           sharingPost: {
             __typename: 'Post',
-            _id: postId,
+            _id: idRandom(),
+            message,
+            user: {
+              __typename: 'Friend',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              // totalNotification: 0,
+            },
+            author: {
+              __typename: 'Author',
+              _id: ownProps.data.me._id,
+              username: ownProps.data.me.username,
+              profile: ownProps.data.me.profile,
+              // totalNotification: 0,
+            },
+            sharing: null,
+            building: null,
+            privacy: PUBLIC,
+            comments: [],
+            createdAt: (new Date()).toString(),
+            totalLikes: 0,
+            totalComments: 0,
+            isLiked: false,
           },
         },
         update: (store, { data: { sharingPost } }) => {

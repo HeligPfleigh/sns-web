@@ -73,9 +73,9 @@ class SharingPost extends Component {
 SharingPost.propTypes = {
   id: PropTypes.string,
   message: PropTypes.string,
-  author: PropTypes.Object,
-  user: PropTypes.Object,
-  building: PropTypes.Object,
+  author: PropTypes.object,
+  user: PropTypes.object,
+  building: PropTypes.object,
   privacy: PropTypes.string,
   createdAt: PropTypes.string,
 };
