@@ -7,7 +7,6 @@ import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
-import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
@@ -15,6 +14,7 @@ import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import FeedList, { Feed } from '../../components/Feed';
 import { MY_TIME_LINE, MY_INFO, PUBLIC } from '../../constants';
+import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery {
   me {
@@ -397,42 +397,12 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ ownProps, mutate }) => ({
-      sharingPost: (postId, message) => mutate({
+    props: ({ mutate }) => ({
+      sharingPost: postId => mutate({
         variables: { _id: postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          sharingPost: {
-            __typename: 'Post',
-            _id: idRandom(),
-            message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-              // totalNotification: 0,
-            },
-            author: {
-              __typename: 'Author',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-              // totalNotification: 0,
-            },
-            sharing: null,
-            building: null,
-            privacy: PUBLIC,
-            comments: [],
-            createdAt: (new Date()).toString(),
-            totalLikes: 0,
-            totalComments: 0,
-            isLiked: false,
-          },
-        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
+          let data = store.readQuery({ query: profilePageQuery, variables: {} });
           data = update(data, {
             me: {
               posts: {
@@ -440,7 +410,7 @@ export default compose(
               },
             },
           });
-          store.writeQuery({ query: profilePageQuery, data });
+          store.writeQuery({ query: profilePageQuery, variables: {}, data });
         },
       }),
     }),
