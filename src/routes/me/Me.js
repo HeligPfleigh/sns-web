@@ -10,7 +10,6 @@ import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
-import s from './Me.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
 
 import Info from '../../components/Me/InfoComponent/Info';
@@ -22,6 +21,7 @@ import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
 import FeedList from './FeedList';
 import { MY_TIME_LINE, MY_INFO } from '../../constants';
+import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
   userTest(_id: $_id) {
@@ -450,16 +450,9 @@ export default compose(
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
         variables: { _id: postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          sharingPost: {
-            __typename: 'Post',
-            _id: postId,
-          },
-        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
+          let data = store.readQuery({ query: profilePageQuery, variables: {} });
           data = update(data, {
             userTest: {
               posts: {
@@ -467,7 +460,7 @@ export default compose(
               },
             },
           });
-          store.writeQuery({ query: profilePageQuery, data });
+          store.writeQuery({ query: profilePageQuery, variables: {}, data });
         },
       }),
     }),
