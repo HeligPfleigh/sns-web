@@ -7,7 +7,8 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
-import { Feed } from '../../components/Feed';
+import FeedList, { Feed } from '../../components/Feed';
+
 import s from './PostDetail.scss';
 
 const PostDetailQuery = gql`query PostDetailQuery ($postId: String!) {
@@ -88,7 +89,17 @@ ${Feed.fragments.comment}`;
 
 class PostDetail extends Component {
   render() {
-    const { data: { loading, post, me }, likePost, unlikePost, loadMoreComments, createNewComment } = this.props;
+    const {
+      data: {
+        loading,
+        post,
+        me,
+      },
+      likePost,
+      unlikePost,
+      loadMoreComments,
+      createNewComment,
+    } = this.props;
     return (
       <span>
         {
@@ -97,16 +108,18 @@ class PostDetail extends Component {
             <Loading show={loading} full>Loading ...</Loading>
             <Row className={s.containerTop30}>
               <Col md={8} sm={12} xs={12}>
-                { post && <Feed
-                  data={post}
+                { post && <FeedList
+                  feeds={[post]}
                   likePostEvent={likePost}
                   unlikePostEvent={unlikePost}
                   userInfo={me}
                   loadMoreComments={loadMoreComments}
                   createNewComment={createNewComment}
+                  // deletePost={deletePost}
+                  // editPost={editPost}
+                  // sharingPost={sharingPost}
                 />}
               </Col>
-
               <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
                 <Col md={4} smHidden xsHidden>
                   <FriendSuggestions />
