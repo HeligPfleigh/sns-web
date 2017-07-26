@@ -7,10 +7,13 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import FriendSuggestions from '../../components/FriendSuggestions';
 import Loading from '../../components/Loading';
+import history from '../../core/history';
 import FeedList, { Feed } from '../../components/Feed';
 import likePostMutation from './likePostMutation.graphql';
 import unlikePostMutation from './unlikePostMutation.graphql';
 import editPostMutation from './editPostMutation.graphql';
+import sharingPostMutation from './sharingPostMutation.graphql';
+import deletePostMutation from './deletePostMutation.graphql';
 import s from './PostDetail.scss';
 
 const postDetailQuery = gql`query postDetailQuery ($postId: String!) {
@@ -88,6 +91,8 @@ class PostDetail extends Component {
       editPost,
       loadMoreComments,
       createNewComment,
+      sharingPost,
+      deletePost,
     } = this.props;
     return (
       <span>
@@ -104,9 +109,9 @@ class PostDetail extends Component {
                   userInfo={me}
                   loadMoreComments={loadMoreComments}
                   createNewComment={createNewComment}
-                  // deletePost={deletePost}
+                  deletePost={deletePost}
                   editPost={editPost}
-                  // sharingPost={sharingPost}
+                  sharingPost={sharingPost}
                 />}
               </Col>
               <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
@@ -143,6 +148,8 @@ PostDetail.propTypes = {
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   editPost: PropTypes.func.isRequired,
+  sharingPost: PropTypes.func.isRequired,
+  deletePost: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -205,6 +212,32 @@ export default compose(
             },
             data,
           });
+        },
+      }),
+    }),
+  }),
+  graphql(sharingPostMutation, {
+    props: ({ mutate }) => ({
+      sharingPost: postId => mutate({
+        variables: { _id: postId },
+        update: (store, { data: { sharingPost } }) => {
+          // Read the data from our cache for this query.
+          setTimeout(() => {
+            history.push(`/post/${sharingPost._id}`);
+          }, 700);
+        },
+      }),
+    }),
+  }),
+  graphql(deletePostMutation, {
+    props: ({ mutate }) => ({
+      deletePost: postId => mutate({
+        variables: { _id: postId },
+        update: () => {
+          // Read the data from our cache for this query.
+          setTimeout(() => {
+            history.push('/');
+          }, 700);
         },
       }),
     }),
