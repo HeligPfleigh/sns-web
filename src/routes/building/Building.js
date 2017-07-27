@@ -183,9 +183,9 @@ class Building extends Component {
                       <ul className="dc ayn">
                         <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> { building.name }</li>
                         <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> {building.address.country}</li>
-                        <li> {building.address.city}</li>
-                        <li> {building.address.state}</li>
-                        <li>{building.address.street}</li>
+                        <li> {building.address.city} </li>
+                        <li> {building.address.state} </li>
+                        <li> {building.address.street} </li>
                       </ul>
                     </Panel>
                   }
@@ -311,9 +311,11 @@ export default compose(
               profile: ownProps.data.me.profile,
             },
             building: {
+              __typename: 'Building',
               _id: ownProps.data.building._id,
               name: ownProps.data.building.name,
             },
+            sharing: null,
             privacy: PUBLIC,
             comments: [],
             createdAt: (new Date()).toString(),
@@ -322,17 +324,29 @@ export default compose(
             isLiked: false,
           },
         },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            const newPost = mutationResult.data.createNewPostOnBuilding;
-            return update(previousResult, {
-              building: {
-                posts: {
-                  $unshift: [newPost],
-                },
+        update: (store, { data: { createNewPostOnBuilding } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: loadBuildingQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+            },
+          });
+          data = update(data, {
+            building: {
+              posts: {
+                $unshift: [createNewPostOnBuilding],
               },
-            });
-          },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: loadBuildingQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+            },
+            data,
+          });
         },
       }),
     }),

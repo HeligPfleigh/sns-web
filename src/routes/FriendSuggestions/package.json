@@ -2,5 +2,5 @@
   "name": "FriendSuggestions",
   "version": "0.0.0",
   "private": true,
-  "main": "./FriendSuggestions.js"
+  "main": "./index.js"
 }

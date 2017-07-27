@@ -1,0 +1,8 @@
+mutation sendFriendRequest ($_id: String!) {
+  sendFriendRequest(_id: $_id) {
+    _id
+    profile {
+      picture
+    }
+  }
+}
