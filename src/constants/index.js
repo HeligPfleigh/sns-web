@@ -54,3 +54,5 @@ export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME];
 // Feed Actions
 export const DELETE_POST_ACTION = 'DELETE_POST_ACTION';
 export const EDIT_POST_ACTION = 'EDIT_POST_ACTION';
+
+export const OPEN_ALERT_GLOBAL = 'sns/OPEN_ALERT_GLOBAL';
