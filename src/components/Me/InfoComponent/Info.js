@@ -36,7 +36,7 @@ Info.propTypes = {
     phone: PropTypes.string,
   }).isRequired,
   isMe: PropTypes.bool.isRequired,
-  openInfoUpdate: PropTypes.func.isRequired,
+  openInfoUpdate: PropTypes.func,
 };
 Info.defaultProps = {
   birthday: '',
