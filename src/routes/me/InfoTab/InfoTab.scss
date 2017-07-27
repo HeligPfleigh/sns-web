@@ -31,19 +31,40 @@
       display: inline-block;
     }
     span {
-      width:100px;
+      width:auto;
       color: #737373;
       display: inline-block;
     }
-    .button {
-      background-color: #263E49;
-      border: 0px;
+    .profileLeft {
+      padding: 0px;
+    }
+    .warning {
+      display: block;
+      padding-top: 5px;
+      padding-left: 5px;
+      color: #c66;
+      i {
+        color: #c66;
+        width: auto;
+        margin-right: 5px;
+        font-size: 19px;
+        display: inline-block;
+      }
+    }
+    .buttonAccept {
       padding: 10px 15px;
       text-align: center;
-      color: #fff;
       font-size: 14px;
       font-weight: 400;
       width: 150px;
-    }    
+      margin-right: 10px;
+    }
+    .buttonCancel {
+      padding: 10px 15px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      width: 75px;
+    }
   }
 }
