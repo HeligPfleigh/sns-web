@@ -8,13 +8,13 @@ import {
   FormGroup,
   Radio,
 } from 'react-bootstrap';
-import s from './InfoTab.scss';
 import {
   MALE,
   FEMALE,
   // GENDER,
 } from '../../../constants';
 import updateProfileMutation from './updateProfileMutation.graphql';
+import s from './InfoTab.scss';
 
 class InfoTab extends Component {
 
@@ -141,8 +141,6 @@ class InfoTab extends Component {
     );
   }
 }
-
-InfoTab.propTypes = {};
 
 InfoTab.propTypes = {
   userId: PropTypes.string,

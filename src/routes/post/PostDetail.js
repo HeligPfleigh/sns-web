@@ -5,7 +5,7 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
-import FriendSuggestions from '../../components/FriendSuggestions';
+import FriendSuggestions from '../FriendSuggestions';
 import Loading from '../../components/Loading';
 import history from '../../core/history';
 import FeedList, { Feed } from '../../components/Feed';

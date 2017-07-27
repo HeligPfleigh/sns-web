@@ -112,6 +112,9 @@ class Friends extends React.Component {
             {
               me && me.friendSuggestions && me.friendSuggestions.length > 0 &&
               <FriendsList>
+                <li style={{ paddingLeft: '10px' }}>
+                  <Label label="Giới thiệu bạn bè" />
+                </li>
                 {
                   me.friendSuggestions.map(friend =>
                     <FriendItem

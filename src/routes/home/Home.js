@@ -8,11 +8,10 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import { generate as idRandom } from 'shortid';
-import FriendSuggestions from '../../components/FriendSuggestions';
+import FriendSuggestions from '../FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
-import { PUBLIC } from '../../constants';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -193,7 +192,6 @@ export default compose(
             },
             sharing: null,
             building: null,
-            sharing: null,
             privacy,
             comments: [],
             createdAt: (new Date()).toString(),
