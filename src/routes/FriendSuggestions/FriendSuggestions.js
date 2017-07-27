@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import FriendsList, { FriendItem } from './FriendsList';
+import FriendsList, { FriendItem } from '../../components/FriendsList';
 import Label from '../../components/Friend/Label';
 import friendSuggestionsQuery from './friendSuggestionsQuery.graphql';
 import sendFriendRequestMutation from './sendFriendRequestMutation.graphql';
