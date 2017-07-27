@@ -42,14 +42,6 @@ FriendSuggestions.propTypes = {
   sendFriendRequest: PropTypes.func.isRequired,
 };
 
-// FriendSuggestions.defaultProps = {
-//   profile: {
-//     firstName: '',
-//     lastName: '',
-//     gender: '',
-//   },
-// };
-
 export default compose(
   withStyles(s),
   connect(state => ({
@@ -78,64 +70,4 @@ export default compose(
       }),
     }),
   }),
-  // graphql(sendFriendRequestMutation, {
-  //   props: ({ mutate }) => ({
-  //     sendFriendRequestAction: userId => mutate({
-  //       variables: { userId },
-  //       refetchQueries: [{
-  //         query: friendSuggestionsQuery,
-  //         variables: {},
-  //       }],
-        // update: (store, { data: { sendFriendRequest } }) => {
-        //   // Read the data from our cache for this query.
-        //   let data = store.readQuery({ query: friendsPageQuery });
-        //   if (sendFriendRequest.nextUser) {
-        //     const index = data.me.friendSuggestions.findIndex(item => item._id === sendFriendRequest.currentUser._id);
-        //     data = update(data, {
-        //       me: {
-        //         friendSuggestions: {
-        //           // $unset: [newFriend.currentUser._id],
-        //           $splice: [[index, 1, sendFriendRequest.nextUser]],
-        //         },
-        //       },
-        //     });
-        //   } else {
-        //     data = update(data, {
-        //       me: {
-        //         friendSuggestions: {
-        //           $unset: [sendFriendRequest.currentUser._id],
-        //         },
-        //       },
-        //     });
-        //   }
-        //   // Write our data back to the cache.
-        //   store.writeQuery({ query: friendsPageQuery, data });
-        // },
-        // updateQueries: {
-        //   friendsPageQuery: (previousResult, { mutationResult }) => {
-        //     const newFriend = mutationResult.data.sendFriendRequest;
-        //     if (newFriend.nextUser) {
-        //       const index = previousResult.me.friendSuggestions.findIndex(item => item._id === newFriend.currentUser._id);
-        //       console.log(index);
-        //       return update(previousResult, {
-        //         me: {
-        //           friendSuggestions: {
-        //             // $unset: [newFriend.currentUser._id],
-        //             $splice: [[index, 1, newFriend.nextUser]],
-        //           },
-        //         },
-        //       });
-        //     }
-        //     return update(previousResult, {
-        //       me: {
-        //         friendSuggestions: {
-        //           $unset: [newFriend.currentUser._id],
-        //         },
-        //       },
-        //     });
-        //   },
-        // },
-  //     }),
-  //   }),
-  // }),
 )(FriendSuggestions);
