@@ -24,7 +24,7 @@ import { MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
-  userTest(_id: $_id) {
+  resident(_id: $_id) {
     _id,
     username,
     profile {
@@ -50,7 +50,7 @@ ${Feed.fragments.post}
 `;
 
 const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: String!, $cursor: String) {
-  userTest(_id: $_id) {
+  resident(_id: $_id) {
     posts (cursor: $cursor) {
       pageInfo {
         endCursor
@@ -110,7 +110,7 @@ class Me extends React.Component {
   }
 
   updatePostInList = (data, index, post) => (update(data, {
-    userTest: {
+    resident: {
       posts: {
         edges: {
           $splice: [[index, 1, post]],
@@ -133,7 +133,7 @@ class Me extends React.Component {
     console.log(this.props);
     const {
       data: {
-        userTest,
+        resident,
         loading,
       },
       query,
@@ -144,7 +144,7 @@ class Me extends React.Component {
       deletePost,
       sharingPost,
     } = this.props;
-    const me = userTest;
+    const me = resident;
     const avatar = (me && me.profile && me.profile.picture) || '';
     const profile = me && me.profile;
 
@@ -192,7 +192,7 @@ class Me extends React.Component {
                       sharingPost={sharingPost}
                       queryData={profilePageQuery}
                       paramData={{
-                        _id: userTest._id,
+                        _id: resident._id,
                         cursor: null,
                       }}
                       updatePost={this.updatePostInList}
@@ -206,7 +206,7 @@ class Me extends React.Component {
                     profile={profile}
                     queryData={profilePageQuery}
                     paramData={{
-                      _id: userTest._id,
+                      _id: resident._id,
                       cursor: null,
                     }}
                   />}
@@ -271,14 +271,14 @@ export default compose(
       const loadMoreRows = throttle(() => fetchMore({
         variables: {
           _id: ownProps.user.id,
-          cursor: data.userTest.posts.pageInfo.endCursor,
+          cursor: data.resident.posts.pageInfo.endCursor,
         },
         query: morePostsProfilePageQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.userTest.posts.edges;
-          const pageInfo = fetchMoreResult.userTest.posts.pageInfo;
+          const newEdges = fetchMoreResult.resident.posts.edges;
+          const pageInfo = fetchMoreResult.resident.posts.pageInfo;
           return update(previousResult, {
-            userTest: {
+            resident: {
               posts: {
                 edges: {
                   $push: newEdges,
@@ -299,15 +299,15 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const index = previousResult.userTest.posts.findIndex(item => item._id === fetchMoreResult.post._id);
+          const index = previousResult.resident.posts.findIndex(item => item._id === fetchMoreResult.post._id);
 
-          const updatedPost = update(previousResult.userTest.posts[index], {
+          const updatedPost = update(previousResult.resident.posts[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
             },
           });
           return update(previousResult, {
-            userTest: {
+            resident: {
               posts: {
                 $splice: [[index, 1, updatedPost]],
               },
@@ -334,15 +334,15 @@ export default compose(
             message,
             user: {
               __typename: 'UserSchemas',
-              _id: ownProps.data.userTest._id,
-              username: ownProps.data.userTest.username,
-              profile: ownProps.data.userTest.profile,
+              _id: ownProps.data.resident._id,
+              username: ownProps.data.resident.username,
+              profile: ownProps.data.resident.profile,
             },
             author: {
               __typename: 'UserSchemas',
-              _id: ownProps.data.userTest._id,
-              username: ownProps.data.userTest.username,
-              profile: ownProps.data.userTest.profile,
+              _id: ownProps.data.resident._id,
+              username: ownProps.data.resident.username,
+              profile: ownProps.data.resident.profile,
             },
             building: null,
             sharing: null,
@@ -364,7 +364,7 @@ export default compose(
             },
           });
           data = update(data, {
-            userTest: {
+            resident: {
               posts: {
                 edges: {
                   $unshift: [createNewPost],
@@ -401,13 +401,13 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           const newMessage = editPost.message;
-          const index = data.userTest.posts.findIndex(item => item._id === postId);
-          const currentPost = data.userTest.posts[index];
+          const index = data.resident.posts.findIndex(item => item._id === postId);
+          const currentPost = data.resident.posts[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
           });
           data = update(data, {
-            userTest: {
+            resident: {
               posts: {
                 $splice: [[index, 1, updatedPost]],
               },
@@ -434,7 +434,7 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           data = update(data, {
-            userTest: {
+            resident: {
               posts: {
                 $unset: [deletePost._id],
               },
@@ -454,7 +454,7 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery, variables: {} });
           data = update(data, {
-            userTest: {
+            resident: {
               posts: {
                 $unshift: [sharingPost],
               },
@@ -489,8 +489,8 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            const index = previousResult.userTest.posts.findIndex(item => item._id === postId);
-            const currentPost = previousResult.userTest.posts[index];
+            const index = previousResult.resident.posts.findIndex(item => item._id === postId);
+            const currentPost = previousResult.resident.posts[index];
 
             let updatedPost = null;
             if (currentPost._id !== postId) {
@@ -522,7 +522,7 @@ export default compose(
               });
             }
             return update(previousResult, {
-              userTest: {
+              resident: {
                 posts: {
                   $splice: [[index, 1, updatedPost]],
                 },
