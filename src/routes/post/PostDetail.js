@@ -220,11 +220,12 @@ export default compose(
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
         variables: { _id: postId },
-        update: (store, { data: { sharingPost } }) => {
-          // Read the data from our cache for this query.
-          setTimeout(() => {
-            history.push(`/post/${sharingPost._id}`);
-          }, 700);
+        update: () => {
+        // update: (store, { data: { sharingPost } }) => {
+          // // Read the data from our cache for this query.
+          // setTimeout(() => {
+          //   history.push(`/post/${sharingPost._id}`);
+          // }, 700);
         },
       }),
     }),
