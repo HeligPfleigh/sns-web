@@ -1,0 +1,16 @@
+query buildingNotificationQuery ($_id: String!, $cursor: String, $limit: Int) {
+  building(_id: $_id) {
+    _id,
+    notifications (cursor: $cursor, limit: $limit) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        _id
+      }
+    }
+  }
+}

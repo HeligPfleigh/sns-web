@@ -9,6 +9,7 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import { generate as idRandom } from 'shortid';
 import FriendSuggestions from '../FriendSuggestions';
+import BuildingNotification from '../BuildingNotification';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
@@ -99,6 +100,7 @@ class Home extends Component {
           </Col>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={4} smHidden xsHidden>
+              <BuildingNotification />
               <FriendSuggestions />
             </Col>
           </MediaQuery>
