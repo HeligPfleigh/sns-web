@@ -56,3 +56,4 @@ export const DELETE_POST_ACTION = 'DELETE_POST_ACTION';
 export const EDIT_POST_ACTION = 'EDIT_POST_ACTION';
 
 export const OPEN_ALERT_GLOBAL = 'sns/OPEN_ALERT_GLOBAL';
+export const LOAD_PROFILE = 'sns/Me/LOAD_PROFILE';

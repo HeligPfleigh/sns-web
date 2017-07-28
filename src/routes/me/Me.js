@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import pick from 'lodash/pick';
 import throttle from 'lodash/throttle';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
@@ -11,11 +10,7 @@ import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import Tab from '../../components/Me/TabComponent/Tab';
-
-import Info from '../../components/Me/InfoComponent/Info';
-import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
 import InfoTab from './InfoTab';
-
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
@@ -67,47 +62,7 @@ const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: Str
 ${Feed.fragments.post}
 `;
 
-const updateProfileQuery = gql`mutation updateProfile ($profile: ProfileInput!) {
-  updateProfile (profile: $profile) {
-    _id
-    username
-    profile {
-      picture
-      firstName
-      lastName
-      gender
-    }
-  }
-}`;
-
 class Me extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isInfoUpdate: false,
-    };
-  }
-
-  openInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: true,
-    });
-  }
-
-  closeInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: false,
-    });
-  }
-
-  handleUpdate = (values) => {
-    const profile = pick(values, ['firstName', 'lastName', 'gender', 'picture']);
-    this.props.updateProfile({
-      variables: { profile },
-    }).then(res => console.log(res)).catch(err => console.log(err));
-    this.closeInfoUpdate();
-  }
 
   updatePostInList = (data, index, post) => (update(data, {
     resident: {
@@ -130,7 +85,6 @@ class Me extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     const {
       data: {
         resident,
@@ -201,19 +155,17 @@ class Me extends React.Component {
 
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile && <InfoTab
-                    userId={me._id}
-                    profile={profile}
-                    queryData={profilePageQuery}
-                    paramData={{
-                      _id: resident._id,
-                      cursor: null,
-                    }}
-                  />}
                   {profile &&
-                    (this.state.isInfoUpdate ?
-                      <InfoUpdate initialValues={profile} profile={profile} closeInfoUpdate={this.closeInfoUpdate} onSubmit={this.handleUpdate} />
-                      : <Info profile={profile} isMe openInfoUpdate={this.openInfoUpdate} />)}
+                    <InfoTab
+                      userId={me._id}
+                      profile={profile}
+                      queryData={profilePageQuery}
+                      paramData={{
+                        _id: resident._id,
+                        cursor: null,
+                      }}
+                    />
+                  }
                 </div>
               </Grid>
             </div>
@@ -239,7 +191,6 @@ Me.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   createNewPost: PropTypes.func.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
-  updateProfile: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   query: PropTypes.shape({
@@ -532,9 +483,5 @@ export default compose(
         },
       }),
     }),
-  }),
-
-  graphql(updateProfileQuery, {
-    name: 'updateProfile',
   }),
 )(Me);
