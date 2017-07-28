@@ -1,30 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { withApollo } from 'react-apollo';
-import {
-  Button,
-  FormControl,
-  FormGroup,
-  Radio,
-} from 'react-bootstrap';
-import {
-  MALE,
-  FEMALE,
-  // GENDER,
-} from '../../../constants';
+import ProfileReduxForm from './ProfileReduxForm';
 import updateProfileMutation from './updateProfileMutation.graphql';
-import s from './InfoTab.scss';
 
 class InfoTab extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      value: '',
       firstName: props.profile.firstName,
       lastName: props.profile.lastName,
       gender: props.profile.gender,
+      isInfoUpdate: false,
     };
   }
 
@@ -36,8 +24,21 @@ class InfoTab extends Component {
     });
   }
 
-  openInfoUpdate = (evt) => {
-    evt.preventDefault();
+  openInfoUpdate = () => {
+    this.setState({
+      isInfoUpdate: true,
+    });
+  }
+
+  closeInfoUpdate = () => {
+    this.setState({
+      isInfoUpdate: false,
+    });
+  }
+
+  submit = (values) => {
+    // print the form values to the console
+    // evt.preventDefault();
     const {
       userId,
       queryData,
@@ -46,7 +47,8 @@ class InfoTab extends Component {
     const {
       firstName,
       lastName,
-    } = this.state;
+      gender,
+    } = values;
     this.props.client.mutate({
       mutation: updateProfileMutation,
       variables: {
@@ -55,7 +57,7 @@ class InfoTab extends Component {
           profile: {
             firstName,
             lastName,
-            gender: MALE,
+            gender,
           },
         },
       },
@@ -78,65 +80,21 @@ class InfoTab extends Component {
         });
       },
     });
-  }
-
-  handleChangeLastName = (e) => {
-    this.setState({
-      lastName: e.target.value,
-    });
-  }
-
-  handleChangeFirstName = (e) => {
-    this.setState({
-      firstName: e.target.value,
-    });
+    this.closeInfoUpdate();
   }
 
   render() {
     return (
-      <div className={s.root}>
-        <form>
-          <ul className={s.profile}>
-            <li>
-              <i className="fa fa-address-book-o fa-2x" aria-hidden="true"></i>
-              <span>Họ</span>
-              <FormControl
-                type="text"
-                value={this.state.lastName}
-                placeholder="Enter text"
-                onChange={this.handleChangeLastName}
-              />
-            </li>
-            <li>
-              <i className="fa fa-envelope-o fa-2x" aria-hidden="true"></i>
-              <span>Tên</span>
-              <FormControl
-                type="text"
-                value={this.state.firstName}
-                placeholder="Enter text"
-                onChange={this.handleChangeFirstName}
-              />
-            </li>
-            <li>
-              <i className="fa fa-venus-mars fa-2x" aria-hidden="true"></i>
-              <span>Giới tính</span>
-              <FormGroup>
-                <Radio value={MALE} name="radioGroup" inline>
-                  Nam
-                </Radio>
-                {' '}
-                <Radio value={FEMALE} name="radioGroup" inline>
-                  Nữ
-                </Radio>
-              </FormGroup>
-            </li>
-            <li>
-              <Button className={s.button} onClick={this.openInfoUpdate}>
-                Thay đổi
-              </Button>
-            </li>
-          </ul>
-        </form>
+      <div style={{ marginTop: '-5px', marginBottom: '100px', backgroundColor: '#fff', clear: 'both', padding: '20px 15px' }}>
+        <ProfileReduxForm
+          onSubmit={this.submit}
+          firstName={this.state.firstName}
+          lastName={this.state.lastName}
+          gender={this.state.gender}
+          isInfoUpdate={this.state.isInfoUpdate}
+          openInfoUpdate={this.openInfoUpdate}
+          closeInfoUpdate={this.closeInfoUpdate}
+        />
       </div>
     );
   }
@@ -162,5 +120,5 @@ InfoTab.defaultProps = {
   },
 };
 
-export default withStyles(s)(withApollo(InfoTab));
+export default withApollo(InfoTab);
 
