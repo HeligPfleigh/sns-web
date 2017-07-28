@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { withApollo } from 'react-apollo';
-import { isNumber, toNumber } from 'lodash';
+// import { isNumber, toNumber } from 'lodash';
 import {
   Button,
   FormControl,
@@ -10,7 +9,7 @@ import {
   Radio,
   Col,
 } from 'react-bootstrap';
-import s from './InfoTab.scss';
+import ProfileReduxForm from './ProfileReduxForm';
 import {
   MALE,
   FEMALE,
@@ -23,13 +22,10 @@ class InfoTab extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: '',
       firstName: props.profile.firstName,
       lastName: props.profile.lastName,
       gender: props.profile.gender,
-      errorFirstname: false,
-      errorLastName: false,
-      errorMessage: '',
+      isInfoUpdate: false,
     };
   }
 
@@ -41,8 +37,21 @@ class InfoTab extends Component {
     });
   }
 
-  openInfoUpdate = (evt) => {
-    evt.preventDefault();
+  openInfoUpdate = () => {
+    this.setState({
+      isInfoUpdate: true,
+    });
+  }
+
+  closeInfoUpdate = () => {
+    this.setState({
+      isInfoUpdate: false,
+    });
+  }
+
+  submit = (values) => {
+    // print the form values to the console
+    // evt.preventDefault();
     const {
       userId,
       queryData,
@@ -51,7 +60,8 @@ class InfoTab extends Component {
     const {
       firstName,
       lastName,
-    } = this.state;
+      gender,
+    } = values;
     this.props.client.mutate({
       mutation: updateProfileMutation,
       variables: {
@@ -60,7 +70,7 @@ class InfoTab extends Component {
           profile: {
             firstName,
             lastName,
-            gender: MALE,
+            gender,
           },
         },
       },
@@ -83,171 +93,25 @@ class InfoTab extends Component {
         });
       },
     });
-  }
-
-  handleChangeLastName = (e) => {
-    const ln = e.target.value;
-    if (!/^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*$/g.test(ln)) {
-      this.setState({
-        lastName: ln,
-        errorLastName: true,
-        errorMessage: 'Các ký tự đặc biệt và số không được cho phép',
-      });
-    } else if (ln.length === 0) {
-      this.setState({
-        lastName: ln,
-        errorLastName: true,
-        errorMessage: 'Vui lòng điền đầy đủ thông tin',
-      });
-    } else if (ln.length === 1) {
-      this.setState({
-        lastName: ln,
-        errorLastName: true,
-        errorMessage: 'Bạn điền quá ít',
-      });
-    } else if (ln.length > 15) {
-      this.setState({
-        lastName: ln,
-        errorLastName: true,
-        errorMessage: 'Bạn điền quá nhiều từ',
-      });
-    } else {
-      this.setState({
-        lastName: ln,
-        errorLastName: false,
-      });
-    }
-  }
-
-  handleChangeFirstName = (e) => {
-    const ln = e.target.value;
-    if (!/^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*$/g.test(ln)) {
-      this.setState({
-        firstName: ln,
-        errorFirstname: true,
-        errorMessage: 'Các ký tự đặc biệt và số không được cho phép',
-      });
-    } else if (ln.length === 0) {
-      this.setState({
-        firstName: ln,
-        errorFirstname: true,
-        errorMessage: 'Vui lòng điền đầy đủ thông tin',
-      });
-    } else if (ln.length === 1) {
-      this.setState({
-        firstName: ln,
-        errorFirstname: true,
-        errorMessage: 'Bạn điền quá ít',
-      });
-    } else if (ln.length > 15) {
-      this.setState({
-        firstName: ln,
-        errorFirstname: true,
-        errorMessage: 'Bạn điền quá nhiều từ',
-      });
-    } else {
-      this.setState({
-        firstName: ln,
-        errorFirstname: false,
-      });
-    }
+    this.closeInfoUpdate();
   }
 
   render() {
-    const { errorFirstname, errorLastName, errorMessage } = this.state;
     return (
-      <div className={s.root}>
-        <form>
-          <ul className={s.profile}>
-            <li>
-              <Col sm={2} className={s.profileLeft}>
-                <i className="fa fa-address-book-o fa-2x" aria-hidden="true"></i>
-                <span>Họ</span>
-              </Col>
-              <Col sm={10}>
-                <FormControl
-                  type="text"
-                  value={this.state.lastName}
-                  placeholder="Enter text"
-                  onChange={this.handleChangeLastName}
-                />
-                { errorLastName &&
-                  <span className={s.warning}>
-                    <i className="fa fa-times fa-1" aria-hidden="true"></i>
-                    {errorMessage}
-                  </span>
-                }
-              </Col>
-            </li>
-            <li>
-              <Col sm={2} className={s.profileLeft}>
-                <i className="fa fa-envelope-o fa-2x" aria-hidden="true"></i>
-                <span>Tên</span>
-              </Col>
-              <Col sm={10}>
-                <FormControl
-                  type="text"
-                  value={this.state.firstName}
-                  placeholder="Enter text"
-                  onChange={this.handleChangeFirstName}
-                />
-                { errorFirstname &&
-                  <span className={s.warning}>
-                    <i className="fa fa-times fa-1" aria-hidden="true"></i>
-                    {errorMessage}
-                  </span>
-                }
-              </Col>
-            </li>
-            <li>
-              <Col sm={2} className={s.profileLeft}>
-                <i className="fa fa-venus-mars fa-2x" aria-hidden="true"></i>
-                <span>Giới tính</span>
-              </Col>
-              <Col sm={10} style={{ paddingTop: '5px' }}>
-                <FormGroup>
-                  <Radio value={MALE} name="radioGroup" inline>
-                    Nam
-                  </Radio>
-                  {' '}
-                  <Radio value={FEMALE} name="radioGroup" inline>
-                    Nữ
-                  </Radio>
-                </FormGroup>
-              </Col>
-            </li>
-            <li>
-              <Col sm={2}></Col>
-              <Col sm={10}>
-                {/* <Button
-                  bsSize="large"
-                  className={s.buttonAccept}
-                  onClick={this.openInfoUpdate}
-                  disabled={errorFirstname || errorLastName}
-                >
-                  Xem lại thay đổi
-                </Button> */}
-                <Button
-                  bsStyle="primary" bsSize="large"
-                  className={s.buttonAccept}
-                  onClick={this.openInfoUpdate}
-                  disabled={errorFirstname || errorLastName}
-                >
-                  Xem lại thay đổi
-                </Button>
-                <Button className={s.buttonCancel}>
-                  Hủy
-                </Button>
-              </Col>
-            </li>
-          </ul>
-        </form>
+      <div style={{ marginTop: '-5px', marginBottom: '100px', backgroundColor: '#fff', clear: 'both', padding: '20px 15px' }}>
+        <ProfileReduxForm
+          onSubmit={this.submit}
+          firstName={this.state.firstName}
+          lastName={this.state.lastName}
+          gender={this.state.gender}
+          isInfoUpdate={this.state.isInfoUpdate}
+          openInfoUpdate={this.openInfoUpdate}
+          closeInfoUpdate={this.closeInfoUpdate}
+        />
       </div>
     );
   }
 }
-
-InfoTab.propTypes = {};
 
 InfoTab.propTypes = {
   userId: PropTypes.string,
@@ -269,5 +133,5 @@ InfoTab.defaultProps = {
   },
 };
 
-export default withStyles(s)(withApollo(InfoTab));
+export default withApollo(InfoTab);
 

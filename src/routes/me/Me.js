@@ -81,26 +81,7 @@ const updateProfileQuery = gql`mutation updateProfile ($profile: ProfileInput!) 
 }`;
 
 class Me extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isInfoUpdate: false,
-    };
-  }
-
-  openInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: true,
-    });
-  }
-
-  closeInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: false,
-    });
-  }
-
+  // ??? XOAS
   handleUpdate = (values) => {
     const profile = pick(values, ['firstName', 'lastName', 'gender', 'picture']);
     this.props.updateProfile({
@@ -130,7 +111,6 @@ class Me extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     const {
       data: {
         resident,
@@ -201,19 +181,17 @@ class Me extends React.Component {
 
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile && <InfoTab
-                    userId={me._id}
-                    profile={profile}
-                    queryData={profilePageQuery}
-                    paramData={{
-                      _id: resident._id,
-                      cursor: null,
-                    }}
-                  />}
                   {profile &&
-                    (this.state.isInfoUpdate ?
-                      <InfoUpdate initialValues={profile} profile={profile} closeInfoUpdate={this.closeInfoUpdate} onSubmit={this.handleUpdate} />
-                      : <Info profile={profile} isMe openInfoUpdate={this.openInfoUpdate} />)}
+                    <InfoTab
+                      userId={me._id}
+                      profile={profile}
+                      queryData={profilePageQuery}
+                      paramData={{
+                        _id: resident._id,
+                        cursor: null,
+                      }}
+                    />
+                  }
                 </div>
               </Grid>
             </div>
