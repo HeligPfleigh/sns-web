@@ -495,9 +495,9 @@ export default compose(
       sharingPost: postId => mutate({
         variables: { _id: postId },
         update: () => {
-          setTimeout(() => {
-            history.push('/');
-          }, 350);
+          // setTimeout(() => {
+          //   history.push('/');
+          // }, 350);
         },
       }),
     }),
