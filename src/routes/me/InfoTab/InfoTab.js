@@ -1,20 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from 'react-apollo';
-// import { isNumber, toNumber } from 'lodash';
-import {
-  Button,
-  FormControl,
-  FormGroup,
-  Radio,
-  Col,
-} from 'react-bootstrap';
 import ProfileReduxForm from './ProfileReduxForm';
-import {
-  MALE,
-  FEMALE,
-  // GENDER,
-} from '../../../constants';
 import updateProfileMutation from './updateProfileMutation.graphql';
 
 class InfoTab extends Component {

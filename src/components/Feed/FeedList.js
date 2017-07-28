@@ -5,6 +5,10 @@ import SharingPostModal from './SharingPostModal';
 import { DELETE_POST_ACTION } from '../../constants';
 import Feed from './Feed';
 
+function doNothing(e) {
+  e && e.preventDefault && e.preventDefault();
+}
+
 class FeedList extends Component {
 
   constructor(props) {
@@ -80,7 +84,7 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
-      editPost,
+      editPost = doNothing,
     } = this.props;
     return (
       <div>
@@ -124,8 +128,8 @@ FeedList.propTypes = {
   userInfo: PropTypes.object.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
-  deletePost: PropTypes.func.isRequired,
-  editPost: PropTypes.func.isRequired,
+  deletePost: PropTypes.func,
+  editPost: PropTypes.func, // (user page)
   sharingPost: PropTypes.func.isRequired,
 };
 
