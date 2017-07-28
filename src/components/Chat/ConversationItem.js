@@ -25,9 +25,7 @@ class ConversationItem extends React.Component {
       <div className={classnames(s.conversationItem, { [s.activeNew]: active })}>
         <div className={s.friendAvata}>
           { receiver &&
-            <Link to={`/user/${receiver.id}`}>
-              <img alt={name} src={picture || '/tile.png'} />
-            </Link>
+            <img alt={name} src={picture || '/tile.png'} />
           }
           { !picture && <img alt={name} src={'/tile.png'} /> }
         </div>
