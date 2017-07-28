@@ -1,0 +1,6 @@
+{
+  "name": "ChatSideBar",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ChatSideBar.js"
+}

@@ -1,0 +1,13 @@
+query getFriendsQuery{
+  me {
+    friends {
+      _id
+      profile {
+        picture
+        lastName
+        firstName
+        gender
+      }
+    }
+  }
+}

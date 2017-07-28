@@ -12,6 +12,7 @@ import FriendSuggestions from '../FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import ChatSideBar from '../ChatSideBar';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -100,6 +101,7 @@ class Home extends Component {
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={4} smHidden xsHidden>
               <FriendSuggestions />
+              <ChatSideBar />
             </Col>
           </MediaQuery>
         </Row>
