@@ -86,19 +86,14 @@ class Alert extends Component {
       message,
       open,
     } = this.state;
-    // if (open && message !== '') {
     return (
-      <div bsStyle="danger">
-        <Modal show={open} onHide={this.close}>
-          {/** <Modal.Header closeButton></Modal.Header> */}
-          <Modal.Body className="text-center">
-            { message }
-          </Modal.Body>
-        </Modal>
-      </div>
+      <Modal show={open} onHide={this.close}>
+        {/** <Modal.Header closeButton></Modal.Header> */}
+        <Modal.Body className="text-center">
+          { message }
+        </Modal.Body>
+      </Modal>
     );
-    // }
-    // return null;
   }
 }
 

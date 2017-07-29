@@ -1,11 +1,11 @@
-query buildingNotificationQuery ($userId: String!, $cursor: String, $limit: Int) {
+query buildingNotificationQuery ($userId: String!, $skip: Int, $limit: Int) {
   resident(_id: $userId) {
     _id
     building {
       _id
-      announcements (cursor: $cursor, limit: $limit) {
+      announcements (skip: $skip, limit: $limit) {
         pageInfo {
-          endCursor
+          skip
           hasNextPage
           total
           limit
