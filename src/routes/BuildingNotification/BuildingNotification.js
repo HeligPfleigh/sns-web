@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import BuildingNotificationItem from '../../components/BuildingNotificationItem';
+import BuildingNotificationItem from './BuildingNotificationItem';
 import Label from '../../components/Friend/Label';
 import buildingNotificationQuery from './buildingNotificationQuery.graphql';
 import s from './BuildingNotification.scss';
