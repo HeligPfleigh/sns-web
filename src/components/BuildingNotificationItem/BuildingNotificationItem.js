@@ -10,7 +10,7 @@ class BuildingNotificationItem extends Component {
       <li>
         <div className={s.buildingNotificationItem}>
           <div className={s.buildingNotificationIcon}>
-            <i className="fa fa-bullhorn fa-2x" style={{ backgroundColor: `${notification.type}` }}aria-hidden="true"></i>
+            <i className="fa fa-bullhorn fa-2x" style={{ backgroundColor: `${notification.type === 'type01' ? '#006400' : '#FF8C00'}` }} aria-hidden="true"></i>
           </div>
           <div className={s.buildingNotificationInfo}>
             <strong>{notification.title}</strong>
