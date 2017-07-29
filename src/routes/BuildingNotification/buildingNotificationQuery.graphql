@@ -1,15 +1,18 @@
-query buildingNotificationQuery ($_id: String!, $cursor: String, $limit: Int) {
-  building(_id: $_id) {
-    _id,
-    notifications (cursor: $cursor, limit: $limit) {
-      pageInfo {
-        endCursor
-        hasNextPage
-        total
-        limit
-      }
-      edges {
-        _id
+query buildingNotificationQuery ($userId: String!, $cursor: String, $limit: Int) {
+  resident(_id: $userId) {
+    _id
+    building {
+      _id
+      announcements (cursor: $cursor, limit: $limit) {
+        pageInfo {
+          endCursor
+          hasNextPage
+          total
+          limit
+        }
+        edges {
+          title
+        }
       }
     }
   }

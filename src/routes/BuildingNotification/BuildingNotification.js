@@ -28,8 +28,8 @@ const buildingNotification = [
 
 class BuildingNotification extends Component {
   render() {
-    // const { data: { loading } } = this.props;
-    // console.log(this.props, 'this.props');
+    const { data: { loading } } = this.props;
+    console.log(this.props, 'this.props');
     return (
       <div>
         {/* {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>} */}
@@ -70,13 +70,13 @@ export default compose(
   connect(state => ({
     user: state.user,
   })),
-  // graphql(buildingNotificationQuery, {
-  //   options: ownProps => ({
-  //     variables: {
-  //       _id: ownProps.user.id,
-  //       cursor: null,
-  //     },
-  //     fetchPolicy: 'network-only',
-  //   }),
-  // }),
+  graphql(buildingNotificationQuery, {
+    options: ownProps => ({
+      variables: {
+        userId: ownProps.user.id,
+        cursor: null,
+      },
+      fetchPolicy: 'network-only',
+    }),
+  }),
 )(BuildingNotification);
