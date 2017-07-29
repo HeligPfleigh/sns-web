@@ -40,7 +40,7 @@ export default compose(
   graphql(buildingNotificationQuery, {
     options: ownProps => ({
       variables: {
-        _id: ownProps.user.id,
+        userId: ownProps.user.id,
         cursor: null,
       },
       fetchPolicy: 'network-only',
