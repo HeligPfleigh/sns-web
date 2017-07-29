@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import BuildingNotificationItem from './BuildingNotificationItem';
-import Label from '../../components/Friend/Label';
 import buildingNotificationQuery from './buildingNotificationQuery.graphql';
+import BuildingAnnouncementList, {
+  BuildingAnnouncementHeader,
+  BuildingAnnouncementItem,
+} from './BuildingAnnouncement';
 import s from './BuildingNotification.scss';
 
 const buildingNotification = [
@@ -28,32 +30,20 @@ const buildingNotification = [
 
 class BuildingNotification extends Component {
   render() {
-    const { data: { loading } } = this.props;
-    console.log(this.props, 'this.props');
+    const { data: { loading, resident: { building } } } = this.props;
     return (
       <div>
-        {/* {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>} */}
-        {/* {!loading && <FriendsList>
-          <li style={{ paddingLeft: '10px' }}>
-            <Label label="Thông báo" />
-          </li>
-        </FriendsList>
-        } */}
-        <div className={s.buildingNotificationList}>
-          <ul>
-            <li style={{ backgroundColor: '#FF8C00', height: '10px', marginBottom: '5px' }}></li>
-            {
-              buildingNotification.map(notification =>
-                <BuildingNotificationItem
-                  notification={notification}
-                />,
-              )
-            }
-          </ul>
-          <div className={s.buildingNotificationListFooter}>
-            Xem thêm
-          </div>
-        </div>
+        {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
+        <BuildingAnnouncementList>
+          <BuildingAnnouncementHeader />
+          {
+            !loading && building && building.announcements && building.announcements.edges.map(notification =>
+              <BuildingAnnouncementItem
+                data={notification}
+              />,
+            )
+          }
+        </BuildingAnnouncementList>
       </div>
     );
   }
@@ -75,6 +65,7 @@ export default compose(
       variables: {
         userId: ownProps.user.id,
         cursor: null,
+        limit: 3,
       },
       fetchPolicy: 'network-only',
     }),

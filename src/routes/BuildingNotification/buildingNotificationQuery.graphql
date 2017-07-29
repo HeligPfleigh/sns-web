@@ -11,7 +11,9 @@ query buildingNotificationQuery ($userId: String!, $skip: Int, $limit: Int) {
           limit
         }
         edges {
-          title
+          message
+          date
+          type
         }
       }
     }

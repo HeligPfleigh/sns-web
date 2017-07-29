@@ -1,5 +1,5 @@
 {
-  "name": "BuildingNotificationList",
+  "name": "BuildingAnnouncement",
   "version": "0.0.0",
   "private": true,
   "main": "./index.js"
