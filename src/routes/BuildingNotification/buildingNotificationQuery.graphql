@@ -11,6 +11,7 @@ query buildingNotificationQuery ($userId: String!, $skip: Int, $limit: Int) {
           limit
         }
         edges {
+          _id
           message
           date
           type

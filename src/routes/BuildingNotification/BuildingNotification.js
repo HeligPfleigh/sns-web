@@ -39,6 +39,7 @@ class BuildingNotification extends Component {
           {
             !loading && building && building.announcements && building.announcements.edges.map(notification =>
               <BuildingAnnouncementItem
+                key={notification._id}
                 data={notification}
               />,
             )

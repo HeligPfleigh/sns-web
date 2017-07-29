@@ -20,7 +20,7 @@ export const BuildingAnnouncementItem = ({ data }) => (
 );
 
 BuildingAnnouncementItem.propTypes = {
-  data: PropTypes.obj,
+  data: PropTypes.object,
 };
 
 export default withStyles(s)(BuildingAnnouncementItem);
