@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
@@ -19,13 +20,17 @@ import NewPost from '../../components/NewPost';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
+import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
+import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
+import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import Errors from './Errors';
-import s from './Building.scss';
 import Sponsored from './Sponsored';
+import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
 const REQUEST_TAB = 'REQUEST_TAB';
+const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!) {
@@ -69,25 +74,6 @@ const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($m
   }
 }
 ${Feed.fragments.post}
-`;
-const deletePostOnBuildingMutation = gql`mutation deletePostOnBuilding ($postId: String!, $buildingId: String!) {
-  deletePostOnBuilding(postId: $postId, buildingId: $buildingId) {
-    _id
-  }
-}
-`;
-const acceptRequestForJoiningBuildingMutation = gql`mutation acceptRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
-  acceptRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
-    _id
-  }
-}
-`;
-
-const rejectRequestForJoiningBuildingMutation = gql`mutation rejectRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
-  rejectRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
-    _id
-  }
-}
 `;
 
 class Building extends Component {
@@ -144,7 +130,6 @@ class Building extends Component {
 
     return (
       <Grid>
-
         <Tab.Container onSelect={this.handleSelect} activeKey={tab}>
           <Row className="clearfix">
             <Col sm={2}>
@@ -157,7 +142,10 @@ class Building extends Component {
                 </NavItem>
                 { building && building.isAdmin && <NavItem
                   title="Yêu cầu kết nối" eventKey={REQUEST_TAB}
-                > Yêu cầu </NavItem>}
+                > Yêu cầu </NavItem> }
+                { building && building.isAdmin && <NavItem
+                  title="Thông báo" eventKey={ANNOUNCEMENT_TAB}
+                > Thông báo </NavItem> }
               </Nav>
             </Col>
             <Col sm={7}>
@@ -208,6 +196,9 @@ class Building extends Component {
                       )
                     }
                   </FriendList>
+                </Tab.Pane>}
+                { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
+                  123
                 </Tab.Pane>}
               </Tab.Content>
             </Col>

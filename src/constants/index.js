@@ -57,3 +57,7 @@ export const EDIT_POST_ACTION = 'EDIT_POST_ACTION';
 
 export const OPEN_ALERT_GLOBAL = 'sns/OPEN_ALERT_GLOBAL';
 export const LOAD_PROFILE = 'sns/Me/LOAD_PROFILE';
+
+export const TYPE1 = 'TYPE1';
+export const TYPE2 = 'TYPE2';
+export const ANNOUNCEMENT_TYPE = [TYPE1, TYPE2];
