@@ -3,32 +3,14 @@ import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import buildingNotificationQuery from './buildingNotificationQuery.graphql';
+import buildingAnnouncementQuery from './buildingAnnouncementQuery.graphql';
 import BuildingAnnouncementList, {
   BuildingAnnouncementHeader,
   BuildingAnnouncementItem,
 } from './BuildingAnnouncement';
-import s from './BuildingNotification.scss';
+import s from './BuildingAnnouncement.scss';
 
-const buildingNotification = [
-  {
-    type: 'type01',
-    date: '11:00 AM  15 tháng 5',
-    title: 'Thông báo tổ chức mùng 1-6 cho các bé',
-  },
-  {
-    type: 'type01',
-    date: '11:00 AM  15 tháng 4',
-    title: 'Thông báo diễn tập phòng cháy chữa cháy',
-  },
-  {
-    type: 'type02',
-    date: '11:00 AM  01 tháng 4',
-    title: 'Thông báo nộp tiền phí dịch vụ tháng 4',
-  },
-];
-
-class BuildingNotification extends Component {
+class BuildingAnnouncement extends Component {
   render() {
     const { data: { loading, resident: { building } } } = this.props;
     return (
@@ -37,10 +19,10 @@ class BuildingNotification extends Component {
         <BuildingAnnouncementList>
           <BuildingAnnouncementHeader />
           {
-            !loading && building && building.announcements && building.announcements.edges.map(notification =>
+            !loading && building && building.announcements && building.announcements.edges.map(a =>
               <BuildingAnnouncementItem
-                key={notification._id}
-                data={notification}
+                key={a._id}
+                data={a}
               />,
             )
           }
@@ -50,7 +32,7 @@ class BuildingNotification extends Component {
   }
 }
 
-BuildingNotification.propTypes = {
+BuildingAnnouncement.propTypes = {
   data: PropTypes.shape({
     loading: PropTypes.bool.isRequired,
   }).isRequired,
@@ -61,7 +43,7 @@ export default compose(
   connect(state => ({
     user: state.user,
   })),
-  graphql(buildingNotificationQuery, {
+  graphql(buildingAnnouncementQuery, {
     options: ownProps => ({
       variables: {
         userId: ownProps.user.id,
@@ -71,4 +53,4 @@ export default compose(
       fetchPolicy: 'network-only',
     }),
   }),
-)(BuildingNotification);
+)(BuildingAnnouncement);

@@ -9,11 +9,11 @@ import s from './BuildingAnnouncementItem.scss';
 
 export const BuildingAnnouncementItem = ({ data }) => (
   <li>
-    <div className={s.buildingNotificationItem}>
-      <div className={s.buildingNotificationIcon}>
+    <div className={s.buildingAnnouncementItem}>
+      <div className={s.buildingAnnouncementIcon}>
         <i className="fa fa-bullhorn fa-2x" style={{ backgroundColor: `${data.type === TYPE1 ? '#006400' : '#FF8C00'}` }} aria-hidden="true"></i>
       </div>
-      <div className={s.buildingNotificationInfo}>
+      <div className={s.buildingAnnouncementInfo}>
         <strong>{data.message}</strong>
         <br />
         <small>{moment(data.date).format('HH:mm DD/MM/YYYY')}</small>

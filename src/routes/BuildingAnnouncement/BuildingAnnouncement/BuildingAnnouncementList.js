@@ -4,9 +4,9 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './BuildingAnnouncementList.scss';
 
 export const BuildingAnnouncementList = ({ children }) => (
-  <div className={s.buildingNotificationList}>
+  <div className={s.buildingAnnouncementList}>
     <ul>{children}</ul>
-    <div className={s.buildingNotificationListFooter}>
+    <div className={s.buildingAnnouncementListFooter}>
       Xem thêm
     </div>
   </div>

@@ -1,4 +1,4 @@
-query buildingNotificationQuery ($userId: String!, $skip: Int, $limit: Int) {
+query buildingAnnouncementsQuery ($userId: String!, $skip: Int, $limit: Int) {
   resident(_id: $userId) {
     _id
     building {

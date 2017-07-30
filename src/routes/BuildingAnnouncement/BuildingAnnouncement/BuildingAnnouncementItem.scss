@@ -1,9 +1,9 @@
-.buildingNotificationItem {
+.buildingAnnouncementItem {
   display: flex;
   align-items: center;
   padding: 1em;
   border-bottom: 1px solid #dedede;
-  .buildingNotificationIcon {
+  .buildingAnnouncementIcon {
     margin-right: 10px;
     i {
       // background-color: #006400;
@@ -15,7 +15,7 @@
       padding: 12px;
     }
   }
-  .buildingNotificationInfo {
+  .buildingAnnouncementInfo {
     small {
       color: #888888;
     }
