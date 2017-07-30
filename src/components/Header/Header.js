@@ -1,12 +1,3 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Button } from 'react-bootstrap';
@@ -141,10 +132,9 @@ const rejectFriend = gql`mutation rejectFriend ($userId: String!) {
 
 const updateSeenQuery = gql`mutation updateSeen {
   updateSeen {
-    ...NotificationView
+    response
   }
-}
-${NotifyFragment}`;
+}`;
 
 const updateReadQuery = gql`mutation updateRead ($_id: String!) {
   updateRead(_id: $_id) {
