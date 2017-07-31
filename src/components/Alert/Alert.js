@@ -86,7 +86,6 @@ class Alert extends Component {
       message,
       open,
     } = this.state;
-    // if (open && message !== '') {
     return (
       <div className="danger">
         <Modal show={open} onHide={this.close}>
@@ -97,8 +96,6 @@ class Alert extends Component {
         </Modal>
       </div>
     );
-    // }
-    // return null;
   }
 }
 
