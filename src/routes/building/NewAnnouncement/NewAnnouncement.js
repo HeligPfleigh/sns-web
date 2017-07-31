@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import { reset } from 'redux-form';
+import { generate as idRandom } from 'shortid';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import NewAnnouncementForm from './NewAnnouncementForm';
 import {
@@ -62,6 +64,41 @@ export default compose(
               message,
             },
           },
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          createNewBuildingAnnouncement: {
+            __typename: 'CreateNewBuildingAnnouncementPayload',
+            announcement: {
+              __typename: 'BuildingAnnouncement',
+              _id: idRandom(),
+              message,
+              type,
+              date: (new Date()).toISOString(),
+            },
+          },
+        },
+        update: (store, { data: { createNewBuildingAnnouncement } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: ownProps.query,
+            variables: ownProps.param,
+          });
+          data = update(data, {
+            building: {
+              announcements: {
+                edges: {
+                  $unshift: [createNewBuildingAnnouncement.announcement],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: ownProps.query,
+            variables: ownProps.param,
+            data,
+          });
         },
       }),
     }),

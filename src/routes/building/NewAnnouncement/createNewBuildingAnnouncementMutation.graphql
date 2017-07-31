@@ -4,6 +4,7 @@ mutation createNewBuildingAnnouncement ($input: CreateNewBuildingAnnouncementInp
       _id
       message
       type
+      date
     }
   }
 }

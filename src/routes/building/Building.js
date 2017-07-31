@@ -148,8 +148,6 @@ class Building extends Component {
       editPost,
       sharingPost,
     } = this.props;
-    console.log(this.props, 'this.props');
-
     let tab = POST_TAB;
     if (query.tab) {
       tab = query.tab;
@@ -215,7 +213,14 @@ class Building extends Component {
                 </Tab.Pane>
                 { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
                   <Panel>
-                    <NewAnnouncement buildingId={building._id} />
+                    <NewAnnouncement
+                      buildingId={building._id}
+                      query={loadBuildingQuery}
+                      param={{
+                        buildingId: building._id,
+                        limit: 1000,
+                      }}
+                    />
                   </Panel>
                   <Panel>
                     <BuildingAnnouncementList>
