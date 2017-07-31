@@ -191,6 +191,8 @@ export default compose(
               profile: ownProps.data.me.profile,
             },
             privacy,
+            building: null,
+            sharing: null,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
@@ -289,8 +291,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: () => {
           history.push('/');
         },

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Button } from 'react-bootstrap';
+import { Button, Col } from 'react-bootstrap';
 import s from './Info.scss';
 
 const Info = ({ profile: { firstName, lastName, gender }, isMe, openInfoUpdate }) => (
@@ -19,10 +19,15 @@ const Info = ({ profile: { firstName, lastName, gender }, isMe, openInfoUpdate }
         <span>Giới tính</span>
         {gender === 'male' ? 'Nam' : 'Nữ'}
       </li>
-      { isMe && <li>
-        <Button className={s.button} onClick={openInfoUpdate}>
-          Thay đổi
-        </Button></li>
+      { isMe &&
+        <li>
+          <Col sm={2}></Col>
+          <Col sm={10}>
+            <Button bsStyle="primary" bsSize="large" className={s.button} onClick={openInfoUpdate}>
+              Thay đổi
+            </Button>
+          </Col>
+        </li>
          }
     </ul>
   </div>
@@ -36,7 +41,7 @@ Info.propTypes = {
     phone: PropTypes.string,
   }).isRequired,
   isMe: PropTypes.bool.isRequired,
-  openInfoUpdate: PropTypes.func.isRequired,
+  openInfoUpdate: PropTypes.func,
 };
 Info.defaultProps = {
   birthday: '',

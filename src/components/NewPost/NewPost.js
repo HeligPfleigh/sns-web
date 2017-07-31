@@ -162,26 +162,17 @@ class NewPost extends React.Component {
             <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
           <Col className="pull-right" style={{ marginRight: '15px' }}>
-            {/* {displayPrivacy && <FormControl
-              onChange={this.onChangePrivacy}
-              defaultValue={privacy[0]}
-              componentClass="select"
-              title="Ai có thể đọc bài viết của bạn"
-            >
-              {privacy.map(item => (
-                <option key={item} value={item}>{item === 'PUBLIC' ? 'Công khai' : (item === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}</option>
-              ))}
-            </FormControl>} */}
             {displayPrivacy && <Dropdown id={idRandom()}>
               <Dropdown.Toggle>
                 <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
               </Dropdown.Toggle>
               <Dropdown.Menu onSelect={this.onChangePrivacy}>
-                { privacy.map(item => { let _id = idRandom(); return (
-                  <MenuItem eventKey={item.name} id={ _id } key={ _id }>
-                    <Glyphicon className={s.glyphicon} glyph={item.glyph} />{item.name}
+                {privacy.map(item => (
+                  <MenuItem key={item.name} eventKey={item.name}>
+                    <Glyphicon className={s.glyphicon} glyph={item.glyph} />
+                    {item.name === 'PUBLIC' ? 'Công khai' : (item.name === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}
                   </MenuItem>
-                )}) }
+                ))}
               </Dropdown.Menu>
             </Dropdown>}
           </Col>

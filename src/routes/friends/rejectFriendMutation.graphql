@@ -1,0 +1,5 @@
+mutation rejectFriend ($userId: String!) {
+  rejectFriend(_id: $userId) {
+    _id
+  }
+}

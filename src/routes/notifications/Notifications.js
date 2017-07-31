@@ -16,7 +16,7 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 
-import FriendSuggestions from '../../components/FriendSuggestions';
+import FriendSuggestions from '../FriendSuggestions';
 import { NotificationList } from '../../components/Notification';
 import Loading from '../../components/Loading';
 import s from './Notifications.scss';

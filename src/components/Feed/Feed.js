@@ -7,6 +7,7 @@ import {
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
+import includes from 'lodash/includes';
 import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -79,6 +80,19 @@ class Feed extends Component {
     }
   }
 
+  onSelectShareButton = (eventKey, event) => {
+    event.preventDefault();
+    const {
+      data: {
+        _id,
+      },
+      sharingPostEvent = doNothing,
+    } = this.props;
+    if (eventKey && includes([PUBLIC, FRIEND, ONLY_ME], eventKey)) {
+      sharingPostEvent(_id, eventKey);
+    }
+  }
+
   editPostHandler = (value) => {
     const {
       data: {
@@ -93,17 +107,6 @@ class Feed extends Component {
     this.setState({
       isEdit: false,
     });
-  }
-
-  sharingPostEvent = (evt) => {
-    evt.preventDefault();
-    const {
-      data: {
-        _id,
-      },
-      sharingPostEvent,
-    } = this.props;
-    sharingPostEvent(_id);
   }
 
   render() {
@@ -229,7 +232,18 @@ class Feed extends Component {
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
           <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-          <Icon onClick={this.sharingPostEvent} title="Chia sẻ" icons="fa fa-share fa-lg" />
+          <Dropdown id={idRandom()}>
+            <CustomToggle bsRole="toggle">
+              <span title="Chia sẻ">
+                <i className="fa fa-share fa-lg" aria-hidden="true"></i> Chia sẻ
+              </span>
+            </CustomToggle>
+            <Dropdown.Menu onSelect={this.onSelectShareButton}>
+              <MenuItem eventKey={PUBLIC}>Chi sẻ công khai</MenuItem>
+              <MenuItem eventKey={FRIEND}>Chia sẻ với bạn bè</MenuItem>
+              <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
+            </Dropdown.Menu>
+          </Dropdown>
         </PostActions>
         <PostContent className={s.commentPanel}>
           <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
@@ -461,8 +475,8 @@ Feed.mutation = {
     }
   }
   `,
-  sharingPost: gql`mutation sharingPost ($_id: String!) {
-    sharingPost(_id: $_id) {
+  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!) {
+    sharingPost(_id: $_id, privacy: $privacy) {
       ...PostView
     }
   }

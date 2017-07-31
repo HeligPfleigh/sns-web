@@ -8,7 +8,7 @@ import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import { generate as idRandom } from 'shortid';
-import FriendSuggestions from '../../components/FriendSuggestions';
+import FriendSuggestions from '../FriendSuggestions';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
@@ -184,18 +184,15 @@ export default compose(
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              // totalNotification: 0,
             },
             author: {
               __typename: 'Author',
               _id: ownProps.data.me._id,
               username: ownProps.data.me.username,
               profile: ownProps.data.me.profile,
-              // totalNotification: 0,
             },
             sharing: null,
             building: null,
-            sharing: null,
             privacy,
             comments: [],
             createdAt: (new Date()).toString(),
@@ -345,8 +342,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: homePageQuery });

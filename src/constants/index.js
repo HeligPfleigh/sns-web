@@ -3,11 +3,14 @@
 export const HANDLE_REGEX = /@[\w\d]+/g;
 export const HASHTAG_REGEX = /#[\w\d]+/g;
 
+export const MALE = 'MALE';
+export const FEMALE = 'FEMALE';
+export const GENDER = [MALE, FEMALE];
+
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
 
 export const SET_RUNTIME_VARIABLE = 'SET_RUNTIME_VARIABLE';
-
 export const POST_TYPES = ['STATUS', 'EVENT'];
 
 export const LIKES = 'LIKES';
@@ -51,3 +54,6 @@ export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME];
 // Feed Actions
 export const DELETE_POST_ACTION = 'DELETE_POST_ACTION';
 export const EDIT_POST_ACTION = 'EDIT_POST_ACTION';
+
+export const OPEN_ALERT_GLOBAL = 'sns/OPEN_ALERT_GLOBAL';
+export const LOAD_PROFILE = 'sns/Me/LOAD_PROFILE';

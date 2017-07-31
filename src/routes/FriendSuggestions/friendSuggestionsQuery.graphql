@@ -1,0 +1,21 @@
+query friendSuggestionsQuery ($_id: String!, $cursor: String, $limit: Int) {
+  resident(_id: $_id) {
+    _id,
+    friendSuggestions (cursor: $cursor, limit: $limit) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        _id
+        profile {
+          firstName
+          lastName
+          picture
+        }
+      }
+    }
+  }
+}
