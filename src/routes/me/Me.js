@@ -120,7 +120,7 @@ class Me extends React.Component {
                 <Image className={s.image} src={imageSrc} />
                 <div className={s.userName} >
                   <Image className={s.avartar} src={avatar} />
-                  {profile && (<h1> {profile.lastName} {profile.firstName}</h1>)}
+                  {profile && (<h1>{profile.firstName} {profile.lastName}</h1>)}
                 </div>
               </div>
               <div className={s.infors}>
