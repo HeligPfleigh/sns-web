@@ -27,6 +27,8 @@ import BuildingAnnouncementList, {
 import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
 import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
+import DeleteBuildingAnnouncementModal from './DeleteBuildingAnnouncementModal';
+import EditBuildingAnnouncementModal from './EditBuildingAnnouncementModal';
 import Errors from './Errors';
 import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
@@ -101,6 +103,10 @@ class Building extends Component {
     this.state = {
       errorMessage: '',
       activeTab: POST_TAB,
+      showDeleteAnnouncement: false,
+      showEditAnnouncement: false,
+      idDeleteAnnouncemen: null,
+      idEditAnnouncement: null,
     };
   }
 
@@ -128,11 +134,38 @@ class Building extends Component {
   }
 
   deleteAnnouncement = (id) => {
+    this.setState(() => ({
+      showDeleteAnnouncement: true,
+      idDeleteAnnouncemen: id,
+    }));
     console.log(id);
   }
 
   editAnnouncement = (id) => {
+    this.setState(() => ({
+      showEditAnnouncement: true,
+      idEditAnnouncement: id,
+    }));
     console.log(id);
+  }
+
+  onClickModal = (evt) => {
+    evt.preventDefault();
+    this.closeModal();
+  }
+
+  closeModal = () => {
+    const { idDeleteAnnouncemen, idEditAnnouncement } = this.state;
+    if (idDeleteAnnouncemen) {
+      this.setState(() => ({
+        showDeleteAnnouncement: false,
+      }));
+    }
+    if (idEditAnnouncement) {
+      this.setState(() => ({
+        showEditAnnouncement: false,
+      }));
+    }
   }
 
   render() {
@@ -148,7 +181,6 @@ class Building extends Component {
       editPost,
       sharingPost,
     } = this.props;
-    console.log(this.props, 'this.props');
 
     let tab = POST_TAB;
     if (query.tab) {
@@ -173,9 +205,10 @@ class Building extends Component {
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
                   Thông báo
                 </NavItem>}
-                { building && building.isAdmin && <NavItem
-                  title="Yêu cầu kết nối" eventKey={REQUEST_TAB}
-                > Yêu cầu </NavItem> }
+                { building && building.isAdmin && <NavItem title="Yêu cầu kết nối" eventKey={REQUEST_TAB}>
+                  <i className="fa fa-question-circle" aria-hidden="true"></i>
+                  Yêu cầu
+                </NavItem> }
               </Nav>
             </Col>
             <Col sm={7}>
@@ -219,7 +252,6 @@ class Building extends Component {
                   </Panel>
                   <Panel>
                     <BuildingAnnouncementList>
-                      <BuildingAnnouncementHeader />
                       {
                         building && building.announcements && building.announcements.edges.map(a =>
                           <BuildingAnnouncementItem
@@ -232,6 +264,16 @@ class Building extends Component {
                       }
                     </BuildingAnnouncementList>
                   </Panel>
+                  <DeleteBuildingAnnouncementModal
+                    show={this.state.showDeleteAnnouncement}
+                    closeModal={this.closeModal}
+                    clickModal={this.onClickModal}
+                  />
+                  <EditBuildingAnnouncementModal
+                    show={this.state.showEditAnnouncement}
+                    closeModal={this.closeModal}
+                    clickModal={this.onClickModal}
+                  />
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
                   <FriendList>
