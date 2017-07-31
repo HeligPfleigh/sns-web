@@ -189,7 +189,7 @@ class Building extends Component {
                 </Tab.Pane>
                 { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
                   <Panel>
-                    <NewAnnouncement />
+                    <NewAnnouncement buildingId={building._id} />
                   </Panel>
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>

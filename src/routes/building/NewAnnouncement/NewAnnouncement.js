@@ -1,42 +1,75 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { graphql, compose } from 'react-apollo';
+import { connect } from 'react-redux';
+import { reset } from 'redux-form';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import NewAnnouncementForm from './NewAnnouncementForm';
 import {
-  FormGroup,
-  ControlLabel,
-  FormControl,
-  Button,
-} from 'react-bootstrap';
+  TYPE1,
+} from '../../../constants';
+import { openAlertGlobal } from '../../../reducers/alert';
+import createNewBuildingAnnouncementMutation from './createNewBuildingAnnouncementMutation.graphql';
 import s from './NewAnnouncement.scss';
 
 class NewAnnouncement extends Component {
 
+  submit = (values) => {
+    const {
+      type = TYPE1,
+      message,
+    } = values;
+    this.props.createNewBuildingAnnouncement(type, message)
+    .then(({ data }) => {
+      console.log('got data', data);
+      this.props.resetForm();
+      this.props.openAlertGlobalAction({
+        message: 'Bạn đã đăng thông báo thành công',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
+  }
+
   render() {
     return (
-      <form>
-        <FormGroup controlId="formControlsSelect">
-          <ControlLabel>Kiểu thông báo</ControlLabel>
-          <FormControl componentClass="select" placeholder="select">
-            <option value="type01">Kiểu thông báo 01</option>
-            <option value="type02">Kiểu thông báo 02</option>
-          </FormControl>
-        </FormGroup>
-        <FormGroup>
-          <ControlLabel>Tiêu đề</ControlLabel>
-          <FormControl
-            type="text"
-            placeholder="Tiêu đề của thông báo"
-          />
-        </FormGroup>
-        <Button bsStyle="primary" style={{ float: 'right' }}>
-          Đăng thông báo
-        </Button>
-      </form>
+      <NewAnnouncementForm
+        onSubmit={this.submit}
+      />
     );
   }
 }
 
 NewAnnouncement.propTypes = {
+  createNewBuildingAnnouncement: PropTypes.func.isRequired,
+  buildingId: PropTypes.string.isRequired,
+  openAlertGlobalAction: PropTypes.func,
+  resetForm: PropTypes.func,
 };
 
-export default withStyles(s)(NewAnnouncement);
+export default compose(
+  withStyles(s),
+  graphql(createNewBuildingAnnouncementMutation, {
+    props: ({ ownProps, mutate }) => ({
+      createNewBuildingAnnouncement: (type, message) => mutate({
+        variables: {
+          input: {
+            buildingId: ownProps.buildingId,
+            announcementInput: {
+              type,
+              message,
+            },
+          },
+        },
+      }),
+    }),
+  }),
+)(connect(
+  null,
+  dispatch => ({
+    openAlertGlobalAction: data => dispatch(openAlertGlobal(data)),
+    resetForm: () => dispatch(reset('newAnnouncementForm')),
+  }),
+)(NewAnnouncement));
