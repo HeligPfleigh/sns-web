@@ -430,6 +430,7 @@ export default compose(
             query: loadBuildingQuery,
             variables: {
               buildingId: ownProps.buildingId,
+              limit: 1000, // FIXME: paging
             },
           });
           data = update(data, {
@@ -444,6 +445,7 @@ export default compose(
             query: loadBuildingQuery,
             variables: {
               buildingId: ownProps.buildingId,
+              limit: 1000, // FIXME: paging
             },
             data,
           });
@@ -528,7 +530,7 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.editPost, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       editPost: (postId, message) => mutate({
         variables: { postId, message },
         optimisticResponse: {
@@ -541,7 +543,13 @@ export default compose(
         },
         update: (store, { data: { editPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: loadBuildingQuery });
+          let data = store.readQuery({
+            query: loadBuildingQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+              limit: 1000, // FIXME: paging
+            },
+          });
           const newMessage = editPost.message;
           const index = data.building.posts.findIndex(item => item._id === postId);
           const currentPost = data.building.posts[index];
@@ -556,7 +564,14 @@ export default compose(
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: loadBuildingQuery, data });
+          store.writeQuery({
+            query: loadBuildingQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+              limit: 1000, // FIXME: paging
+            },
+            data,
+          });
         },
       }),
     }),
