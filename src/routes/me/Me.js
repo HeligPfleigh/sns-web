@@ -15,7 +15,7 @@ import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
 import FeedList from './FeedList';
-import { MY_TIME_LINE, MY_INFO } from '../../constants';
+import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
@@ -399,8 +399,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery, variables: {} });
