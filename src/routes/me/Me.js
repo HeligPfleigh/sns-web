@@ -352,31 +352,11 @@ export default compose(
             ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
         },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
-          const newMessage = editPost.message;
-          const index = data.feeds.edges.findIndex(item => item._id === post._id);
-          const currentPost = data.feeds.edges[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-            sharing: editPost.sharing,
-          });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: profilePageQuery, data });
-        },
       }),
     }),
   }),
   graphql(Feed.mutation.deletePost, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       deletePost: postId => mutate({
         variables: { _id: postId },
         optimisticResponse: {
@@ -388,22 +368,37 @@ export default compose(
         },
         update: (store, { data: { deletePost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+          });
           data = update(data, {
             resident: {
               posts: {
-                $unset: [deletePost._id],
+                edges: {
+                  $unset: [deletePost._id],
+                },
               },
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: profilePageQuery, data });
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+            data,
+          });
         },
       }),
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       sharingPost: (postId, privacy) => mutate({
         variables: {
           _id: postId,
@@ -411,15 +406,30 @@ export default compose(
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery, variables: {} });
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+          });
           data = update(data, {
             resident: {
               posts: {
-                $unshift: [sharingPost],
+                edges: {
+                  $unshift: [sharingPost],
+                },
               },
             },
           });
-          store.writeQuery({ query: profilePageQuery, variables: {}, data });
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+            data,
+          });
         },
       }),
     }),
@@ -448,8 +458,8 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            const index = previousResult.resident.posts.findIndex(item => item._id === postId);
-            const currentPost = previousResult.resident.posts[index];
+            const index = previousResult.resident.posts.edges.findIndex(item => item._id === postId);
+            const currentPost = previousResult.resident.posts.edges[index];
 
             let updatedPost = null;
             if (currentPost._id !== postId) {
@@ -483,7 +493,9 @@ export default compose(
             return update(previousResult, {
               resident: {
                 posts: {
-                  $splice: [[index, 1, updatedPost]],
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
                 },
               },
             });
