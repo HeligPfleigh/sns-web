@@ -554,19 +554,13 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.editPost, {
-<<<<<<< HEAD
     props: ({ ownProps, mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
-=======
-    props: ({ mutate }) => ({
       editPost: (post, isDelPostSharing) => mutate({
         variables: {
           postId: post._id,
           message: post.message,
           isDelPostSharing,
         },
->>>>>>> b96f4a2630dfb8d34bd32a5ca1ee7cb16b32889c
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
@@ -574,39 +568,6 @@ export default compose(
             ...post,
             ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
-        },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: loadBuildingQuery,
-            variables: {
-              buildingId: ownProps.buildingId,
-              limit: 1000, // FIXME: paging
-            },
-          });
-          const newMessage = editPost.message;
-          const index = data.feeds.edges.findIndex(item => item._id === post._id);
-          const currentPost = data.feeds.edges[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-            sharing: editPost.sharing,
-          });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: loadBuildingQuery,
-            variables: {
-              buildingId: ownProps.buildingId,
-              limit: 1000, // FIXME: paging
-            },
-            data,
-          });
         },
       }),
     }),

@@ -324,26 +324,6 @@ export default compose(
             ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
         },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: homePageQuery });
-          const newMessage = editPost.message;
-          const index = data.feeds.edges.findIndex(item => item._id === post._id);
-          const currentPost = data.feeds.edges[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-            sharing: editPost.sharing,
-          });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: homePageQuery, data });
-        },
       }),
     }),
   }),

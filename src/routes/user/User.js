@@ -93,6 +93,7 @@ class User extends Component {
                     userInfo={me}
                     loadMoreComments={this.props.loadMoreComments}
                     createNewComment={this.props.createNewComment}
+                    editPost={this.props.editPost}
                     sharingPost={this.props.sharingPost}
                   />}
                 </div>
@@ -121,6 +122,7 @@ User.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   query: PropTypes.object.isRequired,
+  editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
 };
 
@@ -317,26 +319,6 @@ export default compose(
             ...post,
             ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
-        },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: usersPageQuery });
-          const newMessage = editPost.message;
-          const index = data.feeds.edges.findIndex(item => item._id === post._id);
-          const currentPost = data.feeds.edges[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-            sharing: editPost.sharing,
-          });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: usersPageQuery, data });
         },
       }),
     }),
