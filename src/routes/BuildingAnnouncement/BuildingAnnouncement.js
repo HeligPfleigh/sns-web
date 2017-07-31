@@ -12,7 +12,11 @@ import s from './BuildingAnnouncement.scss';
 
 class BuildingAnnouncement extends Component {
   render() {
-    const { data: { loading, resident: { building } } } = this.props;
+    const { data: { loading, resident } } = this.props;
+    let building = null;
+    if (resident) {
+      building = resident.building;
+    }
     return (
       <div>
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}

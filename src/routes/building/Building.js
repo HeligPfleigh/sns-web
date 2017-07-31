@@ -24,12 +24,8 @@ import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql
 import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import Errors from './Errors';
-<<<<<<< Updated upstream
-=======
 import NewAnnouncement from './NewAnnouncement';
 import BuildingAnnouncement from './BuildingAnnouncement';
-import s from './Building.scss';
->>>>>>> Stashed changes
 import Sponsored from './Sponsored';
 import s from './Building.scss';
 
@@ -37,8 +33,6 @@ const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const REQUEST_TAB = 'REQUEST_TAB';
-const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
-
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!) {
     building (_id: $buildingId) {
@@ -149,16 +143,13 @@ class Building extends Component {
                   <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
                 </NavItem>
-                <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
+                { building && building.isAdmin && <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
                   Thông báo
-                </NavItem>
+                </NavItem>}
                 { building && building.isAdmin && <NavItem
                   title="Yêu cầu kết nối" eventKey={REQUEST_TAB}
                 > Yêu cầu </NavItem> }
-                { building && building.isAdmin && <NavItem
-                  title="Thông báo" eventKey={ANNOUNCEMENT_TAB}
-                > Thông báo </NavItem> }
               </Nav>
             </Col>
             <Col sm={7}>
@@ -196,13 +187,11 @@ class Building extends Component {
                     </Panel>
                   }
                 </Tab.Pane>
-                <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
-                  { building &&
-                    <Panel>
-                      <NewAnnouncement />
-                    </Panel>
-                  }
-                </Tab.Pane>
+                { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
+                  <Panel>
+                    <NewAnnouncement />
+                  </Panel>
+                </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
                   <FriendList>
                     <Errors
@@ -221,9 +210,6 @@ class Building extends Component {
                       )
                     }
                   </FriendList>
-                </Tab.Pane>}
-                { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
-                  123
                 </Tab.Pane>}
               </Tab.Content>
             </Col>
