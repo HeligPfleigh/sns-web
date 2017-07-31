@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { Button } from 'react-bootstrap';
 import moment from 'moment';
 import {
   TYPE1,
@@ -27,7 +28,7 @@ class BuildingAnnouncementItem extends Component {
       data,
     } = this.props;
     if (onDelete) {
-      onDelete(data._id);
+      onDelete(data._id, data.message);
     }
   }
 
@@ -45,13 +46,15 @@ class BuildingAnnouncementItem extends Component {
             <br />
             <small>{moment(data.date).format('HH:mm DD/MM/YYYY')}</small>
           </div>
-          { displayAction && <div className="pull-right">
-            <a className="btn btn-xs btn-white" onClick={this.edit}>
-              <i className="fa fa-thumbs-up"></i>Edit
-            </a>
-            <a className="btn btn-xs btn-white" onClick={this.delete}>
-              <i className="fa fa-thumbs-up"></i>Delete
-            </a>
+          { displayAction && <div className={s.buildingAnnouncementButtons}>
+            <Button
+              bsStyle="primary"
+              onClick={this.edit}
+              style={{ marginRight: '5px' }}
+            >
+              Edit
+            </Button>
+            <Button bsStyle="primary" onClick={this.delete} >Delete</Button>
           </div>
           }
         </div>

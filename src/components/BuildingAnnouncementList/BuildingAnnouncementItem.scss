@@ -1,10 +1,12 @@
 .buildingAnnouncementItem {
-  display: flex;
-  align-items: center;
+  // display: flex;
+  // align-items: center;
+  display: flow-root;
   padding: 1em;
   border-bottom: 1px solid #dedede;
   .buildingAnnouncementIcon {
     margin-right: 10px;
+    float: left;
     i {
       // background-color: #006400;
       color: #fff;
@@ -16,8 +18,34 @@
     }
   }
   .buildingAnnouncementInfo {
+    display: inline-block;
+    margin-top: 8px;
     small {
       color: #888888;
     }
+  }
+  .buildingAnnouncementButtons {
+    display: none;
+    float: right;
+    margin-top: 8px;
+  }
+  &:hover {
+    .buildingAnnouncementButtons {
+      display: block;
+      float: right;
+      margin-top: 8px;
+    }
+  };
+  @media (max-width: 992px) {
+    .buildingAnnouncementButtons {
+      text-align: left;
+      float: none;
+    }
+    &:hover {
+      .buildingAnnouncementButtons {
+        text-align: left;
+        float: none;
+      }
+    };
   }
 }

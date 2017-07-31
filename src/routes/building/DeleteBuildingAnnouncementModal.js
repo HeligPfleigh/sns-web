@@ -11,7 +11,7 @@ class DeleteBuildingAnnouncementModal extends Component {
         </Modal.Header>
         <Modal.Body>
           <p>
-            Bạn có muốn xóa thông báo này không?.
+            Bạn có muốn xóa thông báo &ldquo;{this.props.message}&rdquo; không?.
           </p>
         </Modal.Body>
         <Modal.Footer>
@@ -24,6 +24,7 @@ class DeleteBuildingAnnouncementModal extends Component {
 }
 
 DeleteBuildingAnnouncementModal.propTypes = {
+  message: PropTypes.string,
   show: PropTypes.bool,
   closeModal: PropTypes.func,
   clickModal: PropTypes.func,

@@ -180,10 +180,11 @@ class Building extends Component {
     history.push(`${pathname}?tab=${key}`);
   }
 
-  deleteAnnouncement = (id) => {
+  deleteAnnouncement = (id, message) => {
     this.setState(() => ({
       showDeleteAnnouncement: true,
       idDeleteAnnouncemen: id,
+      announcementMessage: message,
     }));
   }
 
@@ -284,21 +285,19 @@ class Building extends Component {
                       }}
                     />
                   </Panel>
-                  <Panel>
-                    <BuildingAnnouncementList>
-                      {
-                        building && building.announcements && building.announcements.edges.map(a =>
-                          <BuildingAnnouncementItem
-                            key={a._id}
-                            data={a}
-                            onDelete={this.deleteAnnouncement}
-                            onEdit={this.editAnnouncement}
-                            displayAction
-                          />,
-                        )
-                      }
-                    </BuildingAnnouncementList>
-                  </Panel>
+                  <BuildingAnnouncementList>
+                    {
+                      building && building.announcements && building.announcements.edges.map(a =>
+                        <BuildingAnnouncementItem
+                          key={a._id}
+                          data={a}
+                          onDelete={this.deleteAnnouncement}
+                          onEdit={this.editAnnouncement}
+                          displayAction
+                        />,
+                      )
+                    }
+                  </BuildingAnnouncementList>
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
                   <FriendList>
@@ -327,6 +326,7 @@ class Building extends Component {
           </Row>
         </Tab.Container>
         <DeleteBuildingAnnouncementModal
+          message={this.state.announcementMessage}
           show={this.state.showDeleteAnnouncement}
           closeModal={this.closeModal}
           clickModal={this.onClickDeleteModal}
@@ -554,11 +554,6 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.editPost, {
-<<<<<<< HEAD
-    props: ({ ownProps, mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
-=======
     props: ({ mutate }) => ({
       editPost: (post, isDelPostSharing) => mutate({
         variables: {
@@ -566,7 +561,6 @@ export default compose(
           message: post.message,
           isDelPostSharing,
         },
->>>>>>> b96f4a2630dfb8d34bd32a5ca1ee7cb16b32889c
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
