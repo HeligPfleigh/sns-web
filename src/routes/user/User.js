@@ -291,8 +291,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: () => {
           history.push('/');
         },

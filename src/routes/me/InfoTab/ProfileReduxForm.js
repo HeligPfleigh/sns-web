@@ -136,7 +136,7 @@ class ProfileForm extends Component {
 ProfileForm.propTypes = {
   load: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  submitting: PropTypes.func.isRequired,
+  submitting: PropTypes.bool.isRequired,
   firstName: PropTypes.string.isRequired,
   lastName: PropTypes.string.isRequired,
   gender: PropTypes.string.isRequired,
