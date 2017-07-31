@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
-import { DELETE_POST_ACTION } from '../../constants';
+import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
 import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
 
@@ -20,12 +20,13 @@ class FeedList extends Component {
       showSharingPost: false,
       idDeletedPost: null,
       idSharingPost: null,
+      privacyPost: PUBLIC,
     };
   }
 
   onClickModal = (evt) => {
     evt.preventDefault();
-    const { idDeletedPost, idSharingPost } = this.state;
+    const { idDeletedPost, idSharingPost, privacyPost } = this.state;
     const { openAlertGlobalAction } = this.props;
     this.closeModal();
     if (idDeletedPost) {
@@ -33,7 +34,7 @@ class FeedList extends Component {
     }
     if (idSharingPost) {
       this.props
-      .sharingPost(idSharingPost)
+      .sharingPost(idSharingPost, privacyPost)
       .then(({ data }) => {
         console.log('got data', data);
         openAlertGlobalAction({
@@ -83,10 +84,11 @@ class FeedList extends Component {
     this.updateStateModal(true);
   }
 
-  sharingPostEvent = (id) => {
+  sharingPostEvent = (id, privacy) => {
     this.setState(() => ({
       showSharingPost: true,
       idSharingPost: id,
+      privacyPost: privacy || PUBLIC,
     }));
   }
 
