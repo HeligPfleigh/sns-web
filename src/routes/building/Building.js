@@ -429,28 +429,33 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (post, isDelPostSharing) => mutate({
+        variables: {
+          postId: post._id,
+          message: post.message,
+          isDelPostSharing,
+        },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
+            ...{ __typename: 'Post' },
+            ...post,
+            ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
         },
         update: (store, { data: { editPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: loadBuildingQuery });
           const newMessage = editPost.message;
-          const index = data.building.posts.findIndex(item => item._id === postId);
-          const currentPost = data.building.posts[index];
+          const index = data.feeds.edges.findIndex(item => item._id === post._id);
+          const currentPost = data.feeds.edges[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
+            sharing: editPost.sharing,
           });
           data = update(data, {
-            building: {
-              posts: {
+            feeds: {
+              edges: {
                 $splice: [[index, 1, updatedPost]],
               },
             },
