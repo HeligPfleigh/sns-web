@@ -63,7 +63,7 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
+const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, photos: [String], $buildingId: String!) {
   createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
     ...PostView
   }
@@ -429,24 +429,27 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (postId, message, photos) => mutate({
+        variables: { postId, message, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
             __typename: 'Post',
             _id: postId,
             message,
+            photos,
           },
         },
         update: (store, { data: { editPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: loadBuildingQuery });
           const newMessage = editPost.message;
+          const newPhotos = editPost.photos;
           const index = data.building.posts.findIndex(item => item._id === postId);
           const currentPost = data.building.posts[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
+            photos: newPhotos,
           });
           data = update(data, {
             building: {

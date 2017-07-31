@@ -7,7 +7,7 @@ import {
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
+import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
@@ -79,14 +79,15 @@ class Feed extends Component {
     }
   }
 
-  editPostHandler = (value) => {
+  editPostHandler = (value, photos) => {
     const {
       data: {
         _id,
       },
       editPostEvent,
     } = this.props;
-    editPostEvent(_id, value);
+    console.log(photos);
+    editPostEvent(_id, value, photos);
   }
 
   closeEditPost = () => {
@@ -115,6 +116,7 @@ class Feed extends Component {
         author,
         totalLikes,
         isLiked,
+        photos,
         totalComments = 0,
         createdAt,
         comments = [],
@@ -213,10 +215,12 @@ class Feed extends Component {
         {isEdit &&
           <EditPost
             message={message}
+            photos={photos}
             onChange={this.editPostHandler}
             closeEditPost={this.closeEditPost}
           />
         }
+        {!sharing && !isEdit && photos && photos.length > 0 && <PostPhotos images={photos} />}
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
@@ -404,6 +408,7 @@ Feed.fragments = {
       isLiked
       createdAt
       privacy
+      photos
       comments (limit: 2) {
         _id
         message
@@ -428,17 +433,18 @@ Feed.fragments = {
 };
 
 Feed.mutation = {
-  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String) {
-    createNewPost(message: $message, userId: $userId) {
+  createNewPost: gql`mutation createNewPost ($message: String!,  $photos: [String], $userId: String) {
+    createNewPost(message: $message, photos: $photos,userId: $userId) {
       ...PostView
     }
   }
   ${Feed.fragments.post}
   `,
-  editPost: gql`mutation editPost ($postId: String!, $message: String!) {
-    editPost(_id: $postId, message: $message) {
+  editPost: gql`mutation editPost ($postId: String!, $message: String!, $photos: [String]) {
+    editPost(_id: $postId, message: $message, photos: $photos) {
       _id
       message
+      photos
     }
   }`,
   likePost: gql`mutation likePost ($postId: String!) {

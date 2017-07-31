@@ -170,8 +170,8 @@ export default compose(
   }),
   graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: (message, privacy) => mutate({
-        variables: { message, privacy },
+      createNewPost: (message, privacy, photos) => mutate({
+        variables: { message, privacy, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -193,6 +193,7 @@ export default compose(
             sharing: null,
             building: null,
             privacy,
+            photos,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
@@ -307,24 +308,27 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (postId, message, photos) => mutate({
+        variables: { postId, message, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
             __typename: 'Post',
             _id: postId,
             message,
+            photos,
           },
         },
         update: (store, { data: { editPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: homePageQuery });
           const newMessage = editPost.message;
+          const newPhotos = editPost.photos;
           const index = data.feeds.edges.findIndex(item => item._id === postId);
           const currentPost = data.feeds.edges[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
+            photos: newPhotos,
           });
           data = update(data, {
             feeds: {

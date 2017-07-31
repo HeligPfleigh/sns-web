@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
+import ListImagePreview from '../ListImagePreview';
+import uploadImage from '../../utils/uploadImage';
 
 import {
   Editor,
@@ -79,6 +81,7 @@ class NewPost extends React.Component {
     editorState: EditorState.createEmpty(compositeDecorator),
     isSubmit: true,
     privacy: PUBLIC,
+    photos: [],
     glyph: 'globe',
   };
 
@@ -93,17 +96,33 @@ class NewPost extends React.Component {
   onSubmit = () => {
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     const { friend } = this.props;
+    const { photos } = this.state;
     if (friend) {
-      this.props.createNewPost(data, this.state.privacy, friend);
+      this.props.createNewPost(data, this.state.privacy, photos, friend);
     } else {
-      this.props.createNewPost(data, this.state.privacy);
+      this.props.createNewPost(data, this.state.privacy, photos);
     }
     this.setState(prevState => ({
       ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: true,
       privacy: PUBLIC,
+      photos: [],
     }));
+  }
+
+
+  onFilePicked = (input) => {
+    const { photos } = this.state;
+    Object.keys(input.target.files).forEach((key) => {
+      if (key !== 'length') {
+        photos.push(input.target.files[key]);
+      }
+    });
+    this.uploadImages(photos);
+    this.setState({
+      photos,
+    });
   }
 
   onChangePrivacy = (eventKey, evt) => {
@@ -128,10 +147,35 @@ class NewPost extends React.Component {
     }
   }
 
+  onDeleteImage = (index) => {
+    const { photos } = this.state;
+    photos.splice(index, 1);
+    this.setState({
+      photos,
+    });
+  }
+
+  uploadImages = (files) => {
+    files.forEach(async (file, index) => {
+      try {
+        if (typeof file !== 'string') {
+          const result = await uploadImage('http://localhost:3005/upload/image', file);
+          const { photos } = this.state;
+          photos[index] = result.url;
+          this.setState({
+            photos,
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
+  }
+
   focus = () => this.editor.focus();
 
   render() {
-    const { editorState, isSubmit, glyph } = this.state;
+    const { editorState, isSubmit, glyph, photos } = this.state;
     const { displayPrivacy, privacy } = this.props;
     return (
       <div className={s.newPostPanel}>
@@ -148,16 +192,42 @@ class NewPost extends React.Component {
               ref={(editor) => { this.editor = editor; }}
               spellCheck
             />
+            {
+              photos.length > 0 ?
+                <div
+                  className={s.listImagePreview}
+                >
+                  <ListImagePreview
+                    images={photos}
+                    onDeleteImage={this.onDeleteImage}
+                  />
+                </div> :
+                null
+            }
           </div>
         </Col>
         <Col className={s.newPostControl}>
           <Col className="pull-left">
-            <Button bsStyle="link" className={s.addPhoto} title="Đính kèm ảnh">
+            <Button
+              bsStyle="link"
+              className={s.addPhoto}
+              title="Đính kèm ảnh"
+              onClick={() => {
+                document.getElementById('fileInput').click();
+              }}
+            >
               <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
               <strong>Ảnh</strong>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="fileInput"
+                type="file"
+                onChange={this.onFilePicked}
+                multiple
+              />
             </Button>
           </Col>
-
           <Col className="pull-right">
             <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
@@ -217,8 +287,8 @@ NewPost.defaultProps = {
 
 NewPost.fragments = {};
 NewPost.mutation = {
-  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String, $privacy: PrivacyType) {
-    createNewPost(message: $message, userId: $userId, privacy: $privacy) {
+  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String, $privacy: PrivacyType, $photos: [String]) {
+    createNewPost(message: $message, userId: $userId, privacy: $privacy, photos: $photos) {
       ...PostView
     }
   }

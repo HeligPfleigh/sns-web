@@ -338,24 +338,27 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (postId, message, photos) => mutate({
+        variables: { postId, message, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
             __typename: 'Post',
             _id: postId,
             message,
+            photos,
           },
         },
         update: (store, { data: { editPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery });
           const newMessage = editPost.message;
+          const newPhotos = editPost.photos;
           const index = data.resident.posts.findIndex(item => item._id === postId);
           const currentPost = data.resident.posts[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
+            photos: newPhotos,
           });
           data = update(data, {
             resident: {
