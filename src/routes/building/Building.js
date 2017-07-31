@@ -25,6 +25,7 @@ import BuildingAnnouncementList, {
 } from '../../components/BuildingAnnouncementList';
 import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
 import deleteBuildingAnnouncementMutation from './deleteBuildingAnnouncementMutation.graphql';
+import updateBuildingAnnouncementMutation from './updateBuildingAnnouncementMutation.graphql';
 import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import DeleteBuildingAnnouncementModal from './DeleteBuildingAnnouncementModal';
@@ -126,6 +127,22 @@ class Building extends Component {
     });
   }
 
+  onClickEditModal = (message) => {
+    this.props.updateBuildingAnnouncement(
+      this.state.idEditAnnouncement,
+      message,
+    )
+    .then(({ data }) => {
+      console.log('got data', data);
+      this.closeModal();
+      this.setState(() => ({
+        idEditAnnouncement: null,
+      }));
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
+  }
+
   closeModal = () => {
     const { idDeleteAnnouncemen, idEditAnnouncement } = this.state;
     if (idDeleteAnnouncemen) {
@@ -170,7 +187,7 @@ class Building extends Component {
     }));
   }
 
-  editAnnouncement = (id, message, type ) => {
+  editAnnouncement = (id, message, type) => {
     this.setState(() => ({
       showEditAnnouncement: true,
       idEditAnnouncement: id,
@@ -276,23 +293,12 @@ class Building extends Component {
                             data={a}
                             onDelete={this.deleteAnnouncement}
                             onEdit={this.editAnnouncement}
+                            displayAction
                           />,
                         )
                       }
                     </BuildingAnnouncementList>
                   </Panel>
-                  <DeleteBuildingAnnouncementModal
-                    show={this.state.showDeleteAnnouncement}
-                    closeModal={this.closeModal}
-                    clickModal={this.onClickModal}
-                  />
-                  <EditBuildingAnnouncementModal
-                    message={this.state.announcementMessage}
-                    type={this.state.announcementType}
-                    show={this.state.showEditAnnouncement}
-                    closeModal={this.closeModal}
-                    clickModal={this.onClickModal}
-                  />
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
                   <FriendList>
@@ -326,9 +332,10 @@ class Building extends Component {
           clickModal={this.onClickDeleteModal}
         />
         <EditBuildingAnnouncementModal
+          message={this.state.announcementMessage}
           show={this.state.showEditAnnouncement}
           closeModal={this.closeModal}
-          clickModal={this.onClickModal}
+          clickModal={this.onClickEditModal}
         />
       </Grid>
     );
@@ -355,6 +362,7 @@ Building.propTypes = {
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   deleteBuildingAnnouncement: PropTypes.func.isRequired,
+  updateBuildingAnnouncement: PropTypes.func.isRequired,
 };
 
 Building.defaultProps = {
@@ -810,6 +818,21 @@ export default compose(
             },
             data,
           });
+        },
+      }),
+    }),
+  }),
+  graphql(updateBuildingAnnouncementMutation, {
+    props: ({ ownProps, mutate }) => ({
+      updateBuildingAnnouncement: (announcementId, message) => mutate({
+        variables: {
+          input: {
+            buildingId: ownProps.buildingId,
+            announcementId,
+            announcementInput: {
+              message,
+            },
+          },
         },
       }),
     }),

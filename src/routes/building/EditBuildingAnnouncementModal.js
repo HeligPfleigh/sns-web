@@ -5,7 +5,7 @@ class EditBuildingAnnouncementModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: '',
+      value: props.message,
     };
   }
 
@@ -15,9 +15,16 @@ class EditBuildingAnnouncementModal extends Component {
     });
   }
 
+  onClick = (evt) => {
+    evt.preventDefault();
+    this.props.clickModal(this.state.value);
+  }
+
   handleChange = (evt) => {
+    evt.preventDefault();
     this.setState({ value: evt.target.value });
   }
+
   render() {
     return (
       <Modal show={this.props.show} onHide={this.props.closeModal}>
@@ -26,13 +33,6 @@ class EditBuildingAnnouncementModal extends Component {
         </Modal.Header>
         <Modal.Body>
           <form>
-            <FormGroup controlId="formControlsSelect">
-              <ControlLabel>Select</ControlLabel>
-              <FormControl componentClass="select" placeholder="select">
-                <option value="TYPE1">TYPE1</option>
-                <option value="TYPE2">TYPE2</option>
-              </FormControl>
-            </FormGroup>
             <FormGroup>
               <ControlLabel>Message</ControlLabel>
               <FormControl
@@ -46,7 +46,7 @@ class EditBuildingAnnouncementModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeModal}>Hủy</Button>
-          <Button bsStyle="primary" onClick={this.props.clickModal}>Chỉnh sửa</Button>
+          <Button bsStyle="primary" onClick={this.onClick}>Chỉnh sửa</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -55,7 +55,6 @@ class EditBuildingAnnouncementModal extends Component {
 
 EditBuildingAnnouncementModal.propTypes = {
   message: PropTypes.string,
-  type: PropTypes.string,
   show: PropTypes.bool,
   closeModal: PropTypes.func,
   clickModal: PropTypes.func,

@@ -32,7 +32,7 @@ class BuildingAnnouncementItem extends Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, displayAction } = this.props;
 
     return (
       <li>
@@ -45,7 +45,7 @@ class BuildingAnnouncementItem extends Component {
             <br />
             <small>{moment(data.date).format('HH:mm DD/MM/YYYY')}</small>
           </div>
-          <div className="pull-right">
+          { displayAction && <div className="pull-right">
             <a className="btn btn-xs btn-white" onClick={this.edit}>
               <i className="fa fa-thumbs-up"></i>Edit
             </a>
@@ -53,6 +53,7 @@ class BuildingAnnouncementItem extends Component {
               <i className="fa fa-thumbs-up"></i>Delete
             </a>
           </div>
+          }
         </div>
       </li>
     );
@@ -63,6 +64,11 @@ BuildingAnnouncementItem.propTypes = {
   data: PropTypes.object,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
+  displayAction: PropTypes.bool,
+};
+
+BuildingAnnouncementItem.defaultProps = {
+  displayAction: false,
 };
 
 export default withStyles(s)(BuildingAnnouncementItem);
