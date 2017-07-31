@@ -11,7 +11,7 @@ class SharingPostModal extends Component {
         </Modal.Header>
         <Modal.Body>
           <p>
-            Bạn có muốn chia sẻ bài viết này với mọi người?
+            Bạn có muốn chia sẻ bài viết này?
           </p>
         </Modal.Body>
         <Modal.Footer>

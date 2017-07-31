@@ -13,6 +13,7 @@ import BuildingAnnouncement from '../BuildingAnnouncement';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import { PUBLIC } from '../../constants';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -343,8 +344,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: homePageQuery });
