@@ -2,8 +2,6 @@ mutation deleteBuildingAnnouncement($input: DeleteBuildingAnnouncementInput!) {
   deleteBuildingAnnouncement(input: $input) {
     announcement {
       _id
-      message
-      type
     }
   }
 }
