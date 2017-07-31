@@ -177,11 +177,11 @@ class NewPost extends React.Component {
                 <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
               </Dropdown.Toggle>
               <Dropdown.Menu onSelect={this.onChangePrivacy}>
-                {privacy.map(item => (
-                  <MenuItem eventKey={item.name}>
+                { privacy.map(item => { let _id = idRandom(); return (
+                  <MenuItem eventKey={item.name} id={ _id } key={ _id }>
                     <Glyphicon className={s.glyphicon} glyph={item.glyph} />{item.name}
                   </MenuItem>
-                ))}
+                )}) }
               </Dropdown.Menu>
             </Dropdown>}
           </Col>
