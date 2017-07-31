@@ -127,6 +127,14 @@ class Building extends Component {
     history.push(`${pathname}?tab=${key}`);
   }
 
+  deleteAnnouncement = (id) => {
+    console.log(id);
+  }
+
+  editAnnouncement = (id) => {
+    console.log(id);
+  }
+
   render() {
     const {
       data: { building, me },
@@ -217,6 +225,8 @@ class Building extends Component {
                           <BuildingAnnouncementItem
                             key={a._id}
                             data={a}
+                            onDelete={this.deleteAnnouncement}
+                            onEdit={this.editAnnouncement}
                           />,
                         )
                       }
