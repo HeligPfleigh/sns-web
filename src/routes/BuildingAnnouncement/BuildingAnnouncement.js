@@ -47,7 +47,6 @@ export default compose(
     options: ownProps => ({
       variables: {
         userId: ownProps.user.id,
-        cursor: null,
         limit: 3,
       },
       fetchPolicy: 'network-only',

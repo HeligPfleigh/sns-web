@@ -24,11 +24,18 @@ import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql
 import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import Errors from './Errors';
+<<<<<<< Updated upstream
+=======
+import NewAnnouncement from './NewAnnouncement';
+import BuildingAnnouncement from './BuildingAnnouncement';
+import s from './Building.scss';
+>>>>>>> Stashed changes
 import Sponsored from './Sponsored';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
+const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const REQUEST_TAB = 'REQUEST_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 
@@ -135,10 +142,16 @@ class Building extends Component {
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
                 <NavItem title="Tất cả bài viết" eventKey={POST_TAB}>
+                  <i className="fa fa-pencil" aria-hidden="true"></i>
                   Bài viết
                 </NavItem>
                 <NavItem title="Thông tin tòa nhà" eventKey={INFO_TAB}>
+                  <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
+                </NavItem>
+                <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
+                  <i className="fa fa-bullhorn" aria-hidden="true"></i>
+                  Thông báo
                 </NavItem>
                 { building && building.isAdmin && <NavItem
                   title="Yêu cầu kết nối" eventKey={REQUEST_TAB}
@@ -167,14 +180,26 @@ class Building extends Component {
                 <Tab.Pane eventKey={INFO_TAB}>
                   { building &&
                     <Panel>
-                      <h6>Thông tin</h6>
-                      <ul className="dc ayn">
-                        <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> { building.name }</li>
-                        <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> {building.address.country}</li>
-                        <li> {building.address.city} </li>
-                        <li> {building.address.state} </li>
-                        <li> {building.address.street} </li>
+                      <h3 className={s.informationBuildingHeader}>Thông Tin Chung Cư</h3>
+                      <div className={s.hrLine}></div>
+                      <ul className={s.informationBuilding}>
+                        <li>
+                          <strong>Tên Chung Cư</strong>
+                          <br />
+                          <p className={s.textMuted}>{ building.name }</p>
+                        </li>
+                        <li>
+                          <strong>Địa Chỉ Chung Cư</strong>
+                          <p className={s.textMuted}>{building.address.street} {building.address.state} {building.address.city} {building.address.country} </p>
+                        </li>
                       </ul>
+                    </Panel>
+                  }
+                </Tab.Pane>
+                <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
+                  { building &&
+                    <Panel>
+                      <NewAnnouncement />
                     </Panel>
                   }
                 </Tab.Pane>
