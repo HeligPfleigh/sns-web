@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './BuildingAnnouncementList.scss';
 
-export const BuildingAnnouncementList = ({ children }) => (
+const BuildingAnnouncementList = ({ children }) => (
   <div className={s.buildingAnnouncementList}>
     <ul>{children}</ul>
     <div className={s.buildingAnnouncementListFooter}>

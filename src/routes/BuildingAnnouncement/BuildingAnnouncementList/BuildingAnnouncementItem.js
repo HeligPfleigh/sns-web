@@ -7,7 +7,7 @@ import {
 } from '../../../constants';
 import s from './BuildingAnnouncementItem.scss';
 
-export const BuildingAnnouncementItem = ({ data }) => (
+const BuildingAnnouncementItem = ({ data }) => (
   <li>
     <div className={s.buildingAnnouncementItem}>
       <div className={s.buildingAnnouncementIcon}>
