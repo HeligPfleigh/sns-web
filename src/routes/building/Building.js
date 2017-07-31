@@ -554,7 +554,7 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.editPost, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       editPost: (post, isDelPostSharing) => mutate({
         variables: {
           postId: post._id,
