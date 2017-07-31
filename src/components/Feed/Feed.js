@@ -93,14 +93,9 @@ class Feed extends Component {
     }
   }
 
-  editPostHandler = (value) => {
-    const {
-      data: {
-        _id,
-      },
-      editPostEvent,
-    } = this.props;
-    editPostEvent(_id, value);
+  editPostHandler = (value, isDelPostSharing) => {
+    const { editPostEvent } = this.props;
+    editPostEvent(value, isDelPostSharing);
   }
 
   closeEditPost = () => {
@@ -195,12 +190,13 @@ class Feed extends Component {
                 </CustomToggle>
                 <Dropdown.Menu onSelect={this.onSelectRightEvent}>
                   <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
-                  {!sharing && <MenuItem divider /> }
-                  {!sharing && <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>}
+                  <MenuItem divider />
+                  <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>
                 </Dropdown.Menu>
               </Dropdown> : <div></div>
           }
         />
+        {message && !isEdit && <PostText html={message} /> }
         {sharing && !isEdit &&
           <SharingPost
             id={sharing._id}
@@ -212,10 +208,11 @@ class Feed extends Component {
             createdAt={sharing.createdAt}
           />
         }
-        {!sharing && !isEdit && <PostText html={message || {}} /> }
         {isEdit &&
           <EditPost
+            sharing={sharing || {}}
             message={message}
+            data={this.props.data}
             onChange={this.editPostHandler}
             closeEditPost={this.closeEditPost}
           />
@@ -449,12 +446,12 @@ Feed.mutation = {
   }
   ${Feed.fragments.post}
   `,
-  editPost: gql`mutation editPost ($postId: String!, $message: String!) {
-    editPost(_id: $postId, message: $message) {
-      _id
-      message
+  editPost: gql`mutation editPost ($postId: String!, $message: String!, $isDelPostSharing: Boolean!) {
+    editPost(_id: $postId, message: $message, isDelPostSharing: $isDelPostSharing) {
+      ...PostView
     }
-  }`,
+  }
+  ${Feed.fragments.post}`,
   likePost: gql`mutation likePost ($postId: String!) {
     likePost(_id: $postId) {
       ...PostView
