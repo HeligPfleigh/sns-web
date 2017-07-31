@@ -1,5 +1,6 @@
 query getFriendsQuery{
   me {
+    _id
     friends {
       _id
       profile {
@@ -8,6 +9,7 @@ query getFriendsQuery{
         firstName
         gender
       }
+      chatId
     }
   }
 }

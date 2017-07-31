@@ -11,6 +11,7 @@ import {
   CHAT_ON_CHANGE_ONLINE_STATE,
   CHAT_ON_NOTIFICATION,
   CHAT_ON_FAIL,
+  CHAT_ON_DIRECT_MESSAGE_ADD,
 } from '../constants';
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   conversations: [],
   messages: {},
   online: {},
+  directMessages: {},
 };
 export default function chat(state = initialState, action) {
   switch (action.type) {
@@ -45,6 +47,7 @@ export default function chat(state = initialState, action) {
         },
       };
     case CHAT_ACTIVE_CONVERSATION:
+      console.log(action.payload);
       return {
         ...state,
         newChat: {
@@ -125,6 +128,16 @@ export default function chat(state = initialState, action) {
         ...state,
         error: action.error,
       };
+
+    case CHAT_ON_DIRECT_MESSAGE_ADD: {
+      const currentDirectMessages = state.directMessages;
+      currentDirectMessages[action.payload.key] = action.payload.value;
+      return {
+        ...state,
+        directMessages: Object.assign({}, currentDirectMessages),
+      };
+    }
+
     default:
       return state;
   }

@@ -40,6 +40,7 @@ export const CHAT_ON_NOTIFICATION = 'CHAT_ON_NOTIFICATION';
 export const CHAT_ON_FAIL = 'CHAT_ON_FAIL';
 export const MY_TIME_LINE = 'MY_TIME_LINE';
 export const MY_INFO = 'MY_INFO';
+export const CHAT_ON_DIRECT_MESSAGE_ADD = 'CHAT_ON_DIRECT_MESSAGE_ADD';
 
 export const ADMIN = 'ADMIN';
 export const MEMBER = 'MEMBER';

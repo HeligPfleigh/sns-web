@@ -102,6 +102,14 @@ export class FirebaseProvider {
     }
     return null;
   }
+  onDirectMessages(cb) {
+    if (this.user) {
+      const ref = this.service.database().ref(`direct-message/${this.user.uid}`);
+      ref.on('child_added', (snapshot) => {
+        cb(null, snapshot.key, snapshot.val());
+      });
+    }
+  }
   onConversation(cb) {
     if (this.user) {
       const ref = this.service.database().ref('members/');
@@ -164,11 +172,9 @@ export class FirebaseProvider {
   }
 
   makeDirectMessage(sender, receiver, conversationId) {
-    if (sender.localCompare(receiver) === -1) {
-      this.service.database().ref(`direct-message/${sender}/${receiver}`).set(conversationId);
-    } else {
-      this.service.database().ref(`direct-message/${receiver}/${sender}`).set(conversationId);
-    }
+    this.service.database().ref(`direct-message/${sender}/${receiver}`).set(conversationId);
+
+    this.service.database().ref(`direct-message/${receiver}/${sender}`).set(conversationId);
   }
 
   async getDirectMessage(sender, receiver) {
