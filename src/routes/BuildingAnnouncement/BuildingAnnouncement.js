@@ -7,7 +7,7 @@ import buildingAnnouncementQuery from './buildingAnnouncementQuery.graphql';
 import BuildingAnnouncementList, {
   BuildingAnnouncementHeader,
   BuildingAnnouncementItem,
-} from './BuildingAnnouncementList';
+} from '../../components/BuildingAnnouncementList';
 import s from './BuildingAnnouncement.scss';
 
 class BuildingAnnouncement extends Component {

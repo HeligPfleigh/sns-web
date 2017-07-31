@@ -4,7 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import moment from 'moment';
 import {
   TYPE1,
-} from '../../../constants';
+} from '../../constants';
 import s from './BuildingAnnouncementItem.scss';
 
 const BuildingAnnouncementItem = ({ data }) => (
@@ -17,6 +17,10 @@ const BuildingAnnouncementItem = ({ data }) => (
         <strong>{data.message}</strong>
         <br />
         <small>{moment(data.date).format('HH:mm DD/MM/YYYY')}</small>
+      </div>
+      <div className="pull-right">
+        <a className="btn btn-xs btn-white"><i className="fa fa-thumbs-up"></i> Edit </a>
+        <a className="btn btn-xs btn-white"><i className="fa fa-thumbs-up"></i> Delete </a>
       </div>
     </div>
   </li>

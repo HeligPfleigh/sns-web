@@ -20,12 +20,15 @@ import NewPost from '../../components/NewPost';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
+import BuildingAnnouncementList, {
+  BuildingAnnouncementHeader,
+  BuildingAnnouncementItem,
+} from '../../components/BuildingAnnouncementList';
 import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
 import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import Errors from './Errors';
 import NewAnnouncement from './NewAnnouncement';
-import BuildingAnnouncement from './BuildingAnnouncement';
 import Sponsored from './Sponsored';
 import s from './Building.scss';
 
@@ -34,7 +37,7 @@ const INFO_TAB = 'INFO_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const REQUEST_TAB = 'REQUEST_TAB';
 const loadBuildingQuery = gql`
-  query loadBuildingQuery ($buildingId: String!) {
+  query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int) {
     building (_id: $buildingId) {
       _id
       name
@@ -46,6 +49,20 @@ const loadBuildingQuery = gql`
       }
       posts {
         ...PostView
+      }
+      announcements (skip: $skip, limit: $limit) {
+        pageInfo {
+          skip
+          hasNextPage
+          total
+          limit
+        }
+        edges {
+          _id
+          message
+          date
+          type
+        }
       }
       isAdmin
       requests {
@@ -123,6 +140,7 @@ class Building extends Component {
       editPost,
       sharingPost,
     } = this.props;
+    console.log(this.props, 'this.props');
 
     let tab = POST_TAB;
     if (query.tab) {
@@ -191,6 +209,19 @@ class Building extends Component {
                   <Panel>
                     <NewAnnouncement buildingId={building._id} />
                   </Panel>
+                  <Panel>
+                    <BuildingAnnouncementList>
+                      <BuildingAnnouncementHeader />
+                      {
+                        building && building.announcements && building.announcements.edges.map(a =>
+                          <BuildingAnnouncementItem
+                            key={a._id}
+                            data={a}
+                          />,
+                        )
+                      }
+                    </BuildingAnnouncementList>
+                  </Panel>
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
                   <FriendList>
@@ -256,6 +287,7 @@ export default compose(
     options: props => ({
       variables: {
         buildingId: props.buildingId,
+        limit: 1000, // FIXME: paging
       },
       fetchPolicy: 'network-only',
       // fetchPolicy: 'cache-and-network', ???
