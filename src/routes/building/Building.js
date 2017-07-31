@@ -107,6 +107,8 @@ class Building extends Component {
       showEditAnnouncement: false,
       idDeleteAnnouncemen: null,
       idEditAnnouncement: null,
+      announcementType: null,
+      announcementMessage: null,
     };
   }
 
@@ -141,10 +143,12 @@ class Building extends Component {
     console.log(id);
   }
 
-  editAnnouncement = (id) => {
+  editAnnouncement = (id, message, type ) => {
     this.setState(() => ({
       showEditAnnouncement: true,
       idEditAnnouncement: id,
+      announcementMessage: message,
+      announcementType: type,
     }));
     console.log(id);
   }
@@ -276,6 +280,8 @@ class Building extends Component {
                     clickModal={this.onClickModal}
                   />
                   <EditBuildingAnnouncementModal
+                    message={this.state.announcementMessage}
+                    type={this.state.announcementType}
                     show={this.state.showEditAnnouncement}
                     closeModal={this.closeModal}
                     clickModal={this.onClickModal}

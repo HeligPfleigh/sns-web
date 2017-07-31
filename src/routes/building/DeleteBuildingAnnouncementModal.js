@@ -16,7 +16,7 @@ class DeleteBuildingAnnouncementModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeModal}>Hủy</Button>
-          <Button bsStyle="primary" onClick={this.props.clickModal}>Xóa bài viết</Button>
+          <Button bsStyle="primary" onClick={this.props.clickModal}>Xóa thông báo</Button>
         </Modal.Footer>
       </Modal>
     );
