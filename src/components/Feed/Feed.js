@@ -8,7 +8,7 @@ import {
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
 import { noop, includes } from 'lodash';
-import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
+import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
@@ -93,9 +93,10 @@ class Feed extends Component {
     }
   }
 
-  editPostHandler = (value, isDelPostSharing) => {
+  // check process
+  editPostHandler = (value, photos, isDelPostSharing) => {
     const { editPostEvent } = this.props;
-    editPostEvent(value, isDelPostSharing);
+    editPostEvent(value, photos, isDelPostSharing);
   }
 
   closeEditPost = () => {
@@ -113,6 +114,7 @@ class Feed extends Component {
         author,
         totalLikes,
         isLiked,
+        photos,
         totalComments = 0,
         createdAt,
         comments = [],
@@ -218,6 +220,7 @@ class Feed extends Component {
             closeEditPost={this.closeEditPost}
           />
         }
+        {!sharing && !isEdit && photos && photos.length > 0 && <PostPhotos images={photos} />}
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
@@ -433,6 +436,7 @@ Feed.fragments = {
       isLiked
       createdAt
       privacy
+      photos
       comments (limit: 2) {
         _id
         message
@@ -457,15 +461,15 @@ Feed.fragments = {
 };
 
 Feed.mutation = {
-  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String) {
-    createNewPost(message: $message, userId: $userId) {
+  createNewPost: gql`mutation createNewPost ($message: String!,  $photos: [String], $userId: String) {
+    createNewPost(message: $message, photos: $photos,userId: $userId) {
       ...PostView
     }
   }
   ${Feed.fragments.post}
   `,
-  editPost: gql`mutation editPost ($postId: String!, $message: String!, $isDelPostSharing: Boolean!) {
-    editPost(_id: $postId, message: $message, isDelPostSharing: $isDelPostSharing) {
+  editPost: gql`mutation editPost ($postId: String!, $message: String!, $photos: [String], $isDelPostSharing: Boolean!) {
+    editPost(_id: $postId, message: $message, photos: $photos, isDelPostSharing: $isDelPostSharing) {
       ...PostView
     }
   }

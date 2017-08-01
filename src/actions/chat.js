@@ -11,6 +11,7 @@ import {
   CHAT_ON_CHANGE_ONLINE_STATE,
   CHAT_ON_NOTIFICATION,
   CHAT_ON_FAIL,
+  CHAT_ON_DIRECT_MESSAGE_ADD,
  } from '../constants';
 
 export function isLoad(state, conversationId) {
@@ -66,6 +67,7 @@ export function activeConversation({ conversation }) {
   return async (dispatch, getState, { chat }) => {
     try {
       if (conversation) {
+        console.log(conversation);
         const conversationId = Object.keys(conversation)[0];
         dispatch({
           type: CHAT_ACTIVE_CONVERSATION,
@@ -203,9 +205,34 @@ export function getFriendStatus(friend) {
   };
 }
 
+export function getDirectMessages() {
+  return (dispatch, chat) => {
+    try {
+      chat.onDirectMessages((err, key, value) => {
+        if (err) {
+          makeError(err);
+        } else {
+          dispatch({
+            type: CHAT_ON_DIRECT_MESSAGE_ADD,
+            payload: {
+              key,
+              value,
+            },
+          });
+        }
+      });
+    } catch (err) {
+      makeError(err);
+    }
+  };
+}
+
 export function getConversations() {
+  console.log('haha');
   return async (dispatch, getState, { chat }) => {
     try {
+      console.log(getState());
+      await auth(getState().user.chatToken)(dispatch, getState, { chat });
       if (isLoad(getState())) return;
       chat.onConversation((err, data) => {
         if (err) {
@@ -222,6 +249,7 @@ export function getConversations() {
             type: CHAT_ON_CONVERSATION_CHILD_ADD,
             payload: { [key]: value },
           });
+          getDirectMessages()(dispatch, chat);
           if (isLoad(getState(), key)) return;
           dispatch(getFriendStatus(value.receiver));
         }

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
@@ -19,16 +20,27 @@ import NewPost from '../../components/NewPost';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
+import BuildingAnnouncementList, {
+  BuildingAnnouncementItem,
+} from '../../components/BuildingAnnouncementList';
+import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
+import deleteBuildingAnnouncementMutation from './deleteBuildingAnnouncementMutation.graphql';
+import updateBuildingAnnouncementMutation from './updateBuildingAnnouncementMutation.graphql';
+import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
+import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
+import DeleteBuildingAnnouncementModal from './DeleteBuildingAnnouncementModal';
+import EditBuildingAnnouncementModal from './EditBuildingAnnouncementModal';
 import Errors from './Errors';
-import s from './Building.scss';
+import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
+import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
+const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const REQUEST_TAB = 'REQUEST_TAB';
-
 const loadBuildingQuery = gql`
-  query loadBuildingQuery ($buildingId: String!) {
+  query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int) {
     building (_id: $buildingId) {
       _id
       name
@@ -40,6 +52,20 @@ const loadBuildingQuery = gql`
       }
       posts {
         ...PostView
+      }
+      announcements (skip: $skip, limit: $limit) {
+        pageInfo {
+          skip
+          hasNextPage
+          total
+          limit
+        }
+        edges {
+          _id
+          message
+          date
+          type
+        }
       }
       isAdmin
       requests {
@@ -63,31 +89,12 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
-  createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
+const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $photos: [String], $buildingId: String!) {
+  createNewPostOnBuilding(message: $message, photos: $photos, buildingId: $buildingId) {
     ...PostView
   }
 }
 ${Feed.fragments.post}
-`;
-const deletePostOnBuildingMutation = gql`mutation deletePostOnBuilding ($postId: String!, $buildingId: String!) {
-  deletePostOnBuilding(postId: $postId, buildingId: $buildingId) {
-    _id
-  }
-}
-`;
-const acceptRequestForJoiningBuildingMutation = gql`mutation acceptRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
-  acceptRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
-    _id
-  }
-}
-`;
-
-const rejectRequestForJoiningBuildingMutation = gql`mutation rejectRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
-  rejectRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
-    _id
-  }
-}
 `;
 
 class Building extends Component {
@@ -97,7 +104,57 @@ class Building extends Component {
     this.state = {
       errorMessage: '',
       activeTab: POST_TAB,
+      showDeleteAnnouncement: false,
+      showEditAnnouncement: false,
+      idDeleteAnnouncemen: null,
+      idEditAnnouncement: null,
+      announcementType: null,
+      announcementMessage: null,
     };
+  }
+
+  onClickDeleteModal = (evt) => {
+    evt.preventDefault();
+    this.props.deleteBuildingAnnouncement(this.state.idDeleteAnnouncemen)
+    .then(({ data }) => {
+      console.log('got data', data);
+      this.closeModal();
+      this.setState(() => ({
+        idDeleteAnnouncemen: null,
+      }));
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
+  }
+
+  onClickEditModal = (message) => {
+    this.props.updateBuildingAnnouncement(
+      this.state.idEditAnnouncement,
+      message,
+    )
+    .then(({ data }) => {
+      console.log('got data', data);
+      this.closeModal();
+      this.setState(() => ({
+        idEditAnnouncement: null,
+      }));
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
+  }
+
+  closeModal = () => {
+    const { idDeleteAnnouncemen, idEditAnnouncement } = this.state;
+    if (idDeleteAnnouncemen) {
+      this.setState(() => ({
+        showDeleteAnnouncement: false,
+      }));
+    }
+    if (idEditAnnouncement) {
+      this.setState(() => ({
+        showEditAnnouncement: false,
+      }));
+    }
   }
 
   accept = friend => (evt) => {
@@ -123,6 +180,23 @@ class Building extends Component {
     history.push(`${pathname}?tab=${key}`);
   }
 
+  deleteAnnouncement = (id, message) => {
+    this.setState(() => ({
+      showDeleteAnnouncement: true,
+      idDeleteAnnouncemen: id,
+      announcementMessage: message,
+    }));
+  }
+
+  editAnnouncement = (id, message, type) => {
+    this.setState(() => ({
+      showEditAnnouncement: true,
+      idEditAnnouncement: id,
+      announcementMessage: message,
+      announcementType: type,
+    }));
+  }
+
   render() {
     const {
       data: { building, me },
@@ -136,7 +210,6 @@ class Building extends Component {
       editPost,
       sharingPost,
     } = this.props;
-
     let tab = POST_TAB;
     if (query.tab) {
       tab = query.tab;
@@ -144,20 +217,26 @@ class Building extends Component {
 
     return (
       <Grid>
-
         <Tab.Container onSelect={this.handleSelect} activeKey={tab}>
           <Row className="clearfix">
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
                 <NavItem title="Tất cả bài viết" eventKey={POST_TAB}>
+                  <i className="fa fa-pencil" aria-hidden="true"></i>
                   Bài viết
                 </NavItem>
                 <NavItem title="Thông tin tòa nhà" eventKey={INFO_TAB}>
+                  <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
                 </NavItem>
-                { building && building.isAdmin && <NavItem
-                  title="Yêu cầu kết nối" eventKey={REQUEST_TAB}
-                > Yêu cầu </NavItem>}
+                { building && building.isAdmin && <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
+                  <i className="fa fa-bullhorn" aria-hidden="true"></i>
+                  Thông báo
+                </NavItem>}
+                { building && building.isAdmin && <NavItem title="Yêu cầu kết nối" eventKey={REQUEST_TAB}>
+                  <i className="fa fa-question-circle" aria-hidden="true"></i>
+                  Yêu cầu
+                </NavItem> }
               </Nav>
             </Col>
             <Col sm={7}>
@@ -179,17 +258,47 @@ class Building extends Component {
                 <Tab.Pane eventKey={INFO_TAB}>
                   { building &&
                     <Panel>
-                      <h6>Thông tin</h6>
-                      <ul className="dc ayn">
-                        <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> { building.name }</li>
-                        <li><i className="fa fa-address-card-o" aria-hidden="true" ></i> {building.address.country}</li>
-                        <li> {building.address.city} </li>
-                        <li> {building.address.state} </li>
-                        <li> {building.address.street} </li>
+                      <h3 className={s.informationBuildingHeader}>Thông Tin Chung Cư</h3>
+                      <div className={s.hrLine}></div>
+                      <ul className={s.informationBuilding}>
+                        <li>
+                          <strong>Tên Chung Cư</strong>
+                          <br />
+                          <p className={s.textMuted}>{ building.name }</p>
+                        </li>
+                        <li>
+                          <strong>Địa Chỉ Chung Cư</strong>
+                          <p className={s.textMuted}>{building.address.street} {building.address.state} {building.address.city} {building.address.country} </p>
+                        </li>
                       </ul>
                     </Panel>
                   }
                 </Tab.Pane>
+                { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
+                  <Panel>
+                    <NewAnnouncement
+                      buildingId={building._id}
+                      query={loadBuildingQuery}
+                      param={{
+                        buildingId: building._id,
+                        limit: 1000,
+                      }}
+                    />
+                  </Panel>
+                  <BuildingAnnouncementList>
+                    {
+                      building && building.announcements && building.announcements.edges.map(a =>
+                        <BuildingAnnouncementItem
+                          key={a._id}
+                          data={a}
+                          onDelete={this.deleteAnnouncement}
+                          onEdit={this.editAnnouncement}
+                          displayAction
+                        />,
+                      )
+                    }
+                  </BuildingAnnouncementList>
+                </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
                   <FriendList>
                     <Errors
@@ -216,6 +325,18 @@ class Building extends Component {
             </Col>
           </Row>
         </Tab.Container>
+        <DeleteBuildingAnnouncementModal
+          message={this.state.announcementMessage}
+          show={this.state.showDeleteAnnouncement}
+          closeModal={this.closeModal}
+          clickModal={this.onClickDeleteModal}
+        />
+        <EditBuildingAnnouncementModal
+          message={this.state.announcementMessage}
+          show={this.state.showEditAnnouncement}
+          closeModal={this.closeModal}
+          clickModal={this.onClickEditModal}
+        />
       </Grid>
     );
   }
@@ -240,6 +361,8 @@ Building.propTypes = {
   // buildingId: PropTypes.string.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
+  deleteBuildingAnnouncement: PropTypes.func.isRequired,
+  updateBuildingAnnouncement: PropTypes.func.isRequired,
 };
 
 Building.defaultProps = {
@@ -254,6 +377,7 @@ export default compose(
     options: props => ({
       variables: {
         buildingId: props.buildingId,
+        limit: 1000, // FIXME: paging
       },
       fetchPolicy: 'network-only',
       // fetchPolicy: 'cache-and-network', ???
@@ -330,6 +454,7 @@ export default compose(
             query: loadBuildingQuery,
             variables: {
               buildingId: ownProps.buildingId,
+              limit: 1000, // FIXME: paging
             },
           });
           data = update(data, {
@@ -344,6 +469,7 @@ export default compose(
             query: loadBuildingQuery,
             variables: {
               buildingId: ownProps.buildingId,
+              limit: 1000, // FIXME: paging
             },
             data,
           });
@@ -433,6 +559,7 @@ export default compose(
         variables: {
           postId: post._id,
           message: post.message,
+          photos: post.photos || [],
           isDelPostSharing,
         },
         optimisticResponse: {
@@ -442,26 +569,6 @@ export default compose(
             ...post,
             ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
-        },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: loadBuildingQuery });
-          const newMessage = editPost.message;
-          const index = data.feeds.edges.findIndex(item => item._id === post._id);
-          const currentPost = data.feeds.edges[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-            sharing: editPost.sharing,
-          });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: loadBuildingQuery, data });
         },
       }),
     }),
@@ -631,6 +738,73 @@ export default compose(
                 },
               },
             });
+          },
+        },
+      }),
+    }),
+  }),
+
+  graphql(deleteBuildingAnnouncementMutation, {
+    props: ({ ownProps, mutate }) => ({
+      deleteBuildingAnnouncement: announcementId => mutate({
+        variables: {
+          input: {
+            buildingId: ownProps.buildingId,
+            announcementId,
+          },
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deleteBuildingAnnouncement: {
+            __typename: 'DeleteBuildingAnnouncementPayload',
+            announcement: {
+              __typename: 'BuildingAnnouncement',
+              _id: announcementId,
+            },
+          },
+        },
+        update: (store, { data: { deleteBuildingAnnouncement } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: loadBuildingQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+              limit: 1000,
+            },
+          });
+          const announcement = deleteBuildingAnnouncement.announcement;
+          data = update(data, {
+            building: {
+              announcements: {
+                edges: {
+                  $unset: [announcement._id],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: loadBuildingQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+              limit: 1000,
+            },
+            data,
+          });
+        },
+      }),
+    }),
+  }),
+  graphql(updateBuildingAnnouncementMutation, {
+    props: ({ ownProps, mutate }) => ({
+      updateBuildingAnnouncement: (announcementId, message) => mutate({
+        variables: {
+          input: {
+            buildingId: ownProps.buildingId,
+            announcementId,
+            announcementInput: {
+              message,
+            },
           },
         },
       }),

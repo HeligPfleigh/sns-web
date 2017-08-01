@@ -15,6 +15,8 @@ import {
 import isEmpty from 'lodash/isEmpty';
 import SharingPost from '../SharingPost';
 import s from './EditPost.scss';
+import ListImagePreview from '../../ListImagePreview';
+import uploadImage from '../../../utils/uploadImage';
 
 const styles = {
   editor: {
@@ -29,7 +31,7 @@ const styles = {
 class EditPost extends Component {
   constructor(props) {
     super(props);
-    const { data: { message } } = this.props;
+    const { data: { message, photos } } = this.props;
     let editorState = null;
     if (message) {
       const contentState = convertFromRaw(JSON.parse(message));
@@ -40,6 +42,7 @@ class EditPost extends Component {
     this.state = {
       editorState: editorState || EditorState.createEmpty(),
       isSubmit: true,
+      photos: Array.from(photos || []),
       isDelPostSharing: true,
     };
 
@@ -49,15 +52,56 @@ class EditPost extends Component {
     });
   }
 
+  onDeleteImage = (index) => {
+    const { photos } = this.state;
+    photos.splice(index, 1);
+    this.setState({
+      photos,
+      isSubmit: false,
+    });
+  }
+
+  onFilePicked = (input) => {
+    const { photos } = this.state;
+    Object.keys(input.target.files).forEach((key) => {
+      if (key !== 'length') {
+        photos.push(input.target.files[key]);
+      }
+    });
+    this.uploadImages(photos);
+    this.setState({
+      photos,
+      isSubmit: false,
+    });
+  }
+
+  uploadImages = (files) => {
+    files.forEach(async (file, index) => {
+      try {
+        if (typeof file !== 'string') {
+          const result = await uploadImage(file);
+          const { photos } = this.state;
+          photos[index] = result.url;
+          this.setState({
+            photos,
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
+  }
+
   onSubmit = (evt) => {
     evt.preventDefault();
     const { data: postData } = this.props;
     const { data: { message } } = this.props;
     const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (content === message) {
+    const { photos } = this.state;
+    if (content === message && photos === this.props.photos) {
       this.props.closeEditPost();
     } else {
-      const data = { ...postData, ...{ message: content } };
+      const data = { ...postData, ...{ message: content, photos: photos || [] } };
       this.props.onChange(data, this.state.isDelPostSharing);
     }
   }
@@ -72,7 +116,7 @@ class EditPost extends Component {
 
   render() {
     const { className, sharing } = this.props;
-    const { editorState, isSubmit, isDelPostSharing } = this.state;
+    const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
     const delBlockStyle = {
       position: 'absolute',
       zIndex: 1,
@@ -96,6 +140,18 @@ class EditPost extends Component {
               editorState={editorState} onChange={this.onChange}
               ref={(editor) => { this.editor = editor; }}
             />
+            {
+              photos.length > 0 ?
+                <div
+                  className={s.listImagePreview}
+                >
+                  <ListImagePreview
+                    images={photos}
+                    onDeleteImage={this.onDeleteImage}
+                  />
+                </div> :
+                null
+            }
           </div>
         </Col>
         {sharing && !isEmpty(sharing) && isDelPostSharing &&
@@ -113,6 +169,27 @@ class EditPost extends Component {
           </Col>
         }
         <Col style={{ borderTop: '1px solid #ddd', paddingTop: '10px' }}>
+          <Col className="pull-left">
+            <Button
+              bsStyle="link"
+              className={s.addPhoto}
+              title="Đính kèm ảnh"
+              onClick={() => {
+                document.getElementById('fileInputOnEdit').click();
+              }}
+            >
+              <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
+              <strong>Ảnh</strong>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="fileInputOnEdit"
+                type="file"
+                onChange={this.onFilePicked}
+                multiple
+              />
+            </Button>
+          </Col>
           <Col className="pull-right">
             <Button title="Chỉnh sửa xong" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
           </Col>

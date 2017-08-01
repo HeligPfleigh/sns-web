@@ -1,6 +1,7 @@
-mutation editPost ($postId: String!, $message: String!) {
-  editPost(_id: $postId, message: $message) {
+mutation editPost ($postId: String!, $message: String!, $photos: [String]) {
+  editPost(_id: $postId, message: $message, photos: $photos) {
     _id
     message
+    photos
   }
 }

@@ -40,6 +40,7 @@ export const CHAT_ON_NOTIFICATION = 'CHAT_ON_NOTIFICATION';
 export const CHAT_ON_FAIL = 'CHAT_ON_FAIL';
 export const MY_TIME_LINE = 'MY_TIME_LINE';
 export const MY_INFO = 'MY_INFO';
+export const CHAT_ON_DIRECT_MESSAGE_ADD = 'CHAT_ON_DIRECT_MESSAGE_ADD';
 
 export const ADMIN = 'ADMIN';
 export const MEMBER = 'MEMBER';
@@ -57,3 +58,10 @@ export const EDIT_POST_ACTION = 'EDIT_POST_ACTION';
 
 export const OPEN_ALERT_GLOBAL = 'sns/OPEN_ALERT_GLOBAL';
 export const LOAD_PROFILE = 'sns/Me/LOAD_PROFILE';
+
+export const TYPE1 = 'TYPE1';
+export const TYPE2 = 'TYPE2';
+export const ANNOUNCEMENT_TYPE = [TYPE1, TYPE2];
+
+export const RESOURCE_UPDATED_SUCCESSFULLY = 'RESOURCE_UPDATED_SUCCESSFULLY';
+export const RESOURCE_UPDATED_FAILURE = 'RESOURCE_UPDATED_FAILURE';

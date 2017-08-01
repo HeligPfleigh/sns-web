@@ -20,6 +20,7 @@ class ConversationList extends React.Component {
     user: PropTypes.object,
     newChat: PropTypes.object,
     current: PropTypes.string,
+    conversationId: PropTypes.string,
     conversations: PropTypes.array,
     activeNewChat: PropTypes.func.isRequired,
     getConversations: PropTypes.func.isRequired,
@@ -35,10 +36,15 @@ class ConversationList extends React.Component {
   }
 
   componentWillMount() {
-    const { user, getConversations, current, newChat, activeConversation, conversations } = this.props;
+    const { user, getConversations, current, newChat, activeConversation, conversations, conversationId } = this.props;
     if (user && user.uid) {
       getConversations();
-      if (!current && !newChat.active && conversations && conversations[0]) {
+      if (conversationId) {
+        const conversation = this.getConversationById(conversationId);
+        if (!current && !newChat.active && conversations && conversation) {
+          activeConversation(conversation);
+        }
+      } else if (!current && !newChat.active && conversations && conversations[0]) {
         activeConversation(conversations[0]);
       }
     }
@@ -49,12 +55,29 @@ class ConversationList extends React.Component {
     if (nextProps.user && nextProps.user !== user) {
       getConversations();
     }
-    if (nextProps.user && !current && !newChat.active && conversations && conversations[0]) {
+    if (nextProps.conversationId) {
+      const conversation = this.getConversationById(nextProps.conversationId);
+      if (nextProps.user && !current && !newChat.active && conversations && conversation) {
+        activeConversation({ conversation });
+      }
+    } else if (nextProps.user && !current && !newChat.active && conversations && conversations[0]) {
       activeConversation({ conversation: conversations[0] });
     }
   }
   componentWillUnmount() {
     this.props.activeConversation({});
+  }
+
+  getConversationById = (id) => {
+    const { conversations } = this.props;
+    for (let i = 0; i < conversations.length; i++) {
+      const element = conversations[i];
+      if (Object.keys(element)[0] === id) {
+        console.log('hihihihih');
+        return element;
+      }
+    }
+    return null;
   }
 
   handleActiveConversation = conversation => () => {
