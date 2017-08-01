@@ -9,10 +9,12 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import { generate as idRandom } from 'shortid';
 import FriendSuggestions from '../FriendSuggestions';
+import BuildingAnnouncement from '../BuildingAnnouncement';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import ChatSideBar from '../ChatSideBar';
+import { PUBLIC } from '../../constants';
 import s from './Home.scss';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
@@ -100,6 +102,7 @@ class Home extends Component {
           </Col>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={4} smHidden xsHidden>
+              <BuildingAnnouncement />
               <FriendSuggestions />
               <ChatSideBar />
             </Col>
@@ -172,8 +175,8 @@ export default compose(
   }),
   graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: (message, privacy) => mutate({
-        variables: { message, privacy },
+      createNewPost: (message, privacy, photos) => mutate({
+        variables: { message, privacy, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -195,6 +198,7 @@ export default compose(
             sharing: null,
             building: null,
             privacy,
+            photos,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
@@ -220,23 +224,23 @@ export default compose(
   }),
   graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments) => mutate({
+      likePost: (postId, message, totalLikes) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
             __typename: 'Post',
             _id: postId,
-            message,
-            totalLikes: totalLikes + 1,
-            totalComments,
-            isLiked: true,
           },
         },
         updateQueries: {
           homePageQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.likePost;
+            let updatedPost = mutationResult.data.likePost;
             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.user.posts[index], {
+              totalLikes: totalLikes + 1,
+              isLiked: true,
+            });
             return update(previousResult, {
               feeds: {
                 edges: {
@@ -266,8 +270,12 @@ export default compose(
         },
         updateQueries: {
           homePageQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.unlikePost;
+            let updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.user.posts[index], {
+              totalLikes: totalLikes - 1,
+              isLiked: false,
+            });
             return update(previousResult, {
               feeds: {
                 edges: {
@@ -293,7 +301,10 @@ export default compose(
         },
         update: (store, { data: { deletePost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: homePageQuery });
+          let data = store.readQuery({
+            query: homePageQuery,
+            variables: {},
+          });
           data = update(data, {
             feeds: {
               edges: {
@@ -302,52 +313,48 @@ export default compose(
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: homePageQuery, data });
+          store.writeQuery({
+            query: homePageQuery,
+            variables: {},
+            data,
+          });
         },
       }),
     }),
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (post, isDelPostSharing) => mutate({
+        variables: {
+          postId: post._id,
+          message: post.message,
+          photos: post.photos || [],
+          isDelPostSharing,
+        },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
+            ...{ __typename: 'Post' },
+            ...post,
+            ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
-        },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: homePageQuery });
-          const newMessage = editPost.message;
-          const index = data.feeds.edges.findIndex(item => item._id === postId);
-          const currentPost = data.feeds.edges[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-          });
-          data = update(data, {
-            feeds: {
-              edges: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: homePageQuery, data });
         },
       }),
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: homePageQuery });
+          let data = store.readQuery({
+            query: homePageQuery,
+            variables: {},
+          });
           data = update(data, {
             feeds: {
               edges: {
@@ -355,7 +362,11 @@ export default compose(
               },
             },
           });
-          store.writeQuery({ query: homePageQuery, data });
+          store.writeQuery({
+            query: homePageQuery,
+            variables: {},
+            data,
+          });
         },
       }),
     }),

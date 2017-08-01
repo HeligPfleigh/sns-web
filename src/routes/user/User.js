@@ -5,7 +5,6 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
-import history from '../../core/history';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
@@ -63,7 +62,7 @@ class User extends Component {
                 <Image className={s.image} src={imageSrc} />
                 <div className={s.userName} >
                   <Image className={s.avartar} src={avatar} />
-                  { profile && (<h1> {profile.lastName} {profile.firstName}</h1>) }
+                  { profile && (<h1>{profile.firstName} {profile.lastName}</h1>) }
                 </div>
               </div>
               <div className={s.infors}>
@@ -91,8 +90,10 @@ class User extends Component {
                     likePostEvent={this.props.likePost}
                     unlikePostEvent={this.props.unlikePost}
                     userInfo={me}
+                    deletePost={this.props.deletePost}
                     loadMoreComments={this.props.loadMoreComments}
                     createNewComment={this.props.createNewComment}
+                    editPost={this.props.editPost}
                     sharingPost={this.props.sharingPost}
                   />}
                 </div>
@@ -120,7 +121,9 @@ User.propTypes = {
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
+  deletePost: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
+  editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
 };
 
@@ -170,8 +173,8 @@ export default compose(
   }),
   graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: (message, privacy, friend) => mutate({
-        variables: { message, privacy, userId: friend._id },
+      createNewPost: (message, privacy, photos, friend) => mutate({
+        variables: { message, privacy, photos, userId: friend._id },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -194,6 +197,7 @@ export default compose(
             building: null,
             sharing: null,
             comments: [],
+            photos,
             createdAt: (new Date()).toString(),
             totalLikes: 0,
             totalComments: 0,
@@ -217,29 +221,23 @@ export default compose(
   }),
   graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments, user) => mutate({
+      likePost: (postId, message, totalLikes) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
             __typename: 'PostSchemas',
             _id: postId,
-            message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
-            },
-            totalLikes: totalLikes + 1,
-            totalComments,
-            isLiked: true,
           },
         },
         updateQueries: {
           usersPageQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.likePost;
+            let updatedPost = mutationResult.data.likePost;
             const index = previousResult.user.posts.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.user.posts[index], {
+              totalLikes: totalLikes + 1,
+              isLiked: true,
+            });
             return update(previousResult, {
               user: {
                 posts: {
@@ -254,29 +252,23 @@ export default compose(
   }),
   graphql(Feed.mutation.unlikePost, {
     props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments, user) => mutate({
+      unlikePost: (postId, message, totalLikes) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           unlikePost: {
             __typename: 'PostSchemas',
             _id: postId,
-            message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: user._id,
-              username: user.username,
-              profile: user.profile,
-            },
-            totalLikes: totalLikes - 1,
-            totalComments,
-            isLiked: false,
           },
         },
         updateQueries: {
           usersPageQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.unlikePost;
+            let updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.user.posts.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.user.posts[index], {
+              totalLikes: totalLikes - 1,
+              isLiked: false,
+            });
             return update(previousResult, {
               user: {
                 posts: {
@@ -291,10 +283,67 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.editPost, {
+    props: ({ mutate }) => ({
+      editPost: (post, isDelPostSharing) => mutate({
+        variables: {
+          postId: post._id,
+          message: post.message,
+          isDelPostSharing,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          editPost: {
+            ...{ __typename: 'Post' },
+            ...post,
+            ...{ sharing: isDelPostSharing ? post.sharing : null },
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.deletePost, {
+    props: ({ ownProps, mutate }) => ({
+      deletePost: postId => mutate({
         variables: { _id: postId },
-        update: () => {
-          history.push('/');
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deletePost: {
+            __typename: 'Post',
+            _id: postId,
+          },
+        },
+        update: (store, { data: { deletePost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: usersPageQuery,
+            variables: {
+              _id: ownProps.id,
+            },
+          });
+          data = update(data, {
+            user: {
+              posts: {
+                $unset: [deletePost._id],
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: usersPageQuery,
+            variables: {
+              _id: ownProps.id,
+            },
+            data,
+          });
         },
       }),
     }),

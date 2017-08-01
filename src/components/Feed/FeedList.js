@@ -1,9 +1,15 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
-import { DELETE_POST_ACTION } from '../../constants';
+import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
+import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
+
+function doNothing(e) {
+  e && e.preventDefault && e.preventDefault();
+}
 
 class FeedList extends Component {
 
@@ -14,18 +20,31 @@ class FeedList extends Component {
       showSharingPost: false,
       idDeletedPost: null,
       idSharingPost: null,
+      privacyPost: PUBLIC,
     };
   }
 
   onClickModal = (evt) => {
     evt.preventDefault();
-    const { idDeletedPost, idSharingPost } = this.state;
+    const { idDeletedPost, idSharingPost, privacyPost } = this.state;
+    const { openAlertGlobalAction } = this.props;
     this.closeModal();
     if (idDeletedPost) {
       this.props.deletePost(idDeletedPost);
     }
     if (idSharingPost) {
-      this.props.sharingPost(idSharingPost);
+      this.props
+      .sharingPost(idSharingPost, privacyPost)
+      .then(({ data }) => {
+        console.log('got data', data);
+        openAlertGlobalAction({
+          message: 'Bạn đã chia sẽ được thành công trên dòng thời gian của bạn',
+          open: true,
+          autoHideDuration: 0,
+        });
+      }).catch((error) => {
+        console.log('there was an error sending the query', error);
+      });
     }
   }
 
@@ -65,10 +84,11 @@ class FeedList extends Component {
     this.updateStateModal(true);
   }
 
-  sharingPostEvent = (id) => {
+  sharingPostEvent = (id, privacy) => {
     this.setState(() => ({
       showSharingPost: true,
       idSharingPost: id,
+      privacyPost: privacy || PUBLIC,
     }));
   }
 
@@ -80,7 +100,7 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
-      editPost,
+      editPost = doNothing,
     } = this.props;
     return (
       <div>
@@ -124,9 +144,13 @@ FeedList.propTypes = {
   userInfo: PropTypes.object.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
-  deletePost: PropTypes.func.isRequired,
-  editPost: PropTypes.func.isRequired,
+  deletePost: PropTypes.func,
+  editPost: PropTypes.func, // (user page)
   sharingPost: PropTypes.func.isRequired,
+  openAlertGlobalAction: PropTypes.func,
 };
 
-export default FeedList;
+export default connect(
+  null,
+  { openAlertGlobalAction: openAlertGlobal },
+)(FeedList);

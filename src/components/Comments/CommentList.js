@@ -116,7 +116,7 @@ const userFragment = gql`
   }
 `;
 
-const commentFragment = gql`fragment CommentView on Comment {
+const commentFragment = gql`fragment _CommentView on Comment {
     _id,
     message,
     user {
@@ -141,7 +141,7 @@ CommentList.fragments = {
           },
           parent,
           reply {
-            ...CommentView
+            ..._CommentView
           },
           updatedAt,
         }
@@ -163,9 +163,9 @@ CommentList.mutation = {
         message: $message,
         commentId: $commentId,
       ) {
-        ...CommentView
+        ..._CommentView
         reply {
-          ...CommentView
+          ..._CommentView
         },
       }
     }

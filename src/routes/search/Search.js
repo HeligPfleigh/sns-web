@@ -41,7 +41,7 @@ class Search extends React.Component {
               {
                 search && search.length === 0 &&
                 <div className={s.friendsContent}>
-                  Not Found
+                  Không tìm thấy kết quả
                 </div>
               }
             </div>

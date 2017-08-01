@@ -1,0 +1,9 @@
+mutation updateBuildingAnnouncement($input: UpdateBuildingAnnouncementInput!) {
+  updateBuildingAnnouncement(input: $input) {
+    announcement {
+      _id
+      message
+      type
+    }
+  }
+}

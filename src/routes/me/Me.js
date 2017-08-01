@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import pick from 'lodash/pick';
 import throttle from 'lodash/throttle';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
@@ -11,16 +10,12 @@ import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import CommentList from '../../components/Comments/CommentList';
 import Tab from '../../components/Me/TabComponent/Tab';
-
-import Info from '../../components/Me/InfoComponent/Info';
-import InfoUpdate from '../../components/Me/InfoComponent/InfoUpdate';
 import InfoTab from './InfoTab';
-
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
 import FeedList from './FeedList';
-import { MY_TIME_LINE, MY_INFO } from '../../constants';
+import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
@@ -67,47 +62,7 @@ const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: Str
 ${Feed.fragments.post}
 `;
 
-const updateProfileQuery = gql`mutation updateProfile ($profile: ProfileInput!) {
-  updateProfile (profile: $profile) {
-    _id
-    username
-    profile {
-      picture
-      firstName
-      lastName
-      gender
-    }
-  }
-}`;
-
 class Me extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isInfoUpdate: false,
-    };
-  }
-
-  openInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: true,
-    });
-  }
-
-  closeInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: false,
-    });
-  }
-
-  handleUpdate = (values) => {
-    const profile = pick(values, ['firstName', 'lastName', 'gender', 'picture']);
-    this.props.updateProfile({
-      variables: { profile },
-    }).then(res => console.log(res)).catch(err => console.log(err));
-    this.closeInfoUpdate();
-  }
 
   updatePostInList = (data, index, post) => (update(data, {
     resident: {
@@ -130,7 +85,6 @@ class Me extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     const {
       data: {
         resident,
@@ -166,7 +120,7 @@ class Me extends React.Component {
                 <Image className={s.image} src={imageSrc} />
                 <div className={s.userName} >
                   <Image className={s.avartar} src={avatar} />
-                  {profile && (<h1> {profile.lastName} {profile.firstName}</h1>)}
+                  {profile && (<h1>{profile.firstName} {profile.lastName}</h1>)}
                 </div>
               </div>
               <div className={s.infors}>
@@ -201,19 +155,17 @@ class Me extends React.Component {
 
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile && <InfoTab
-                    userId={me._id}
-                    profile={profile}
-                    queryData={profilePageQuery}
-                    paramData={{
-                      _id: resident._id,
-                      cursor: null,
-                    }}
-                  />}
                   {profile &&
-                    (this.state.isInfoUpdate ?
-                      <InfoUpdate initialValues={profile} profile={profile} closeInfoUpdate={this.closeInfoUpdate} onSubmit={this.handleUpdate} />
-                      : <Info profile={profile} isMe openInfoUpdate={this.openInfoUpdate} />)}
+                    <InfoTab
+                      userId={me._id}
+                      profile={profile}
+                      queryData={profilePageQuery}
+                      paramData={{
+                        _id: resident._id,
+                        cursor: null,
+                      }}
+                    />
+                  }
                 </div>
               </Grid>
             </div>
@@ -239,7 +191,6 @@ Me.propTypes = {
   createNewComment: PropTypes.func.isRequired,
   createNewPost: PropTypes.func.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
-  updateProfile: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   query: PropTypes.shape({
@@ -387,40 +338,26 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (post, isDelPostSharing) => mutate({
+        variables: {
+          postId: post._id,
+          message: post.message,
+          photos: post.photos || [],
+          isDelPostSharing,
+        },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
+            ...{ __typename: 'Post' },
+            ...post,
+            ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
-        },
-        update: (store, { data: { editPost } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
-          const newMessage = editPost.message;
-          const index = data.resident.posts.findIndex(item => item._id === postId);
-          const currentPost = data.resident.posts[index];
-          const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
-          });
-          data = update(data, {
-            resident: {
-              posts: {
-                $splice: [[index, 1, updatedPost]],
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: profilePageQuery, data });
         },
       }),
     }),
   }),
   graphql(Feed.mutation.deletePost, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       deletePost: postId => mutate({
         variables: { _id: postId },
         optimisticResponse: {
@@ -432,35 +369,68 @@ export default compose(
         },
         update: (store, { data: { deletePost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery });
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+          });
           data = update(data, {
             resident: {
               posts: {
-                $unset: [deletePost._id],
+                edges: {
+                  $unset: [deletePost._id],
+                },
               },
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: profilePageQuery, data });
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+            data,
+          });
         },
       }),
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+    props: ({ ownProps, mutate }) => ({
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: profilePageQuery, variables: {} });
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+          });
           data = update(data, {
             resident: {
               posts: {
-                $unshift: [sharingPost],
+                edges: {
+                  $unshift: [sharingPost],
+                },
               },
             },
           });
-          store.writeQuery({ query: profilePageQuery, variables: {}, data });
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.user.id,
+              cursor: null,
+            },
+            data,
+          });
         },
       }),
     }),
@@ -489,8 +459,8 @@ export default compose(
         updateQueries: {
           profilePageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            const index = previousResult.resident.posts.findIndex(item => item._id === postId);
-            const currentPost = previousResult.resident.posts[index];
+            const index = previousResult.resident.posts.edges.findIndex(item => item._id === postId);
+            const currentPost = previousResult.resident.posts.edges[index];
 
             let updatedPost = null;
             if (currentPost._id !== postId) {
@@ -524,7 +494,9 @@ export default compose(
             return update(previousResult, {
               resident: {
                 posts: {
-                  $splice: [[index, 1, updatedPost]],
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
                 },
               },
             });
@@ -532,9 +504,5 @@ export default compose(
         },
       }),
     }),
-  }),
-
-  graphql(updateProfileQuery, {
-    name: 'updateProfile',
   }),
 )(Me);

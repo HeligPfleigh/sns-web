@@ -7,7 +7,8 @@ import {
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import Post, { PostHeader, PostText, PostActions, PostContent } from '../Card';
+import includes from 'lodash/includes';
+import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
@@ -79,31 +80,29 @@ class Feed extends Component {
     }
   }
 
-  editPostHandler = (value) => {
+  onSelectShareButton = (eventKey, event) => {
+    event.preventDefault();
     const {
       data: {
         _id,
       },
-      editPostEvent,
+      sharingPostEvent = doNothing,
     } = this.props;
-    editPostEvent(_id, value);
+    if (eventKey && includes([PUBLIC, FRIEND, ONLY_ME], eventKey)) {
+      sharingPostEvent(_id, eventKey);
+    }
+  }
+
+  // check process
+  editPostHandler = (value, photos, isDelPostSharing) => {
+    const { editPostEvent } = this.props;
+    editPostEvent(value, photos, isDelPostSharing);
   }
 
   closeEditPost = () => {
     this.setState({
       isEdit: false,
     });
-  }
-
-  sharingPostEvent = (evt) => {
-    evt.preventDefault();
-    const {
-      data: {
-        _id,
-      },
-      sharingPostEvent,
-    } = this.props;
-    sharingPostEvent(_id);
   }
 
   render() {
@@ -115,6 +114,7 @@ class Feed extends Component {
         author,
         totalLikes,
         isLiked,
+        photos,
         totalComments = 0,
         createdAt,
         comments = [],
@@ -192,12 +192,13 @@ class Feed extends Component {
                 </CustomToggle>
                 <Dropdown.Menu onSelect={this.onSelectRightEvent}>
                   <MenuItem eventKey={DELETE_POST_ACTION}>Xóa</MenuItem>
-                  {!sharing && <MenuItem divider /> }
-                  {!sharing && <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>}
+                  <MenuItem divider />
+                  <MenuItem eventKey={EDIT_POST_ACTION}>Chỉnh sửa bài viết</MenuItem>
                 </Dropdown.Menu>
               </Dropdown> : <div></div>
           }
         />
+        {message && !isEdit && <PostText html={message} /> }
         {sharing && !isEdit &&
           <SharingPost
             id={sharing._id}
@@ -209,14 +210,16 @@ class Feed extends Component {
             createdAt={sharing.createdAt}
           />
         }
-        {!sharing && !isEdit && <PostText html={message || {}} /> }
         {isEdit &&
           <EditPost
+            sharing={sharing || {}}
             message={message}
+            data={this.props.data}
             onChange={this.editPostHandler}
             closeEditPost={this.closeEditPost}
           />
         }
+        {!sharing && !isEdit && photos && photos.length > 0 && <PostPhotos images={photos} />}
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
@@ -229,7 +232,18 @@ class Feed extends Component {
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
           <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-          <Icon onClick={this.sharingPostEvent} title="Chia sẻ" icons="fa fa-share fa-lg" />
+          <Dropdown id={idRandom()}>
+            <CustomToggle bsRole="toggle">
+              <span title="Chia sẻ">
+                <i className="fa fa-share fa-lg" aria-hidden="true"></i> Chia sẻ
+              </span>
+            </CustomToggle>
+            <Dropdown.Menu onSelect={this.onSelectShareButton}>
+              <MenuItem eventKey={PUBLIC}>Chi sẻ công khai</MenuItem>
+              <MenuItem eventKey={FRIEND}>Chia sẻ với bạn bè</MenuItem>
+              <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
+            </Dropdown.Menu>
+          </Dropdown>
         </PostActions>
         <PostContent className={s.commentPanel}>
           <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
@@ -404,6 +418,7 @@ Feed.fragments = {
       isLiked
       createdAt
       privacy
+      photos
       comments (limit: 2) {
         _id
         message
@@ -428,19 +443,19 @@ Feed.fragments = {
 };
 
 Feed.mutation = {
-  createNewPost: gql`mutation createNewPost ($message: String!, $userId: String) {
-    createNewPost(message: $message, userId: $userId) {
+  createNewPost: gql`mutation createNewPost ($message: String!,  $photos: [String], $userId: String) {
+    createNewPost(message: $message, photos: $photos,userId: $userId) {
       ...PostView
     }
   }
   ${Feed.fragments.post}
   `,
-  editPost: gql`mutation editPost ($postId: String!, $message: String!) {
-    editPost(_id: $postId, message: $message) {
-      _id
-      message
+  editPost: gql`mutation editPost ($postId: String!, $message: String!, $photos: [String], $isDelPostSharing: Boolean!) {
+    editPost(_id: $postId, message: $message, photos: $photos, isDelPostSharing: $isDelPostSharing) {
+      ...PostView
     }
-  }`,
+  }
+  ${Feed.fragments.post}`,
   likePost: gql`mutation likePost ($postId: String!) {
     likePost(_id: $postId) {
       ...PostView
@@ -461,8 +476,8 @@ Feed.mutation = {
     }
   }
   `,
-  sharingPost: gql`mutation sharingPost ($_id: String!) {
-    sharingPost(_id: $_id) {
+  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!) {
+    sharingPost(_id: $_id, privacy: $privacy) {
       ...PostView
     }
   }

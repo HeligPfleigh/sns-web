@@ -220,11 +220,12 @@ export default compose(
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
         variables: { _id: postId },
-        update: (store, { data: { sharingPost } }) => {
-          // Read the data from our cache for this query.
-          setTimeout(() => {
-            history.push(`/post/${sharingPost._id}`);
-          }, 700);
+        update: () => {
+        // update: (store, { data: { sharingPost } }) => {
+          // // Read the data from our cache for this query.
+          // setTimeout(() => {
+          //   history.push(`/post/${sharingPost._id}`);
+          // }, 700);
         },
       }),
     }),
@@ -277,14 +278,15 @@ export default compose(
   }),
   graphql(editPostMutation, {
     props: ({ mutate }) => ({
-      editPost: (postId, message) => mutate({
-        variables: { postId, message },
+      editPost: (postId, message, photos) => mutate({
+        variables: { postId, message, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
             __typename: 'Post',
             _id: postId,
             message,
+            photos,
           },
         },
         update: (store, { data: { editPost } }) => {
@@ -297,6 +299,7 @@ export default compose(
           });
           // Do we need create new Object ?
           data.post.message = editPost.message;
+          data.post.photos = editPost.photos;
           // Write our data back to the cache.
           store.writeQuery({
             query: postDetailQuery,
