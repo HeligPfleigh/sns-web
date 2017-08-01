@@ -10,7 +10,6 @@ const uploadImage = async (file) => {
   const url = 'http://api-sns.mttjsc.com/upload/image';
 
   const token = getCookie('id_token');
-  console.log(token);
   const formData = new FormData();
   formData.append('file', file);
   const response = await fetch(url, {

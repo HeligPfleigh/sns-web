@@ -228,10 +228,8 @@ export function getDirectMessages() {
 }
 
 export function getConversations() {
-  console.log('haha');
   return async (dispatch, getState, { chat }) => {
     try {
-      console.log(getState());
       await auth(getState().user.chatToken)(dispatch, getState, { chat });
       if (isLoad(getState())) return;
       chat.onConversation((err, data) => {
