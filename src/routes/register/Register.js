@@ -266,10 +266,10 @@ class Register extends React.Component {
             <Field
               name="phoneNumber"
               component={InputField}
-              label="Số SĐT"
-              type="number"
+              label="SĐT"
+              type="text"
               placeholder="Nhập số điện thoại của bạn"
-              validate={[required, normalLength, phoneNumber]}
+              validate={[required, phoneNumber]}
             />
 
             <div className="form-group">
