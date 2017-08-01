@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 import { Field, reduxForm, SubmissionError } from 'redux-form';
 
 import history from '../../core/history';
-import { required, minLength6, maxLength25 } from '../../utils/validator';
+import { required, normalLength } from '../../utils/validator';
 import loginSuccess from '../../actions/user';
 import s from './Login.scss';
 
@@ -99,7 +99,7 @@ class Login extends React.Component {
             this.props.loginSuccess(user);
             history.push('/');
           } catch (error) {
-            alert('Login fail.');
+            alert('Đăng nhập thất bại.');
           }
         } else {
           alert('User cancelled login or did not fully authorize.');
@@ -126,7 +126,7 @@ class Login extends React.Component {
               className="form-control"
               component={renderField}
               addOn={<span className={`glyphicon glyphicon-user ${s.addon}`}></span>}
-              validate={[required, maxLength25, minLength6]}
+              validate={[required, normalLength]}
             />
 
             <Field
@@ -136,7 +136,7 @@ class Login extends React.Component {
               className="form-control"
               component={renderField}
               addOn={<span className={`glyphicon glyphicon-lock ${s.addon}`}></span>}
-              validate={[required, maxLength25, minLength6]}
+              validate={[required, normalLength]}
             />
 
             <div className="form-group" style={{ textAlign: 'left', marginBottom: 10 }}>
