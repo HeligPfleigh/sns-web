@@ -429,15 +429,19 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message, photos) => mutate({
-        variables: { postId, message, photos },
+      editPost: (post, isDelPostSharing) => mutate({
+        variables: {
+          postId: post._id,
+          message: post.message,
+          photos: post.photos,
+          isDelPostSharing,
+        },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
-            photos,
+            ...{ __typename: 'Post' },
+            ...post,
+            ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
         },
         update: (store, { data: { editPost } }) => {
@@ -445,15 +449,16 @@ export default compose(
           let data = store.readQuery({ query: loadBuildingQuery });
           const newMessage = editPost.message;
           const newPhotos = editPost.photos;
-          const index = data.building.posts.findIndex(item => item._id === postId);
+          const index = data.building.posts.findIndex(item => item._id === post._id);
           const currentPost = data.building.posts[index];
           const updatedPost = Object.assign({}, currentPost, {
-            message: newMessage,
             photos: newPhotos,
+            message: newMessage,
+            sharing: editPost.sharing,
           });
           data = update(data, {
-            building: {
-              posts: {
+            feeds: {
+              edges: {
                 $splice: [[index, 1, updatedPost]],
               },
             },
@@ -495,8 +500,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: () => {
           // setTimeout(() => {
           //   history.push('/');

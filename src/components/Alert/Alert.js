@@ -86,9 +86,8 @@ class Alert extends Component {
       message,
       open,
     } = this.state;
-    // if (open && message !== '') {
     return (
-      <div bsStyle="danger">
+      <div className="danger">
         <Modal show={open} onHide={this.close}>
           {/** <Modal.Header closeButton></Modal.Header> */}
           <Modal.Body className="text-center">
@@ -97,8 +96,6 @@ class Alert extends Component {
         </Modal>
       </div>
     );
-    // }
-    // return null;
   }
 }
 

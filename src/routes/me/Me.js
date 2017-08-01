@@ -15,7 +15,7 @@ import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import { Feed } from '../../components/Feed';
 import FeedList from './FeedList';
-import { MY_TIME_LINE, MY_INFO } from '../../constants';
+import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './Me.scss';
 
 const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
@@ -120,7 +120,7 @@ class Me extends React.Component {
                 <Image className={s.image} src={imageSrc} />
                 <div className={s.userName} >
                   <Image className={s.avartar} src={avatar} />
-                  {profile && (<h1> {profile.lastName} {profile.firstName}</h1>)}
+                  {profile && (<h1>{profile.firstName} {profile.lastName}</h1>)}
                 </div>
               </div>
               <div className={s.infors}>
@@ -338,15 +338,18 @@ export default compose(
   }),
   graphql(Feed.mutation.editPost, {
     props: ({ mutate }) => ({
-      editPost: (postId, message, photos) => mutate({
-        variables: { postId, message, photos },
+      editPost: (post, isDelPostSharing) => mutate({
+        variables: {
+          postId: post._id,
+          message: post.message,
+          isDelPostSharing,
+        },
         optimisticResponse: {
           __typename: 'Mutation',
           editPost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
-            photos,
+            ...{ __typename: 'Post' },
+            ...post,
+            ...{ sharing: isDelPostSharing ? post.sharing : null },
           },
         },
         update: (store, { data: { editPost } }) => {
@@ -354,15 +357,16 @@ export default compose(
           let data = store.readQuery({ query: profilePageQuery });
           const newMessage = editPost.message;
           const newPhotos = editPost.photos;
-          const index = data.resident.posts.findIndex(item => item._id === postId);
+          const index = data.resident.posts.findIndex(item => item._id === post._id);
           const currentPost = data.resident.posts[index];
           const updatedPost = Object.assign({}, currentPost, {
             message: newMessage,
+            sharing: editPost.sharing,
             photos: newPhotos,
           });
           data = update(data, {
-            resident: {
-              posts: {
+            feeds: {
+              edges: {
                 $splice: [[index, 1, updatedPost]],
               },
             },
@@ -402,8 +406,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: postId => mutate({
-        variables: { _id: postId },
+      sharingPost: (postId, privacy) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+        },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({ query: profilePageQuery, variables: {} });
