@@ -11,6 +11,8 @@ class PostPhotos extends React.Component {
     const imagesToView = images.map(image => ({
       src: image,
       thumbnail: image,
+      thumbnailWidth: 0,
+      thumbnailHeight: 0,
     }));
     return (
       <div
