@@ -344,10 +344,11 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: (postId, privacy) => mutate({
+      sharingPost: (postId, privacy, message) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
+          message,
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
