@@ -89,8 +89,8 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, photos: [String], $buildingId: String!) {
-  createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
+const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $photos: [String], $buildingId: String!) {
+  createNewPostOnBuilding(message: $message, photos: $photos, buildingId: $buildingId) {
     ...PostView
   }
 }
