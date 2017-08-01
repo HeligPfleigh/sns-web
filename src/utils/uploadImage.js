@@ -1,10 +1,13 @@
+import config from '../config';
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
 }
-const uploadImage = async (url, file) => {
+const uploadImage = async (file) => {
+  const url = config.server.uploadImage;
   const token = getCookie('id_token');
   const formData = new FormData();
   formData.append('file', file);

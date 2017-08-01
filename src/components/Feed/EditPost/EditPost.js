@@ -70,7 +70,7 @@ class EditPost extends Component {
     files.forEach(async (file, index) => {
       try {
         if (typeof file !== 'string') {
-          const result = await uploadImage('http://localhost:3005/upload/image', file);
+          const result = await uploadImage(file);
           const { photos } = this.state;
           photos[index] = result.url;
           this.setState({
