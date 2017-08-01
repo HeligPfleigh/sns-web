@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './ListImagePreview.scss';
 import { Image } from 'react-bootstrap';
+import { generate as idRandom } from 'shortid';
+import s from './ListImagePreview.scss';
 
 
 class ListImagePreview extends React.Component {
@@ -15,6 +16,7 @@ class ListImagePreview extends React.Component {
           images.map((element, index) => (
             <div
               className={s.wrapperImage}
+              key={idRandom()}
             >
               <Image
                 className={s.imageCrop}

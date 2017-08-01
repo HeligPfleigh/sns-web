@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './PostPhotos.scss';
 import { Image } from 'react-bootstrap';
 import Gallery from 'react-grid-gallery';
+import s from './PostPhotos.scss';
 
 class PostPhotos extends React.Component {
 
