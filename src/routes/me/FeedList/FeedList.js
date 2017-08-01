@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import update from 'immutability-helper';
 import { withApollo } from 'react-apollo';
 import { generate as idRandom } from 'shortid';
-import { DELETE_POST_ACTION } from '../../../constants';
+import { DELETE_POST_ACTION, PUBLIC } from '../../../constants';
 import {
   Feed,
   DeletePostModal,
@@ -11,6 +11,7 @@ import {
 } from '../../../components/Feed';
 import likePostMutation from './likePostMutation.graphql';
 import unlikePostMutation from './unlikePostMutation.graphql';
+import { openAlertGlobal } from '../../../reducers/alert';
 
 class FeedList extends Component {
 
@@ -21,18 +22,30 @@ class FeedList extends Component {
       showSharingPost: false,
       idDeletedPost: null,
       idSharingPost: null,
+      privacyPost: PUBLIC,
+      sharingFeed: {},
     };
   }
 
-  onClickModal = (evt) => {
+  onClickModal = (evt, message) => {
     evt.preventDefault();
-    const { idDeletedPost, idSharingPost } = this.state;
+
+    const { idDeletedPost, idSharingPost, privacyPost } = this.state;
     this.closeModal();
+    
     if (idDeletedPost) {
       this.props.deletePost(idDeletedPost);
     }
     if (idSharingPost) {
-      this.props.sharingPost(idSharingPost);
+      this.props.sharingPost(idSharingPost, privacyPost, message).then(({ data }) => {
+        openAlertGlobal({
+          message: 'Bạn đã chia sẽ được thành công trên dòng thời gian của bạn',
+          open: true,
+          autoHideDuration: 0,
+        });
+      }).catch((error) => {
+        console.log('there was an error sending the query', error);
+      });
     }
   }
 
@@ -72,10 +85,12 @@ class FeedList extends Component {
     this.updateStateModal(true);
   }
 
-  sharingPostEvent = (id) => {
+  sharingPostEvent = (id, privacy, sharingFeed) => {
     this.setState(() => ({
       showSharingPost: true,
       idSharingPost: id,
+      privacyPost: privacy || PUBLIC,
+      sharingFeed,
     }));
   }
 
@@ -190,9 +205,10 @@ class FeedList extends Component {
           clickModal={this.onClickModal}
         />
         <SharingPostModal
-          show={this.state.showSharingPost}
-          closeModal={this.closeModal}
-          clickModal={this.onClickModal}
+          show={ this.state.showSharingPost }
+          closeModal={ this.closeModal.bind(this) }
+          clickModal={ this.onClickModal.bind(this) }
+          sharingFeed={ this.state.sharingFeed }
         />
       </div>
     );

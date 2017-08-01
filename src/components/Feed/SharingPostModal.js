@@ -9,6 +9,8 @@ import Draft, {
 import { HANDLE_REGEX, HASHTAG_REGEX } from '../../constants';
 import HandleSpan from '../../components/Common/Editor/HandleSpan';
 import HashtagSpan from '../../components/Common/Editor/HashtagSpan';
+import Feed from '../../components/Feed/Feed';
+import Divider from '../../components/Divider';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -16,9 +18,9 @@ import HashtagSpan from '../../components/Common/Editor/HashtagSpan';
  */
 const styles = {
   editor: {
-    border: '1px solid #ddd',
+    border: '0px solid #ddd',
     cursor: 'text',
-    minHeight: 90,
+    minHeight: 60,
     padding: 5,
     backgroundColor: '#fff',
   },
@@ -75,17 +77,19 @@ class SharingPostModal extends Component {
     });
   }
 
-  onSubmit = () => {
+  onSubmit = (evt) => {
     const { postId, commentId, user } = this.props;
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
 
-    this.props.clickModal();
+    this.props.clickModal(evt, data);
 
     // reset editor
     this.editor.blur();
+    
     this.setState({
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
+      data,
     });
   }
 
@@ -115,21 +119,27 @@ class SharingPostModal extends Component {
           <Modal.Title>Chia sẻ bài viết</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div style={styles.editor} onClick={this.focus}>
+          <div style={ styles.editor } onClick={ this.focus }>
             <Editor
-              editorState={editorState}
-              onChange={this.onChange}
-              keyBindingFn={this._keyBindingFn}
-              handleKeyCommand={this._handleKeyCommand}
-              placeholder="Viết bình luận"
-              ref={(editor) => { this.editor = editor; }}
+              editorState={ editorState }
+              onChange={ this.onChange }
+              keyBindingFn={ this._keyBindingFn }
+              handleKeyCommand={ this._handleKeyCommand }
+              ref={ editor => (this.editor = editor) }
+              placeholder="Nói gì đó về nó ..."
               spellCheck
             />
           </div>
+
+          <Feed
+            data={ this.props.sharingFeed }            
+            sharingPostModalOpenned={ true }
+          />
+
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeModal}>Hủy</Button>
-          <Button bsStyle="primary" onClick={ this.onSubmit }  disabled={ !isSubmit }>Chia sẻ bài viết</Button>
+          <Button bsStyle="primary" onClick={ this.onSubmit.bind(this) }  disabled={ !isSubmit }>Chia sẻ bài viết</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -140,6 +150,7 @@ SharingPostModal.propTypes = {
   show: PropTypes.bool,
   closeModal: PropTypes.func,
   clickModal: PropTypes.func,
+  sharingFeed: PropTypes.object.isRequired,
 };
 
 export default SharingPostModal;
