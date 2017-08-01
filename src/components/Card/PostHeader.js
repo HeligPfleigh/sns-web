@@ -22,7 +22,7 @@ const PostHeader = ({ avatar, title, sharingPostTitle, subtitle, menuRight }) =>
       { menuRight }
     </Col>
   </div>
-);
+  );
 
 PostHeader.propTypes = {
   avatar: PropTypes.node,

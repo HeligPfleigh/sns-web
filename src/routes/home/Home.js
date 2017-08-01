@@ -13,6 +13,7 @@ import BuildingAnnouncement from '../BuildingAnnouncement';
 import NewPost from '../../components/NewPost';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
+import ChatSideBar from '../ChatSideBar';
 import { PUBLIC } from '../../constants';
 import s from './Home.scss';
 
@@ -103,6 +104,7 @@ class Home extends Component {
             <Col md={4} smHidden xsHidden>
               <BuildingAnnouncement />
               <FriendSuggestions />
+              <ChatSideBar />
             </Col>
           </MediaQuery>
         </Row>

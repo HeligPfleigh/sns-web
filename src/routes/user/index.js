@@ -15,5 +15,4 @@ export default {
       component: <Layout><User query={context.query} id={context.params.id} /></Layout>,
     };
   },
-
 };

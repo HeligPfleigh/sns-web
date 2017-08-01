@@ -2,7 +2,6 @@ import * as firebase from 'firebase';
 import EventEmitter from 'events';
 
 export class FirebaseProvider {
-
   constructor(config) {
     const defaultApp = firebase.initializeApp(config);
     this.service = defaultApp;
@@ -76,6 +75,7 @@ export class FirebaseProvider {
           [this.user.uid]: true,
           [data.to.uid]: true,
         };
+        this.makeDirectMessage(this.user.uid, data.to.uid, data.conversationId);
         updates[`/conversations/${data.conversationId}`] = {
           meta: {
             lastMessage: data.message,
@@ -96,12 +96,19 @@ export class FirebaseProvider {
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         user: this.user.uid,
       };
-
       await this.service.database().ref().update(updates);
       this.makeNotification(data, messageId);
       return data.conversationId;
     }
     return null;
+  }
+  onDirectMessages(cb) {
+    if (this.user) {
+      const ref = this.service.database().ref(`direct-message/${this.user.uid}`);
+      ref.on('child_added', (snapshot) => {
+        cb(null, snapshot.key, snapshot.val());
+      });
+    }
   }
   onConversation(cb) {
     if (this.user) {
@@ -163,6 +170,23 @@ export class FirebaseProvider {
       this.service.database().ref(`notifications/${to.uid}/${conversationId}`).set(messageId);
     }
   }
+
+  makeDirectMessage(sender, receiver, conversationId) {
+    this.service.database().ref(`direct-message/${sender}/${receiver}`).set(conversationId);
+
+    this.service.database().ref(`direct-message/${receiver}/${sender}`).set(conversationId);
+  }
+
+  async getDirectMessage(sender, receiver) {
+    let conversationId;
+    if (sender.localCompare(receiver) === -1) {
+      conversationId = await this.getStaticData(`direct-message/${sender}/${receiver}`);
+    } else {
+      conversationId = await this.getStaticData(`direct-message/${receiver}/${sender}`);
+    }
+    return conversationId;
+  }
+
   makeNotificationRead(data) {
     if (this.user) {
       const { conversationId } = data;
