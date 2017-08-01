@@ -282,13 +282,16 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
-      sharingPost: (postId, privacy) => mutate({
+    props: ({ mutate, ownProps }) => ({
+      sharingPost: (postId, privacy, message) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
+          message,
         },
       }),
+      update: (store, { data: { sharingPost } }) => {
+      },
     }),
   }),
   graphql(Feed.mutation.editPost, {

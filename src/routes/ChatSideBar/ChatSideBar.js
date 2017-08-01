@@ -47,7 +47,7 @@ export default compose(
   graphql(getFriendsQuery, {
     props: ({ data }) => {
       const { me } = data;
-      const { friends } = me;
+      const friends = me && me.friends || [];
       return {
         data,
         friends,

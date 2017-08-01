@@ -217,7 +217,7 @@ class Building extends Component {
 
     return (
       <Grid>
-        <Tab.Container onSelect={this.handleSelect} activeKey={tab}>
+        <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={ Math.random() }>
           <Row className="clearfix">
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
@@ -603,16 +603,15 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
-      sharingPost: (postId, privacy) => mutate({
+    props: ({ mutate, ownProps }) => ({
+      sharingPost: (postId, privacy, message) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
+          message,
         },
-        update: () => {
-          // setTimeout(() => {
-          //   history.push('/');
-          // }, 350);
+        update: (store, { data: { sharingPost } }) => {
+         
         },
       }),
     }),

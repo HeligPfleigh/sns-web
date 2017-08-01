@@ -7,7 +7,7 @@ import {
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import includes from 'lodash/includes';
+import { noop, includes } from 'lodash';
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -89,7 +89,7 @@ class Feed extends Component {
       sharingPostEvent = doNothing,
     } = this.props;
     if (eventKey && includes([PUBLIC, FRIEND, ONLY_ME], eventKey)) {
-      sharingPostEvent(_id, eventKey);
+      sharingPostEvent(_id, eventKey, this.props.data);
     }
   }
 
@@ -125,6 +125,7 @@ class Feed extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
+      sharingPostModalOpenned,
     } = this.props;
     const { isEdit } = this.state;
     return (
@@ -224,7 +225,10 @@ class Feed extends Component {
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
         </PostText>
+        { !sharingPostModalOpenned && (
         <Divider />
+        ) }
+        { !sharingPostModalOpenned && (
         <PostActions>
           <Icon
             onClick={this.onLikeCLick}
@@ -245,9 +249,12 @@ class Feed extends Component {
             </Dropdown.Menu>
           </Dropdown>
         </PostActions>
+        ) }
+        { !sharingPostModalOpenned && (
         <PostContent className={s.commentPanel}>
           <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
         </PostContent>
+        ) }
       </Post>
     );
   }
@@ -316,6 +323,7 @@ Feed.propTypes = {
   }),
   editPostEvent: PropTypes.func.isRequired,
   sharingPostEvent: PropTypes.func.isRequired,
+  sharingPostModalOpenned: PropTypes.bool
 };
 
 Feed.defaultProps = {
@@ -323,6 +331,16 @@ Feed.defaultProps = {
     comments: [],
     totalComments: 0,
   },
+  userInfo: {},
+  sharingPostModalOpenned: false,
+  onSelectRightEvent: noop,
+  editPostEvent: noop,
+  likePostEvent: noop,
+  unlikePostEvent: noop,
+  loadMoreComments: noop,
+  createNewComment: noop,
+  editPostEvent: noop,
+  sharingPostEvent: noop,
 };
 
 /**
@@ -476,8 +494,8 @@ Feed.mutation = {
     }
   }
   `,
-  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!) {
-    sharingPost(_id: $_id, privacy: $privacy) {
+  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!, $message: String!) {
+    sharingPost(_id: $_id, privacy: $privacy, message: $message) {
       ...PostView
     }
   }
