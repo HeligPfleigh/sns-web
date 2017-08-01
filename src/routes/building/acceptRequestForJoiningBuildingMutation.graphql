@@ -1,0 +1,5 @@
+mutation acceptRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
+  acceptRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
+    _id
+  }
+}
