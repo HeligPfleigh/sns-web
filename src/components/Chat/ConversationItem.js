@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classnames from 'classnames';
 import formatTime from '../../utils/time';
-import Link from '../Link';
 import s from './Conversation.scss';
 
 class ConversationItem extends React.Component {

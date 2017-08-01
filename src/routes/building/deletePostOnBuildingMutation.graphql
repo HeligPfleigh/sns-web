@@ -1,0 +1,5 @@
+mutation deletePostOnBuilding ($postId: String!, $buildingId: String!) {
+  deletePostOnBuilding(postId: $postId, buildingId: $buildingId) {
+    _id
+  }
+}
