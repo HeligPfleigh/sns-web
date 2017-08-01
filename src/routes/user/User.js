@@ -173,8 +173,8 @@ export default compose(
   }),
   graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: (message, privacy, friend) => mutate({
-        variables: { message, privacy, userId: friend._id },
+      createNewPost: (message, privacy, photos, friend) => mutate({
+        variables: { message, privacy, photos, userId: friend._id },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
@@ -197,6 +197,7 @@ export default compose(
             building: null,
             sharing: null,
             comments: [],
+            photos,
             createdAt: (new Date()).toString(),
             totalLikes: 0,
             totalComments: 0,

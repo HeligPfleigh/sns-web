@@ -342,6 +342,7 @@ export default compose(
         variables: {
           postId: post._id,
           message: post.message,
+          photos: post.photos || [],
           isDelPostSharing,
         },
         optimisticResponse: {

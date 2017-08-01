@@ -13,3 +13,21 @@
     padding: 0;
   }
 }
+
+.listImagePreview{
+  margin-top: 8px;
+  width: 100%;
+  height: 100px;
+  overflow: auto;
+}
+
+button.addPhoto, button.addPhoto:hover, button.addPhoto:active {
+  padding-left: 0px;
+  color: $text-color;
+  text-decoration: none;
+}
+.addPhoto{
+  padding-left: 0px;
+  color: $text-color;
+  text-decoration: none;
+}

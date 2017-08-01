@@ -1,3 +1,5 @@
+
+
 const fetchAPI = async (url, data) => {
   const response = await fetch(url, {
     headers: new Headers({
@@ -15,5 +17,6 @@ const fetchAPI = async (url, data) => {
   const result = await response.json();
   return result;
 };
+
 
 export default fetchAPI;

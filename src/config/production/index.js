@@ -13,6 +13,7 @@ export const server = {
   ipBrowser: process.env.BROWSER_IP || 'http://api-sns.mttjsc.com',
   graphqlBrowser: process.env.BROWSER_GRAPHQL_URL || 'http://api-sns.mttjsc.com/graphql',
   authPath: process.env.APP_AUTH_PATH || '/auth',
+  imageUpload: 'http://api-sns.mttjsc.com/upload/image',
 };
 
 export const auth = {

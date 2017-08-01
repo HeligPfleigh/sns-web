@@ -11,3 +11,4 @@ npm-debug.log
 logs
 yarn*
 .yarnclean
+package-lock.json

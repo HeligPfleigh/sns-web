@@ -89,7 +89,7 @@ const loadBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $buildingId: String!) {
+const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, photos: [String], $buildingId: String!) {
   createNewPostOnBuilding(message: $message, buildingId: $buildingId) {
     ...PostView
   }
@@ -559,6 +559,7 @@ export default compose(
         variables: {
           postId: post._id,
           message: post.message,
+          photos: post.photos || [],
           isDelPostSharing,
         },
         optimisticResponse: {

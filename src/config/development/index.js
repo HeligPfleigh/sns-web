@@ -22,6 +22,7 @@ export const server = {
   ipBrowser: browserIp,
   graphqlBrowser: `${browserIp}/graphql`,
   authPath: '/auth',
+  imageUpload: `${browserIp}/upload/image`,
 };
 
 export const auth = {
