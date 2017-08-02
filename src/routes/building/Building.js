@@ -14,9 +14,8 @@ import {
   Panel,
 } from 'react-bootstrap';
 import { generate as idRandom } from 'shortid';
+import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
-import FeedList, { Feed } from '../../components/Feed';
-import NewPost from '../../components/NewPost';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
@@ -33,6 +32,7 @@ import EditBuildingAnnouncementModal from './EditBuildingAnnouncementModal';
 import Errors from './Errors';
 import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
+import BuildingFeed from './BuildingFeed';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
@@ -51,7 +51,13 @@ const loadBuildingQuery = gql`
         street
       }
       posts {
-        ...PostView
+        edges {
+          ...PostView
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
       }
       announcements (skip: $skip, limit: $limit) {
         pageInfo {
@@ -197,6 +203,10 @@ class Building extends Component {
     }));
   }
 
+  loadMoreRows = () => {
+    console.log('loadMoreRows');
+  }
+
   render() {
     const {
       data: { building, me },
@@ -217,7 +227,7 @@ class Building extends Component {
 
     return (
       <Grid>
-        <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={ Math.random() }>
+        <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={Math.random()}>
           <Row className="clearfix">
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
@@ -242,18 +252,18 @@ class Building extends Component {
             <Col sm={7}>
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
-                  <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
-                  { building && building.posts && <FeedList
-                    feeds={building ? building.posts : []}
+                  <BuildingFeed
+                    createNewPostOnBuilding={createNewPostOnBuilding}
+                    building={building}
                     likePostEvent={likePost}
                     unlikePostEvent={unlikePost}
-                    userInfo={me}
+                    me={me}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePost={deletePostOnBuilding}
                     editPost={editPost}
                     sharingPost={sharingPost}
-                  />}
+                  />
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
                   { building &&
