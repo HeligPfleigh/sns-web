@@ -34,7 +34,7 @@ class BuildingFeed extends Component {
             },
             {
               name: ONLY_ADMIN_BUILDING,
-              glyph: 'phone-alt',
+              glyph: 'bell',
             },
           ]}
         />

@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import find from 'lodash/find';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
@@ -109,7 +110,6 @@ class NewPost extends React.Component {
     }));
   }
 
-
   onFilePicked = (input) => {
     const { photos } = this.state;
     Object.keys(input.target.files).forEach((key) => {
@@ -125,30 +125,11 @@ class NewPost extends React.Component {
 
   onChangePrivacy = (eventKey, evt) => {
     evt.preventDefault();
-    if (eventKey === PUBLIC) {
-      this.setState({
-        privacy: PUBLIC,
-        glyph: 'globe',
-      });
-    }
-    if (eventKey === FRIEND) {
-      this.setState({
-        privacy: FRIEND,
-        glyph: 'user',
-      });
-    }
-    if (eventKey === ONLY_ME) {
-      this.setState({
-        privacy: ONLY_ME,
-        glyph: 'lock',
-      });
-    }
-    if (eventKey === ONLY_ADMIN_BUILDING) {
-      this.setState({
-        privacy: ONLY_ADMIN_BUILDING,
-        glyph: 'phone-alt',
-      });
-    }
+    const f = find(this.props.privacy, o => (eventKey === o.name));
+    this.setState({
+      privacy: f.name,
+      glyph: f.glyph,
+    });
   }
 
   onDeleteImage = (index) => {

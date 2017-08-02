@@ -19,7 +19,6 @@ import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
-import FriendList, { Friend } from './FriendList';
 import BuildingAnnouncementList, {
   BuildingAnnouncementItem,
 } from '../../components/BuildingAnnouncementList';
@@ -30,7 +29,6 @@ import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBu
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import DeleteBuildingAnnouncementModal from './DeleteBuildingAnnouncementModal';
 import EditBuildingAnnouncementModal from './EditBuildingAnnouncementModal';
-import Errors from './Errors';
 import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
 import BuildingFeed from './BuildingFeed';
@@ -114,8 +112,8 @@ const loadMorePostOnBuildingQuery = gql`
   }
 ${Feed.fragments.post}`;
 
-const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $photos: [String], $buildingId: String!) {
-  createNewPostOnBuilding(message: $message, photos: $photos, buildingId: $buildingId) {
+const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $photos: [String], $buildingId: String!, $privacy: PrivacyType) {
+  createNewPostOnBuilding(message: $message, photos: $photos, buildingId: $buildingId, privacy: $privacy) {
     ...PostView
   }
 }
@@ -222,6 +220,16 @@ class Building extends Component {
     }));
   }
 
+  loadMoreRows = () => {
+    const {
+      loadMoreRows,
+      query,
+    } = this.props;
+    if (query && (query.tab === POST_TAB || !query.tab)) {
+      loadMoreRows();
+    }
+  }
+
   render() {
     const {
       data: { building, me },
@@ -234,7 +242,6 @@ class Building extends Component {
       query,
       editPost,
       sharingPost,
-      loadMoreRows,
     } = this.props;
     let tab = POST_TAB;
     if (query.tab) {
@@ -269,7 +276,7 @@ class Building extends Component {
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
                   {building && <BuildingFeed
-                    loadMoreRows={loadMoreRows}
+                    loadMoreRows={this.loadMoreRows}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
                     likePost={likePost}
@@ -418,7 +425,7 @@ export default compose(
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) { return previousResult; }
-          const index = previousResult.building.posts.findIndex(item => item._id === postId);
+          const index = previousResult.building.posts.edges.findIndex(item => item._id === postId);
           const updatedPost = update(previousResult.building.posts[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
@@ -444,10 +451,12 @@ export default compose(
   }),
   graphql(createNewPostOnBuildingMutation, {
     props: ({ ownProps, mutate }) => ({
-      createNewPostOnBuilding: message => mutate({
+      createNewPostOnBuilding: (message, privacy, photos) => mutate({
         variables: {
           message,
           buildingId: ownProps.buildingId,
+          photos,
+          privacy,
         },
         optimisticResponse: {
           __typename: 'Mutation',
@@ -468,7 +477,8 @@ export default compose(
               name: ownProps.data.building.name,
             },
             sharing: null,
-            privacy: PUBLIC,
+            privacy,
+            photos,
             comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
@@ -533,7 +543,7 @@ export default compose(
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.likePost;
-            const index = previousResult.building.posts.findIndex(item => item._id === updatedPost._id);
+            const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
               building: {
                 posts: {
@@ -572,7 +582,7 @@ export default compose(
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
             const updatedPost = mutationResult.data.unlikePost;
-            const index = previousResult.building.posts.findIndex(item => item._id === updatedPost._id);
+            const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
             return update(previousResult, {
               building: {
                 posts: {
