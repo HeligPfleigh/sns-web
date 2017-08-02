@@ -33,7 +33,11 @@ class ConversationItem extends React.Component {
             <span>{name || 'Hội thoại mới'}</span>
             {
               meta && meta.lastMessage &&
-              <span dangerouslySetInnerHTML={{ __html: `${meta.lastMessage.substring(0, 30).replace(/<(?:.|\n)*?>/gm, '')}...` }} />
+              <span
+                dangerouslySetInnerHTML={{ __html: `${meta.lastMessage.replace(/<(?:.|\n)*?>/gm, '').substring(0, 53).trim().length < 53 ?
+                meta.lastMessage.replace(/<(?:.|\n)*?>/gm, '').substring(0, 52).trim()
+                : (`${meta.lastMessage.replace(/<(?:.|\n)*?>/gm, '').substring(0, 52).trim()}...`)}` }}
+              />
             }
           </div>
           {

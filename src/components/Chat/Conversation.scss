@@ -39,7 +39,8 @@ $chatBorder: 1px solid rgba(0, 0, 0, .10);
     }
   }
   .lastTime {
-    display: flex;
+    position: absolute;
+    right: 12px;
   }
 }
 .conversations {
@@ -138,6 +139,9 @@ $chatBorder: 1px solid rgba(0, 0, 0, .10);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    @media screen and (max-width: 992px) {
+      margin-right: 0px;
+    }
   }
   .chatHeader {
     height: 50px;
