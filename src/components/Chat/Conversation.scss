@@ -39,7 +39,8 @@ $chatBorder: 1px solid rgba(0, 0, 0, .10);
     }
   }
   .lastTime {
-    display: flex;
+    position: absolute;
+    right: 12px;
   }
 }
 .conversations {
