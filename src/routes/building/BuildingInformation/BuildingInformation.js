@@ -23,7 +23,7 @@ export const BuildingInformation = ({ building }) => (
 );
 
 BuildingInformation.propTypes = {
-  building: PropTypes.obj,
+  building: PropTypes.object,
 };
 
 export default withStyles(s)(BuildingInformation);

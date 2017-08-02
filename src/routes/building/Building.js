@@ -34,6 +34,7 @@ import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
 import BuildingFeed from './BuildingFeed';
 import BuildingInformation from './BuildingInformation';
+import BuildingRequest from './BuildingRequest';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
@@ -295,23 +296,12 @@ class Building extends Component {
                   </BuildingAnnouncementList>
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
-                  <FriendList>
-                    <Errors
-                      open
-                      message={this.state.errorMessage}
-                      autoHideDuration={4000}
-                    />
-                    {
-                      building && building.requests.length === 0 && <h3>
-                        Bạn không có bất kì yêu cầu nào
-                      </h3>
-                    }
-                    {
-                      building && building.requests.length > 0 && building.requests.map(friend =>
-                        <Friend key={friend._id} friend={friend} onAccept={this.accept(friend)} onCancel={this.cancel(friend)} />,
-                      )
-                    }
-                  </FriendList>
+                  <BuildingRequest
+                    building={building}
+                    error={this.state.errorMessage}
+                    accept={this.accept}
+                    cancel={this.cancel}
+                  />
                 </Tab.Pane>}
               </Tab.Content>
             </Col>
