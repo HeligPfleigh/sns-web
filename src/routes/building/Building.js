@@ -18,7 +18,7 @@ import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import NewPost from '../../components/NewPost';
 import history from '../../core/history';
-import { PUBLIC } from '../../constants';
+import { PUBLIC, ONLY_BUILDING_ADMIN } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import BuildingAnnouncementList, {
   BuildingAnnouncementItem,
@@ -217,7 +217,7 @@ class Building extends Component {
 
     return (
       <Grid>
-        <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={ Math.random() }>
+        <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={Math.random()}>
           <Row className="clearfix">
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
@@ -242,7 +242,20 @@ class Building extends Component {
             <Col sm={7}>
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
-                  <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
+                  <NewPost
+                    displayPrivacyBuilding
+                    createNewPost={createNewPostOnBuilding}
+                    privacy={[
+                      {
+                        name: PUBLIC,
+                        glyph: 'globe',
+                      },
+                      {
+                        name: ONLY_BUILDING_ADMIN,
+                        glyph: 'phone-alt',
+                      },
+                    ]}
+                  />
                   { building && building.posts && <FeedList
                     feeds={building ? building.posts : []}
                     likePostEvent={likePost}
@@ -611,7 +624,7 @@ export default compose(
           message,
         },
         update: (store, { data: { sharingPost } }) => {
-         
+
         },
       }),
     }),

@@ -50,7 +50,8 @@ export const BUILDING_MEMBER_STATUS = [PENDING, ACCEPTED, REJECTED];
 export const PUBLIC = 'PUBLIC';
 export const FRIEND = 'FRIEND';
 export const ONLY_ME = 'ONLY_ME';
-export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME];
+export const ONLY_BUILDING_ADMIN = 'ONLY_BUILDING_ADMIN';
+export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME, ONLY_BUILDING_ADMIN];
 
 // Feed Actions
 export const DELETE_POST_ACTION = 'DELETE_POST_ACTION';

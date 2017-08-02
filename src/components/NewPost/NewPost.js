@@ -27,6 +27,7 @@ import {
   PUBLIC,
   FRIEND,
   ONLY_ME,
+  ONLY_BUILDING_ADMIN,
 } from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
@@ -145,6 +146,12 @@ class NewPost extends React.Component {
         glyph: 'lock',
       });
     }
+    if (eventKey === ONLY_BUILDING_ADMIN) {
+      this.setState({
+        privacy: ONLY_BUILDING_ADMIN,
+        glyph: 'phone-alt',
+      });
+    }
   }
 
   onDeleteImage = (index) => {
@@ -176,7 +183,7 @@ class NewPost extends React.Component {
 
   render() {
     const { editorState, isSubmit, glyph, photos } = this.state;
-    const { displayPrivacy, privacy } = this.props;
+    const { displayPrivacy, displayPrivacyBuilding, privacy } = this.props;
     return (
       <div className={s.newPostPanel}>
         <Col className={s.newPostEditor}>
@@ -237,12 +244,24 @@ class NewPost extends React.Component {
                 <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
               </Dropdown.Toggle>
               <Dropdown.Menu onSelect={this.onChangePrivacy}>
-                {privacy.map(item => { let _id = idRandom(); return (
-                  <MenuItem key={item.name} eventKey={item.name} key={ _id }>
-                    <Glyphicon className={s.glyphicon} glyph={item.glyph} />
-                    {item.name === 'PUBLIC' ? 'Công khai' : (item.name === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}
-                  </MenuItem>
-                )})}
+                {!displayPrivacyBuilding && privacy.map((item) => {
+                  const _id = idRandom();
+                  return (
+                    <MenuItem key={item.name} eventKey={item.name} key={_id}>
+                      <Glyphicon className={s.glyphicon} glyph={item.glyph} />
+                      {item.name === 'PUBLIC' ? 'Công khai' : (item.name === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}
+                    </MenuItem>
+                  );
+                })}
+                {displayPrivacyBuilding && privacy.map((item) => {
+                  const _id = idRandom();
+                  return (
+                    <MenuItem key={item.name} eventKey={item.name} key={_id}>
+                      <Glyphicon className={s.glyphicon} glyph={item.glyph} />
+                      {item.name === 'PUBLIC' ? 'Công khai' : 'Ban quản lý'}
+                    </MenuItem>
+                  );
+                })}
               </Dropdown.Menu>
             </Dropdown>}
           </Col>
@@ -262,12 +281,15 @@ NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
   friend: PropTypes.object,
   displayPrivacy: PropTypes.bool,
+  displayPrivacyBuilding: PropTypes.bool,
   privacy: PropTypes.array,
+
 };
 
 NewPost.defaultProps = {
   createNewPost: doNothing,
   displayPrivacy: true,
+  displayPrivacyBuilding: false,
   privacy: [
     {
       name: PUBLIC,
@@ -281,7 +303,6 @@ NewPost.defaultProps = {
       name: ONLY_ME,
       glyph: 'lock',
     },
-
   ],
 };
 
