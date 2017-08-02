@@ -2,16 +2,12 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import ListImagePreview from '../ListImagePreview';
-import uploadImage from '../../utils/uploadImage';
-
 import {
   Editor,
   EditorState,
   CompositeDecorator,
   convertToRaw,
 } from 'draft-js';
-
 import {
   Col,
   Clearfix,
@@ -20,13 +16,15 @@ import {
   MenuItem,
   Glyphicon,
 } from 'react-bootstrap';
-
+import ListImagePreview from '../ListImagePreview';
+import uploadImage from '../../utils/uploadImage';
 import {
   HANDLE_REGEX,
   HASHTAG_REGEX,
   PUBLIC,
   FRIEND,
   ONLY_ME,
+  ONLY_ADMIN_BUILDING,
 } from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
@@ -145,6 +143,12 @@ class NewPost extends React.Component {
         glyph: 'lock',
       });
     }
+    if (eventKey === ONLY_ADMIN_BUILDING) {
+      this.setState({
+        privacy: ONLY_ADMIN_BUILDING,
+        glyph: 'phone-alt',
+      });
+    }
   }
 
   onDeleteImage = (index) => {
@@ -237,12 +241,15 @@ class NewPost extends React.Component {
                 <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
               </Dropdown.Toggle>
               <Dropdown.Menu onSelect={this.onChangePrivacy}>
-                {privacy.map(item => { let _id = idRandom(); return (
-                  <MenuItem key={item.name} eventKey={item.name} key={ _id }>
+                {privacy.map(item => (
+                  <MenuItem key={item.name} eventKey={item.name}>
                     <Glyphicon className={s.glyphicon} glyph={item.glyph} />
-                    {item.name === 'PUBLIC' ? 'Công khai' : (item.name === 'FRIEND' ? 'Bạn bè' : 'Chỉ mình tôi')}
+                    {item.name === PUBLIC && 'Công khai'}
+                    {item.name === FRIEND && 'Bạn bè' }
+                    {item.name === ONLY_ME && 'Chỉ mình tôi' }
+                    {item.name === ONLY_ADMIN_BUILDING && 'Ban quản trị'}
                   </MenuItem>
-                )})}
+                ))}
               </Dropdown.Menu>
             </Dropdown>}
           </Col>
@@ -281,7 +288,6 @@ NewPost.defaultProps = {
       name: ONLY_ME,
       glyph: 'lock',
     },
-
   ],
 };
 

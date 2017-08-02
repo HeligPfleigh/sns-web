@@ -17,7 +17,7 @@ import { generate as idRandom } from 'shortid';
 import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
-import { PUBLIC } from '../../constants';
+import { PUBLIC, ONLY_ADMIN_BUILDING } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import BuildingAnnouncementList, {
   BuildingAnnouncementItem,
@@ -621,7 +621,7 @@ export default compose(
           message,
         },
         update: (store, { data: { sharingPost } }) => {
-         
+
         },
       }),
     }),

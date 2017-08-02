@@ -4,7 +4,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import FeedList from '../../../components/Feed';
 import NewPost from '../../../components/NewPost';
-import { PUBLIC } from '../../../constants';
+import { PUBLIC, ONLY_ADMIN_BUILDING } from '../../../constants';
 import s from './BuildingFeed.scss';
 
 export const BuildingFeed = ({
@@ -20,7 +20,19 @@ export const BuildingFeed = ({
   sharingPost,
 }) => (
   <div>
-    <NewPost displayPrivacy={false} createNewPost={createNewPostOnBuilding} privacy={[PUBLIC]} />
+    <NewPost
+      createNewPost={createNewPostOnBuilding}
+      privacy={[
+        {
+          name: PUBLIC,
+          glyph: 'globe',
+        },
+        {
+          name: ONLY_ADMIN_BUILDING,
+          glyph: 'phone-alt',
+        },
+      ]}
+    />
     <InfiniteScroll
       loadMore={this.loadMoreRows}
       hasMore={building.posts.pageInfo.hasNextPage}
