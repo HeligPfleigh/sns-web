@@ -18,7 +18,7 @@ import CommentList from '../../components/Comments/CommentList';
 import FeedList, { Feed } from '../../components/Feed';
 import NewPost from '../../components/NewPost';
 import history from '../../core/history';
-import { PUBLIC, ONLY_BUILDING_ADMIN } from '../../constants';
+import { PUBLIC, ONLY_ADMIN_BUILDING } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import BuildingAnnouncementList, {
   BuildingAnnouncementItem,
@@ -251,7 +251,7 @@ class Building extends Component {
                         glyph: 'globe',
                       },
                       {
-                        name: ONLY_BUILDING_ADMIN,
+                        name: ONLY_ADMIN_BUILDING,
                         glyph: 'phone-alt',
                       },
                     ]}

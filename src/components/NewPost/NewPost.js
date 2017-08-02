@@ -27,7 +27,7 @@ import {
   PUBLIC,
   FRIEND,
   ONLY_ME,
-  ONLY_BUILDING_ADMIN,
+  ONLY_ADMIN_BUILDING,
 } from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
@@ -146,9 +146,9 @@ class NewPost extends React.Component {
         glyph: 'lock',
       });
     }
-    if (eventKey === ONLY_BUILDING_ADMIN) {
+    if (eventKey === ONLY_ADMIN_BUILDING) {
       this.setState({
-        privacy: ONLY_BUILDING_ADMIN,
+        privacy: ONLY_ADMIN_BUILDING,
         glyph: 'phone-alt',
       });
     }
