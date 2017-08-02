@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import throttle from 'lodash/throttle';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
@@ -91,6 +92,22 @@ const loadBuildingQuery = gql`
         picture
         firstName
         lastName
+      }
+    }
+  }
+${Feed.fragments.post}`;
+
+const loadMorePostOnBuildingQuery = gql`
+  query loadMorePostOnBuildingQuery ($buildingId: String!, $cursor: String, $limit: Int) {
+    building (_id: $buildingId) {
+      posts (cursor: $cursor, limit: $limit) {
+        edges {
+          ...PostView
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
       }
     }
   }
@@ -204,10 +221,6 @@ class Building extends Component {
     }));
   }
 
-  loadMoreRows = () => {
-    console.log('loadMoreRows');
-  }
-
   render() {
     const {
       data: { building, me },
@@ -220,6 +233,7 @@ class Building extends Component {
       query,
       editPost,
       sharingPost,
+      loadMoreRows,
     } = this.props;
     let tab = POST_TAB;
     if (query.tab) {
@@ -253,18 +267,20 @@ class Building extends Component {
             <Col sm={7}>
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
-                  <BuildingFeed
+                  {building && <BuildingFeed
+                    loadMoreRows={loadMoreRows}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
-                    likePostEvent={likePost}
-                    unlikePostEvent={unlikePost}
+                    likePost={likePost}
+                    unlikePost={unlikePost}
                     me={me}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
-                    deletePost={deletePostOnBuilding}
+                    deletePostOnBuilding={deletePostOnBuilding}
                     editPost={editPost}
                     sharingPost={sharingPost}
                   />
+                  }
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
                   { building && <BuildingInformation building={building} />}
@@ -346,6 +362,7 @@ Building.propTypes = {
   }).isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
+  loadMoreRows: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewPostOnBuilding: PropTypes.func.isRequired,
@@ -379,6 +396,29 @@ export default compose(
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
+      const loadMoreRows = throttle(() => fetchMore({
+        query: loadMorePostOnBuildingQuery,
+        variables: {
+          buildingId: data.building._id,
+          cursor: data.building.posts.pageInfo.endCursor,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newEdges = fetchMoreResult.building.posts.edges;
+          const pageInfo = fetchMoreResult.building.posts.pageInfo;
+          return update(previousResult, {
+            building: {
+              posts: {
+                edges: {
+                  $push: newEdges,
+                },
+                pageInfo: {
+                  $set: pageInfo,
+                },
+              },
+            },
+          });
+        },
+      }), 300);
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {
           commentId,
@@ -397,7 +437,9 @@ export default compose(
           return update(previousResult, {
             building: {
               posts: {
-                $splice: [[index, 1, updatedPost]],
+                edges: {
+                  $splice: [[index, 1, updatedPost]],
+                },
               },
             },
           });
@@ -405,6 +447,7 @@ export default compose(
       });
       return {
         data,
+        loadMoreRows,
         loadMoreComments,
       };
     },
@@ -455,7 +498,9 @@ export default compose(
           data = update(data, {
             building: {
               posts: {
-                $unshift: [createNewPostOnBuilding],
+                edges: {
+                  $unshift: [createNewPostOnBuilding],
+                },
               },
             },
           });
@@ -502,7 +547,9 @@ export default compose(
             return update(previousResult, {
               building: {
                 posts: {
-                  $splice: [[index, 1, updatedPost]],
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
                 },
               },
             });
@@ -539,7 +586,9 @@ export default compose(
             return update(previousResult, {
               building: {
                 posts: {
-                  $splice: [[index, 1, updatedPost]],
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
                 },
               },
             });
@@ -588,7 +637,9 @@ export default compose(
             return update(previousResult, {
               building: {
                 posts: {
-                  $unset: [post._id],
+                  edges: {
+                    $unset: [post._id],
+                  },
                 },
               },
             });
@@ -598,15 +649,12 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate, ownProps }) => ({
+    props: ({ mutate }) => ({
       sharingPost: (postId, privacy, message) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
           message,
-        },
-        update: (store, { data: { sharingPost } }) => {
-
         },
       }),
     }),
@@ -670,7 +718,9 @@ export default compose(
             return update(previousResult, {
               building: {
                 posts: {
-                  $splice: [[index, 1, updatedPost]],
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
                 },
               },
             });
