@@ -17,7 +17,7 @@ import { generate as idRandom } from 'shortid';
 import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
-import { PUBLIC, ONLY_ADMIN_BUILDING } from '../../constants';
+import { PUBLIC } from '../../constants';
 import FriendList, { Friend } from './FriendList';
 import BuildingAnnouncementList, {
   BuildingAnnouncementItem,
@@ -33,6 +33,7 @@ import Errors from './Errors';
 import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
 import BuildingFeed from './BuildingFeed';
+import BuildingInformation from './BuildingInformation';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
@@ -266,23 +267,7 @@ class Building extends Component {
                   />
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
-                  { building &&
-                    <Panel>
-                      <h3 className={s.informationBuildingHeader}>Thông Tin Chung Cư</h3>
-                      <div className={s.hrLine}></div>
-                      <ul className={s.informationBuilding}>
-                        <li>
-                          <strong>Tên Chung Cư</strong>
-                          <br />
-                          <p className={s.textMuted}>{ building.name }</p>
-                        </li>
-                        <li>
-                          <strong>Địa Chỉ Chung Cư</strong>
-                          <p className={s.textMuted}>{building.address.street} {building.address.state} {building.address.city} {building.address.country} </p>
-                        </li>
-                      </ul>
-                    </Panel>
-                  }
+                  { building && <BuildingInformation building={building} />}
                 </Tab.Pane>
                 { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
                   <Panel>
