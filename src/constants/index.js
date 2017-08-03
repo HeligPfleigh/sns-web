@@ -10,6 +10,10 @@ export const GENDER = [MALE, FEMALE];
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
 
+export const PRIVATE_EVENT = 'PRIVATE_EVENT';
+export const PUBLIC_EVENT = 'PUBLIC_EVENT';
+export const EVENT_PRIVACY = [PRIVATE_EVENT, PUBLIC_EVENT];
+
 export const SET_RUNTIME_VARIABLE = 'SET_RUNTIME_VARIABLE';
 export const POST_TYPES = ['STATUS', 'EVENT'];
 

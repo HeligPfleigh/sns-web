@@ -51,6 +51,7 @@ class Html extends React.Component {
           <meta name="theme-color" content="#ffffff" />
           <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, user-scalable=0, width=device-width" />
           <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+          <link href="./bootstrap-datetimepicker.min.css" rel="stylesheet" />
           <style
             type="text/css"
             // eslint-disable-next-line react/no-danger
