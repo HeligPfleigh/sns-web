@@ -567,8 +567,8 @@ export default compose(
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            const index = previousResult.building.posts.findIndex(item => item._id === postId);
-            const currentPost = previousResult.building.posts[index];
+            const index = previousResult.building.posts.edges.findIndex(item => item._id === postId);
+            const currentPost = previousResult.building.posts.edges[index];
             let updatedPost = null;
             if (currentPost._id !== postId) {
               return previousResult;
