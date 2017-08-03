@@ -23,7 +23,6 @@ class NewAnnouncement extends Component {
     } = values;
     this.props.createNewBuildingAnnouncement(type, message)
     .then(({ data }) => {
-      console.log('got data', data);
       this.props.resetForm();
       this.props.openAlertGlobalAction({
         message: 'Bạn đã đăng thông báo thành công',

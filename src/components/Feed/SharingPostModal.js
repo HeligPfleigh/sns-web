@@ -10,7 +10,6 @@ import { HANDLE_REGEX, HASHTAG_REGEX } from '../../constants';
 import HandleSpan from '../../components/Common/Editor/HandleSpan';
 import HashtagSpan from '../../components/Common/Editor/HashtagSpan';
 import Feed from '../../components/Feed/Feed';
-import Divider from '../../components/Divider';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -78,14 +77,11 @@ class SharingPostModal extends Component {
   }
 
   onSubmit = (evt) => {
-    const { postId, commentId, user } = this.props;
     const data = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-
     this.props.clickModal(evt, data);
 
     // reset editor
     this.editor.blur();
-    
     this.setState({
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
@@ -119,27 +115,27 @@ class SharingPostModal extends Component {
           <Modal.Title>Chia sẻ bài viết</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div style={ styles.editor } onClick={ this.focus }>
+          <div style={styles.editor} onClick={this.focus}>
             <Editor
-              editorState={ editorState }
-              onChange={ this.onChange }
-              keyBindingFn={ this._keyBindingFn }
-              handleKeyCommand={ this._handleKeyCommand }
-              ref={ editor => (this.editor = editor) }
+              editorState={editorState}
+              onChange={this.onChange}
+              keyBindingFn={this._keyBindingFn}
+              handleKeyCommand={this._handleKeyCommand}
+              ref={editor => (this.editor = editor)}
               placeholder="Nói gì đó về nó ..."
               spellCheck
             />
           </div>
 
           <Feed
-            data={ this.props.sharingFeed }            
-            sharingPostModalOpenned={ true }
+            data={this.props.sharingFeed}
+            sharingPostModalOpenned
           />
 
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeModal}>Hủy</Button>
-          <Button bsStyle="primary" onClick={ this.onSubmit.bind(this) }  disabled={ !isSubmit }>Chia sẻ bài viết</Button>
+          <Button bsStyle="primary" onClick={this.onSubmit} disabled={!isSubmit}>Chia sẻ bài viết</Button>
         </Modal.Footer>
       </Modal>
     );
@@ -151,6 +147,7 @@ SharingPostModal.propTypes = {
   closeModal: PropTypes.func,
   clickModal: PropTypes.func,
   sharingFeed: PropTypes.object.isRequired,
+  isFocus: PropTypes.bool,
 };
 
 export default SharingPostModal;

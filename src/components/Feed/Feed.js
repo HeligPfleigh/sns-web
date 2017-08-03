@@ -16,7 +16,14 @@ import Link from '../Link';
 import EditPost from './EditPost';
 import SharingPost from './SharingPost';
 import CommentList from '../Comments/CommentList';
-import { PUBLIC, FRIEND, ONLY_ME, DELETE_POST_ACTION, EDIT_POST_ACTION } from '../../constants';
+import {
+  PUBLIC,
+  FRIEND,
+  ONLY_ME,
+  DELETE_POST_ACTION,
+  EDIT_POST_ACTION,
+  ONLY_ADMIN_BUILDING,
+} from '../../constants';
 import s from './Feed.scss';
 
 function doNothing(e) {
@@ -179,6 +186,7 @@ class Feed extends Component {
             { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
             { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
             { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
+            { ONLY_ADMIN_BUILDING === privacy && <Icon onClick={doNothing} icons="fa fa-bell fa-1" /> }
             <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
           </div>}
           menuRight={
@@ -323,7 +331,7 @@ Feed.propTypes = {
   }),
   editPostEvent: PropTypes.func.isRequired,
   sharingPostEvent: PropTypes.func.isRequired,
-  sharingPostModalOpenned: PropTypes.bool
+  sharingPostModalOpenned: PropTypes.bool,
 };
 
 Feed.defaultProps = {
@@ -339,7 +347,6 @@ Feed.defaultProps = {
   unlikePostEvent: noop,
   loadMoreComments: noop,
   createNewComment: noop,
-  editPostEvent: noop,
   sharingPostEvent: noop,
 };
 
@@ -461,13 +468,6 @@ Feed.fragments = {
 };
 
 Feed.mutation = {
-  createNewPost: gql`mutation createNewPost ($message: String!,  $photos: [String], $userId: String) {
-    createNewPost(message: $message, photos: $photos,userId: $userId) {
-      ...PostView
-    }
-  }
-  ${Feed.fragments.post}
-  `,
   editPost: gql`mutation editPost ($postId: String!, $message: String!, $photos: [String], $isDelPostSharing: Boolean!) {
     editPost(_id: $postId, message: $message, photos: $photos, isDelPostSharing: $isDelPostSharing) {
       ...PostView

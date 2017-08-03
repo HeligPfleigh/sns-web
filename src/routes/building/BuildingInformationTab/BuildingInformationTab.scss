@@ -1,0 +1,26 @@
+ul>li>a {
+    color: #6e7179;
+    i {
+        font-size: 17px;
+        margin-right: 5px;
+    }
+}
+.informationBuildingHeader {
+  margin-top: 0px;
+  font-weight: 100;
+  color: #6e7179;
+}
+.hrLine {
+  border-top: 1px solid #e7eaec;
+  color: #ffffff;
+  background-color: #ffffff;
+  height: 1px;
+  margin: 10px 0;
+}
+.informationBuilding {
+  list-style: none;
+  padding-left: 10px;
+  .textMuted {
+    color: #99abb4;
+  }
+}

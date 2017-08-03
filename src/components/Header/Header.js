@@ -149,6 +149,7 @@ class Header extends React.Component {
   }
 
   render() {
+    console.log('render');
     const {
       data: { notifications, me, refetch },
       loadMoreRows,
@@ -234,8 +235,8 @@ export default compose(
   withStyles(s),
   graphql(headerQuery, {
     options: () => ({
-      // variables: {},
-      pollInterval: 30000,
+      variables: {},
+      // pollInterval: 30000,
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
