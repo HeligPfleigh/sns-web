@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Panel } from 'react-bootstrap';
-import s from './BuildingInformation.scss';
+import s from './BuildingInformationTab.scss';
 
-export const BuildingInformation = ({ building }) => (
+export const BuildingInformationTab = ({ building }) => (
   <Panel>
     <h3 className={s.informationBuildingHeader}>Thông Tin Chung Cư</h3>
     <div className={s.hrLine}></div>
@@ -22,8 +22,8 @@ export const BuildingInformation = ({ building }) => (
   </Panel>
 );
 
-BuildingInformation.propTypes = {
+BuildingInformationTab.propTypes = {
   building: PropTypes.object,
 };
 
-export default withStyles(s)(BuildingInformation);
+export default withStyles(s)(BuildingInformationTab);

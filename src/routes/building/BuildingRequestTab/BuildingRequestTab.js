@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import FriendList, { Friend } from '../FriendList';
 import Errors from '../Errors';
-import s from './BuildingRequest.scss';
+import s from './BuildingRequestTab.scss';
 
-export const BuildingRequest = ({ building, error, accept, cancel }) => (
+export const BuildingRequestTab = ({ building, error, accept, cancel }) => (
   <FriendList>
     <Errors
       open
@@ -25,11 +25,11 @@ export const BuildingRequest = ({ building, error, accept, cancel }) => (
   </FriendList>
 );
 
-BuildingRequest.propTypes = {
+BuildingRequestTab.propTypes = {
   building: PropTypes.object,
   error: PropTypes.string,
   accept: PropTypes.func,
   cancel: PropTypes.func,
 };
 
-export default withStyles(s)(BuildingRequest);
+export default withStyles(s)(BuildingRequestTab);

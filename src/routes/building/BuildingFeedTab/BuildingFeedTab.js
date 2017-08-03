@@ -5,9 +5,9 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import FeedList from '../../../components/Feed';
 import NewPost from '../../../components/NewPost';
 import { PUBLIC, ONLY_ADMIN_BUILDING } from '../../../constants';
-import s from './BuildingFeed.scss';
+import s from './BuildingFeedTab.scss';
 
-class BuildingFeed extends Component {
+class BuildingFeedTab extends Component {
 
   render() {
     const {
@@ -60,7 +60,7 @@ class BuildingFeed extends Component {
   }
 }
 
-BuildingFeed.propTypes = {
+BuildingFeedTab.propTypes = {
   createNewPostOnBuilding: PropTypes.func.isRequired,
   building: PropTypes.object.isRequired,
   me: PropTypes.object.isRequired,
@@ -75,4 +75,4 @@ BuildingFeed.propTypes = {
   sharingPost: PropTypes.func.isRequired,
 };
 
-export default withStyles(s)(BuildingFeed);
+export default withStyles(s)(BuildingFeedTab);

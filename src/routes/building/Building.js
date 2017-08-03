@@ -12,16 +12,12 @@ import {
   Tab,
   NavItem,
   Nav,
-  Panel,
 } from 'react-bootstrap';
 import { generate as idRandom } from 'shortid';
 import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
-import BuildingAnnouncementList, {
-  BuildingAnnouncementItem,
-} from '../../components/BuildingAnnouncementList';
 import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
 import deleteBuildingAnnouncementMutation from './deleteBuildingAnnouncementMutation.graphql';
 import updateBuildingAnnouncementMutation from './updateBuildingAnnouncementMutation.graphql';
@@ -29,11 +25,11 @@ import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBu
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
 import DeleteBuildingAnnouncementModal from './DeleteBuildingAnnouncementModal';
 import EditBuildingAnnouncementModal from './EditBuildingAnnouncementModal';
-import NewAnnouncement from './NewAnnouncement';
 import Sponsored from './Sponsored';
-import BuildingFeed from './BuildingFeed';
-import BuildingInformation from './BuildingInformation';
-import BuildingRequest from './BuildingRequest';
+import BuildingFeedTab from './BuildingFeedTab';
+import BuildingInformationTab from './BuildingInformationTab';
+import BuildingRequestTab from './BuildingRequestTab';
+import BuildingAnnouncementTab from './BuildingAnnouncementTab';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
@@ -156,7 +152,6 @@ class Building extends Component {
       message,
     )
     .then(({ data }) => {
-      console.log('got data', data);
       this.closeModal();
       this.setState(() => ({
         idEditAnnouncement: null,
@@ -275,7 +270,7 @@ class Building extends Component {
             <Col sm={7}>
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
-                  {building && <BuildingFeed
+                  {building && <BuildingFeedTab
                     loadMoreRows={this.loadMoreRows}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
@@ -291,35 +286,18 @@ class Building extends Component {
                   }
                 </Tab.Pane>
                 <Tab.Pane eventKey={INFO_TAB}>
-                  { building && <BuildingInformation building={building} />}
+                  { building && <BuildingInformationTab building={building} />}
                 </Tab.Pane>
                 { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
-                  <Panel>
-                    <NewAnnouncement
-                      buildingId={building._id}
-                      query={loadBuildingQuery}
-                      param={{
-                        buildingId: building._id,
-                        limit: 1000,
-                      }}
-                    />
-                  </Panel>
-                  <BuildingAnnouncementList>
-                    {
-                      building && building.announcements && building.announcements.edges.map(a =>
-                        <BuildingAnnouncementItem
-                          key={a._id}
-                          data={a}
-                          onDelete={this.deleteAnnouncement}
-                          onEdit={this.editAnnouncement}
-                          displayAction
-                        />,
-                      )
-                    }
-                  </BuildingAnnouncementList>
+                  <BuildingAnnouncementTab
+                    building={building}
+                    loadBuildingQuery={loadBuildingQuery}
+                    deleteAnnouncement={this.deleteAnnouncement}
+                    editAnnouncement={this.editAnnouncement}
+                  />
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
-                  <BuildingRequest
+                  <BuildingRequestTab
                     building={building}
                     error={this.state.errorMessage}
                     accept={this.accept}
