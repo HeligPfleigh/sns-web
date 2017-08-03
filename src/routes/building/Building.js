@@ -26,14 +26,17 @@ import BuildingFeedTab from './BuildingFeedTab';
 import BuildingInformationTab from './BuildingInformationTab';
 import BuildingRequestTab from './BuildingRequestTab';
 import BuildingAnnouncementTab from './BuildingAnnouncementTab';
+import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const REQUEST_TAB = 'REQUEST_TAB';
+const USERS_AWAITING_APPROVAL_TAB = 'USERS_AWAITING_APPROVAL_TAB';
+
 const loadBuildingQuery = gql`
-  query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int) {
+  query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int, $cursor: String) {
     building (_id: $buildingId) {
       _id
       name
@@ -43,7 +46,7 @@ const loadBuildingQuery = gql`
         state
         street
       }
-      posts {
+      posts(cursor: $cursor) {
         edges {
           ...PostView
         }
@@ -68,11 +71,18 @@ const loadBuildingQuery = gql`
       }
       isAdmin
       requests {
-        _id
-        profile {
-          picture
-          firstName
-          lastName
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          _id
+          username
+          profile {
+            picture
+            firstName
+            lastName
+          }
         }
       }
     }
@@ -103,6 +113,22 @@ const loadMorePostOnBuildingQuery = gql`
     }
   }
 ${Feed.fragments.post}`;
+
+const loadMoreUsersAwaitingApprovalBuildingQuery = gql`
+  query loadMoreUsersAwaitingApprovalBuildingQuery ($buildingId: String!, $cursor: String, $limit: Int) {
+    building (_id: $buildingId) {
+      requests (cursor: $cursor, limit: $limit) {
+        edges {
+          ...UsersAwaitingApproval
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+      }
+    }
+  }
+${Feed.fragments.requests}`;
 
 const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $photos: [String], $buildingId: String!, $privacy: PrivacyType) {
   createNewPostOnBuilding(message: $message, photos: $photos, buildingId: $buildingId, privacy: $privacy) {
@@ -145,19 +171,29 @@ class Building extends Component {
     history.push(`${pathname}?tab=${key}`);
   }
 
-  loadMoreRows = () => {
+  loadMoreFeeds = () => {
     const {
-      loadMoreRows,
+      loadMoreFeeds,
       query,
     } = this.props;
     if (query && (query.tab === POST_TAB || !query.tab)) {
-      loadMoreRows();
+      loadMoreFeeds();
+    }
+  }
+
+  loadMoreUsersAwaitingApproval = () => {
+    const {
+      loadMoreUsersAwaitingApproval,
+      query,
+    } = this.props;
+    if (query && (query.tab === USERS_AWAITING_APPROVAL_TAB || !query.tab)) {
+      loadMoreUsersAwaitingApproval();
     }
   }
 
   render() {
     const {
-      data: { building, me },
+      data: { building, me, loading },
       likePost,
       unlikePost,
       createNewComment,
@@ -168,9 +204,14 @@ class Building extends Component {
       editPost,
       sharingPost,
     } = this.props;
+
     let tab = POST_TAB;
     if (query.tab) {
       tab = query.tab;
+    }
+console.log(loading);
+    if (loading) {
+      return <div>loading ....</div>;
     }
 
     return (
@@ -195,18 +236,22 @@ class Building extends Component {
                   <i className="fa fa-question-circle" aria-hidden="true"></i>
                   Yêu cầu
                 </NavItem> }
+                { building && building.isAdmin && <NavItem title="Danh sách thành viên tòa nhà" eventKey={USERS_AWAITING_APPROVAL_TAB}>
+                  <i className="fa fa-users" aria-hidden="true"></i>
+                  Thành viên
+                </NavItem> }
               </Nav>
             </Col>
             <Col sm={7}>
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
                   {building && <BuildingFeedTab
-                    loadMoreRows={this.loadMoreRows}
+                    loadMoreFeeds={this.loadMoreFeeds}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
                     likePost={likePost}
                     unlikePost={unlikePost}
-                    me={me}
+                    me={me ? me : {}}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePostOnBuilding={deletePostOnBuilding}
@@ -236,6 +281,10 @@ class Building extends Component {
                     cancel={this.cancel}
                   />
                 </Tab.Pane>}
+                {/* Users awaiting approval */}
+                { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
+                  <ListUsersAwaitingApproval data={building.requests} loadMore={this.loadMoreUsersAwaitingApproval} />
+                </Tab.Pane>) }
               </Tab.Content>
             </Col>
             <Col sm={3}>
@@ -257,7 +306,8 @@ Building.propTypes = {
   }).isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
-  loadMoreRows: PropTypes.func.isRequired,
+  loadMoreFeeds: PropTypes.func.isRequired,
+  loadMoreUsersAwaitingApproval: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewPostOnBuilding: PropTypes.func.isRequired,
@@ -265,15 +315,8 @@ Building.propTypes = {
   acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
   rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
-  // buildingId: PropTypes.string.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
-};
-
-Building.defaultProps = {
-  data: {
-    loading: false,
-  },
 };
 
 export default compose(
@@ -284,28 +327,32 @@ export default compose(
         buildingId: props.buildingId,
         limit: 1000, // FIXME: paging
       },
-      fetchPolicy: 'network-only',
-      // fetchPolicy: 'cache-and-network', ???
+      fetchPolicy: 'cache-and-network',
     }),
-    props: ({ data }) => {
+    props: ({ ownProps, data }) => {
+      if (!data) { 
+        return;
+      }
+      
       const { fetchMore } = data;
-      const loadMoreRows = throttle(() => fetchMore({
+      const loadMoreFeeds = throttle(() => fetchMore({
         query: loadMorePostOnBuildingQuery,
         variables: {
           buildingId: data.building._id,
           cursor: data.building.posts.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.building.posts.edges;
-          const pageInfo = fetchMoreResult.building.posts.pageInfo;
+          if (!fetchMoreResult) { 
+            return nextResult;
+          }
           return update(previousResult, {
             building: {
               posts: {
                 edges: {
-                  $push: newEdges,
+                  $push: fetchMoreResult.building.posts.edges,
                 },
                 pageInfo: {
-                  $set: pageInfo,
+                  $set: fetchMoreResult.building.posts.pageInfo,
                 },
               },
             },
@@ -320,7 +367,9 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { return previousResult; }
+          if (!fetchMoreResult) { 
+            return nextResult;
+          }
           const index = previousResult.building.posts.edges.findIndex(item => item._id === postId);
           const updatedPost = update(previousResult.building.posts[index], {
             comments: {
@@ -338,10 +387,37 @@ export default compose(
           });
         },
       });
+      
+      const loadMoreUsersAwaitingApproval = throttle(() => fetchMore({
+        query: loadMoreUsersAwaitingApprovalBuildingQuery,
+        variables: {
+          buildingId: data.building._id,
+          cursor: data.building.requests.pageInfo.endCursor,
+        },
+        updateQuery: (previousResult, { nextResult }) => {
+          if (!nextResult) { 
+            return nextResult;
+          }
+          return update(previousResult, {
+            building: {
+              requests: {
+                edges: {
+                  $push: nextResult.building.requests.edges,
+                },
+                pageInfo: {
+                  $set: nextResult.building.requests.pageInfo,
+                },
+              },
+            },
+          });
+        },
+      }), 300);
+
       return {
         data,
-        loadMoreRows,
+        loadMoreFeeds,
         loadMoreComments,
+        loadMoreUsersAwaitingApproval,
       };
     },
   }),

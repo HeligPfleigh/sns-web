@@ -140,6 +140,9 @@ export default compose(
       variables: { _id: props.id },
     }),
     props: ({ data }) => {
+      if (!data) { 
+        return;
+      }
       const { fetchMore } = data;
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {

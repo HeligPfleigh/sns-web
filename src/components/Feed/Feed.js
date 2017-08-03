@@ -383,6 +383,21 @@ const commentFragment = gql`fragment CommentView on Comment {
 
 Feed.fragments = {
   comment: commentFragment,
+  requests: gql`
+    fragment UsersAwaitingApproval on Friend {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+      chatId
+      isFriend
+      createdAt
+      updatedAt
+    }
+  `,
   // user: userFragment,
   post: gql`
     fragment PostView on Post {

@@ -12,16 +12,16 @@ export const BuildingRequestTab = ({ building, error, accept, cancel }) => (
       message={error}
       autoHideDuration={4000}
     />
-    {
-      building && building.requests.length === 0 && <h3>
+    { /*
+      building && building.requests && <h3>
         Bạn không có bất kì yêu cầu nào
       </h3>
-    }
-    {
-      building && building.requests.length > 0 && building.requests.map(friend =>
+    */ }
+    {/*
+      building && building.requests && building.requests.edges.map(friend =>
         <Friend key={friend._id} friend={friend} onAccept={accept(friend)} onCancel={cancel(friend)} />,
       )
-    }
+    */}
   </FriendList>
 );
 

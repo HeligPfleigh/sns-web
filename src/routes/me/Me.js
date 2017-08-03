@@ -108,7 +108,7 @@ class Me extends React.Component {
       tab = MY_INFO;
     }
     let hasNextPage = false;
-    if (!loading && me.posts && me.posts.pageInfo) {
+    if (!loading && me && me.posts && me.posts.pageInfo) {
       hasNextPage = me.posts.pageInfo.hasNextPage;
     }
     return (
@@ -200,10 +200,6 @@ Me.propTypes = {
   sharingPost: PropTypes.func.isRequired,
 };
 
-Me.defaultProps = {
-  data: [],
-};
-
 export default compose(
   withStyles(s),
   connect(state => ({
@@ -215,9 +211,12 @@ export default compose(
         _id: ownProps.user.id,
         cursor: null,
       },
-      fetchPolicy: 'network-only',
     }),
     props: ({ ownProps, data }) => {
+      if (!data) { 
+        return;
+      }
+
       const { fetchMore } = data;
       const loadMoreRows = throttle(() => fetchMore({
         variables: {
@@ -251,7 +250,6 @@ export default compose(
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const index = previousResult.resident.posts.findIndex(item => item._id === fetchMoreResult.post._id);
-
           const updatedPost = update(previousResult.resident.posts[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
