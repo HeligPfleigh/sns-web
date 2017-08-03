@@ -19,12 +19,8 @@ import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
 import deletePostOnBuildingMutation from './deletePostOnBuildingMutation.graphql';
-import deleteBuildingAnnouncementMutation from './deleteBuildingAnnouncementMutation.graphql';
-import updateBuildingAnnouncementMutation from './updateBuildingAnnouncementMutation.graphql';
 import acceptRequestForJoiningBuildingMutation from './acceptRequestForJoiningBuildingMutation.graphql';
 import rejectRequestForJoiningBuildingMutation from './rejectRequestForJoiningBuildingMutation.graphql';
-import DeleteBuildingAnnouncementModal from './DeleteBuildingAnnouncementModal';
-import EditBuildingAnnouncementModal from './EditBuildingAnnouncementModal';
 import Sponsored from './Sponsored';
 import BuildingFeedTab from './BuildingFeedTab';
 import BuildingInformationTab from './BuildingInformationTab';
@@ -123,56 +119,7 @@ class Building extends Component {
     this.state = {
       errorMessage: '',
       activeTab: POST_TAB,
-      showDeleteAnnouncement: false,
-      showEditAnnouncement: false,
-      idDeleteAnnouncemen: null,
-      idEditAnnouncement: null,
-      announcementType: null,
-      announcementMessage: null,
     };
-  }
-
-  onClickDeleteModal = (evt) => {
-    evt.preventDefault();
-    this.props.deleteBuildingAnnouncement(this.state.idDeleteAnnouncemen)
-    .then(({ data }) => {
-      console.log('got data', data);
-      this.closeModal();
-      this.setState(() => ({
-        idDeleteAnnouncemen: null,
-      }));
-    }).catch((error) => {
-      console.log('there was an error sending the query', error);
-    });
-  }
-
-  onClickEditModal = (message) => {
-    this.props.updateBuildingAnnouncement(
-      this.state.idEditAnnouncement,
-      message,
-    )
-    .then(({ data }) => {
-      this.closeModal();
-      this.setState(() => ({
-        idEditAnnouncement: null,
-      }));
-    }).catch((error) => {
-      console.log('there was an error sending the query', error);
-    });
-  }
-
-  closeModal = () => {
-    const { idDeleteAnnouncemen, idEditAnnouncement } = this.state;
-    if (idDeleteAnnouncemen) {
-      this.setState(() => ({
-        showDeleteAnnouncement: false,
-      }));
-    }
-    if (idEditAnnouncement) {
-      this.setState(() => ({
-        showEditAnnouncement: false,
-      }));
-    }
   }
 
   accept = friend => (evt) => {
@@ -196,23 +143,6 @@ class Building extends Component {
   handleSelect = (key) => {
     const { pathname } = history.location;
     history.push(`${pathname}?tab=${key}`);
-  }
-
-  deleteAnnouncement = (id, message) => {
-    this.setState(() => ({
-      showDeleteAnnouncement: true,
-      idDeleteAnnouncemen: id,
-      announcementMessage: message,
-    }));
-  }
-
-  editAnnouncement = (id, message, type) => {
-    this.setState(() => ({
-      showEditAnnouncement: true,
-      idEditAnnouncement: id,
-      announcementMessage: message,
-      announcementType: type,
-    }));
   }
 
   loadMoreRows = () => {
@@ -292,8 +222,10 @@ class Building extends Component {
                   <BuildingAnnouncementTab
                     building={building}
                     loadBuildingQuery={loadBuildingQuery}
-                    deleteAnnouncement={this.deleteAnnouncement}
-                    editAnnouncement={this.editAnnouncement}
+                    param={{
+                      buildingId: building._id,
+                      limit: 1000,
+                    }}
                   />
                 </Tab.Pane>}
                 { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
@@ -311,18 +243,6 @@ class Building extends Component {
             </Col>
           </Row>
         </Tab.Container>
-        <DeleteBuildingAnnouncementModal
-          message={this.state.announcementMessage}
-          show={this.state.showDeleteAnnouncement}
-          closeModal={this.closeModal}
-          clickModal={this.onClickDeleteModal}
-        />
-        <EditBuildingAnnouncementModal
-          message={this.state.announcementMessage}
-          show={this.state.showEditAnnouncement}
-          closeModal={this.closeModal}
-          clickModal={this.onClickEditModal}
-        />
       </Grid>
     );
   }
@@ -348,8 +268,6 @@ Building.propTypes = {
   // buildingId: PropTypes.string.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
-  deleteBuildingAnnouncement: PropTypes.func.isRequired,
-  updateBuildingAnnouncement: PropTypes.func.isRequired,
 };
 
 Building.defaultProps = {
@@ -760,73 +678,6 @@ export default compose(
                 },
               },
             });
-          },
-        },
-      }),
-    }),
-  }),
-
-  graphql(deleteBuildingAnnouncementMutation, {
-    props: ({ ownProps, mutate }) => ({
-      deleteBuildingAnnouncement: announcementId => mutate({
-        variables: {
-          input: {
-            buildingId: ownProps.buildingId,
-            announcementId,
-          },
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          deleteBuildingAnnouncement: {
-            __typename: 'DeleteBuildingAnnouncementPayload',
-            announcement: {
-              __typename: 'BuildingAnnouncement',
-              _id: announcementId,
-            },
-          },
-        },
-        update: (store, { data: { deleteBuildingAnnouncement } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: loadBuildingQuery,
-            variables: {
-              buildingId: ownProps.buildingId,
-              limit: 1000,
-            },
-          });
-          const announcement = deleteBuildingAnnouncement.announcement;
-          data = update(data, {
-            building: {
-              announcements: {
-                edges: {
-                  $unset: [announcement._id],
-                },
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: loadBuildingQuery,
-            variables: {
-              buildingId: ownProps.buildingId,
-              limit: 1000,
-            },
-            data,
-          });
-        },
-      }),
-    }),
-  }),
-  graphql(updateBuildingAnnouncementMutation, {
-    props: ({ ownProps, mutate }) => ({
-      updateBuildingAnnouncement: (announcementId, message) => mutate({
-        variables: {
-          input: {
-            buildingId: ownProps.buildingId,
-            announcementId,
-            announcementInput: {
-              message,
-            },
           },
         },
       }),
