@@ -1,3 +1,61 @@
-.containerTop30 {
-  margin-top: 30px;
+.profile{
+  background-color: #fff;
+  padding: 20px 15px;
+  .profileInfo {
+    margin-bottom: 15px;
+    i {
+      color: #c7d1d8 !important
+    }
+  }
+  i {
+    color: #4c4c4c;
+    width: 40px;
+    font-size: 24px;
+    display: inline-block;
+  }
+  h4 {
+    display: inline-block;
+  }
+  h3{
+    margin-top: 50px;
+    margin-bottom: 30px;
+  }
+  .profileRight {
+    margin-top: 7px;
+  }
+}
+.buttonAccept {
+  background-color: #263E49;
+  border: 0px;
+  border-radius:4px;
+  padding: 10px 15px;
+  margin-right: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  width: 150px;
+}
+.buttonCancel {
+  border: 0px;
+  border-radius:4px;
+  padding: 10px 15px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  width: 150px;
+}
+
+@media (max-width: 992px) {
+  .profile {
+    .backBuildingRequestTab {
+      margin-top: 30px;  
+    }
+  }
+  .buttonAccept {
+    width: 130px;
+  }
+  .buttonCancel {
+    width: 130px;
+  }
 }
