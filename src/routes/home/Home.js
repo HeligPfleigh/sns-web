@@ -237,7 +237,7 @@ export default compose(
           homePageQuery: (previousResult, { mutationResult }) => {
             let updatedPost = mutationResult.data.likePost;
             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.user.posts[index], {
+            updatedPost = Object.assign({}, previousResult.feeds.edges[index], {
               totalLikes: totalLikes + 1,
               isLiked: true,
             });
@@ -272,7 +272,7 @@ export default compose(
           homePageQuery: (previousResult, { mutationResult }) => {
             let updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.user.posts[index], {
+            updatedPost = Object.assign({}, previousResult.feeds.edges[index], {
               totalLikes: totalLikes - 1,
               isLiked: false,
             });

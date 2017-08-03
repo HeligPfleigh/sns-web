@@ -414,8 +414,8 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.likePost, {
-    props: ({ ownProps, mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments) => mutate({
+    props: ({ mutate }) => ({
+      likePost: (postId, message, totalLikes) => mutate({
         variables: {
           postId,
         },
@@ -424,22 +424,16 @@ export default compose(
           likePost: {
             __typename: 'PostSchemas',
             _id: postId,
-            message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
-            totalLikes: totalLikes + 1,
-            totalComments,
-            isLiked: true,
           },
         },
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.likePost;
+            let updatedPost = mutationResult.data.likePost;
             const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.building.posts.edges[index], {
+              totalLikes: totalLikes + 1,
+              isLiked: true,
+            });
             return update(previousResult, {
               building: {
                 posts: {
@@ -455,30 +449,24 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.unlikePost, {
-    props: ({ ownProps, mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments) => mutate({
+    props: ({ mutate }) => ({
+      unlikePost: (postId, message, totalLikes) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           unlikePost: {
-            __typename: 'Post',
+            __typename: 'PostSchemas',
             _id: postId,
-            message,
-            user: {
-              __typename: 'Friend',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
-            totalLikes: totalLikes - 1,
-            totalComments,
-            isLiked: false,
           },
         },
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
-            const updatedPost = mutationResult.data.unlikePost;
+            let updatedPost = mutationResult.data.unlikePost;
             const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.building.posts.edges[index], {
+              totalLikes: totalLikes - 1,
+              isLiked: false,
+            });
             return update(previousResult, {
               building: {
                 posts: {
