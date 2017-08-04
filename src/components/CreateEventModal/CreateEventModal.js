@@ -108,6 +108,17 @@ class CreateEventModal extends Component {
     }
 
     this.props.createNewEvent(privary, bannerUrl, nameEvent, location, start.toDate(), end.toDate(), description);
+    this.setState({
+      nameEvent: '',
+      validationNameEventText: '',
+      bannerUrl: '',
+      start: moment(),
+      end: moment(),
+      location: '',
+      description: '',
+      privary: PUBLIC_EVENT,
+      validateDescriptionText: '',
+    });
     this.props.closeModal();
   }
   onDescriptionChange = (e) => {
