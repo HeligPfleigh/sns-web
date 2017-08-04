@@ -7,17 +7,33 @@ import InputWithValidation from './InputWithValidation';
 import moment from 'moment';
 import { generate as idRandom } from 'shortid';
 import uploadImage from '../../utils/uploadImage';
-import { PRIVATE_EVENT, PUBLIC_EVENT } from '../../constants';
+import {
+  HANDLE_REGEX,
+  HASHTAG_REGEX,
+  PUBLIC,
+  FRIEND,
+  ONLY_ME,
+} from '../../constants';
 import Draft from 'draft-js';
 import gql from 'graphql-tag';
+import {
+  Editor,
+  EditorState,
+  CompositeDecorator,
+  convertToRaw,
+} from 'draft-js';
+
+import HandleSpan from '../Common/Editor/HandleSpan';
+import HashtagSpan from '../Common/Editor/HashtagSpan';
 
 import DateTime from 'react-datetime';
 
 // const DateTimeField = require('react-bootstrap-datetimepicker');
 
 const PRIVARY_TEXT = {
-  PRIVATE_EVENT: 'Riêng tư',
-  PUBLIC_EVENT: 'Công khai',
+  ONLY_ME: 'Chỉ mình tôi',
+  PUBLIC: 'Công khai',
+  FRIEND: 'Bạn bè',
 };
 
 moment.locale('vi');
@@ -33,16 +49,44 @@ CustomToggle.propTypes = {
   children: PropTypes.node,
 };
 
+const findWithRegex = (regex, contentBlock, callback) => {
+  const text = contentBlock.getText();
+  let start;
+  let matchArr = regex.exec(text);
+  while (matchArr !== null) {
+    start = matchArr.index;
+    callback(start, start + matchArr[0].length);
+    matchArr = regex.exec(text);
+  }
+};
+
+const handleStrategy = (contentBlock, callback) => {
+  findWithRegex(HANDLE_REGEX, contentBlock, callback);
+};
+
+const hashtagStrategy = (contentBlock, callback) => {
+  findWithRegex(HASHTAG_REGEX, contentBlock, callback);
+};
+
+const compositeDecorator = new CompositeDecorator([{
+  strategy: handleStrategy,
+  component: HandleSpan,
+},
+{
+  strategy: hashtagStrategy,
+  component: HashtagSpan,
+}]);
+
 class CreateEventModal extends Component {
   state = {
+    editorState: EditorState.createEmpty(compositeDecorator),
     nameEvent: '',
     validationNameEventText: '',
-    bannerUrl: '',
+    photos: '',
     start: moment(),
     end: moment(),
     location: '',
-    description: '',
-    privary: PUBLIC_EVENT,
+    privacy: PUBLIC,
     validateDescriptionText: '',
   };
 
@@ -65,14 +109,14 @@ class CreateEventModal extends Component {
   onSelectPrivary = (eventKey, event) => {
     event.preventDefault();
     this.setState({
-      privary: eventKey,
+      privacy: eventKey,
     });
   }
 
   onSubmit = () => {
-    const { privary, bannerUrl, nameEvent, location, start, end, description } = this.state;
-
-    if (bannerUrl.length === 0) {
+    const { privacy, photos, nameEvent, location, start, end } = this.state;
+    const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (photos.length === 0) {
       this.setState({
         validateDescriptionText: 'Vui lòng chọn ảnh sự kiện',
       });
@@ -100,13 +144,14 @@ class CreateEventModal extends Component {
       return;
     }
 
-    if (description.length <= 10) {
+    if (message.length <= 10) {
       this.setState({
         validateDescriptionText: 'Mô tả quá ngắn',
       });
       return;
     }
 
+<<<<<<< HEAD
     this.props.createNewEvent(privary, bannerUrl, nameEvent, location, start.toDate(), end.toDate(), description);
     this.setState({
       nameEvent: '',
@@ -118,8 +163,29 @@ class CreateEventModal extends Component {
       description: '',
       privary: PUBLIC_EVENT,
       validateDescriptionText: '',
+=======
+    this.props.createNewEvent({
+      privacy,
+      photos: [photos],
+      name: nameEvent,
+      location,
+      start: start.toDate(),
+      end: end.toDate(),
+      message,
+>>>>>>> feature/419_create_FE_for_Add_event
     });
     this.props.closeModal();
+    this.setState({
+      editorState: EditorState.createEmpty(compositeDecorator),
+      nameEvent: '',
+      validationNameEventText: '',
+      phots: '',
+      start: moment(),
+      end: moment(),
+      location: '',
+      privacy: PUBLIC,
+      validateDescriptionText: '',
+    });
   }
   onDescriptionChange = (e) => {
     if (this.state.description.length <= 10) {
@@ -136,11 +202,18 @@ class CreateEventModal extends Component {
     });
   }
 
+  onChangeMessage = (editorState) => {
+    this.setState(prevState => ({
+      ...prevState,
+      editorState,
+    }));
+  }
+
   uploadImages = async (file) => {
     try {
       const result = await uploadImage(file);
       this.setState({
-        bannerUrl: result.url,
+        photos: result.url,
       });
     } catch (err) {
       throw err;
@@ -177,6 +250,7 @@ class CreateEventModal extends Component {
   }
 
   render() {
+    const { editorState } = this.state;
     return (
       <Modal show={this.props.show} onHide={this.props.closeModal}>
         <Modal.Header closeButton>
@@ -205,11 +279,11 @@ class CreateEventModal extends Component {
                     />
                   </Button>
                 </div>
-                {this.state.bannerUrl.length > 0 ?
+                {this.state.photos.length > 0 ?
                   <div className={s.wrapperImage}>
                     <Image
                       style={{ maxHeight: '100%' }}
-                      src={this.state.bannerUrl}
+                      src={this.state.photos}
                       responsive
                     />
                   </div> : null}
@@ -288,13 +362,22 @@ class CreateEventModal extends Component {
             <div className={s.rowItem}>
               <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Miêu tả</strong></div>
               <div className={s.rightColumn}>
-                <textarea
-                  placeholder="Mô tả sự kiện"
-                  id="txtArea"
-                  className={s.txtArea}
-                  value={this.state.description}
-                  onChange={this.onDescriptionChange}
-                />
+                <div
+                  style={{
+                    padding: '8px',
+                    border: 'solid 1px #dedede',
+                    minHeight: '200px',
+                  }}
+                >
+                  <Editor
+
+                    editorState={editorState}
+                    onChange={this.onChangeMessage}
+                    placeholder="Mô tả sự kiện"
+                    ref={(editor) => { this.editor = editor; }}
+                    spellCheck
+                  />
+                </div>
                 {this.state.validateDescriptionText.length > 0 ? <div className={s.errorText}>{this.state.validateDescriptionText}</div> : null}
               </div>
             </div>
@@ -308,13 +391,14 @@ class CreateEventModal extends Component {
             pullRight
           >
             <CustomToggle bsRole="toggle">
-              <span title={PRIVARY_TEXT[this.state.privary]}>
-                {PRIVARY_TEXT[this.state.privary]} <i className="fa fa-caret-down" aria-hidden="true"></i>
+              <span title={PRIVARY_TEXT[this.state.privacy]}>
+                {PRIVARY_TEXT[this.state.privacy]} <i className="fa fa-caret-down" aria-hidden="true"></i>
               </span>
             </CustomToggle>
             <Dropdown.Menu onSelect={this.onSelectPrivary}>
-              <MenuItem eventKey={PUBLIC_EVENT}>Công khai</MenuItem>
-              <MenuItem eventKey={PRIVATE_EVENT}>Riêng tư</MenuItem>
+              <MenuItem eventKey={PUBLIC}>Công khai</MenuItem>
+              <MenuItem eventKey={FRIEND}>Bạn bè</MenuItem>
+              <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
           <Button onClick={this.props.closeModal}>Hủy bỏ</Button>
@@ -345,18 +429,18 @@ CreateEventModal.fragments = {
           lastName
         }
       }
-      banner
+      photos
       name
       location
       start
       end
-      description
+      message
     }
   `,
 };
 CreateEventModal.mutation = {
-  createNewEvent: gql`mutation createNewEvent ($privacy: PrivacyEvent!, $banner: String!, $name: String!, $location: String!, $start: Date!, $end: Date!, $description: String!) {
-    createNewEvent (privacy: $privacy, banner: $banner, name: $name, location: $location, start: $start, end: $end, description: $description) {
+  createNewEvent: gql`mutation createNewEvent ($input: CreateNewEventAnnouncementInput!) {
+    createNewEvent (input: $input) {
       ...EventView
     }
   }
@@ -368,8 +452,8 @@ export default compose(
   withStyles(s),
   graphql(CreateEventModal.mutation.createNewEvent, {
     props: ({ mutate }) => ({
-      createNewEvent: (privacy, banner, name, location, start, end, description) => mutate({
-        variables: { privacy, banner, name, location, start, end, description },
+      createNewEvent: input => mutate({
+        variables: { input },
       }),
     }),
   }),

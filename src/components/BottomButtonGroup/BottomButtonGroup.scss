@@ -28,4 +28,9 @@
 }
 .AddEventButton:hover{
   border-color: transparent;
+  background: #fff;
+}
+.AddEventButton:active :focus{
+  border-color: transparent;
+  background: #fff;
 }
