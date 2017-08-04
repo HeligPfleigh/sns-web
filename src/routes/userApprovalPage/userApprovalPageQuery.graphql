@@ -1,0 +1,12 @@
+query userApprovalPageQuery($userId: String!) {
+  resident(_id : $userId){
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+      gender
+    }
+  }
+}
