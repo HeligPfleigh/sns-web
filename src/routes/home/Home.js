@@ -130,7 +130,7 @@ export default compose(
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) { 
-            return nextResult;
+            return;
           }
           const newEdges = fetchMoreResult.feeds.edges;
           const pageInfo = fetchMoreResult.feeds.pageInfo;
@@ -155,7 +155,7 @@ export default compose(
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) { 
-            return nextResult;
+            return;
           }
 
           const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);

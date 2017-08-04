@@ -210,6 +210,7 @@ export default compose(
       variables: {
         _id: ownProps.user.id,
         cursor: null,
+        fetchPolicy: 'cache-and-network',
       },
     }),
     props: ({ ownProps, data }) => {

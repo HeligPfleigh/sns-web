@@ -5,31 +5,31 @@ import FriendList, { Friend } from '../FriendList';
 import Errors from '../Errors';
 import s from './BuildingRequestTab.scss';
 
-export const BuildingRequestTab = ({ building, error, accept, cancel }) => (
+export const BuildingRequestTab = ({ data, error, onAccept, onCancel }) => (
   <FriendList>
     <Errors
       open
       message={error}
       autoHideDuration={4000}
     />
-    { /*
-      building && building.requests && <h3>
-        Bạn không có bất kì yêu cầu nào
-      </h3>
-    */ }
-    {/*
-      building && building.requests && building.requests.edges.map(friend =>
-        <Friend key={friend._id} friend={friend} onAccept={accept(friend)} onCancel={cancel(friend)} />,
-      )
-    */}
+    {!data.edges && <h3>Bạn không có bất kì yêu cầu nào</h3>}
+    {data.edges.map(user => <Friend key={Math.random()} friend={user} onAccept={onAccept(user)} onCancel={onCancel(user)} />)}
   </FriendList>
 );
 
+BuildingRequestTab.defaultProps = {
+  data: {
+    edges: []
+  }
+}
+
 BuildingRequestTab.propTypes = {
-  building: PropTypes.object,
+  data: PropTypes.shape({
+    edges: PropTypes.arrayOf(PropTypes.object)
+  }).isRequired,
   error: PropTypes.string,
-  accept: PropTypes.func,
-  cancel: PropTypes.func,
+  onAccept: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(BuildingRequestTab);

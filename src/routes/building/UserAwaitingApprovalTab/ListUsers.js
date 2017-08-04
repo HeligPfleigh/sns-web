@@ -7,29 +7,61 @@ import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Panel, Image, Col, Row, Clearfix, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+import * as _ from 'lodash';
+import classNames from 'classnames';
 
+import Errors from '../Errors';
+import UserDetail from './UserDetail';
 import s from './UserAwaitingApproval.scss';
 
-const listUsersAwaitingApproval = gql`
-  query listUsersAwaitingApproval ($buildingId: String!) {
-    building (_id: $buildingId) {
-      requests {
-        edges {
-          _id
-          chatId
-          isFriend
-          createdAt
-          updatedAt
-        }
-      }
-    }
-  }`;
-
 class ListUsers extends Component {
+  /**
+   * 
+   * @param {*} props 
+   */
+  constructor(props) {
+    super(props);
+    this.state = {
+      userDetail: {},
+      showModal: false,
+    };
+  }
+  /**
+   * 
+   * @param {*} nextProps 
+   */
+  componentWillReceiveProps(nextProps) {
+  }
+
+  /**
+   * 
+   */
+  onCloseUserDetailModal() {
+    this.setState({
+      showModal: false,
+      userDetail: {},
+    });
+  }
+
+  onOpenUserDetailModal(userDetail) {
+    this.setState({
+      showModal: true,
+      userDetail,
+    });
+  }
+
+  /**
+   * 
+   */
   render() {
-    console.log(this.props);
     return (
       <Panel header="Danh sách thành viên của tòa nhà" className={ s.usersAwaitingApproval }>
+        <Errors
+          open
+          message={ this.props.error }
+          autoHideDuration={ 4000 }
+        />
+        
         { this.props.loading ? this.__renderLoadingIcon() : this.__renderListUsers() }
       </Panel>
     );
@@ -40,7 +72,7 @@ class ListUsers extends Component {
    */
   __renderLoadingIcon() {
     return (
-      <div className="text-center">
+      <div className={ classNames(s.noRecordsFound, 'text-center') }>
         <i className="fa fa-spinner fa-spin" aria-hidden="true"></i> Đang tải dữ liệu ...
       </div>
     );
@@ -49,50 +81,113 @@ class ListUsers extends Component {
   /**
    * 
    */
+  __renderNoRecordsFound() {
+    return (
+      <div className={ classNames(s.noRecordsFound, 'text-center') }>
+        Hiện tại chưa có yêu cầu từ cư dân của tòa nhà
+      </div>
+    );
+  }
+
+  /**
+   * 
+   */
   __renderListUsers() {
+    if (this.props.data.edges.length === 0) {
+      return this.__renderNoRecordsFound();
+    }
+
+    const buildingID = this.props.building;
+    const users = [];
+    this.props.data.edges.forEach(obj => {      
+      if (!_.isArray(obj.building) || !_.isArray(obj.apartments) || (obj.building.length === 0) || (obj.apartments.length === 0)) {
+        return;
+      }
+
+      // Clone object
+      const user = _.clone(obj);
+
+      // Determine whether valid buildings belong to itself
+      user.buildings = user.building.filter(b => b._id === buildingID);
+      delete user.building;
+      
+      // Validate buidlings belongs to itself
+      if (_.isUndefined(user.buildings) || !_.isArray(user.buildings) || (user.buildings.length === 0)) {
+        return;
+      }
+
+      // Determine whether valid apartments belong to itself
+      user.apartments = user.apartments.filter(a => a.building._id === buildingID);
+
+      // Validate buidlings belongs to itself
+      if (_.isUndefined(user.apartments) || !_.isArray(user.apartments) || (user.apartments.length === 0)) {
+        return;
+      }
+
+      // Determine whether valid phones belong to itself
+      user.phones = (_.isUndefined(user.phone) || !_.isObject(user.phone) ? {} : user.phone);
+      delete user.phone;
+
+      // Determine whether valid emails belong to itself
+      user.emails = (_.isUndefined(user.emails) || !_.isObject(user.emails) ? {} : user.emails);
+
+      // Apply into valid users
+      users.push(user);
+    });
+
+    if (users.length === 0) {
+      return this.__renderNoRecordsFound();
+    }
+    
     return (
       <InfiniteScroll
           loadMore={ this.props.loadMore }
           hasMore={ this.props.data.pageInfo.hasNextPage }
           loader={ this.__renderLoadingIcon() }
         >
-        xuan
-        {/* { this.props.data.edges.map(item => (
-          <Row className={ s.item } key={ item }>
-            <Col xs={4} md={3}>
-              <Image src="https://bootstrap-themes.github.io/application/assets/img/instagram_2.jpg" circle thumbnail responsive />
-            </Col>
-            <Col xs={8} md={9}>
-              <label className={ s.fullName }>Xuan Toc Den</label>
-              
-              <div className={ s.moreInfo }>
-                <div><small><i>Căn hộ số 204, thuộc tòa nhà Hancorp</i></small></div>
-                <div><small><i>Số điện thoại: 0989 649 075</i></small></div>
-              </div>
+        { users.map(user => {
+          return (
+            <Row className={ s.item } key={ Math.random() }>
+              <Col xs={4} md={3}>
+                <Image src={ user.profile.picture || '/avatar-default.jpg' } thumbnail responsive />
+              </Col>
+              <Col xs={8} md={9}>
+                <label className={ s.fullName }>{`${user.profile.firstName} ${user.profile.lastName}`}</label>
+                
+                <div className={ s.moreInfo }>
+                  { user.apartments.map(apartment => {
+                    return <div key={ apartment._id }><small><i>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</i></small></div>;
+                  }) }
 
-              <ButtonToolbar>
+                  { user.phones.number && <div><small><i>Số điện thoại: { user.phones.number }</i></small></div> }
+                  
+                  { user.emails.address && <div><small><i>Email: { user.emails.address }</i></small></div> }
+                </div>
 
-                <Button title="Xem thông tin của thành viên" bsStyle="info" bsSize="xsmall">
-                  <i className="fa fa-info-circle" /> Xem thông tin
-                </Button>
+                <ButtonToolbar>
 
-                <ButtonGroup>
-
-                  <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" bsSize="xsmall">
-                    <i className="fa fa-check" /> Đồng ý
+                  <Button title="Xem thông tin của thành viên" bsStyle="info" bsSize="xsmall" onClick={ this.onOpenUserDetailModal(user) }>
+                    <i className="fa fa-info-circle" /> Xem thông tin
                   </Button>
 
-                  <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="danger" bsSize="xsmall">
-                    <i className="fa fa-remove" /> Từ chối
-                  </Button>
+                  <ButtonGroup>
 
-                </ButtonGroup>
+                    <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" bsSize="xsmall" onClick={ this.props.onAccept(user) }>
+                      <i className="fa fa-check" /> Đồng ý
+                    </Button>
 
-              </ButtonToolbar>
-            </Col>
-            <Clearfix />
-          </Row>
-        )) } */}
+                    <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="danger" bsSize="xsmall" onClick={ this.props.onCancel(user) }>
+                      <i className="fa fa-remove" /> Từ chối
+                    </Button>
+
+                  </ButtonGroup>
+
+                </ButtonToolbar>
+              </Col>
+              <Clearfix />
+            </Row>
+          )
+        } ) } 
       </InfiniteScroll>
     );
   }
@@ -104,61 +199,21 @@ ListUsers.defaultProps = {
     pageInfo: {
       hasNextPage: false,
     }
-  },
-  loadMore: () => void(0),
+  }
 };
 
 ListUsers.PropTypes = {
   data: PropTypes.shape({
-    edges: PropTypes.array,
+    edges: PropTypes.arrayOf(PropTypes.object),
     pageInfo: PropTypes.object,
   }).isRequired,
   loadMore: PropTypes.func.isRequired,
+  onAccept: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.object.isRequired,
+  building: PropTypes.string.isRequired,
+  error: PropTypes.string,
 };
 
 export default withStyles(s)(ListUsers);
-// export default compose(withStyles(s), connect(state => ({
-//     user: state.user,
-//   })), graphql(listUsersAwaitingApproval, {
-//     options: ownProps => ({
-//       variables: {
-//         // _id: ownProps.data.building._id,
-//         buildingId: "58da279f0ff5af8c8be59c36",
-//       },
-//       fetchPolicy: 'network-only',
-//     }),
-//     props: ({ ownProps, data }) => {
-//       // const { fetchMore } = data;
-//       // const loadMoreRows = throttle(() => fetchMore({
-//       //   variables: {
-//       //     _id: ownProps.building.id,
-//       //     cursor: data.resident.posts.pageInfo.endCursor,
-//       //   },
-//       //   query: morePostsProfilePageQuery,
-//       //   updateQuery: (previousResult, { fetchMoreResult }) => {
-//       //     const newEdges = fetchMoreResult.resident.posts.edges;
-//       //     const pageInfo = fetchMoreResult.resident.posts.pageInfo;
-//       //     return update(previousResult, {
-//       //       resident: {
-//       //         posts: {
-//       //           edges: {
-//       //             $push: newEdges,
-//       //           },
-//       //           pageInfo: {
-//       //             $set: pageInfo,
-//       //           },
-//       //         },
-//       //       },
-//       //     });
-//       //   },
-//       // }), 300);
-      
-//       return {
-//         data,
-//         // loadMoreRows,
-//       };
-//     },
-//   })
-// )(ListUsers);

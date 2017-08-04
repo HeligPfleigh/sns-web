@@ -8,7 +8,7 @@ export class Friend extends Component {
 
   render() {
     const { friend } = this.props;
-    return (<li key={friend._id}>
+    return (<li key={Math.random()}>
       <div className={s.friend} onClick={this.handleClickFriend}>
         <div className={s.friendAvatar}>
           <img alt={friend.profile && friend.profile.firstName} src={friend.profile && friend.profile.picture} />

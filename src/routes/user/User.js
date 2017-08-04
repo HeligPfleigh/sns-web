@@ -137,7 +137,10 @@ export default compose(
   withStyles(s),
   graphql(usersPageQuery, {
     options: props => ({
-      variables: { _id: props.id },
+      variables: { 
+        _id: props.id,
+        fetchPolicy: 'cache-and-network',
+      },
     }),
     props: ({ data }) => {
       if (!data) { 

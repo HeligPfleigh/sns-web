@@ -387,15 +387,34 @@ Feed.fragments = {
     fragment UsersAwaitingApproval on Friend {
       _id
       username
+      phone {
+        number
+        verified
+      }
+      emails {
+        address
+        verified
+      }
       profile {
         picture
         firstName
         lastName
       }
-      chatId
-      isFriend
-      createdAt
-      updatedAt
+      apartments {
+        _id
+        number
+        isOwner
+        building {
+          _id
+          name
+          isAdmin
+        }
+      }
+      building {
+        _id
+        name
+        isAdmin
+      }
     }
   `,
   // user: userFragment,
