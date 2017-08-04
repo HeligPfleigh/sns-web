@@ -1,0 +1,30 @@
+@import "../../theme/resources.scss";
+.BottomButtonGroup{
+  padding: 0px 8px;
+  height: 40px;
+  position: fixed;
+  bottom: 0px;
+  background: #ffffff;
+  right: 8px;
+  color: #40a3cf;
+  line-height: 40px;
+  text-align: center;
+}
+.BottomButtonGroup::before{
+  position: absolute;
+  z-index: -1;
+  content: "";
+  left: 1px;
+  right: 1px;
+  top: 1px;
+  bottom: 0px;
+  -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+.AddEventButton {
+  border-color: transparent;
+}
+.AddEventButton:hover{
+  border-color: transparent;
+}

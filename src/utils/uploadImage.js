@@ -8,6 +8,7 @@ function getCookie(name) {
 }
 const uploadImage = async (file) => {
   const url = 'http://api-sns.mttjsc.com/upload/image';
+  // const url = 'http://localhost:3005/upload/image';
 
   const token = getCookie('id_token');
   const formData = new FormData();

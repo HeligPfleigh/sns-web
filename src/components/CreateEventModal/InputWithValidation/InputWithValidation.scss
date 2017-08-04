@@ -1,0 +1,27 @@
+.inputText{
+  width: 100%;
+  border: 0px;
+}
+.inputText:focus{
+  outline: none;
+}
+.errorText{
+  font-size: 10px;
+  color: red;
+  font-style: italic;
+}
+.wrapperNormal{
+  padding: 5px;
+  min-height: 30px;
+  text-align: center;
+  line-height: 30px;
+  border: 1px solid #dedede;
+}
+
+.wrapperError{
+  padding: 5px;
+  min-height: 30x;
+  text-align: center;
+  line-height: 30px;
+  border: 1px solid red;
+}

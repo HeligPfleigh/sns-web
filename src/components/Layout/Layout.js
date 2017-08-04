@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { StickyContainer, Sticky } from 'react-sticky';
+import BottomButtonGroup from '../BottomButtonGroup';
 import Header from '../Header';
 import Alert from '../Alert';
 import s from './Layout.scss';
@@ -17,6 +18,9 @@ class Layout extends Component {
         <Sticky className="navbar-fixed-top">
           <Header />
         </Sticky>
+
+        <BottomButtonGroup />
+
         {this.props.children}
         <Alert />
       </StickyContainer>
