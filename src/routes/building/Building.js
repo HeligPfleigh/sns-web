@@ -38,9 +38,10 @@ const loadBuildingQuery = gql`
       _id
       name
       address {
-        country
-        city
-        state
+        basisPoint
+        province
+        district
+        ward
         street
       }
       posts {

@@ -1,5 +1,8 @@
 query userApprovalPageQuery($requestId: String!) {
   requestsToJoinBuilding(_id : $requestId){
+    _id
+    type
+    status
     user {
       _id
       emails {
