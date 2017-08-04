@@ -7,11 +7,18 @@ import MediaQuery from 'react-responsive';
 import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import Loading from '../../components/Loading';
+import {
+  EventList,
+  EventMenu,
+} from '../../components/EventsComponents';
 import s from './Events.scss';
 
 class Events extends Component {
   state= {
     loading: false,
+  }
+  onCreateEvent = () => {
+
   }
   render() {
     const { loading } = this.state;
@@ -21,11 +28,13 @@ class Events extends Component {
         <Row className={s.containerTop30}>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={3} smHidden xsHidden>
-              <p>HIHIHIHIH</p>
+              <EventMenu
+                onCreateEvent={this.onCreateEvent}
+              />
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
-            <p>HEHEHEHEHE</p>
+            <EventList />
           </Col>
         </Row>
       </Grid>

@@ -1,0 +1,43 @@
+@import "../../theme/resources.scss";
+.wrapperMenu {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.itemMenu {
+  button {
+    height: 32px;
+    padding-left: 15px;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #283e4a;
+    background: none;
+    border:none;
+  }
+  button:focus{
+    outline: none;
+  }
+}
+
+.itemMenuSelected {
+  button {
+    height: 32px;
+    padding-left: 15px;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #283e4a;
+    background: none;
+    border: none;
+    border-left: solid 2px #283e4a;
+    background-color: #ffffff;
+  }
+  button:focus{
+    outline: none;
+  }
+}
+
