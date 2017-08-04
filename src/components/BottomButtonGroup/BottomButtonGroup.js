@@ -23,7 +23,7 @@ class BottomButtonGroup extends React.Component {
   render() {
     const { showCreateEventModal } = this.state;
     return (
-      <div>
+      <div style={{ zIndex: 999 }}>
         <CreateEventModal
           show={showCreateEventModal}
           closeModal={this.closeModal}
