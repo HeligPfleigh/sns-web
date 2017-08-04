@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import FriendList, { Friend } from '../FriendList';
+import FriendList, { Friend } from './FriendList';
 import Errors from '../Errors';
 import s from './BuildingRequestTab.scss';
 
