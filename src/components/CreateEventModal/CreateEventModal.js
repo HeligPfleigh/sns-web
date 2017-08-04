@@ -151,19 +151,6 @@ class CreateEventModal extends Component {
       return;
     }
 
-<<<<<<< HEAD
-    this.props.createNewEvent(privary, bannerUrl, nameEvent, location, start.toDate(), end.toDate(), description);
-    this.setState({
-      nameEvent: '',
-      validationNameEventText: '',
-      bannerUrl: '',
-      start: moment(),
-      end: moment(),
-      location: '',
-      description: '',
-      privary: PUBLIC_EVENT,
-      validateDescriptionText: '',
-=======
     this.props.createNewEvent({
       privacy,
       photos: [photos],
@@ -172,7 +159,6 @@ class CreateEventModal extends Component {
       start: start.toDate(),
       end: end.toDate(),
       message,
->>>>>>> feature/419_create_FE_for_Add_event
     });
     this.props.closeModal();
     this.setState({
