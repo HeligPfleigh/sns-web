@@ -9,17 +9,35 @@ import update from 'immutability-helper';
 import Loading from '../../components/Loading';
 import s from './Events.scss';
 
-class Events extends React.Component {
+class Events extends Component {
+  state= {
+    loading: false,
+  }
   render() {
+    const { loading } = this.state;
     return (
       <Grid>
         <Loading show={loading} full>Đang tải ...</Loading>
         <Row className={s.containerTop30}>
-          <Col md={8} sm={12} xs={12}>
+          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+            <Col md={3} smHidden xsHidden>
+              <p>HIHIHIHIH</p>
+            </Col>
+          </MediaQuery>
+          <Col md={9} sm={12} xs={12}>
+            <p>HEHEHEHEHE</p>
           </Col>
         </Row>
       </Grid>
     );
   }
 }
+
+Events.propTypes = {
+
+};
+
+export default compose(
+  withStyles(s),
+)(Events);
 
