@@ -11,7 +11,7 @@ export default {
     const UserApprovalPage = await require.ensure([], require => require('./UserApprovalPage').default, 'userapprovalpage');
     return {
       title: 'SNS - Phê duyệt user',
-      component: <Layout><UserApprovalPage userId={context.params.id} /></Layout>,
+      component: <Layout><UserApprovalPage requestId={context.params.id} /></Layout>,
     };
   },
 };

@@ -6,6 +6,20 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import userApprovalPageQuery from './userApprovalPageQuery.graphql';
 import s from './UserApprovalPage.scss';
 
+function generateFullname({ firstName, lastName }) {
+  return `${lastName} ${firstName}`;
+}
+
+function getAddress({
+  basisPoint,
+  province,
+  district,
+  ward,
+  street,
+}) {
+  return ` ${basisPoint}, ${street} - ${ward} - ${district} - ${province}`;
+}
+
 class UserApprovalPage extends Component {
 
   backBuildingRequestTab = () => history.back()
@@ -23,10 +37,17 @@ class UserApprovalPage extends Component {
   }
 
   render() {
-    const { data: { resident } } = this.props;
+    const { data: { loading, requestsToJoinBuilding } } = this.props;
+    console.log(requestsToJoinBuilding);
+    let user = null;
+    let building = null;
+    if (!loading && requestsToJoinBuilding) {
+      user = requestsToJoinBuilding.user;
+      building = requestsToJoinBuilding.building;
+    }
     return (
       <div>
-        {resident &&
+        {user &&
           <Grid>
             <Row>
               <Col md={8} sm={12} xs={12} className={s.profile}>
@@ -45,7 +66,7 @@ class UserApprovalPage extends Component {
                     <ControlLabel htmlFor="name">Name</ControlLabel>
                   </Col>
                   <Col sm={9} className={s.profileRight}>
-                    {resident.profile.lastName} {resident.profile.firstName}
+                    {user.profile && generateFullname(user.profile)}
                   </Col>
                 </Row>
                 <Row className={s.profileInfo}>
@@ -54,7 +75,7 @@ class UserApprovalPage extends Component {
                     <ControlLabel htmlFor="phoneNumber">Số điện thoại</ControlLabel>
                   </Col>
                   <Col sm={9} className={s.profileRight}>
-                    094 559 36 37
+                    { user.phone && user.phone.number }
                   </Col>
                 </Row>
                 <Row className={s.profileInfo}>
@@ -63,7 +84,8 @@ class UserApprovalPage extends Component {
                     <ControlLabel htmlFor="address">Địa chỉ</ControlLabel>
                   </Col>
                   <Col sm={9} className={s.profileRight}>
-                    Căn hộ A204, Tòa tháp Tây Hacorplaza
+                    {requestsToJoinBuilding.requestInformation.apartment.number}
+                    {getAddress(building.address)}
                   </Col>
                 </Row>
                 <Row className={s.profileInfo}>
@@ -72,7 +94,7 @@ class UserApprovalPage extends Component {
                     <ControlLabel htmlFor="email">Email</ControlLabel>
                   </Col>
                   <Col sm={9} className={s.profileRight}>
-                    abc@gmail.com
+                    { user.emails && user.emails.address }
                   </Col>
                 </Row>
                 <Row className={s.profileInfo}>
@@ -81,7 +103,7 @@ class UserApprovalPage extends Component {
                     <ControlLabel htmlFor="gender">Giới Tính</ControlLabel>
                   </Col>
                   <Col sm={9} className={s.profileRight}>
-                    {resident.profile.gender === 'male' ? 'Nam' : 'Nữ'}
+                    {user.profile && user.profile.gender === 'male' ? 'Nam' : 'Nữ'}
                   </Col>
                 </Row>
                 <Row className={s.profileInfo}>
@@ -90,7 +112,7 @@ class UserApprovalPage extends Component {
                     <ControlLabel htmlFor="email">Ngày sinh</ControlLabel>
                   </Col>
                   <Col sm={9} className={s.profileRight}>
-                    16 tháng 5 năm 1980
+                    None
                   </Col>
                 </Row>
                 <Row>
@@ -120,16 +142,16 @@ class UserApprovalPage extends Component {
 
 UserApprovalPage.propTypes = {
   data: PropTypes.shape({
-    resident: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-      profile: PropTypes.shape({
-        picture: PropTypes.string.isRequired,
-        firstName: PropTypes.string.isRequired,
-        lastName: PropTypes.string.isRequired,
-        gender: PropTypes.string.isRequired,
-      }),
-    }),
+    // resident: PropTypes.shape({
+    //   _id: PropTypes.string.isRequired,
+    //   username: PropTypes.string.isRequired,
+    //   profile: PropTypes.shape({
+    //     picture: PropTypes.string.isRequired,
+    //     firstName: PropTypes.string.isRequired,
+    //     lastName: PropTypes.string.isRequired,
+    //     gender: PropTypes.string.isRequired,
+    //   }),
+    // }),
   }).isRequired,
 };
 
@@ -137,7 +159,7 @@ export default compose(
   withStyles(s),
   graphql(userApprovalPageQuery, {
     options: props => ({
-      variables: { userId: props.userId },
+      variables: { requestId: props.requestId },
     }),
   }),
 )(UserApprovalPage);
