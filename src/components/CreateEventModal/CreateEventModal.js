@@ -11,7 +11,9 @@ import { PRIVATE_EVENT, PUBLIC_EVENT } from '../../constants';
 import Draft from 'draft-js';
 import gql from 'graphql-tag';
 
-const DateTimeField = require('react-bootstrap-datetimepicker');
+import DateTime from 'react-datetime';
+
+// const DateTimeField = require('react-bootstrap-datetimepicker');
 
 const PRIVARY_TEXT = {
   PRIVATE_EVENT: 'Riêng tư',
@@ -229,19 +231,46 @@ class CreateEventModal extends Component {
             <div className={s.rowItem}>
               <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Bắt đầu</strong></div>
               <div className={s.rightColumn}>
-                <DateTimeField
-                  dateTime={this.state.start}
-                  onChange={this.handleChange}
+                <DateTime
+                  locale="vi"
+                  inputProps={{
+                    readOnly: true,
+                    placeholder: 'hihi',
+                  }}
+                  closeOnSelect
+                  closeOnTab
+                  input
+                  defaultValue={this.state.start}
+                  onChange={(start) => {
+                    this.setState({
+                      start,
+                    });
+                  }}
+                  value={this.state.start}
+                  style={{ marginBottom: '5px' }}
                 />
               </div>
             </div>
             <div className={s.rowItem}>
               <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Kết thúc</strong></div>
               <div className={s.rightColumn}>
-                <DateTimeField
-                  label={moment().toDate()}
-                  dateTime={this.state.end}
-                  onChange={this.handleChange}
+                <DateTime
+                  locale="vi"
+                  inputProps={{
+                    readOnly: true,
+                    placeholder: 'hihi',
+                  }}
+                  closeOnSelect
+                  closeOnTab
+                  input
+                  defaultValue={this.state.end}
+                  onChange={(end) => {
+                    this.setState({
+                      end,
+                    });
+                  }}
+                  value={this.state.end}
+                  style={{ marginBottom: '5px' }}
                 />
               </div>
             </div>
