@@ -26,14 +26,10 @@ class UserApprovalPage extends Component {
 
   acceptUser = (evt) => {
     evt.preventDefault();
-    const { data: { resident } } = this.props;
-    alert(resident._id);
   }
 
   rejectUser = (evt) => {
     evt.preventDefault();
-    const { data: { resident } } = this.props;
-    alert(resident._id);
   }
 
   render() {

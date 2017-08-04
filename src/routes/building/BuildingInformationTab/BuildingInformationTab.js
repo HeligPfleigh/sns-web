@@ -16,7 +16,7 @@ export const BuildingInformationTab = ({ building }) => (
       </li>
       <li>
         <strong>Địa Chỉ Chung Cư</strong>
-        <p className={s.textMuted}>{building.address.street} {building.address.state} {building.address.city} {building.address.country} </p>
+        <p className={s.textMuted}>{building.address.street} {building.address.country} </p>
       </li>
     </ul>
   </Panel>
