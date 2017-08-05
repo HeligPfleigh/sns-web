@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-import { Grid, Row, Col, ControlLabel, Clearfix } from 'react-bootstrap';
+import { Grid, Row, Col, ControlLabel } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import userApprovalPageQuery from './userApprovalPageQuery.graphql';
+import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
+import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
+import {
+  PENDING,
+} from '../../constants';
+import { openAlertGlobal } from '../../reducers/alert';
 import s from './UserApprovalPage.scss';
 
 function generateFullname({ firstName, lastName }) {
@@ -26,15 +33,44 @@ class UserApprovalPage extends Component {
 
   acceptUser = (evt) => {
     evt.preventDefault();
+    const {
+      data: { requestsToJoinBuilding },
+      approvingUserToBuilding,
+      openAlertGlobalAction,
+    } = this.props;
+    approvingUserToBuilding(requestsToJoinBuilding._id)
+    .then(() => {
+      openAlertGlobalAction({
+        message: 'Bạn đã xác nhận yêu cầu của user thành công',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
   }
 
   rejectUser = (evt) => {
     evt.preventDefault();
+    const {
+      data: { requestsToJoinBuilding },
+      rejectingUserToBuilding,
+      openAlertGlobalAction,
+    } = this.props;
+    rejectingUserToBuilding(requestsToJoinBuilding._id)
+    .then(() => {
+      openAlertGlobalAction({
+        message: 'Bạn đã hủy yêu cầu của user thành công',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
   }
 
   render() {
     const { data: { loading, requestsToJoinBuilding } } = this.props;
-    console.log(requestsToJoinBuilding);
     let user = null;
     let building = null;
     if (!loading && requestsToJoinBuilding) {
@@ -43,7 +79,10 @@ class UserApprovalPage extends Component {
     }
     return (
       <div>
-        {user &&
+        {!requestsToJoinBuilding && <h3>
+          Không tìm thấy thông tin yêu cầu của người dùng xin vào tòa nhà
+        </h3>}
+        {requestsToJoinBuilding && user && building &&
           <Grid>
             <Row>
               <Col md={8} sm={12} xs={12} className={s.profile}>
@@ -111,7 +150,8 @@ class UserApprovalPage extends Component {
                     None
                   </Col>
                 </Row>
-                <Row>
+
+                { requestsToJoinBuilding.status === PENDING && <Row>
                   <Col md={8} sm={12} xs={12}>
                     <button
                       onClick={this.acceptUser}
@@ -126,7 +166,7 @@ class UserApprovalPage extends Component {
                       Từ chối
                     </button>
                   </Col>
-                </Row>
+                </Row>}
               </Col>
             </Row>
           </Grid>
@@ -149,13 +189,43 @@ UserApprovalPage.propTypes = {
     //   }),
     // }),
   }).isRequired,
+  approvingUserToBuilding: PropTypes.func.isRequired,
+  rejectingUserToBuilding: PropTypes.func.isRequired,
+  openAlertGlobalAction: PropTypes.func.isRequired,
 };
 
 export default compose(
   withStyles(s),
   graphql(userApprovalPageQuery, {
     options: props => ({
-      variables: { requestId: props.requestId },
+      variables: {
+        requestId: props.requestId,
+      },
     }),
   }),
-)(UserApprovalPage);
+  graphql(approvingUserToBuildingMutation, {
+    props: ({ mutate }) => ({
+      approvingUserToBuilding: id => mutate({
+        variables: {
+          input: {
+            requestsToJoinBuildingId: id,
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(rejectingUserToBuildingMutation, {
+    props: ({ mutate }) => ({
+      rejectingUserToBuilding: id => mutate({
+        variables: {
+          input: {
+            requestsToJoinBuildingId: id,
+          },
+        },
+      }),
+    }),
+  }),
+)(connect(
+  null,
+  { openAlertGlobalAction: openAlertGlobal },
+)(UserApprovalPage));

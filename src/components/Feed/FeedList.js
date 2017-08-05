@@ -27,7 +27,6 @@ class FeedList extends Component {
 
   onClickModal = (evt, message) => {
     evt.preventDefault();
-    
     const { idDeletedPost, idSharingPost, privacyPost } = this.state;
     const { openAlertGlobalAction } = this.props;
     this.closeModal();
@@ -35,7 +34,6 @@ class FeedList extends Component {
     if (idDeletedPost) {
       this.props.deletePost(idDeletedPost);
     }
-    
     if (idSharingPost) {
       this.props
       .sharingPost(idSharingPost, privacyPost, message)
@@ -93,7 +91,7 @@ class FeedList extends Component {
       showSharingPost: true,
       idSharingPost: id,
       privacyPost: privacy || PUBLIC,
-      sharingFeed
+      sharingFeed,
     }));
   }
 
@@ -106,7 +104,6 @@ class FeedList extends Component {
       loadMoreComments,
       createNewComment,
       editPost = doNothing,
-      sharingPost,
     } = this.props;
     return (
       <div>
@@ -130,10 +127,10 @@ class FeedList extends Component {
           clickModal={this.onClickModal}
         />
         <SharingPostModal
-          show={ this.state.showSharingPost }
-          closeModal={ this.closeModal.bind(this) }
-          clickModal={ this.onClickModal.bind(this) }
-          sharingFeed={ this.state.sharingFeed }
+          show={this.state.showSharingPost}
+          closeModal={this.closeModal}
+          clickModal={this.onClickModal}
+          sharingFeed={this.state.sharingFeed}
         />
       </div>
     );
