@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-import { Grid, Row, Col, ControlLabel } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import userApprovalPageQuery from './userApprovalPageQuery.graphql';
 import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
@@ -79,116 +79,107 @@ class UserApprovalPage extends Component {
     }
     return (
       <div>
-        {!requestsToJoinBuilding && <h3>
-          Không tìm thấy thông tin yêu cầu của người dùng xin vào tòa nhà
-        </h3>}
-        {requestsToJoinBuilding && user && building &&
-          <Grid>
-            <Row>
-              <Col md={8} sm={12} xs={12} className={s.profile}>
-                <Row className={s.backBuildingRequestTab}>
-                  <Col md={8} sm={12} xs={12}>
-                    <div onClick={this.backBuildingRequestTab}>
-                      <i className="fa fa-chevron-left" aria-hidden="true"></i>
-                      <h4>Quay lại trang</h4>
+        <Grid>
+          <Row>
+            <Col md={8} sm={12} xs={12} className={s.profile}>
+              <div className={s.backBuildingRequestTab} onClick={this.backBuildingRequestTab}>
+                <i className="fa fa-chevron-left" aria-hidden="true"></i>
+                <h4>Quay lại trang</h4>
+              </div>
+              <h3>THÔNG TIN</h3>
+              {!requestsToJoinBuilding &&
+                <h4>
+                  Không tìm thấy thông tin yêu cầu xin vào tòa nhà
+                </h4>
+              }
+              {requestsToJoinBuilding && user && building &&
+              <div>
+                <ul>
+                  <li>
+                    <div className={s.pullLeft}>
+                      <i className="fa fa-user-circle" aria-hidden="true"></i>
+                      <label htmlFor="name">Name</label>
                     </div>
-                    <h3>THÔNG TIN</h3>
-                  </Col>
-                </Row>
-                <Row className={s.profileInfo}>
-                  <Col sm={3}>
-                    <i className="fa fa-user-circle" aria-hidden="true"></i>
-                    <ControlLabel htmlFor="name">Name</ControlLabel>
-                  </Col>
-                  <Col sm={9} className={s.profileRight}>
-                    {user.profile && generateFullname(user.profile)}
-                  </Col>
-                </Row>
-                <Row className={s.profileInfo}>
-                  <Col sm={3}>
-                    <i className="fa fa-mobile" aria-hidden="true"></i>
-                    <ControlLabel htmlFor="phoneNumber">Số điện thoại</ControlLabel>
-                  </Col>
-                  <Col sm={9} className={s.profileRight}>
-                    { user.phone && user.phone.number }
-                  </Col>
-                </Row>
-                <Row className={s.profileInfo}>
-                  <Col sm={3}>
-                    <i className="fa fa-building" aria-hidden="true"></i>
-                    <ControlLabel htmlFor="address">Địa chỉ</ControlLabel>
-                  </Col>
-                  <Col sm={9} className={s.profileRight}>
-                    {requestsToJoinBuilding.requestInformation.apartment.number}
-                    {getAddress(building.address)}
-                  </Col>
-                </Row>
-                <Row className={s.profileInfo}>
-                  <Col sm={3}>
-                    <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                    <ControlLabel htmlFor="email">Email</ControlLabel>
-                  </Col>
-                  <Col sm={9} className={s.profileRight}>
-                    { user.emails && user.emails.address }
-                  </Col>
-                </Row>
-                <Row className={s.profileInfo}>
-                  <Col sm={3}>
-                    <i className="fa fa-venus-mars" aria-hidden="true"></i>
-                    <ControlLabel htmlFor="gender">Giới Tính</ControlLabel>
-                  </Col>
-                  <Col sm={9} className={s.profileRight}>
-                    {user.profile && user.profile.gender === 'male' ? 'Nam' : 'Nữ'}
-                  </Col>
-                </Row>
-                <Row className={s.profileInfo}>
-                  <Col sm={3}>
-                    <i className="fa fa-birthday-cake" aria-hidden="true"></i>
-                    <ControlLabel htmlFor="email">Ngày sinh</ControlLabel>
-                  </Col>
-                  <Col sm={9} className={s.profileRight}>
-                    None
-                  </Col>
-                </Row>
-
-                { requestsToJoinBuilding.status === PENDING && <Row>
-                  <Col md={8} sm={12} xs={12}>
-                    <button
-                      onClick={this.acceptUser}
-                      className={s.buttonAccept}
-                    >
-                      Đồng ý
-                    </button>
-                    <button
-                      onClick={this.rejectUser}
-                      className={s.buttonCancel}
-                    >
-                      Từ chối
-                    </button>
-                  </Col>
-                </Row>}
-              </Col>
-            </Row>
-          </Grid>
-        }
+                    <div className={s.pullRight}>
+                      <span>{user.profile && generateFullname(user.profile)}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div className={s.pullLeft}>
+                      <i className="fa fa-mobile" aria-hidden="true"></i>
+                      <label htmlFor="phoneNumber">Số điện thoại</label>
+                    </div>
+                    <div className={s.pullRight}>
+                      <span>{ user.phone && user.phone.number }</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div className={s.pullLeft}>
+                      <i className="fa fa-building" aria-hidden="true"></i>
+                      <label htmlFor="address">Địa chỉ</label>
+                    </div>
+                    <div className={s.pullRight}>
+                      <span>
+                        {requestsToJoinBuilding.requestInformation.apartment.number}
+                        {getAddress(building.address)}
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div className={s.pullLeft}>
+                      <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                      <label htmlFor="email">Email</label>
+                    </div>
+                    <div className={s.pullRight}>
+                      <span>{ user.emails && user.emails.address }</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div className={s.pullLeft}>
+                      <i className="fa fa-venus-mars" aria-hidden="true"></i>
+                      <label htmlFor="gender">Giới Tính</label>
+                    </div>
+                    <div className={s.pullRight}>
+                      <span>{user.profile && user.profile.gender === 'male' ? 'Nam' : 'Nữ'}</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div className={s.pullLeft}>
+                      <i className="fa fa-birthday-cake" aria-hidden="true"></i>
+                      <label htmlFor="birthday">Ngày sinh</label>
+                    </div>
+                    <div className={s.pullRight}>
+                      <span>None</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              }
+              {requestsToJoinBuilding && requestsToJoinBuilding.status === PENDING &&
+                <div>
+                  <button
+                    onClick={this.acceptUser}
+                    className={s.buttonAccept}
+                  >
+                    Đồng ý
+                  </button>
+                  <button
+                    onClick={this.rejectUser}
+                    className={s.buttonCancel}
+                  >
+                    Từ chối
+                  </button>
+                </div>}
+            </Col>
+          </Row>
+        </Grid>
       </div>
     );
   }
 }
 
 UserApprovalPage.propTypes = {
-  data: PropTypes.shape({
-    // resident: PropTypes.shape({
-    //   _id: PropTypes.string.isRequired,
-    //   username: PropTypes.string.isRequired,
-    //   profile: PropTypes.shape({
-    //     picture: PropTypes.string.isRequired,
-    //     firstName: PropTypes.string.isRequired,
-    //     lastName: PropTypes.string.isRequired,
-    //     gender: PropTypes.string.isRequired,
-    //   }),
-    // }),
-  }).isRequired,
+  data: PropTypes.shape({}).isRequired,
   approvingUserToBuilding: PropTypes.func.isRequired,
   rejectingUserToBuilding: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func.isRequired,
