@@ -12,10 +12,11 @@ import s from './FriendSuggestions.css';
 class FriendSuggestions extends Component {
   render() {
     const { data: { loading, resident } } = this.props;
+    console.log(resident.friendSuggestions.edges.length);
     return (
       <div>
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
-        {!loading && <FriendsList>
+        {!loading && resident.friendSuggestions.edges.length > 0 && <FriendsList>
           <li style={{ paddingLeft: '10px' }}>
             <Label label="Giới thiệu bạn bè" />
           </li>
