@@ -8,7 +8,6 @@ import { loadProfile } from '../../../reducers/me';
 
 import {
   required,
-  hasWhiteSpace,
   maxLength15,
   minLength2,
 } from '../../../utils/validator';
@@ -68,7 +67,7 @@ class ProfileForm extends Component {
                   type="text"
                   component={renderField}
                   label="Enter Text"
-                  validate={[required, hasWhiteSpace, maxLength15, minLength2]}
+                  validate={[required, maxLength15, minLength2]}
                 /> : lastName}
               </Col>
             </Row>
@@ -83,7 +82,7 @@ class ProfileForm extends Component {
                   type="text"
                   component={renderField}
                   label="Enter Text"
-                  validate={[required, hasWhiteSpace, maxLength15, minLength2]}
+                  validate={[required, maxLength15, minLength2]}
                 /> : firstName}
               </Col>
             </Row>
