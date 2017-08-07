@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './EventItem.scss';
+import history from '../../../core/history';
 import {
   Col,
   Image,
@@ -12,7 +13,14 @@ class EventItem extends React.Component {
     const { event } = this.props;
     const start = new Date(event.start);
     return (
-      <Col md={6}>
+      <Col
+        style={{
+          cursor: 'pointer',
+        }}
+        md={6} onClick={async () => {
+          history.push(`/events/${event._id}`);
+        }}
+      >
         <div className={s.eventItem}>
           <div className={s.photo}>
             <Image

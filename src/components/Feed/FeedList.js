@@ -150,7 +150,7 @@ FeedList.propTypes = {
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   deletePost: PropTypes.func,
-  editPost: PropTypes.func, // (user page)
+  editPost: PropTypes.func,
   sharingPost: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func,
 };

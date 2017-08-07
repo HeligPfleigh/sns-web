@@ -4,7 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './CreateEventModal.scss';
 import { graphql, compose } from 'react-apollo';
 import InputWithValidation from './InputWithValidation';
-import update from 'immutability-helper';
+import history from '../../core/history';
 import moment from 'moment';
 import { generate as idRandom } from 'shortid';
 import uploadImage from '../../utils/uploadImage';
@@ -114,7 +114,7 @@ class CreateEventModal extends Component {
     });
   }
 
-  onSubmit = () => {
+  onSubmit = async () => {
     const { privacy, photos, nameEvent, location, start, end } = this.state;
     const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     if (photos.length === 0) {
@@ -152,7 +152,7 @@ class CreateEventModal extends Component {
       return;
     }
 
-    this.props.createNewEvent({
+    const res = await this.props.createNewEvent({
       privacy,
       photos: [photos],
       name: nameEvent,
@@ -173,6 +173,7 @@ class CreateEventModal extends Component {
       privacy: PUBLIC,
       validateDescriptionText: '',
     });
+    history.push(`/events/${res.data.createNewEvent._id}`);
   }
   onDescriptionChange = (e) => {
     if (this.state.description.length <= 10) {
