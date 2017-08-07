@@ -119,6 +119,7 @@ class NewPost extends React.Component {
     this.uploadImages(photos);
     this.setState({
       photos,
+      isSubmit: false,
     });
   }
 
