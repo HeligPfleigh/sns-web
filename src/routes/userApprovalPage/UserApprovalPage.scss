@@ -1,10 +1,25 @@
 .profile{
   background-color: #fff;
   padding: 20px 15px;
-  .profileInfo {
-    margin-bottom: 15px;
-    i {
-      color: #c7d1d8 !important
+  ul {
+    list-style: none;
+    padding: 0px;
+    li {
+      display: flex;
+      margin-bottom: 15px;
+      .pullLeft {
+        float: left;
+        min-width: 150px;
+        i {
+          color: #c7d1d8 !important;
+        }
+        label {
+          color: #90949c !important;
+        }
+      }
+      .pullRight {
+        padding-top: 8px;
+      }
     }
   }
   i {
@@ -50,6 +65,14 @@
   .profile {
     .backBuildingRequestTab {
       margin-top: 30px;  
+    }
+    ul {
+      li {
+        display: block;
+        .pullLeft {
+          float: none;
+        }
+      }
     }
   }
   .buttonAccept {

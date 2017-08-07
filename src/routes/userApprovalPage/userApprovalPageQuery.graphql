@@ -1,12 +1,39 @@
-query userApprovalPageQuery($userId: String!) {
-  resident(_id : $userId){
+query userApprovalPageQuery($requestId: String!) {
+  requestsToJoinBuilding(_id : $requestId){
     _id
-    username
-    profile {
-      picture
-      firstName
-      lastName
-      gender
+    type
+    status
+    user {
+      _id
+      emails {
+        address
+        verified
+      }
+      phone {
+        number
+        verified
+      }
+      profile {
+        picture
+        firstName
+        lastName
+        gender
+      }
+    }
+    building {
+      _id
+      address {
+        basisPoint
+        province
+        district
+        ward
+        street
+      }
+    }
+    requestInformation {
+      apartment {
+        number
+      }
     }
   }
 }
