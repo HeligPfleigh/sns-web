@@ -38,7 +38,6 @@ import { Feed } from '../Feed';
  */
 const styles = {
   editor: {
-    // border: '1px solid #ddd',
     cursor: 'text',
     minHeight: 40,
     padding: '10px 0px',
