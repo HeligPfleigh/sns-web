@@ -1,0 +1,50 @@
+.eventItem{
+  background: #f0f9fd;
+}
+.bottom{
+  
+}
+
+.photo {
+  height: 200px;
+  width: 100%;
+  display: inline-block;
+  overflow: hidden;
+  min-height: 200px;
+  text-align: center;
+  img{width: 100%}
+}
+
+.calendar{
+  width: 75px;
+  float: left;
+  text-align: center;
+  .month{
+    color: red;
+    font-weight: bold;
+  }
+  .day{
+
+  }
+}
+.contentSmall{
+  margin-left: 95px;
+  p {
+    color: #999999;
+    button {
+      margin-left: 180px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.location{
+
+}
+
+.care{
+
+}
+.title{
+
+}

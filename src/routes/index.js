@@ -22,6 +22,8 @@ export default {
     require('./user').default,
     require('./me').default,
     require('./search').default,
+    require('./userApprovalPage').default,
+    require('./events').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

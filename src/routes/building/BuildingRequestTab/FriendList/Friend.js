@@ -1,10 +1,11 @@
 import React, { PropTypes, Component } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button, ButtonToolbar } from 'react-bootstrap';
-import { ACCEPTED, REJECTED } from '../../../constants';
+import { ACCEPTED, REJECTED } from '../../../../constants';
+import Link from '../../../../components/Link';
 import s from './FriendStyle.scss';
 
-export class Friend extends Component {
+class Friend extends Component {
 
   render() {
     const { friend } = this.props;
@@ -15,7 +16,9 @@ export class Friend extends Component {
         </div>
         <div className={s.friendInfo}>
           <div className={s.friendName}>
-            <span>{friend.profile.firstName} {friend.profile.lastName}</span>
+            <Link to={`/user-approval/${friend._id}`} style={{ textDecoration: 'none' }}>
+              <span>{friend.profile.firstName} {friend.profile.lastName}</span>
+            </Link>
           </div>
           <ButtonToolbar>
             <Button onClick={this.props.onAccept} bsStyle="primary">{ ACCEPTED }</Button>

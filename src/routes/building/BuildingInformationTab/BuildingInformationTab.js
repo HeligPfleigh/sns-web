@@ -4,6 +4,16 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Panel } from 'react-bootstrap';
 import s from './BuildingInformationTab.scss';
 
+function getAddress({
+  basisPoint,
+  province,
+  district,
+  ward,
+  street,
+}) {
+  return ` ${basisPoint}, ${street} - ${ward} - ${district} - ${province}`;
+}
+
 export const BuildingInformationTab = ({ building }) => (
   <Panel>
     <h3 className={s.informationBuildingHeader}>Thông Tin Chung Cư</h3>
@@ -16,7 +26,7 @@ export const BuildingInformationTab = ({ building }) => (
       </li>
       <li>
         <strong>Địa Chỉ Chung Cư</strong>
-        <p className={s.textMuted}>{building.address.street} {building.address.state} {building.address.city} {building.address.country} </p>
+        <p className={s.textMuted}>{getAddress(building.address)}</p>
       </li>
     </ul>
   </Panel>

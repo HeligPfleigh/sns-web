@@ -1,0 +1,39 @@
+query userApprovalPageQuery($requestId: String!) {
+  requestsToJoinBuilding(_id : $requestId){
+    _id
+    type
+    status
+    user {
+      _id
+      emails {
+        address
+        verified
+      }
+      phone {
+        number
+        verified
+      }
+      profile {
+        picture
+        firstName
+        lastName
+        gender
+      }
+    }
+    building {
+      _id
+      address {
+        basisPoint
+        province
+        district
+        ward
+        street
+      }
+    }
+    requestInformation {
+      apartment {
+        number
+      }
+    }
+  }
+}

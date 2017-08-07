@@ -73,7 +73,7 @@ class NavRight extends React.Component {
               <MenuItem title="Cửa hàng quanh tôi" eventKey="4">
                 Cửa hàng quanh tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
               </MenuItem>
-              <MenuItem title="Sự kiện sắp tới" eventKey="4">
+              <MenuItem title="Sự kiện sắp tới" eventKey="4" onClick={() => this.navEventHandler('/events')}>
                 Sự kiện sắp tới <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
               </MenuItem>
             </Dropdown.Menu>
