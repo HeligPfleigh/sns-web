@@ -4,6 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './CreateEventModal.scss';
 import { graphql, compose } from 'react-apollo';
 import InputWithValidation from './InputWithValidation';
+import update from 'immutability-helper';
 import moment from 'moment';
 import { generate as idRandom } from 'shortid';
 import uploadImage from '../../utils/uploadImage';

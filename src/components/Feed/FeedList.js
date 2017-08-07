@@ -27,6 +27,7 @@ class FeedList extends Component {
 
   onClickModal = (evt, message) => {
     evt.preventDefault();
+
     const { idDeletedPost, idSharingPost, privacyPost } = this.state;
     const { openAlertGlobalAction } = this.props;
     this.closeModal();
@@ -34,18 +35,18 @@ class FeedList extends Component {
     if (idDeletedPost) {
       this.props.deletePost(idDeletedPost);
     }
+
     if (idSharingPost) {
       this.props
       .sharingPost(idSharingPost, privacyPost, message)
       .then(({ data }) => {
-        console.log('got data', data);
         openAlertGlobalAction({
           message: 'Bạn đã chia sẽ được thành công trên dòng thời gian của bạn',
           open: true,
           autoHideDuration: 0,
         });
       }).catch((error) => {
-        console.log('there was an error sending the query', error);
+        // console.log('there was an error sending the query', error);
       });
     }
   }
