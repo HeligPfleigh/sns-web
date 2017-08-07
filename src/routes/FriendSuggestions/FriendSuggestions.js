@@ -15,7 +15,7 @@ class FriendSuggestions extends Component {
     return (
       <div>
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
-        {!loading && <FriendsList>
+        {!loading && resident && resident.friendSuggestions && resident.friendSuggestions.edges.length > 0 && <FriendsList>
           <li style={{ paddingLeft: '10px' }}>
             <Label label="Giới thiệu bạn bè" />
           </li>
