@@ -213,11 +213,8 @@ class NewPost extends React.Component {
               />
             </Button>
           </Col>
-          <Col className="pull-right">
-            <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
-          </Col>
           <Col className="pull-right" style={{ marginRight: '15px' }}>
-            {displayPrivacy && <Dropdown id={idRandom()}>
+            {displayPrivacy && <Dropdown id={idRandom()} className={ s.privacyOptions }>
               <Dropdown.Toggle>
                 <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
               </Dropdown.Toggle>
@@ -233,6 +230,7 @@ class NewPost extends React.Component {
                 ))}
               </Dropdown.Menu>
             </Dropdown>}
+            <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
 
           <Clearfix />
