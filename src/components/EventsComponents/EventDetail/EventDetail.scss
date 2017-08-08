@@ -1,0 +1,103 @@
+@import "../../../theme/resources.scss";
+.eventDetailContent {
+  background: #ffffff;
+}
+.divider {
+  margin: 12px;
+}
+.titleLayout {
+  padding-bottom: 72px;
+  .left {
+    width: 120px;
+    float: left;
+    text-align: center;
+    h5 {
+      color: red;
+    }
+    h4 {
+
+    }
+  }
+  .right{
+    h4 {
+      font-size: 20px;
+      font-weight: normal;
+    }
+    h5 {
+      font-weight: 100;
+      color: #999999;
+      b {
+        color: #4c4c4c;
+      }
+    }
+    .actionsButton {
+      float: right;
+      margin-right: 12px;
+      font-size: 12px;
+      button {
+        background-color: #f6f7f9;
+        i {
+        }
+        span {
+          font-weight: bold;
+          margin-left: 3px;
+        }
+      }
+      .btnLeft {
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+      }
+      .btnMiddle {
+        border-radius: 0px;
+      }
+      .btnRight {
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+      }
+    }
+  }
+}
+
+.timeLocationLayout{
+  padding: 12px;
+  p {
+   i {
+     margin-right: 4px;
+   } 
+  }
+}
+
+.inviteLayout{
+  display: inline-block;
+  width: 100%;
+  padding-left: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  .text {
+    float: left;
+    span {
+      color: #999999;
+    }
+  }
+  .btnInviteWrapper {
+    float: right;
+    div {
+      display: table-cell;
+      height: 70px;
+      vertical-align: middle;
+    }
+    .btnInvite {
+      float: right;
+      margin-right: 12px;
+      background-color: #f6f7f9;
+      i {
+        margin-right: 5px;
+      }
+    }
+  }
+  
+}
+
+.description{
+  padding: 12px;
+}
