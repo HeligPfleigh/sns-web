@@ -310,7 +310,9 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,
+            },
           });
           data = update(data, {
             feeds: {
@@ -322,7 +324,9 @@ export default compose(
           // Write our data back to the cache.
           store.writeQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,
+            },
             data,
           });
         },
