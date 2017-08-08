@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 // import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 // import moment from 'moment';
 import DateTime from 'react-datetime';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './DateTimeField.scss';
 
 const currentDate = new Date();
 const isValidValue = () => true;
@@ -21,13 +23,13 @@ const DateTimeField = ({
     error,
   },
 }) => (
-  <div className={`form-group ${error ? 'has-error' : ''}`}>
+  <div className="form-group">
     {label &&
       <label htmlFor={input.name} className="col-sm-3 control-label">
         {label}
       </label>
     }
-    <div className="col-sm-5">
+    <div className={`${label ? 'col-sm-5' : 'col-sm-12'}`}>
       <DateTime
         id={input.name}
         name={input.name}
@@ -51,8 +53,8 @@ const DateTimeField = ({
       />
       {
         touched &&
-        ((error && <span className="control-label">{error}</span>) ||
-        (warning && <span className="control-label">{warning}</span>))
+        ((error && <span className="text-danger control-label">{error}</span>) ||
+        (warning && <span className="text-warning control-label">{warning}</span>))
       }
     </div>
   </div>
@@ -68,4 +70,4 @@ DateTimeField.propTypes = {
   dateFormat: PropTypes.any,
   timeFormat: PropTypes.any,
 };
-export default DateTimeField;
+export default withStyles(s)(DateTimeField);
