@@ -4,6 +4,7 @@ import {
   Image,
   MenuItem,
   Dropdown,
+  Clearfix,
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
@@ -87,17 +88,16 @@ class Feed extends Component {
     }
   }
 
-  onSelectShareButton = (eventKey, event) => {
+  onSelectShareButton = (event) => {
     event.preventDefault();
     const {
       data: {
         _id,
+        sharing,
       },
       sharingPostEvent = doNothing,
     } = this.props;
-    if (eventKey && includes([PUBLIC, FRIEND, ONLY_ME], eventKey)) {
-      sharingPostEvent(_id, eventKey, this.props.data);
-    }
+    sharingPostEvent(_id, sharing || this.props.data);
   }
 
   // check process
@@ -207,6 +207,7 @@ class Feed extends Component {
               </Dropdown> : <div></div>
           }
         />
+        <Clearfix />
         {message && !isEdit && <PostText html={message} /> }
         {sharing && !isEdit &&
           <SharingPost
@@ -244,18 +245,7 @@ class Feed extends Component {
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
           <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-          <Dropdown id={idRandom()}>
-            <CustomToggle bsRole="toggle">
-              <span title="Chia sẻ">
-                <i className="fa fa-share fa-lg" aria-hidden="true"></i> Chia sẻ
-              </span>
-            </CustomToggle>
-            <Dropdown.Menu onSelect={this.onSelectShareButton}>
-              <MenuItem eventKey={PUBLIC}>Chia sẻ công khai</MenuItem>
-              <MenuItem eventKey={FRIEND}>Chia sẻ với bạn bè</MenuItem>
-              <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Icon onClick={this.onSelectShareButton} title="Chia sẻ" icons="fa fa-share fa-lg" />
         </PostActions>
         ) }
         { !sharingPostModalOpenned && (

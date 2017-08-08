@@ -215,7 +215,12 @@ export default compose(
         },
         update: (store, { data: { createNewPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: homePageQuery });
+          let data = store.readQuery({ 
+            query: homePageQuery,
+            variables: {
+              cursor: null,
+            }, 
+          });
           data = update(data, {
             feeds: {
               edges: {
@@ -224,7 +229,13 @@ export default compose(
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: homePageQuery, data });
+          store.writeQuery({ 
+            query: homePageQuery,
+            variables: {
+              cursor: null,
+            }, 
+            data,
+          });
         },
       }),
     }),
@@ -365,7 +376,9 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,
+            },
           });
           data = update(data, {
             feeds: {
@@ -376,7 +389,8 @@ export default compose(
           });
           store.writeQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,},
             data,
           });
         },
