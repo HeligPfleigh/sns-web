@@ -158,7 +158,6 @@ class Notifications extends Component {
 export default compose(
   withStyles(s),
   graphql(notificationQuery, {
-    // options: () => ({}),
     props: ({ data }) => {
       const { fetchMore } = data;
       const loadMoreRows = () => fetchMore({
@@ -166,14 +165,20 @@ export default compose(
           cursor: data.notifications.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.notifications.edges;
-          const pageInfo = fetchMoreResult.notifications.pageInfo;
-          return {
+          console.log(fetchMoreResult);
+          if (!fetchMoreResult) {
+            return;
+          }
+          return update(previousResult, {
             notifications: {
-              edges: [...previousResult.notifications.edges, ...newEdges],
-              pageInfo,
+              edges: {
+                $unshift: fetchMoreResult.notifications.edges,
+              },
+              pageInfo: {
+                $set: fetchMoreResult.notifications.pageInfo,
+              },
             },
-          };
+          });
         },
       });
       return {
@@ -190,9 +195,12 @@ export default compose(
       updateIsRead: _id => mutate({
         variables: { _id },
         updateQueries: {
-          headerQuery: (previousResult, { mutationResult }) => {
-            const result = mutationResult.data.UpdateIsRead;
-            const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
+          headerQuery: (previousResult, { mutationResult: { data } }) => {
+            if (!data) {
+              return;
+            }
+            const result = data.UpdateIsRead;
+            const index = previousResult.notifications.edges.findIndex(item => item._id === data.UpdateIsRead._id);
             return update(previousResult, {
               notifications: {
                 edges: {

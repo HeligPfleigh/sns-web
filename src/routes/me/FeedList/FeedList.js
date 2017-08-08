@@ -22,15 +22,14 @@ class FeedList extends Component {
       showSharingPost: false,
       idDeletedPost: null,
       idSharingPost: null,
-      privacyPost: PUBLIC,
       sharingFeed: {},
     };
   }
 
-  onClickModal = (evt, message) => {
+  onClickModal = (evt, { privacyPost, message }) => {
     evt.preventDefault();
 
-    const { idDeletedPost, idSharingPost, privacyPost } = this.state;
+    const { idDeletedPost, idSharingPost } = this.state;
     this.closeModal();
     
     if (idDeletedPost) {
@@ -85,11 +84,10 @@ class FeedList extends Component {
     this.updateStateModal(true);
   }
 
-  sharingPostEvent = (id, privacy, sharingFeed) => {
+  sharingPostEvent = (id, sharingFeed) => {
     this.setState(() => ({
       showSharingPost: true,
       idSharingPost: id,
-      privacyPost: privacy || PUBLIC,
       sharingFeed,
     }));
   }

@@ -149,7 +149,6 @@ class Header extends React.Component {
   }
 
   render() {
-    console.log('render');
     const {
       data: { notifications, me, refetch },
       loadMoreRows,
@@ -245,14 +244,19 @@ export default compose(
           cursor: data.notifications.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.notifications.edges;
-          const pageInfo = fetchMoreResult.notifications.pageInfo;
-          return {
+          if (!fetchMoreResult) { 
+            return;
+          }
+          return update(previousResult, {
             notifications: {
-              edges: [...previousResult.notifications.edges, ...newEdges],
-              pageInfo,
+              edges: {
+                $unshift: fetchMoreResult.notifications.edges,
+              },
+              pageInfo: {
+                $set: fetchMoreResult.notifications.pageInfo,
+              },
             },
-          };
+          });
         },
       });
       return {
@@ -280,9 +284,12 @@ export default compose(
       updateRead: _id => mutate({
         variables: { _id },
         updateQueries: {
-          headerQuery: (previousResult, { mutationResult }) => {
-            const result = mutationResult.data.updateRead;
-            const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
+          headerQuery: (previousResult, { mutationResult: { data } }) => {
+            if (!data) {
+              return;
+            }
+            const result = data.UpdateIsRead;
+            const index = previousResult.notifications.edges.findIndex(item => item._id === data.UpdateIsRead._id);
             return update(previousResult, {
               notifications: {
                 edges: {
@@ -302,6 +309,9 @@ export default compose(
         variables: { userId },
         updateQueries: {
           headerQuery: (previousResult, { mutationResult }) => {
+            if (!mutationResult) {
+              return;
+            }
             const newFriend = mutationResult.data.acceptFriend;
             return update(previousResult, {
               me: {
@@ -321,6 +331,9 @@ export default compose(
         variables: { userId },
         updateQueries: {
           headerQuery: (previousResult, { mutationResult }) => {
+            if (!mutationResult) {
+              return;
+            }
             const newFriend = mutationResult.data.rejectFriend;
             return update(previousResult, {
               me: {

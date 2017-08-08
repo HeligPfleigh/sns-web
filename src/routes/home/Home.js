@@ -87,17 +87,17 @@ class Home extends Component {
               hasMore={hasNextPage}
               loader={<div className="loader">Loading ...</div>}
             >
-              { feeds && feeds.edges && <FeedList
+              <FeedList
                 feeds={feeds ? feeds.edges : []}
                 likePostEvent={this.props.likePost}
                 unlikePostEvent={this.props.unlikePost}
-                userInfo={me}
+                userInfo={me ? me : {}}
                 loadMoreComments={loadMoreComments}
                 createNewComment={createNewComment}
                 deletePost={deletePost}
                 editPost={editPost}
                 sharingPost={sharingPost}
-              />}
+              />
             </InfiniteScroll>
           </Col>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
@@ -117,17 +117,21 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      variables: {},
-      // pollInterval: 30000,
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
+      if (!data) { 
+        return;
+      }
       const { fetchMore } = data;
       const loadMoreRows = throttle(() => fetchMore({
         variables: {
           cursor: data.feeds.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) { 
+            return;
+          }
           const newEdges = fetchMoreResult.feeds.edges;
           const pageInfo = fetchMoreResult.feeds.pageInfo;
           return update(previousResult, {
@@ -150,8 +154,11 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
+          if (!fetchMoreResult) { 
+            return;
+          }
 
+          const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
           const updatedPost = update(previousResult.feeds.edges[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
@@ -208,7 +215,12 @@ export default compose(
         },
         update: (store, { data: { createNewPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: homePageQuery });
+          let data = store.readQuery({ 
+            query: homePageQuery,
+            variables: {
+              cursor: null,
+            }, 
+          });
           data = update(data, {
             feeds: {
               edges: {
@@ -217,7 +229,13 @@ export default compose(
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: homePageQuery, data });
+          store.writeQuery({ 
+            query: homePageQuery,
+            variables: {
+              cursor: null,
+            }, 
+            data,
+          });
         },
       }),
     }),
@@ -303,7 +321,9 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,
+            },
           });
           data = update(data, {
             feeds: {
@@ -315,7 +335,9 @@ export default compose(
           // Write our data back to the cache.
           store.writeQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,
+            },
             data,
           });
         },
@@ -354,7 +376,9 @@ export default compose(
           // Read the data from our cache for this query.
           let data = store.readQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,
+            },
           });
           data = update(data, {
             feeds: {
@@ -365,7 +389,8 @@ export default compose(
           });
           store.writeQuery({
             query: homePageQuery,
-            variables: {},
+            variables: {
+              cursor: null,},
             data,
           });
         },

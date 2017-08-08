@@ -137,9 +137,15 @@ export default compose(
   withStyles(s),
   graphql(usersPageQuery, {
     options: props => ({
-      variables: { _id: props.id },
+      variables: { 
+        _id: props.id,
+        fetchPolicy: 'cache-and-network',
+      },
     }),
     props: ({ data }) => {
+      if (!data) { 
+        return;
+      }
       const { fetchMore } = data;
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {

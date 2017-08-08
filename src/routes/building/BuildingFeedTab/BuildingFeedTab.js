@@ -12,7 +12,7 @@ class BuildingFeedTab extends Component {
   render() {
     const {
       createNewPostOnBuilding,
-      loadMoreRows,
+      loadMoreFeeds,
       building,
       likePost,
       unlikePost,
@@ -39,11 +39,11 @@ class BuildingFeedTab extends Component {
           ]}
         />
         <InfiniteScroll
-          loadMore={loadMoreRows}
+          loadMore={loadMoreFeeds}
           hasMore={building.posts.pageInfo.hasNextPage}
           loader={<div className="loader">Loading ...</div>}
         >
-          { building && building.posts && <FeedList
+          <FeedList
             feeds={building ? building.posts.edges : []}
             likePostEvent={likePost}
             unlikePostEvent={unlikePost}
@@ -53,7 +53,7 @@ class BuildingFeedTab extends Component {
             deletePost={deletePostOnBuilding}
             editPost={editPost}
             sharingPost={sharingPost}
-          />}
+          />
         </InfiniteScroll>
       </div>
     );
@@ -66,7 +66,7 @@ BuildingFeedTab.propTypes = {
   me: PropTypes.object.isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
-  loadMoreRows: PropTypes.func.isRequired,
+  loadMoreFeeds: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   deletePostOnBuilding: PropTypes.func.isRequired,
