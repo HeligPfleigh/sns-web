@@ -20,10 +20,9 @@ const PRIVARY_TEXT = {
 
 class EventDetail extends React.Component {
   render() {
-    const { event } = this.props;
+    const { event, user } = this.props;
     const start = !event ? new Date() : new Date(event.start);
     const end = !event ? new Date() : new Date(event.end);
-    console.log(event);
     return (
       <div className={s.eventDetailContent}>
         <Row>
@@ -43,7 +42,7 @@ class EventDetail extends React.Component {
                     {PRIVARY_TEXT[event.privacy]} - Tổ chức bởi <b>{`${event.author.profile.firstName} ${event.author.profile.lastName}`}</b>
                   </h5>
                   {
-                    event.isAuthor ? <div className={s.actionsButton}>
+                    user.id == event.author._id ? <div className={s.actionsButton}>
                       <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
                         <i className="fa fa-envelope-o" aria-hidden="true"></i>
                         <span>Mời</span>
@@ -95,7 +94,7 @@ class EventDetail extends React.Component {
                   Mời bạn bè tham gia sự kiện
                 </span>
                 </div>
-                {event.isAuthor &&
+                {user.id == event.author._id &&
                   <div className={s.btnInviteWrapper}>
                     <div>
                       <Button
@@ -127,6 +126,7 @@ class EventDetail extends React.Component {
 EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
   onOpenInviteModal: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 export default compose(

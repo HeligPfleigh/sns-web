@@ -22,7 +22,7 @@ const eventDetailQuery = gql`query eventDetailQuery ($eventId: String!) {
     privacy
     isDeleted
     author {
-       _id
+      _id
       username
       profile {
         picture
@@ -129,6 +129,7 @@ class EventDetailPage extends Component {
               <EventDetail
                 onOpenInviteModal={this.onOpenInviteModal}
                 event={data.event}
+                user={this.props.user}
               />
             </Col>
           </Row>
@@ -150,6 +151,7 @@ EventDetailPage.propTypes = {
   }).isRequired,
   friends: PropTypes.array.isRequired,
   inviteResidentsJoinEvent: PropTypes.any.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 export default compose(
