@@ -8,13 +8,13 @@ const InputField = ({
   placeholder,
   meta: { touched, error, warning },
 }) => (
-  <div className={`form-group ${error ? 'has-error' : ''}`}>
+  <div className="form-group">
     {label && <label htmlFor={input.name} className="col-sm-3 control-label">{label}</label>}
-    <div className="col-sm-9">
+    <div className={`${label ? 'col-sm-9' : 'col-sm-12'}`}>
       <input
         id={input.name}
         name={input.name}
-        type={type}
+        type={type || 'text'}
         {...input}
         placeholder={placeholder}
         className="form-control"
@@ -22,8 +22,8 @@ const InputField = ({
       />
       {
         touched &&
-        ((error && <span className="control-label">{error}</span>) ||
-        (warning && <span className="control-label">{warning}</span>))
+        ((error && <span className="text-danger control-label">{error}</span>) ||
+        (warning && <span className="text-warning control-label">{warning}</span>))
       }
     </div>
   </div>
