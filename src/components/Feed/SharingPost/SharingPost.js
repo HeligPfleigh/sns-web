@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Image } from 'react-bootstrap';
+import { Image, Clearfix } from 'react-bootstrap';
 import Post, { PostHeader, PostText } from '../../Card';
 import Icon from '../../Icon';
 import TimeAgo from '../../TimeAgo';
@@ -17,9 +17,8 @@ class SharingPost extends Component {
   render() {
     const { id, message, author, user, building, privacy, createdAt } = this.props;
     return (
-      <div style={{ marginTop: '35px' }}>
+      <div>
         <Post >
-          <div style={{ marginBottom: '40px' }}>
             <PostHeader
               avatar={
                 <span>
@@ -60,7 +59,7 @@ class SharingPost extends Component {
                 <Link to={`/post/${id}`}><TimeAgo time={createdAt} /></Link>
               </div>}
             />
-          </div>
+          <Clearfix />
           <PostText
             html={`${message || {}}`}
           />

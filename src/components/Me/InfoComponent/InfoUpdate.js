@@ -6,7 +6,6 @@ import s from './Info.scss';
 
 const validate = (values) => {
   const errors = [];
-  console.log('values:', values);
   return errors;
 };
 

@@ -9,6 +9,7 @@ const Divider = () => (
       height: 1,
       border: 'none',
       backgroundColor: '#e6e9ec',
+      width: '100%',
     }}
   />
 );

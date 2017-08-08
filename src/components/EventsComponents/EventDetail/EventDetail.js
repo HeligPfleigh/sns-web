@@ -20,7 +20,7 @@ const PRIVARY_TEXT = {
 
 class EventDetail extends React.Component {
   render() {
-    const { event } = this.props;
+    const { event, user } = this.props;
     const start = !event ? new Date() : new Date(event.start);
     const end = !event ? new Date() : new Date(event.end);
     return (
@@ -29,7 +29,6 @@ class EventDetail extends React.Component {
           {
             event &&
             <Col md={12}>
-
               <div className={s.titleLayout}>
                 <div className={s.left}>
                   <h5>{`THÁNG ${start.getMonth()}`}</h5>
@@ -42,23 +41,36 @@ class EventDetail extends React.Component {
                   <h5>
                     {PRIVARY_TEXT[event.privacy]} - Tổ chức bởi <b>{`${event.author.profile.firstName} ${event.author.profile.lastName}`}</b>
                   </h5>
-                  <div className={s.actionsButton}>
-                    <Button className={s.btnLeft}>
-                      <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                      <span>Mời</span>
-                    </Button>
-                    <Button className={s.btnMiddle}>
-                      <i className="fa fa-picture-o" aria-hidden="true"></i>
-                      <span>Thêm ảnh bìa</span>
-                    </Button>
-                    <Button className={s.btnMiddle}>
-                      <i className="fa fa-pencil" aria-hidden="true"></i>
-                      <span>Chỉnh sửa</span>
-                    </Button>
-                    <Button className={s.btnRight}>
-                      <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
-                    </Button>
-                  </div>
+                  {
+                    user.id == event.author._id ? <div className={s.actionsButton}>
+                      <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
+                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                        <span>Mời</span>
+                      </Button>
+                      <Button className={s.btnMiddle}>
+                        <i className="fa fa-picture-o" aria-hidden="true"></i>
+                        <span>Thêm ảnh bìa</span>
+                      </Button>
+                      <Button className={s.btnMiddle}>
+                        <i className="fa fa-pencil" aria-hidden="true"></i>
+                        <span>Chỉnh sửa</span>
+                      </Button>
+                      <Button className={s.btnRight}>
+                        <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+                      </Button>
+                    </div> : <div className={s.actionsButton}>
+                      <Button className={s.btnLeft}>
+                        <span>Tham gia</span>
+                      </Button>
+                      <Button className={s.btnMiddle}>
+                        <span>Có thể</span>
+                      </Button>
+                      <Button className={s.btnRight}>
+                        <span>Không tham gia</span>
+                      </Button>
+                    </div>
+                  }
+
                 </div>
               </div>
               <Divider className={s.divider} />
@@ -82,14 +94,19 @@ class EventDetail extends React.Component {
                   Mời bạn bè tham gia sự kiện
                 </span>
                 </div>
-                <div className={s.btnInviteWrapper}>
-                  <div>
-                    <Button className={s.btnInvite}>
-                      <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                      <span>Mời</span>
-                    </Button>
+                {user.id == event.author._id &&
+                  <div className={s.btnInviteWrapper}>
+                    <div>
+                      <Button
+                        onClick={this.props.onOpenInviteModal}
+                        className={s.btnInvite}
+                      >
+                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                        <span>Mời</span>
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                }
               </div>
               <Divider className={s.divider} />
               <div className={s.description}>
@@ -101,7 +118,6 @@ class EventDetail extends React.Component {
             </Col>
            }
         </Row>
-
       </div>
     );
   }
@@ -109,6 +125,8 @@ class EventDetail extends React.Component {
 
 EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
+  onOpenInviteModal: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 export default compose(

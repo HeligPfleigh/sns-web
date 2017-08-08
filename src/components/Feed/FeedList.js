@@ -25,10 +25,10 @@ class FeedList extends Component {
     };
   }
 
-  onClickModal = (evt, message) => {
+  onClickModal = (evt, { privacyPost, message }) => {
     evt.preventDefault();
 
-    const { idDeletedPost, idSharingPost, privacyPost } = this.state;
+    const { idDeletedPost, idSharingPost } = this.state;
     const { openAlertGlobalAction } = this.props;
     this.closeModal();
 
@@ -39,7 +39,7 @@ class FeedList extends Component {
     if (idSharingPost) {
       this.props
       .sharingPost(idSharingPost, privacyPost, message)
-      .then(({ data }) => {
+      .then(() => {
         openAlertGlobalAction({
           message: 'Bạn đã chia sẽ được thành công trên dòng thời gian của bạn',
           open: true,
@@ -101,13 +101,12 @@ class FeedList extends Component {
     this.updateStateModal(true);
   }
 
-  sharingPostEvent = (id, privacy, sharingFeed) => {
-    this.setState(() => ({
+  sharingPostEvent = (idSharingPost, sharingFeed) => {
+    this.setState({
       showSharingPost: true,
-      idSharingPost: id,
-      privacyPost: privacy || PUBLIC,
+      idSharingPost,
       sharingFeed,
-    }));
+    });
   }
 
   editPostEvent = (id, dataPost) => {

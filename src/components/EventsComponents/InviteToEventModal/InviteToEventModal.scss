@@ -1,0 +1,27 @@
+@import "../../../theme/resources.scss";
+.ListFriendForInvite {
+  overflow: auto;
+  .ListFriendWrapper{
+    max-height: 360px;
+    display: block;
+    direction: ltr;
+    .ItemFriend {
+      margin: 8px;
+      img{
+        width: 56px;
+        height: 56px;
+        border: 0;
+        margin-right: 10px;
+      }
+      .ItemFriendMiddle {
+        width: 100%;
+      }
+      i {
+        font-size: 20px;
+      }
+      :hover {
+        background: #e3fff0;
+      }
+    }
+  }
+}

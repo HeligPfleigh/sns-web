@@ -7,7 +7,7 @@ import {
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import { noop, includes } from 'lodash';
+import { noop } from 'lodash';
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -80,17 +80,16 @@ class Feed extends Component {
     }
   }
 
-  onSelectShareButton = (eventKey, event) => {
+  onSelectShareButton = (event) => {
     event.preventDefault();
     const {
       data: {
         _id,
+        sharing,
       },
       sharingPostEvent = doNothing,
     } = this.props;
-    if (eventKey && includes([PUBLIC, FRIEND, ONLY_ME], eventKey)) {
-      sharingPostEvent(_id, eventKey, this.props.data);
-    }
+    sharingPostEvent(_id, sharing || this.props.data);
   }
 
   render() {
@@ -215,18 +214,7 @@ class Feed extends Component {
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
           <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-          <Dropdown id={idRandom()}>
-            <CustomToggle bsRole="toggle">
-              <span title="Chia sẻ">
-                <i className="fa fa-share fa-lg" aria-hidden="true"></i> Chia sẻ
-              </span>
-            </CustomToggle>
-            <Dropdown.Menu onSelect={this.onSelectShareButton}>
-              <MenuItem eventKey={PUBLIC}>Chi sẻ công khai</MenuItem>
-              <MenuItem eventKey={FRIEND}>Chia sẻ với bạn bè</MenuItem>
-              <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Icon onClick={this.onSelectShareButton} title="Chia sẻ" icons="fa fa-share fa-lg" />
         </PostActions>
         ) }
         { !sharingPostModalOpenned && (
@@ -354,6 +342,41 @@ const commentFragment = gql`fragment CommentView on Comment {
 
 Feed.fragments = {
   comment: commentFragment,
+  requests: gql`
+    fragment UsersAwaitingApproval on Friend {
+      _id
+      username
+      phone {
+        number
+        verified
+      }
+      emails {
+        address
+        verified
+      }
+      profile {
+        picture
+        firstName
+        lastName
+        gender
+      }
+      apartments {
+        _id
+        number
+        isOwner
+        building {
+          _id
+          name
+          isAdmin
+        }
+      }
+      building {
+        _id
+        name
+        isAdmin
+      }
+    }
+  `,
   // user: userFragment,
   post: gql`
     fragment PostView on Post {
