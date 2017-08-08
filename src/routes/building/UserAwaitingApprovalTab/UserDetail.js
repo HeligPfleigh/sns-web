@@ -68,14 +68,14 @@ class UserDetail extends Component {
             { this.props.data.profile && (
             <div>
               <Row className={ s.item }>              
-                <Col sm={4} md={2} className={ s.label }><i className="fa fa-user-o" /> Họ và tên:</Col>
-                <Col sm={8} md={10}>{ this.props.data.profile.firstName } { this.props.data.profile.lastName }</Col>
+                <Col sm={4} md={3} className={ s.label }><i className="fa fa-user-o" /> Họ và tên:</Col>
+                <Col sm={8} md={9}>{ this.props.data.profile.firstName } { this.props.data.profile.lastName }</Col>
                 <Clearfix visibleSmBlock/>              
               </Row>
 
               <Row className={ s.item }>              
-                <Col sm={4} md={2} className={ s.label }><i className="fa fa-circle-o" /> Giới tính:</Col>
-                <Col sm={8} md={10}>{ this.props.data.profile.gender === 'male' ? 'Nam' : 'Nữ' }</Col>
+                <Col sm={4} md={3} className={ s.label }><i className="fa fa-circle-o" /> Giới tính:</Col>
+                <Col sm={8} md={9}>{ this.props.data.profile.gender === 'male' ? 'Nam' : 'Nữ' }</Col>
                 <Clearfix visibleSmBlock/>              
               </Row>
             </div>
@@ -83,24 +83,24 @@ class UserDetail extends Component {
 
             { this.props.data.phones && this.props.data.phones.number && (
             <Row className={ s.item }>              
-              <Col sm={4} md={2} className={ s.label }><i className="fa fa-phone" /> Số điện thoại:</Col>
-              <Col sm={8} md={10}>{ this.props.data.phones.number }</Col>
+              <Col sm={4} md={3} className={ s.label }><i className="fa fa-phone" /> Số điện thoại:</Col>
+              <Col sm={8} md={9}>{ this.props.data.phones.number }</Col>
               <Clearfix visibleSmBlock/>              
             </Row>
             ) }
 
             { this.props.data.emails && this.props.data.emails.address && (
             <Row className={ s.item }>              
-              <Col sm={4} md={2} className={ s.label }><i className="fa fa-envelope-open-o" /> Email:</Col>
-              <Col sm={8} md={10}>{ this.props.data.emails.address }</Col>
+              <Col sm={4} md={3} className={ s.label }><i className="fa fa-envelope-open-o" /> Email:</Col>
+              <Col sm={8} md={9}>{ this.props.data.emails.address }</Col>
               <Clearfix visibleSmBlock/>              
             </Row>
             ) }
 
             { this.props.data.apartments && (
             <Row className={ s.item }>              
-              <Col sm={4} md={2} className={ s.label }><i className="fa fa-address-book-o" /> Địa chỉ:</Col>
-              <Col sm={8} md={10}>{ this.props.data.apartments.map(apartment => <p key={ Math.random() }>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</p>) }</Col>
+              <Col sm={4} md={3} className={ s.label }><i className="fa fa-address-book-o" /> Địa chỉ:</Col>
+              <Col sm={8} md={9}>{ this.props.data.apartments.map(apartment => <p key={ Math.random() }>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</p>) }</Col>
               <Clearfix visibleSmBlock/>              
             </Row>
             ) }
