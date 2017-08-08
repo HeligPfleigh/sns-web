@@ -251,7 +251,7 @@ class Feed extends Component {
               </span>
             </CustomToggle>
             <Dropdown.Menu onSelect={this.onSelectShareButton}>
-              <MenuItem eventKey={PUBLIC}>Chi sẻ công khai</MenuItem>
+              <MenuItem eventKey={PUBLIC}>Chia sẻ công khai</MenuItem>
               <MenuItem eventKey={FRIEND}>Chia sẻ với bạn bè</MenuItem>
               <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
             </Dropdown.Menu>
@@ -399,6 +399,7 @@ Feed.fragments = {
         picture
         firstName
         lastName
+        gender
       }
       apartments {
         _id

@@ -32,7 +32,6 @@ import s from './Building.scss';
 const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
-const REQUEST_TAB = 'REQUEST_TAB';
 const USERS_AWAITING_APPROVAL_TAB = 'USERS_AWAITING_APPROVAL_TAB';
 
 const loadBuildingQuery = gql`
@@ -146,22 +145,30 @@ class Building extends Component {
     };
   }
 
-  accept = friend => (evt) => {
-    evt.preventDefault();
-    this.props.acceptRequestForJoiningBuilding(friend).catch((error) => {
-      this.setState({
-        errorMessage: error.message,
+  accept(friend) {
+    return event => {
+      event.preventDefault();
+      const xhr = this.props.acceptRequestForJoiningBuilding(friend);
+      xhr.catch(error => {
+        this.setState({
+          errorMessage: error.message,
+        });
       });
-    });
+      return xhr;
+    };
   }
 
-  cancel = friend => (evt) => {
-    evt.preventDefault();
-    this.props.rejectRequestForJoiningBuilding(friend).catch((error) => {
-      this.setState({
-        errorMessage: error.message,
+  cancel(friend) {
+    return event => {
+      event.preventDefault();
+      const xhr = this.props.rejectRequestForJoiningBuilding(friend);
+      xhr.catch(error => {
+        this.setState({
+          errorMessage: error.message,
+        });
       });
-    });
+      return xhr;
+    };
   }
 
   handleSelect = (key) => {
@@ -226,13 +233,9 @@ class Building extends Component {
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
                   Thông báo
                 </NavItem>}
-                { building && building.isAdmin && <NavItem title="Yêu cầu kết nối" eventKey={REQUEST_TAB}>
-                  <i className="fa fa-question-circle" aria-hidden="true"></i>
-                  Yêu cầu
-                </NavItem> }
                 { building && building.isAdmin && <NavItem title="Danh sách đăng ký làm thành viên tòa nhà" eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <i className="fa fa-users" aria-hidden="true"></i>
-                  Danh sách đăng ký
+                  Yêu cầu
                 </NavItem> }
               </Nav>
             </Col>
@@ -265,14 +268,6 @@ class Building extends Component {
                       buildingId: building._id,
                       limit: 1000,
                     }}
-                  />
-                </Tab.Pane>}
-                { building && building.isAdmin && <Tab.Pane eventKey={REQUEST_TAB}>
-                  <BuildingRequestTab
-                    data={building.requests}
-                    error={this.state.errorMessage}
-                    onAccept={this.accept}
-                    onCancel={this.cancel}
                   />
                 </Tab.Pane>}
                 {/* Users awaiting approval */}

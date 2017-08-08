@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -26,12 +25,6 @@ class ListUsers extends Component {
       showModal: false,
     };
   }
-  /**
-   * 
-   * @param {*} nextProps 
-   */
-  componentWillReceiveProps(nextProps) {
-  }
 
   /**
    * 
@@ -44,7 +37,7 @@ class ListUsers extends Component {
   }
 
   onOpenUserDetailModal(userDetail) {
-    this.setState({
+    return () => this.setState({
       showModal: true,
       userDetail,
     });
@@ -62,6 +55,13 @@ class ListUsers extends Component {
           autoHideDuration={ 4000 }
         />
         
+        <UserDetail 
+          show={ this.state.showModal }
+          closeModal={ this.onCloseUserDetailModal.bind(this) }
+          onCancel={ this.props.onCancel.bind(this) }
+          onAccept={ this.props.onAccept.bind(this) }
+          data={ this.state.userDetail }
+        />
         { this.props.loading ? this.__renderLoadingIcon() : this.__renderListUsers() }
       </Panel>
     );
