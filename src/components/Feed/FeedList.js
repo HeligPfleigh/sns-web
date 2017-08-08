@@ -3,13 +3,10 @@ import { connect } from 'react-redux';
 import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
+import EditPostModal from './EditPostModal';
 import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
 import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
-
-function doNothing(e) {
-  e && e.preventDefault && e.preventDefault();
-}
 
 class FeedList extends Component {
 
@@ -18,10 +15,13 @@ class FeedList extends Component {
     this.state = {
       show: false,
       showSharingPost: false,
+      showEditPost: false,
       idDeletedPost: null,
       idSharingPost: null,
+      idEditPost: null,
       privacyPost: PUBLIC,
       sharingFeed: {},
+      dataPost: {},
     };
   }
 
@@ -51,6 +51,14 @@ class FeedList extends Component {
     }
   }
 
+  onClickEditPostModal = (evt, post, isDelPostSharing) => {
+    evt.preventDefault();
+    if (post._id) {
+      this.props.editPost(post, isDelPostSharing);
+    }
+    this.closeModal();
+  }
+
   onSelectRightEvent = (eventKey, id) => {
     this.setState(() => ({
       idDeletedPost: id,
@@ -69,7 +77,7 @@ class FeedList extends Component {
 
   closeModal = () => {
     this.updateStateModal(false);
-    const { idDeletedPost, idSharingPost } = this.state;
+    const { idDeletedPost, idSharingPost, idEditPost } = this.state;
     if (idDeletedPost) {
       this.setState(() => ({
         idDeletedPost: null,
@@ -79,6 +87,12 @@ class FeedList extends Component {
       this.setState(() => ({
         showSharingPost: false,
         idSharingPost: null,
+      }));
+    }
+    if (idEditPost) {
+      this.setState(() => ({
+        showEditPost: false,
+        idEditPost: null,
       }));
     }
   }
@@ -96,6 +110,14 @@ class FeedList extends Component {
     }));
   }
 
+  editPostEvent = (id, dataPost) => {
+    this.setState(() => ({
+      showEditPost: true,
+      idEditPost: id,
+      dataPost,
+    }));
+  }
+
   render() {
     const {
       feeds,
@@ -104,7 +126,6 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
-      editPost = doNothing,
     } = this.props;
     return (
       <div>
@@ -118,7 +139,7 @@ class FeedList extends Component {
             userInfo={userInfo}
             loadMoreComments={loadMoreComments}
             createNewComment={createNewComment}
-            editPostEvent={editPost}
+            editPostEvent={this.editPostEvent}
             sharingPostEvent={this.sharingPostEvent}
           />
         ))}
@@ -132,6 +153,12 @@ class FeedList extends Component {
           closeModal={this.closeModal}
           clickModal={this.onClickModal}
           sharingFeed={this.state.sharingFeed}
+        />
+        <EditPostModal
+          show={this.state.showEditPost}
+          closeModal={this.closeModal}
+          clickModal={this.onClickEditPostModal}
+          dataPost={this.state.dataPost}
         />
       </div>
     );
@@ -149,8 +176,8 @@ FeedList.propTypes = {
   userInfo: PropTypes.object.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
-  deletePost: PropTypes.func,
-  editPost: PropTypes.func,
+  deletePost: PropTypes.func.isRequired,
+  editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func,
 };

@@ -1,11 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import classNames from 'classnames';
-import {
-  Col,
-  Button,
-  Clearfix,
-} from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import {
   Editor,
   EditorState,
@@ -13,10 +7,9 @@ import {
   convertFromRaw,
 } from 'draft-js';
 import isEmpty from 'lodash/isEmpty';
-import SharingPost from '../SharingPost';
-import s from './EditPost.scss';
-import ListImagePreview from '../../ListImagePreview';
-import uploadImage from '../../../utils/uploadImage';
+import SharingPost from './SharingPost';
+import ListImagePreview from '../ListImagePreview';
+import uploadImage from '../../utils/uploadImage';
 
 const styles = {
   editor: {
@@ -28,21 +21,13 @@ const styles = {
   },
 };
 
-class EditPost extends Component {
+class EditPostModal extends Component {
   constructor(props) {
     super(props);
-    const { data: { message, photos } } = this.props;
-    let editorState = null;
-    if (message) {
-      const contentState = convertFromRaw(JSON.parse(message));
-      // move focus to the end.
-      editorState = EditorState.createWithContent(contentState);
-      editorState = EditorState.moveFocusToEnd(editorState);
-    }
     this.state = {
-      editorState: editorState || EditorState.createEmpty(),
+      editorState: EditorState.createEmpty(),
       isSubmit: true,
-      photos: Array.from(photos || []),
+      photos: Array.from([]),
       isDelPostSharing: true,
     };
 
@@ -50,6 +35,35 @@ class EditPost extends Component {
       editorState: editorStateChange,
       isSubmit: !editorStateChange.getCurrentContent().getPlainText().trim(),
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { dataPost: { message, photos }, isFocus } = nextProps;
+    if (message) {
+      const contentState = convertFromRaw(JSON.parse(message));
+      // move focus to the end.
+      this.state.editorState = EditorState.createWithContent(contentState);
+      this.state.editorState = EditorState.moveFocusToEnd(this.state.editorState);
+    }
+    if (nextProps.isFocus !== isFocus) {
+      this.editor.focus();
+    }
+    this.setState({
+      editorState: this.state.editorState,
+      photos: Array.from(photos || []),
+    });
+  }
+
+  onSubmit = (evt) => {
+    const { dataPost: postData } = this.props;
+    const { dataPost: { message, photos } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (content === message && this.state.photos === photos) {
+      this.props.closeModal();
+    } else {
+      const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
+      this.props.clickModal(evt, data, this.state.isDelPostSharing);
+    }
   }
 
   onDeleteImage = (index) => {
@@ -92,30 +106,16 @@ class EditPost extends Component {
     });
   }
 
-  onSubmit = (evt) => {
-    evt.preventDefault();
-    const { data: postData } = this.props;
-    const { data: { message } } = this.props;
-    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    const { photos } = this.state;
-    if (content === message && photos === this.props.photos) {
-      this.props.closeEditPost();
-    } else {
-      const data = { ...postData, ...{ message: content, photos: photos || [] } };
-      this.props.onChange(data, this.state.isDelPostSharing);
-    }
-  }
-
-  focus = () => this.editor.focus();
-
   delPostSharing = () => {
     this.setState({
       isDelPostSharing: false,
     });
   }
 
+  focus = () => this.editor.focus();
+
   render() {
-    const { className, sharing } = this.props;
+    const { dataPost: { sharing } } = this.props;
     const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
     const delBlockStyle = {
       position: 'absolute',
@@ -124,11 +124,12 @@ class EditPost extends Component {
       right: '10px',
       cursor: 'pointer',
     };
-
     return (
-      <div className={classNames(s.postContent, className)}>
-        <Clearfix />
-        <Col>
+      <Modal show={this.props.show} onHide={this.props.closeModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Chỉnh sửa bài viết</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
           <div
             style={styles.editor}
             onClick={this.focus}
@@ -137,13 +138,14 @@ class EditPost extends Component {
             <Editor
               spellCheck
               placeholder="Bạn đang nghĩ gì?"
-              editorState={editorState} onChange={this.onChange}
+              editorState={editorState}
+              onChange={this.onChange}
               ref={(editor) => { this.editor = editor; }}
             />
             {
               photos.length > 0 ?
                 <div
-                  className={s.listImagePreview}
+                  className="listImagePreview"
                 >
                   <ListImagePreview
                     images={photos}
@@ -153,26 +155,26 @@ class EditPost extends Component {
                 null
             }
           </div>
-        </Col>
-        {sharing && !isEmpty(sharing) && isDelPostSharing &&
-          <Col style={{ position: 'relative', marginTop: '-30px' }}>
-            <i className="fa fa-times" style={delBlockStyle} aria-hidden="true" onClick={this.delPostSharing}></i>
-            <SharingPost
-              id={sharing._id}
-              message={sharing.message}
-              author={sharing.author}
-              user={sharing.user}
-              building={sharing.building}
-              privacy={sharing.privacy}
-              createdAt={sharing.createdAt}
-            />
-          </Col>
-        }
-        <Col style={{ borderTop: '1px solid #ddd', paddingTop: '10px' }}>
-          <Col className="pull-left">
+          {sharing && !isEmpty(sharing) && isDelPostSharing &&
+            <div style={{ position: 'relative', marginTop: '-30px' }}>
+              <i className="fa fa-times" style={delBlockStyle} aria-hidden="true" onClick={this.delPostSharing}></i>
+              <SharingPost
+                id={sharing._id}
+                message={sharing.message}
+                author={sharing.author}
+                user={sharing.user}
+                building={sharing.building}
+                privacy={sharing.privacy}
+                createdAt={sharing.createdAt}
+              />
+            </div>
+          }
+        </Modal.Body>
+        <Modal.Footer>
+          <div style={{ float: 'left' }}>
             <Button
               bsStyle="link"
-              className={s.addPhoto}
+              style={{ color: '#4c4c4c', textDecorationLine: 'none' }}
               title="Đính kèm ảnh"
               onClick={() => {
                 document.getElementById('fileInputOnEdit').click();
@@ -189,25 +191,22 @@ class EditPost extends Component {
                 multiple
               />
             </Button>
-          </Col>
-          <Col className="pull-right">
-            <Button title="Chỉnh sửa xong" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
-          </Col>
-          <Col className="pull-right">
-            <Button title="Hủy" bsStyle="default" style={{ marginRight: '5px' }} onClick={this.props.closeEditPost}>Hủy</Button>
-          </Col>
-        </Col>
-      </div>
+          </div>
+          <Button onClick={this.props.closeModal}>Hủy</Button>
+          <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
+        </Modal.Footer>
+      </Modal>
     );
   }
 }
 
-EditPost.propTypes = {
-  data: PropTypes.any,
-  onChange: PropTypes.func.isRequired,
-  className: PropTypes.string,
-  closeEditPost: PropTypes.func.isRequired,
-  sharing: PropTypes.any,
+EditPostModal.propTypes = {
+  show: PropTypes.bool,
+  closeModal: PropTypes.func,
+  clickModal: PropTypes.func,
+  dataPost: PropTypes.object.isRequired,
+  isFocus: PropTypes.bool,
 };
 
-export default withStyles(s)(EditPost);
+
+export default EditPostModal;

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import update from 'immutability-helper';
 import { withApollo } from 'react-apollo';
 import { generate as idRandom } from 'shortid';
 import { DELETE_POST_ACTION, PUBLIC } from '../../../constants';
@@ -8,6 +7,7 @@ import {
   Feed,
   DeletePostModal,
   SharingPostModal,
+  EditPostModal,
 } from '../../../components/Feed';
 import likePostMutation from './likePostMutation.graphql';
 import unlikePostMutation from './unlikePostMutation.graphql';
@@ -20,10 +20,13 @@ class FeedList extends Component {
     this.state = {
       show: false,
       showSharingPost: false,
+      showEditPost: false,
       idDeletedPost: null,
       idSharingPost: null,
+      idEditPost: null,
       privacyPost: PUBLIC,
       sharingFeed: {},
+      dataPost: {},
     };
   }
 
@@ -32,7 +35,6 @@ class FeedList extends Component {
 
     const { idDeletedPost, idSharingPost, privacyPost } = this.state;
     this.closeModal();
-    
     if (idDeletedPost) {
       this.props.deletePost(idDeletedPost);
     }
@@ -47,6 +49,14 @@ class FeedList extends Component {
         console.log('there was an error sending the query', error);
       });
     }
+  }
+
+  onClickEditPostModal = (evt, post, isDelPostSharing) => {
+    evt.preventDefault();
+    if (post._id) {
+      this.props.editPost(post, isDelPostSharing);
+    }
+    this.closeModal();
   }
 
   onSelectRightEvent = (eventKey, id) => {
@@ -67,7 +77,7 @@ class FeedList extends Component {
 
   closeModal = () => {
     this.updateStateModal(false);
-    const { idDeletedPost, idSharingPost } = this.state;
+    const { idDeletedPost, idSharingPost, idEditPost } = this.state;
     if (idDeletedPost) {
       this.setState(() => ({
         idDeletedPost: null,
@@ -77,6 +87,12 @@ class FeedList extends Component {
       this.setState(() => ({
         showSharingPost: false,
         idSharingPost: null,
+      }));
+    }
+    if (idEditPost) {
+      this.setState(() => ({
+        showEditPost: false,
+        idEditPost: null,
       }));
     }
   }
@@ -91,6 +107,14 @@ class FeedList extends Component {
       idSharingPost: id,
       privacyPost: privacy || PUBLIC,
       sharingFeed,
+    }));
+  }
+
+  editPostEvent = (id, dataPost) => {
+    this.setState(() => ({
+      showEditPost: true,
+      idEditPost: id,
+      dataPost,
     }));
   }
 
@@ -181,7 +205,6 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
-      editPost,
     } = this.props;
     return (
       <div>
@@ -195,7 +218,7 @@ class FeedList extends Component {
             userInfo={userInfo}
             loadMoreComments={loadMoreComments}
             createNewComment={createNewComment}
-            editPostEvent={editPost}
+            editPostEvent={this.editPostEvent}
             sharingPostEvent={this.sharingPostEvent}
           />
         ))}
@@ -205,10 +228,16 @@ class FeedList extends Component {
           clickModal={this.onClickModal}
         />
         <SharingPostModal
-          show={ this.state.showSharingPost }
-          closeModal={ this.closeModal.bind(this) }
-          clickModal={ this.onClickModal.bind(this) }
-          sharingFeed={ this.state.sharingFeed }
+          show={this.state.showSharingPost}
+          closeModal={this.closeModal}
+          clickModal={this.onClickModal}
+          sharingFeed={this.state.sharingFeed}
+        />
+        <EditPostModal
+          show={this.state.showEditPost}
+          closeModal={this.closeModal}
+          clickModal={this.onClickEditPostModal}
+          dataPost={this.state.dataPost}
         />
       </div>
     );
