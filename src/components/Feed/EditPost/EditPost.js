@@ -5,6 +5,7 @@ import {
   Col,
   Button,
   Clearfix,
+  ButtonToolbar,
 } from 'react-bootstrap';
 import {
   Editor,
@@ -75,6 +76,20 @@ class EditPost extends Component {
     });
   }
 
+  onSubmit = (evt) => {
+    evt.preventDefault();
+    const { data: postData } = this.props;
+    const { data: { message } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    const { photos } = this.state;
+    if (content === message && photos === this.props.photos) {
+      this.props.closeEditPost();
+    } else {
+      const data = { ...postData, ...{ message: content, photos: photos || [] } };
+      this.props.onChange(data, this.state.isDelPostSharing);
+    }
+  }
+
   uploadImages = (files) => {
     files.forEach(async (file, index) => {
       try {
@@ -90,20 +105,6 @@ class EditPost extends Component {
         console.log(err);
       }
     });
-  }
-
-  onSubmit = (evt) => {
-    evt.preventDefault();
-    const { data: postData } = this.props;
-    const { data: { message } } = this.props;
-    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    const { photos } = this.state;
-    if (content === message && photos === this.props.photos) {
-      this.props.closeEditPost();
-    } else {
-      const data = { ...postData, ...{ message: content, photos: photos || [] } };
-      this.props.onChange(data, this.state.isDelPostSharing);
-    }
   }
 
   focus = () => this.editor.focus();
@@ -191,12 +192,13 @@ class EditPost extends Component {
             </Button>
           </Col>
           <Col className="pull-right">
-            <Button title="Chỉnh sửa xong" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
-          </Col>
-          <Col className="pull-right">
-            <Button title="Hủy" bsStyle="default" style={{ marginRight: '5px' }} onClick={this.props.closeEditPost}>Hủy</Button>
+            <ButtonToolbar>
+              <Button title="Hủy" bsStyle="default" onClick={this.props.closeEditPost}>Hủy</Button>
+              <Button title="Chỉnh sửa xong" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
+            </ButtonToolbar>
           </Col>
         </Col>
+        <Clearfix />
       </div>
     );
   }
@@ -208,6 +210,7 @@ EditPost.propTypes = {
   className: PropTypes.string,
   closeEditPost: PropTypes.func.isRequired,
   sharing: PropTypes.any,
+  photos: PropTypes.any,
 };
 
 export default withStyles(s)(EditPost);
