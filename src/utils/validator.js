@@ -1,4 +1,8 @@
 import validator from 'validator';
+import isEmpty from 'lodash/isEmpty';
+
+// required object value
+export const objRequired = value => (isEmpty(value) ? 'Trường bắt buộc' : undefined);
 
 // Check required
 export const required = value => (value ? undefined : 'Trường bắt buộc');
