@@ -12,6 +12,7 @@ import inviteResidentsJoinEvent from './inviteResidentsJoinEvent.graphql';
 import joinEvent from './joinEvent.graphql';
 import canJoinEvent from './canJoinEvent.graphql';
 import cantJoinEvent from './cantJoinEvent.graphql';
+import deleteEvent from './deleteEvent.graphql';
 import {
   EventMenu,
   EventDetail,
@@ -136,6 +137,7 @@ class EventDetailPage extends Component {
                 joinEvent={this.props.joinEvent}
                 canJoinEvent={this.props.canJoinEvent}
                 cantJoinEvent={this.props.cantJoinEvent}
+                deleteEvent={this.props.deleteEvent}
               />
             </Col>
           </Row>
@@ -160,6 +162,7 @@ EventDetailPage.propTypes = {
   joinEvent: PropTypes.any.isRequired,
   canJoinEvent: PropTypes.any.isRequired,
   cantJoinEvent: PropTypes.any.isRequired,
+  deleteEvent: PropTypes.any.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -186,6 +189,15 @@ export default compose(
         friends,
       };
     },
+  }),
+  graphql(deleteEvent, {
+    props: ({ mutate }) => ({
+      deleteEvent: eventId => mutate({
+        variables: {
+          eventId,
+        },
+      }),
+    }),
   }),
   graphql(joinEvent, {
     props: ({ mutate }) => ({

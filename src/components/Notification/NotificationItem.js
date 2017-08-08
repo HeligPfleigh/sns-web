@@ -15,6 +15,7 @@ import {
   JOIN_EVENT,
   CAN_JOIN_EVENT,
   CANT_JOIN_EVENT,
+  EVENT_DELETED,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
@@ -37,6 +38,7 @@ const collectionNotifyMessages = {
   [JOIN_EVENT]: () => ' xác nhận tham gia sự kiện của bạn',
   [CAN_JOIN_EVENT]: () => ' có thể tham gia sự kiện của bạn',
   [CANT_JOIN_EVENT]: () => ' không thể tham gia sự kiện của bạn',
+  [EVENT_DELETED]: () => ' đã xóa sự kiện',
 };
 
 export const getNotifyContent = (currentUser, author, type, actors) => {
@@ -99,6 +101,10 @@ class NotificationItem extends React.Component {
       history.push('/friends');
     }
 
+    if (EVENT_DELETED === type) {
+      history.push('/events');
+    }
+
     // redirect to PostDetail Page
     if (subject) {
       if ([EVENT_INVITE, CAN_JOIN_EVENT, CANT_JOIN_EVENT].indexOf(type) > -1) {
@@ -112,9 +118,6 @@ class NotificationItem extends React.Component {
   render() {
     const {
       data: {
-        // subject: {
-        //   user: author,
-        // },
         user,
         isRead,
         type,
