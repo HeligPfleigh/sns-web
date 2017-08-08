@@ -19,6 +19,48 @@ const PRIVARY_TEXT = {
 };
 
 class EventDetail extends React.Component {
+
+  onJoinClick = async () => {
+    const { event, user } = this.props;
+    const newInviteList = event.invites.filter(item => (item._id !== user.id));
+    let newJoinList = [];
+    newJoinList = event.joins.map(item => (item));
+    let exist = false;
+    newJoinList.forEach((element) => {
+      if (element._id == user.id) {
+        exist = true;
+      }
+    });
+    if (!exist) {
+      newJoinList.push({
+        _id: user.id,
+        profile: {
+          picture: user.profile.picture,
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
+        },
+        username: user.username,
+      });
+    }
+    await this.props.joinEvent(event._id, newInviteList, newJoinList);
+  }
+
+  onCanJoinClick = async () => {
+    const { event, user } = this.props;
+    const newInviteList = event.invites.filter(item => (item._id !== user.id));
+    let newJoinList = [];
+    newJoinList = event.joins.map(item => (item));
+    await this.props.canJoinEvent(event._id, newInviteList, newJoinList);
+  }
+
+  onCantJoinClick = async () => {
+    const { event, user } = this.props;
+    const newInviteList = event.invites.filter(item => (item._id !== user.id));
+    let newJoinList = [];
+    newJoinList = event.joins.map(item => (item));
+    await this.props.cantJoinEvent(event._id, newInviteList, newJoinList);
+  }
+
   render() {
     const { event, user } = this.props;
     const start = !event ? new Date() : new Date(event.start);
@@ -59,13 +101,13 @@ class EventDetail extends React.Component {
                         <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
                       </Button>
                     </div> : <div className={s.actionsButton}>
-                      <Button className={s.btnLeft}>
+                      <Button onClick={this.onJoinClick} className={s.btnLeft}>
                         <span>Tham gia</span>
                       </Button>
-                      <Button className={s.btnMiddle}>
+                      <Button onClick={this.onCanJoinClick} className={s.btnMiddle}>
                         <span>Có thể</span>
                       </Button>
-                      <Button className={s.btnRight}>
+                      <Button onClick={this.onCantJoinClick} className={s.btnRight}>
                         <span>Không tham gia</span>
                       </Button>
                     </div>
@@ -127,6 +169,9 @@ EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
   onOpenInviteModal: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
+  joinEvent: PropTypes.func.isRequired,
+  canJoinEvent: PropTypes.func.isRequired,
+  cantJoinEvent: PropTypes.func.isRequired,
 };
 
 export default compose(
