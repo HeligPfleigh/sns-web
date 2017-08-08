@@ -53,6 +53,12 @@
       .btnRight {
         border-top-left-radius: 0px;
         border-bottom-left-radius: 0px;
+        button{
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
+          border-top-right-radius: 3px;
+          border-bottom-right-radius: 3px;
+        }
       }
     }
   }
@@ -75,6 +81,7 @@
   padding-bottom: 12px;
   .text {
     float: left;
+    width: 100%;
     span {
       color: #999999;
     }
@@ -95,7 +102,21 @@
       }
     }
   }
-  
+  .ListUserJoin {
+    overflow: auto;
+    .WrapperItemUsers{
+      display: flex;
+      .ItemUserJoin{
+        width: 56px;
+        height: 56px;
+        margin: 8px;
+        img {
+          width: 56px;
+          height: 56px;
+        }
+      }
+    }
+  }
 }
 
 .description{
