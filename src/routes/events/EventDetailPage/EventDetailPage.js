@@ -9,6 +9,9 @@ import MediaQuery from 'react-responsive';
 import Loading from '../../../components/Loading';
 import getFriendsQuery from '../../ChatSideBar/getFriendsQuery.graphql';
 import inviteResidentsJoinEvent from './inviteResidentsJoinEvent.graphql';
+import joinEvent from './joinEvent.graphql';
+import canJoinEvent from './canJoinEvent.graphql';
+import cantJoinEvent from './cantJoinEvent.graphql';
 import {
   EventMenu,
   EventDetail,
@@ -130,6 +133,9 @@ class EventDetailPage extends Component {
                 onOpenInviteModal={this.onOpenInviteModal}
                 event={data.event}
                 user={this.props.user}
+                joinEvent={this.props.joinEvent}
+                canJoinEvent={this.props.canJoinEvent}
+                cantJoinEvent={this.props.cantJoinEvent}
               />
             </Col>
           </Row>
@@ -151,6 +157,9 @@ EventDetailPage.propTypes = {
   }).isRequired,
   friends: PropTypes.array.isRequired,
   inviteResidentsJoinEvent: PropTypes.any.isRequired,
+  joinEvent: PropTypes.any.isRequired,
+  canJoinEvent: PropTypes.any.isRequired,
+  cantJoinEvent: PropTypes.any.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -177,6 +186,93 @@ export default compose(
         friends,
       };
     },
+  }),
+  graphql(joinEvent, {
+    props: ({ mutate }) => ({
+      joinEvent: (eventId, newInvitesList, newJoinList) => mutate({
+        variables: {
+          eventId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          joinEvent: {
+            __typename: 'Event',
+            invites: newInvitesList,
+            joins: newJoinList,
+          },
+        },
+        update: (store, { joinEvent }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: joinEvent });
+          data = update(data, {
+            event: {
+              invites: joinEvent.event.invites,
+              joins: joinEvent.event.joins,
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: joinEvent, data });
+        },
+      }),
+    }),
+  }),
+  graphql(canJoinEvent, {
+    props: ({ mutate }) => ({
+      canJoinEvent: (eventId, newInvitesList, newJoinList) => mutate({
+        variables: {
+          eventId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          canJoinEvent: {
+            __typename: 'Event',
+            invites: newInvitesList,
+            joins: newJoinList,
+          },
+        },
+        update: (store, { canJoinEvent }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: canJoinEvent });
+          data = update(data, {
+            event: {
+              invites: canJoinEvent.event.invites,
+              joins: canJoinEvent.event.joins,
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: canJoinEvent, data });
+        },
+      }),
+    }),
+  }),
+  graphql(cantJoinEvent, {
+    props: ({ mutate }) => ({
+      cantJoinEvent: (eventId, newInvitesList, newJoinList) => mutate({
+        variables: {
+          eventId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          cantJoinEvent: {
+            __typename: 'Event',
+            invites: newInvitesList,
+            joins: newJoinList,
+          },
+        },
+        update: (store, { cantJoinEvent }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: cantJoinEvent });
+          data = update(data, {
+            event: {
+              invites: cantJoinEvent.event.invites,
+              joins: cantJoinEvent.event.joins,
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: cantJoinEvent, data });
+        },
+      }),
+    }),
   }),
   graphql(inviteResidentsJoinEvent, {
     props: ({ mutate, ownProps: { friends } }) => ({
