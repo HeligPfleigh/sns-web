@@ -5,10 +5,11 @@ import { connect } from 'react-redux';
 import { Field, reduxForm, formValueSelector, SubmissionError } from 'redux-form';
 import { Circle } from 'better-react-spinkit';
 import { Button } from 'react-bootstrap';
+import map from 'lodash/map';
 
 import history from '../../core/history';
-import InputField from '../../components/FormFields/InputField';
-import DateTimeField from '../../components/FormFields/DateTimeField';
+import config from '../../config';
+import { InputField, DateTimeField, SelectField } from '../../components/FormFields';
 import Modal from '../../components/Modal';
 import fetchAPI from '../../utils/fetchAPI';
 import {
@@ -21,6 +22,7 @@ import {
   hasWhiteSpace,
   hasSpecialChart,
   chartFirstRequired,
+  objRequired,
 } from '../../utils/validator';
 import s from './Register.scss';
 
@@ -61,6 +63,17 @@ class Register extends React.Component {
     };
   }
 
+  getOptions = async (input) => {
+    try {
+      const url = `${config.server.ipBrowser}/buildings/buildingwithapartment?q=${input || 'v'}`;
+      const response = await fetch(url);
+      const data = await response.text();
+      return { options: JSON.parse(data) };
+    } catch (e) {
+      return { options: [] };
+    }
+  }
+
   toLogin = () => {
     this.setState({
       showModal: false,
@@ -71,7 +84,18 @@ class Register extends React.Component {
   isValidDate = current => current.isAfter(minDate) && current.isBefore(maxDate);
 
   submit = (values) => {
-    const { username, password: passwordVal, fullName, gender, dob, email: emailVal, phoneNumber: phoneVal, address } = values;
+    const {
+      username,
+      password: passwordVal,
+      building,
+      apartments,
+      fullName,
+      gender,
+      dob,
+      email: emailVal,
+      phoneNumber: phoneVal,
+      address,
+    } = values;
 
     const account = {
       username,
@@ -97,6 +121,8 @@ class Register extends React.Component {
         dob: dob && dob.isBefore(maxDate) ? dob.toDate() : maxDate.toDate(),
         address,
       },
+      building: building._id,
+      apartments: map(apartments, '_id'),
     };
 
     this.setState({
@@ -128,10 +154,13 @@ class Register extends React.Component {
       showModal: false,
     });
   }
+  handleChangeBuilding = () => {
+    this.props.change('apartments', null);
+  }
 
   render() {
     const { saved } = this.state;
-    const { handleSubmit, pristine, reset, submitting, valid, error } = this.props;
+    const { apartments, handleSubmit, pristine, reset, submitting, valid, error } = this.props;
 
     const titleStyles = {
       marginTop: '50px',
@@ -200,42 +229,71 @@ class Register extends React.Component {
               name="username"
               type="text"
               component={InputField}
-              label="Tên tài khoản"
-              placeholder="Nhập tên tài khoản"
+              placeholder="(*) Tên tài khoản"
               validate={[required, hasWhiteSpace, chartFirstRequired, normalLength, hasSpecialChart]}
             />
 
             <Field
               name="firstPassword"
               component={InputField}
-              label="Mật khẩu"
               type="password"
-              placeholder="Nhập mật khẩu"
+              placeholder="(*) Mật khẩu"
               validate={[required, normalLength, password]}
             />
 
             <Field
               name="password"
               component={InputField}
-              label="Nhập lại MK"
               type="password"
-              placeholder="Nhập lại mật khẩu"
+              placeholder="(*) Nhập lại mật khẩu"
               validate={[required, normalLength, password, this.compareValue]}
             />
 
             <hr />
             <Field
+              isAsync
+              name="building"
+              valueKey="_id"
+              labelKey="display"
+              component={SelectField}
+              dataSource={this.getOptions}
+              placeholder="(*) Chọn tòa nhà bạn đang ở!"
+              validate={[objRequired]}
+              onChange={this.handleChangeBuilding}
+            />
+
+            <Field
+              multi
+              name="apartments"
+              valueKey="_id"
+              labelKey="name"
+              component={SelectField}
+              dataSource={apartments}
+              placeholder="(*) Chọn căn hộ của bạn!"
+              noResultsText="Tòa nhà bạn chọn chưa có thông tin về căn hộ..."
+              validate={[objRequired]}
+            />
+
+            <Field
               name="fullName"
               component={InputField}
-              label="Họ và tên"
               type="text"
-              placeholder="Họ và tên"
+              placeholder="(*) Họ và tên"
               validate={[required, normalLength]}
             />
 
             <div className="form-group">
-              <label htmlFor="gender" className="col-sm-3 control-label">Giới tính</label>
-              <div className="col-sm-4">
+              <div className="col-sm-6">
+                <Field
+                  name="dob"
+                  component={DateTimeField}
+                  placeholder="(*) Chọn ngày sinh"
+                  dateFormat="DD-MM-YYYY"
+                  defaultValue={maxDate}
+                  isValidDate={this.isValidDate}
+                />
+              </div>
+              <div className="col-sm-6">
                 <Field id="gender" name="gender" component="select" className="form-control">
                   <option value="male">Nam</option>
                   <option value="female">Nữ</option>
@@ -245,57 +303,36 @@ class Register extends React.Component {
             </div>
 
             <Field
-              name="dob"
-              component={DateTimeField}
-              label="Ngày sinh"
-              placeholder="Chọn ngày sinh"
-              dateFormat="DD-MM-YYYY"
-              defaultValue={maxDate}
-              isValidDate={this.isValidDate}
-            />
-
-            <Field
               name="email"
               component={InputField}
-              label="Địa chỉ mail"
               type="text"
-              placeholder="Nhập địa chỉ email của bạn"
+              placeholder="(*) Địa chỉ email của bạn"
               validate={[required, normalLength, email]}
             />
 
             <Field
               name="phoneNumber"
               component={InputField}
-              label="SĐT"
               type="text"
-              placeholder="Nhập số điện thoại của bạn"
+              placeholder="(*) Số điện thoại của bạn"
               validate={[required, phoneNumber]}
             />
 
             <div className="form-group">
-              <label htmlFor="address" className="col-sm-3 control-label">Địa chỉ</label>
-              <div className="col-sm-9">
-                <Field
-                  id="address"
-                  name="address"
-                  component="textarea"
-                  type="text"
-                  placeholder="Ví dụ: Căn hộ 2106, Chung cư Skylight, số 205D, Minh Khai, HBT, HN"
-                  className="form-control"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="col-sm-offset-3 col-sm-9">
-                { pristine && <a className="btn-lg btn btn-danger" href="#" onClick={() => history.push('/login')}>Hủy đăng kí</a> }
-                { !pristine && <button type="button" className="btn-lg btn btn-danger" disabled={pristine || submitting} onClick={reset}>
-                  <i className="fa fa-refresh"></i> Nhập lại
-                </button> }
-                &nbsp;&nbsp;
-                <button type="submit" className="btn-lg btn btn-primary" disabled={!valid || pristine || submitting}>
-                  <i className="fa fa-paper-plane"></i> Đăng ký
-                </button>
+              <div className="col-sm-12">
+                <div className="pull-left text-danger" style={{ marginTop: '13px' }}>
+                  <strong>(*) Trường bắt buộc</strong>
+                </div>
+                <div className="pull-right">
+                  { pristine && <a className="btn-lg btn btn-danger" href="#" onClick={() => history.push('/login')}>Hủy đăng kí</a> }
+                  { !pristine && <button type="button" className="btn-lg btn btn-danger" disabled={pristine || submitting} onClick={reset}>
+                    <i className="fa fa-refresh"></i> Nhập lại
+                  </button> }
+                  &nbsp;&nbsp;
+                  <button type="submit" className="btn-lg btn btn-primary" disabled={!valid || pristine || submitting}>
+                    <i className="fa fa-paper-plane"></i> Đăng ký
+                  </button>
+                </div>
               </div>
             </div>
           </form>
@@ -306,6 +343,7 @@ class Register extends React.Component {
 }
 
 Register.propTypes = {
+  change: PropTypes.func,
   handleSubmit: PropTypes.func,
   reset: PropTypes.func,
   pristine: PropTypes.bool,
@@ -313,6 +351,7 @@ Register.propTypes = {
   valid: PropTypes.bool,
   error: PropTypes.string,
   firstPassword: PropTypes.string,
+  apartments: PropTypes.any,
 };
 
 const RegisterForm = reduxForm({
@@ -324,7 +363,9 @@ const RegisterForm = reduxForm({
 const selector = formValueSelector('registerForm');
 const RegisterPage = connect((state) => {
   const firstPassword = selector(state, 'firstPassword');
-  return { firstPassword };
+  const building = selector(state, 'building');
+  const apartments = (building && building.apartments) || [];
+  return { firstPassword, apartments };
 })(RegisterForm);
 
 export default RegisterPage;
