@@ -17,7 +17,8 @@ class EventItem extends React.Component {
         style={{
           cursor: 'pointer',
         }}
-        md={6} onClick={async () => {
+        md={6}
+        onClick={async () => {
           history.push(`/events/${event._id}`);
         }}
       >

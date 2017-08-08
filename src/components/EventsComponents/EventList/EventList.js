@@ -40,7 +40,7 @@ class EventList extends React.Component {
       hasNextPage = listEvent.pageInfo.hasNextPage;
     }
     return (
-      <div className={s.eventDetailContent}>
+      <div className={s.eventContentList}>
         <h4>Dòng sự kiện</h4>
         <Row>
           <Col md={12}>
@@ -135,8 +135,7 @@ export default compose(
               },
             });
           },
-        })
- ;
+        });
       }, 300);
       return {
         data,
