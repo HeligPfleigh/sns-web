@@ -38,20 +38,21 @@ class EditPostModal extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dataPost: { message, photos }, isFocus } = nextProps;
-    if (message) {
-      const contentState = convertFromRaw(JSON.parse(message));
+    const { dataPost: { message, photos } } = nextProps;
+    if (message !== this.props.dataPost.message) {
+      console.log(message, 'message');
+      let contentState = convertFromRaw(JSON.parse(message));
       // move focus to the end.
-      this.state.editorState = EditorState.createWithContent(contentState);
-      this.state.editorState = EditorState.moveFocusToEnd(this.state.editorState);
+      contentState = EditorState.createWithContent(contentState);
+      contentState = EditorState.moveFocusToEnd(contentState);
+      this.setState({
+        editorState: contentState,
+        photos: Array.from(photos || []),
+      });
     }
-    if (nextProps.isFocus !== isFocus) {
+    if (nextProps.isFocus !== this.props.isFocus) {
       this.editor.focus();
     }
-    this.setState({
-      editorState: this.state.editorState,
-      photos: Array.from(photos || []),
-    });
   }
 
   onSubmit = (evt) => {

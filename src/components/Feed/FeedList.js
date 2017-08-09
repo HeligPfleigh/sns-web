@@ -4,6 +4,7 @@ import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
 import EditPostModal from './EditPostModal';
+import DiscardChangesPostModal from './DiscardChangesPostModal';
 import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
 import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
@@ -16,6 +17,7 @@ class FeedList extends Component {
       show: false,
       showSharingPost: false,
       showEditPost: false,
+      showDiscardChangesPost: false,
       idDeletedPost: null,
       idSharingPost: null,
       idEditPost: null,
@@ -59,6 +61,14 @@ class FeedList extends Component {
     this.closeModal();
   }
 
+  onClickDiscardChangesPostModal = (evt) => {
+    evt.preventDefault();
+    this.setState(() => ({
+      showEditPost: false,
+      showDiscardChangesPost: false,
+    }));
+  }
+
   onSelectRightEvent = (eventKey, id) => {
     this.setState(() => ({
       idDeletedPost: id,
@@ -90,10 +100,7 @@ class FeedList extends Component {
       }));
     }
     if (idEditPost) {
-      this.setState(() => ({
-        showEditPost: false,
-        idEditPost: null,
-      }));
+      this.discardChangesPost();
     }
   }
 
@@ -115,6 +122,19 @@ class FeedList extends Component {
       idEditPost: id,
       dataPost,
     }));
+  }
+
+  discardChangesPost = () => {
+    this.setState({
+      showDiscardChangesPost: true,
+    });
+  }
+
+  closeDiscardChangesPostModal = (evt) => {
+    evt.preventDefault();
+    this.setState({
+      showDiscardChangesPost: false,
+    });
   }
 
   render() {
@@ -158,6 +178,11 @@ class FeedList extends Component {
           closeModal={this.closeModal}
           clickModal={this.onClickEditPostModal}
           dataPost={this.state.dataPost}
+        />
+        <DiscardChangesPostModal
+          show={this.state.showDiscardChangesPost}
+          closeModal={this.closeDiscardChangesPostModal}
+          clickModal={this.onClickDiscardChangesPostModal}
         />
       </div>
     );
