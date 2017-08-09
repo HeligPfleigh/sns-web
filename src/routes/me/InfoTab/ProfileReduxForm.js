@@ -41,6 +41,17 @@ class ProfileForm extends Component {
     });
   }
 
+  genderLabel = (gender) => {
+    switch (gender) {
+      case 'male':
+        return 'Nam';
+      case 'female':
+        return 'Nữ';
+      default:
+        return 'Khác';
+    }
+  };
+
   render() {
     const {
       handleSubmit,
@@ -96,8 +107,9 @@ class ProfileForm extends Component {
                   <Field name="gender" component="select">
                     <option value="male">Nam</option>
                     <option value="female">Nữ</option>
+                    <option value="other">Khác</option>
                   </Field>}
-                {!isInfoUpdate && (gender === 'male' ? 'Nam' : 'Nữ') }
+                { !isInfoUpdate && this.genderLabel(gender) }
               </Col>
             </Row>
             <Row>

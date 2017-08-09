@@ -40,12 +40,15 @@
   float: left;
   width: 100%;
 }
-.infors {    
+.infors {
   width: 100%;
   display: inline-block;
   background-color: #fff;
   margin-top: -5px;
-  border-bottom: 2px solid #f5f5f5; 
+  border-bottom: 2px solid #f5f5f5;
+  a {
+    text-decoration: none;
+  }
 }
 .infor {
   margin-left : 1px;
@@ -63,7 +66,7 @@
   left: 20px;
   bottom:20px;
   h1 {
-    padding-left: 10px;      
+    padding-left: 10px;
     color: white;
     margin: 0px;
     line-height: 100px;
@@ -82,13 +85,13 @@
 }
 
 @media(max-width:767px) {
-  .userName{    
+  .userName{
     h1{
       font-size: 18px;
       line-height: 50px;
     }
   }
-  .avartar {   
+  .avartar {
     width: 50px;
     height: 50px;
   }

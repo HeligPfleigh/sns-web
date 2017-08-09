@@ -21,10 +21,7 @@ function stripTags(input) {
   const commentsTags = /<!--[\s\S]*?-->/gi; // Match <!--, -->
   const whiteSpace = /\s+/gi; // Match any whitespace
 
-  return input
-    .replace(commentsTags, '')
-    .replace(tags, '')
-    .replace(whiteSpace, '');
+  return input.replace(tags, '').replace(commentsTags, '').replace(whiteSpace, ''); // Just replace it by an empty string
 }
 
 class PostText extends React.Component {
@@ -34,10 +31,11 @@ class PostText extends React.Component {
     if (!html) {
       return <div />;
     }
-    const __html = stateToHTML(convertFromRaw(JSON.parse(html)));
+    let __html = stateToHTML(convertFromRaw(JSON.parse(html)));
     if (!stripTags(__html)) {
       return <div />;
     }
+    __html = __html.replace(/<\/p>/gi, '<br/></p>');
 
     const data = JSON.parse(html);
     let isShow = false;
