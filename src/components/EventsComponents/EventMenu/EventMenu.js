@@ -47,12 +47,12 @@ class EventMenu extends React.Component {
   render() {
     const { showCreateEventModal } = this.state;
     return (
-      <div>
+      <div className={s.menuLeftClass}>
         <CreateEventModal
           show={showCreateEventModal}
           closeModal={this.closeModal}
         />
-        <i className={`${s.iconCalender} fa fa-calendar-o`} aria-hidden="true">
+        <i className={`fa fa-calendar-o ${s.iconCalender}`} aria-hidden="true">
           <span>{currentDate.getDay()}</span>
         </i>
         <span className={s.eventTitle}>Sự Kiện</span>
