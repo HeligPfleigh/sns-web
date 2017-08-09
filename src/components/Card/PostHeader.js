@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import {
   Col,
+  Clearfix,
 } from 'react-bootstrap';
 import s from './PostHeader.scss';
 
@@ -21,6 +22,7 @@ const PostHeader = ({ avatar, title, sharingPostTitle, subtitle, menuRight }) =>
     <Col className={s.postHeaderRight}>
       { menuRight }
     </Col>
+    <Clearfix />
   </div>
   );
 
