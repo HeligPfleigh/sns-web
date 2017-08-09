@@ -6,7 +6,6 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import _ from 'lodash';
 
 import {
-  LIKES,
   COMMENTS,
   NEW_POST,
   ACCEPTED_FRIEND,
@@ -16,15 +15,24 @@ import {
   CAN_JOIN_EVENT,
   CANT_JOIN_EVENT,
   EVENT_DELETED,
+  ACCEPTED_JOIN_BUILDING,
+  REJECTED_JOIN_BUILDING,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
 import history from '../../core/history';
 
-const getActorsContent = (actors) => {
+const getActorsContent = (currentUser, author, type, actors) => {
   if (actors && actors.length > 0) {
-    const names = actors.map(actor => `${actor.profile.firstName} ${actor.profile.lastName}`);
-    return names.join();
+    const {
+      _id: userId,
+    } = author;
+    const { _id: currentUserId } = currentUser;
+
+    if (([ACCEPTED_JOIN_BUILDING, REJECTED_JOIN_BUILDING].indexOf(type) > -1) && (currentUserId === userId) && (actors[0]._id === userId)) {
+      return '';
+    }
+    return actors.map(actor => `${actor.profile.firstName} ${actor.profile.lastName}`).join();
   }
   return '';
 };
@@ -39,30 +47,25 @@ const collectionNotifyMessages = {
   [CAN_JOIN_EVENT]: () => ' có thể tham gia sự kiện của bạn',
   [CANT_JOIN_EVENT]: () => ' không thể tham gia sự kiện của bạn',
   [EVENT_DELETED]: () => ' đã xóa sự kiện',
+  [ACCEPTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã được chấp nhận tham gia vào tòa nhà' : ' được chấp nhận tham gia vào tòa nhà'),
+  [REJECTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã bị từ chối tham gia vào tòa nhà' : ' bị từ chối tham gia vào tòa nhà'),
 };
 
 export const getNotifyContent = (currentUser, author, type, actors) => {
   if (actors && actors.length > 0) {
     const {
       _id: userId,
-      // profile: {
-      //   firstName,
-      //   lastName,
-      // },
     } = author;
     const { _id: currentUserId } = currentUser;
 
     let lastContent = 'của bạn';
     if (!_.isEqual(userId, currentUserId)) {
       lastContent = 'bạn đang theo dõi';
-      // if (firstName && lastName) {
-      //   lastContent = `của ${firstName} ${lastName}`;
-      // }
     }
 
     let notifyContent = ` vừa thích bài viết ${lastContent}.`;
     if (type && collectionNotifyMessages[type]) {
-      notifyContent = collectionNotifyMessages[type](lastContent);
+      notifyContent = collectionNotifyMessages[type]([ACCEPTED_JOIN_BUILDING, REJECTED_JOIN_BUILDING].indexOf(type) > -1 ? (currentUserId === userId) && (actors[0]._id === userId) : lastContent);
     }
 
     return notifyContent;
@@ -105,6 +108,10 @@ class NotificationItem extends React.Component {
       history.push('/events');
     }
 
+    if ([ACCEPTED_JOIN_BUILDING, REJECTED_JOIN_BUILDING].indexOf(type) > -1) {
+      // history.push('/building');
+    }
+
     // redirect to PostDetail Page
     if (subject) {
       if ([EVENT_INVITE, CAN_JOIN_EVENT, CANT_JOIN_EVENT].indexOf(type) > -1) {
@@ -126,8 +133,9 @@ class NotificationItem extends React.Component {
       },
       userInfo,
     } = this.props;
+
     const readStyle = isRead ? '' : s.readStyle;
-    const fisrtContent = getActorsContent(actors);
+    const fisrtContent = getActorsContent(userInfo, user, type, actors);
     const lastContent = getNotifyContent(userInfo, user, type, actors);
 
     return (

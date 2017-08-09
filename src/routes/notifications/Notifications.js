@@ -199,8 +199,8 @@ export default compose(
             if (!data) {
               return;
             }
-            const result = data.UpdateIsRead;
-            const index = previousResult.notifications.edges.findIndex(item => item._id === data.UpdateIsRead._id);
+            const result = data.updateRead;
+            const index = previousResult.notifications.edges.findIndex(item => item._id === result._id);
             return update(previousResult, {
               notifications: {
                 edges: {
