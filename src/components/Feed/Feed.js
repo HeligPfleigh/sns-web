@@ -4,17 +4,15 @@ import {
   Image,
   MenuItem,
   Dropdown,
-  Clearfix,
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import { noop, includes } from 'lodash';
+import { noop } from 'lodash';
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
 import Link from '../Link';
-import EditPost from './EditPost';
 import SharingPost from './SharingPost';
 import CommentList from '../Comments/CommentList';
 import {
@@ -43,12 +41,6 @@ CustomToggle.propTypes = {
 };
 
 class Feed extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isEdit: false,
-    };
-  }
 
   onLikeCLick = (evt) => {
     evt.preventDefault();
@@ -78,11 +70,11 @@ class Feed extends Component {
         _id,
       },
       onSelectRightEvent = doNothing,
+      editPostEvent = doNothing,
+
     } = this.props;
     if (eventKey === EDIT_POST_ACTION) {
-      this.setState({
-        isEdit: true,
-      });
+      editPostEvent(_id, this.props.data);
     } else {
       onSelectRightEvent(eventKey, _id);
     }
@@ -98,18 +90,6 @@ class Feed extends Component {
       sharingPostEvent = doNothing,
     } = this.props;
     sharingPostEvent(_id, sharing || this.props.data);
-  }
-
-  // check process
-  editPostHandler = (value, photos, isDelPostSharing) => {
-    const { editPostEvent } = this.props;
-    editPostEvent(value, photos, isDelPostSharing);
-  }
-
-  closeEditPost = () => {
-    this.setState({
-      isEdit: false,
-    });
   }
 
   render() {
@@ -134,7 +114,6 @@ class Feed extends Component {
       createNewComment,
       sharingPostModalOpenned,
     } = this.props;
-    const { isEdit } = this.state;
     return (
       <Post>
         <PostHeader
@@ -207,9 +186,8 @@ class Feed extends Component {
               </Dropdown> : <div></div>
           }
         />
-        <Clearfix />
-        {message && !isEdit && <PostText html={message} /> }
-        {sharing && !isEdit &&
+        {message && <PostText html={message} /> }
+        {sharing &&
           <SharingPost
             id={sharing._id}
             message={sharing.message}
@@ -220,16 +198,7 @@ class Feed extends Component {
             createdAt={sharing.createdAt}
           />
         }
-        {isEdit &&
-          <EditPost
-            sharing={sharing || {}}
-            message={message}
-            data={this.props.data}
-            onChange={this.editPostHandler}
-            closeEditPost={this.closeEditPost}
-          />
-        }
-        {!sharing && !isEdit && photos && photos.length > 0 && <PostPhotos images={photos} />}
+        {!sharing && photos && photos.length > 0 && <PostPhotos images={photos} />}
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
