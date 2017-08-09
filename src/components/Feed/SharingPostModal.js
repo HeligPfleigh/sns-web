@@ -111,27 +111,6 @@ class SharingPostModal extends Component {
   /**
    * 
    */
-  _keyBindingFn(e) {
-    if (e.keyCode === 13 && !e.altKey) {
-      return 'onSubmit';
-    }
-    return Draft.getDefaultKeyBinding(e);
-  }
-
-  /**
-   * 
-   */
-  _handleKeyCommand(command) {
-    const { isSubmit } = this.state;
-    if (command === 'onSubmit' && isSubmit) {
-      this.onSubmit();
-    }
-    return 'not-handler';
-  }
-
-  /**
-   * 
-   */
   focus() {
     return this.editor.focus();
   }
@@ -193,8 +172,6 @@ class SharingPostModal extends Component {
    * 
    */
   render() {
-    const { editorState, isSubmit } = this.state;
-
     return (
       <Modal show={this.props.show} onHide={this.props.closeModal}>
         <Modal.Header closeButton>
@@ -203,10 +180,8 @@ class SharingPostModal extends Component {
         <Modal.Body>
           <div style={styles.editor} onClick={this.focus.bind(this)}>
             <Editor
-              editorState={editorState}
+              editorState={this.state.editorState}
               onChange={this.onChange.bind(this)}
-              keyBindingFn={this._keyBindingFn.bind(this)}
-              handleKeyCommand={this._handleKeyCommand.bind(this)}
               ref={editor => (this.editor = editor)}
               placeholder="Nói gì đó về nó ..."
               spellCheck

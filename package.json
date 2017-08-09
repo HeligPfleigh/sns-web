@@ -76,6 +76,7 @@
     "react-redux": "^5.0.2",
     "react-responsive": "^1.2.7",
     "react-scrollable-anchor": "^0.4.2",
+    "react-select": "^1.0.0-rc.5",
     "react-sticky": "^5.0.5",
     "react-test-renderer": "^15.5.4",
     "react-timeago": "^3.4.3",

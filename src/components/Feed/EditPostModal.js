@@ -1,5 +1,16 @@
 import React, { Component, PropTypes } from 'react';
+<<<<<<< HEAD:src/components/Feed/EditPostModal.js
 import { Modal, Button } from 'react-bootstrap';
+=======
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import classNames from 'classnames';
+import {
+  Col,
+  Button,
+  Clearfix,
+  ButtonToolbar,
+} from 'react-bootstrap';
+>>>>>>> 0e4401fe3909a769e4c2d4c94a65e27debc26ddf:src/components/Feed/EditPost/EditPost.js
 import {
   Editor,
   EditorState,
@@ -89,6 +100,20 @@ class EditPostModal extends Component {
     });
   }
 
+  onSubmit = (evt) => {
+    evt.preventDefault();
+    const { data: postData } = this.props;
+    const { data: { message } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    const { photos } = this.state;
+    if (content === message && photos === this.props.photos) {
+      this.props.closeEditPost();
+    } else {
+      const data = { ...postData, ...{ message: content, photos: photos || [] } };
+      this.props.onChange(data, this.state.isDelPostSharing);
+    }
+  }
+
   uploadImages = (files) => {
     files.forEach(async (file, index) => {
       try {
@@ -106,6 +131,11 @@ class EditPostModal extends Component {
     });
   }
 
+<<<<<<< HEAD:src/components/Feed/EditPostModal.js
+=======
+  focus = () => this.editor.focus();
+
+>>>>>>> 0e4401fe3909a769e4c2d4c94a65e27debc26ddf:src/components/Feed/EditPost/EditPost.js
   delPostSharing = () => {
     this.setState({
       isDelPostSharing: false,
@@ -191,21 +221,44 @@ class EditPostModal extends Component {
                 multiple
               />
             </Button>
+<<<<<<< HEAD:src/components/Feed/EditPostModal.js
           </div>
           <Button onClick={this.props.closeModal}>Hủy</Button>
           <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
         </Modal.Footer>
       </Modal>
+=======
+          </Col>
+          <Col className="pull-right">
+            <ButtonToolbar>
+              <Button title="Hủy" bsStyle="default" onClick={this.props.closeEditPost}>Hủy</Button>
+              <Button title="Chỉnh sửa xong" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
+            </ButtonToolbar>
+          </Col>
+        </Col>
+        <Clearfix />
+      </div>
+>>>>>>> 0e4401fe3909a769e4c2d4c94a65e27debc26ddf:src/components/Feed/EditPost/EditPost.js
     );
   }
 }
 
+<<<<<<< HEAD:src/components/Feed/EditPostModal.js
 EditPostModal.propTypes = {
   show: PropTypes.bool,
   closeModal: PropTypes.func,
   clickModal: PropTypes.func,
   dataPost: PropTypes.object.isRequired,
   isFocus: PropTypes.bool,
+=======
+EditPost.propTypes = {
+  data: PropTypes.any,
+  onChange: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  closeEditPost: PropTypes.func.isRequired,
+  sharing: PropTypes.any,
+  photos: PropTypes.any,
+>>>>>>> 0e4401fe3909a769e4c2d4c94a65e27debc26ddf:src/components/Feed/EditPost/EditPost.js
 };
 
 

@@ -11,6 +11,7 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import { Field, reduxForm, SubmissionError } from 'redux-form';
+import isEmpty from 'lodash/isEmpty';
 
 import history from '../../core/history';
 import { required, normalLength } from '../../utils/validator';
@@ -73,7 +74,11 @@ class Login extends React.Component {
         try {
           const user = await fetchAPI('/auth/login', { username, password });
           this.props.loginSuccess(user);
-          history.push('/');
+          if (isEmpty(user.buildings) || user.isActive === 0) {
+            history.push('/register');
+          } else {
+            history.push('/');
+          }
         } catch (error) {
           throw new Error(error);
         }
@@ -97,7 +102,11 @@ class Login extends React.Component {
           try {
             const user = await fetchAPI('/auth/facebook', { access_token });
             this.props.loginSuccess(user);
-            history.push('/');
+            if (isEmpty(user.buildings) || user.isActive === 0) {
+              history.push('/register');
+            } else {
+              history.push('/');
+            }
           } catch (error) {
             alert('Đăng nhập thất bại.');
           }

@@ -166,7 +166,7 @@ class CreateEventModal extends Component {
       editorState: EditorState.createEmpty(compositeDecorator),
       nameEvent: '',
       validationNameEventText: '',
-      phots: '',
+      photos: '',
       start: moment(),
       end: moment(),
       location: '',

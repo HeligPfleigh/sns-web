@@ -5,7 +5,18 @@ import { Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import _ from 'lodash';
 
-import { LIKES, COMMENTS, NEW_POST, ACCEPTED_FRIEND, FRIEND_REQUEST, EVENT_INVITE } from '../../constants';
+import {
+  LIKES,
+  COMMENTS,
+  NEW_POST,
+  ACCEPTED_FRIEND,
+  FRIEND_REQUEST,
+  EVENT_INVITE,
+  JOIN_EVENT,
+  CAN_JOIN_EVENT,
+  CANT_JOIN_EVENT,
+  EVENT_DELETED,
+} from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
 import history from '../../core/history';
@@ -24,6 +35,10 @@ const collectionNotifyMessages = {
   [ACCEPTED_FRIEND]: () => ' đã chấp nhận lời mời kết bạn của bạn',
   [FRIEND_REQUEST]: () => ' đã gửi cho bạn 1 lời mời kết bạn',
   [EVENT_INVITE]: () => ' vừa mời bạn tham gia 1 sự kiện',
+  [JOIN_EVENT]: () => ' xác nhận tham gia sự kiện của bạn',
+  [CAN_JOIN_EVENT]: () => ' có thể tham gia sự kiện của bạn',
+  [CANT_JOIN_EVENT]: () => ' không thể tham gia sự kiện của bạn',
+  [EVENT_DELETED]: () => ' đã xóa sự kiện',
 };
 
 export const getNotifyContent = (currentUser, author, type, actors) => {
@@ -86,9 +101,13 @@ class NotificationItem extends React.Component {
       history.push('/friends');
     }
 
+    if (EVENT_DELETED === type) {
+      history.push('/events');
+    }
+
     // redirect to PostDetail Page
     if (subject) {
-      if (EVENT_INVITE === type) {
+      if ([EVENT_INVITE, CAN_JOIN_EVENT, CANT_JOIN_EVENT].indexOf(type) > -1) {
         history.push(`/events/${subject._id}`);
       } else {
         history.push(`/post/${subject._id}`);
@@ -99,9 +118,6 @@ class NotificationItem extends React.Component {
   render() {
     const {
       data: {
-        // subject: {
-        //   user: author,
-        // },
         user,
         isRead,
         type,

@@ -4,6 +4,9 @@ import {
   Row,
   Col,
   Button,
+  Image,
+  Dropdown,
+  MenuItem,
 } from 'react-bootstrap';
 import moment from 'moment';
 import Divider from '../../Divider';
@@ -11,6 +14,8 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './EventDetail.scss';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
+import { generate as idRandom } from 'shortid';
+import history from '../../../core/history';
 
 const PRIVARY_TEXT = {
   ONLY_ME: 'Chỉ mình tôi',
@@ -18,7 +23,68 @@ const PRIVARY_TEXT = {
   FRIEND: 'Bạn bè',
 };
 
+const CustomToggle = ({ onClick, children }) => (
+  <Button onClick={onClick}>
+    { children }
+  </Button>
+);
+
+CustomToggle.propTypes = {
+  onClick: PropTypes.func,
+  children: PropTypes.node,
+};
+
 class EventDetail extends React.Component {
+
+  onJoinClick = async () => {
+    const { event, user } = this.props;
+    const newInviteList = event.invites.filter(item => (item._id !== user.id));
+    let newJoinList = [];
+    newJoinList = event.joins.map(item => (item));
+    let exist = false;
+    newJoinList.forEach((element) => {
+      if (element._id == user.id) {
+        exist = true;
+      }
+    });
+    if (!exist) {
+      newJoinList.push({
+        _id: user.id,
+        profile: {
+          picture: user.profile.picture,
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
+        },
+        username: user.username,
+      });
+    }
+    await this.props.joinEvent(event._id, newInviteList, newJoinList);
+  }
+
+  onCanJoinClick = async () => {
+    const { event, user } = this.props;
+    const newInviteList = event.invites.filter(item => (item._id !== user.id));
+    let newJoinList = [];
+    newJoinList = event.joins.map(item => (item));
+    await this.props.canJoinEvent(event._id, newInviteList, newJoinList);
+  }
+
+  onCantJoinClick = async () => {
+    const { event, user } = this.props;
+    const newInviteList = event.invites.filter(item => (item._id !== user.id));
+    let newJoinList = [];
+    newJoinList = event.joins.map(item => (item));
+    await this.props.cantJoinEvent(event._id, newInviteList, newJoinList);
+  }
+
+  onSelectEtcMenu = async (eventKey, event) => {
+    event.preventDefault();
+    if (eventKey === 'DELETE_EVENT') {
+      await this.props.deleteEvent(this.props.event._id);
+      history.push('/events');
+    }
+  }
+
   render() {
     const { event, user } = this.props;
     const start = !event ? new Date() : new Date(event.start);
@@ -55,22 +121,30 @@ class EventDetail extends React.Component {
                         <i className="fa fa-pencil" aria-hidden="true"></i>
                         <span>Chỉnh sửa</span>
                       </Button>
-                      <Button className={s.btnRight}>
-                        <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
-                      </Button>
+                      <Dropdown
+                        className={s.btnRight}
+                        style={{ marginRight: '5px' }}
+                        id={idRandom()}
+                      >
+                        <CustomToggle bsRole="toggle">
+                          <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+                        </CustomToggle>
+                        <Dropdown.Menu onSelect={this.onSelectEtcMenu}>
+                          <MenuItem eventKey="DELETE_EVENT">Xóa sự kiện</MenuItem>
+                        </Dropdown.Menu>
+                      </Dropdown>
                     </div> : <div className={s.actionsButton}>
-                      <Button className={s.btnLeft}>
+                      <Button onClick={this.onJoinClick} className={s.btnLeft}>
                         <span>Tham gia</span>
                       </Button>
-                      <Button className={s.btnMiddle}>
+                      <Button onClick={this.onCanJoinClick} className={s.btnMiddle}>
                         <span>Có thể</span>
                       </Button>
-                      <Button className={s.btnRight}>
+                      <Button onClick={this.onCantJoinClick} className={s.btnRight}>
                         <span>Không tham gia</span>
                       </Button>
                     </div>
                   }
-
                 </div>
               </div>
               <Divider className={s.divider} />
@@ -88,11 +162,21 @@ class EventDetail extends React.Component {
               <div className={s.inviteLayout}>
                 <div className={s.text}>
                   <h5>
-                    {`${!event.joins.edges ? 0 : event.joins.edges.length} Người sẽ tham gia - Đã mời ${!event.invites.edges ? 0 : event.invites.edges.length}`}
+                    {`${!event.joins ? 0 : event.joins.length} Người sẽ tham gia - Đã mời ${!event.invites ? 0 : event.invites.length}`}
                   </h5>
-                  <span>
-                  Mời bạn bè tham gia sự kiện
-                </span>
+                  <div className={s.ListUserJoin}>
+                    <div className={s.WrapperItemUsers}>
+                      {
+                        event.joins.map(item => (
+                          <div className={s.ItemUserJoin}>
+                            <Image
+                              src={item.profile.picture}
+                            />
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
                 </div>
                 {user.id == event.author._id &&
                   <div className={s.btnInviteWrapper}>
@@ -127,6 +211,10 @@ EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
   onOpenInviteModal: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
+  joinEvent: PropTypes.func.isRequired,
+  canJoinEvent: PropTypes.func.isRequired,
+  cantJoinEvent: PropTypes.func.isRequired,
+  deleteEvent: PropTypes.func.isRequired,
 };
 
 export default compose(

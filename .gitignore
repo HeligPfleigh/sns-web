@@ -10,5 +10,6 @@ npm-debug.log
 .idea
 logs
 yarn*
+yarn.lock
 .yarnclean
 package-lock.json
