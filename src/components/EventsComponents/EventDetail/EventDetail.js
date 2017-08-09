@@ -109,30 +109,32 @@ class EventDetail extends React.Component {
                   </h5>
                   {
                     user.id == event.author._id ? <div className={s.actionsButton}>
-                      <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
-                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                        <span>Mời</span>
-                      </Button>
-                      <Button className={s.btnMiddle}>
-                        <i className="fa fa-picture-o" aria-hidden="true"></i>
-                        <span>Thêm ảnh bìa</span>
-                      </Button>
-                      <Button className={s.btnMiddle}>
-                        <i className="fa fa-pencil" aria-hidden="true"></i>
-                        <span>Chỉnh sửa</span>
-                      </Button>
-                      <Dropdown
-                        className={s.btnRight}
-                        style={{ marginRight: '5px' }}
-                        id={idRandom()}
-                      >
-                        <CustomToggle bsRole="toggle">
-                          <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
-                        </CustomToggle>
-                        <Dropdown.Menu onSelect={this.onSelectEtcMenu}>
-                          <MenuItem eventKey="DELETE_EVENT">Xóa sự kiện</MenuItem>
-                        </Dropdown.Menu>
-                      </Dropdown>
+                      <span>
+                        <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
+                          <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                          <span>Mời</span>
+                        </Button>
+                        <Button className={s.btnMiddle}>
+                          <i className="fa fa-picture-o" aria-hidden="true"></i>
+                          <span>Thêm ảnh bìa</span>
+                        </Button>
+                        <Button className={s.btnMiddle}>
+                          <i className="fa fa-pencil" aria-hidden="true"></i>
+                          <span>Chỉnh sửa</span>
+                        </Button>
+                        <Dropdown
+                          className={s.btnRight}
+                          style={{ marginRight: '5px' }}
+                          id={idRandom()}
+                        >
+                          <CustomToggle bsRole="toggle">
+                            <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+                          </CustomToggle>
+                          <Dropdown.Menu onSelect={this.onSelectEtcMenu}>
+                            <MenuItem eventKey="DELETE_EVENT">Xóa sự kiện</MenuItem>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </span>
                     </div> : <div className={s.actionsButton}>
                       <Button onClick={this.onJoinClick} className={s.btnLeft}>
                         <span>Tham gia</span>
@@ -147,58 +149,59 @@ class EventDetail extends React.Component {
                   }
                 </div>
               </div>
-              <Divider className={s.divider} />
-              <div className={s.timeLocationLayout}>
-                <p>
-                  <i className="fa fa-clock-o" aria-hidden="true"></i>
-                  {`${moment(start).calendar()} - ${moment(end).calendar()}`}
-                </p>
-                <p>
-                  <i className="fa fa-map-marker" aria-hidden="true"></i>
-                  {` ${event.location}`}
-                </p>
-              </div>
-              <Divider className={s.divider} />
-              <div className={s.inviteLayout}>
-                <div className={s.text}>
-                  <h5>
-                    {`${!event.joins ? 0 : event.joins.length} Người sẽ tham gia - Đã mời ${!event.invites ? 0 : event.invites.length}`}
-                  </h5>
-                  <div className={s.ListUserJoin}>
-                    <div className={s.WrapperItemUsers}>
-                      {
-                        event.joins.map(item => (
-                          <div className={s.ItemUserJoin}>
-                            <Image
-                              src={item.profile.picture}
-                            />
-                          </div>
-                        ))
-                      }
-                    </div>
-                  </div>
+              <Col md={12}>
+                <Divider className={s.divider} />
+                <div className={s.timeLocationLayout}>
+                  <p>
+                    <i className="fa fa-clock-o" aria-hidden="true"></i>
+                    {`${moment(start).calendar()} - ${moment(end).calendar()}`}
+                  </p>
+                  <p>
+                    <i className="fa fa-map-marker" aria-hidden="true"></i>
+                    {` ${event.location}`}
+                  </p>
                 </div>
-                {user.id == event.author._id &&
-                  <div className={s.btnInviteWrapper}>
-                    <div>
-                      <Button
-                        onClick={this.props.onOpenInviteModal}
-                        className={s.btnInvite}
-                      >
-                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                        <span>Mời</span>
-                      </Button>
+                <Divider className={s.divider} />
+                <div className={s.inviteLayout}>
+                  <div className={s.text}>
+                    <h5>
+                      {`${!event.joins ? 0 : event.joins.length} Người sẽ tham gia - Đã mời ${!event.invites ? 0 : event.invites.length}`}
+                    </h5>
+                    <div className={s.ListUserJoin}>
+                      <div className={s.WrapperItemUsers}>
+                        {
+                          event.joins.map(item => (
+                            <div className={s.ItemUserJoin}>
+                              <Image
+                                src={item.profile.picture}
+                              />
+                            </div>
+                          ))
+                        }
+                      </div>
                     </div>
                   </div>
-                }
-              </div>
-              <Divider className={s.divider} />
-              <div className={s.description}>
-                <span >
-                  <div dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(event.message))) }} />
-                </span>
-              </div>
-
+                  {user.id == event.author._id &&
+                    <div className={s.btnInviteWrapper}>
+                      <div>
+                        <Button
+                          onClick={this.props.onOpenInviteModal}
+                          className={s.btnInvite}
+                        >
+                          <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                          <span>Mời</span>
+                        </Button>
+                      </div>
+                    </div>
+                  }
+                </div>
+                <Divider className={s.divider} />
+                <div className={s.description}>
+                  <span >
+                    <div dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(event.message))) }} />
+                  </span>
+                </div>
+              </Col>
             </Col>
            }
         </Row>

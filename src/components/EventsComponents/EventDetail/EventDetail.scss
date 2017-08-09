@@ -2,6 +2,9 @@
 .eventDetailContent {
   background: #ffffff;
 }
+.button1 {
+
+}
 .divider {
   margin: 12px;
 }
@@ -43,6 +46,24 @@
           margin-left: 3px;
         }
       }
+      span {
+        button:nth-child(2){
+          border-right: 0px;
+          border-left: 0px;
+        }
+        button:nth-child(3){
+          border-right: 0px;
+        }
+        div {
+          button{
+            border-top-left-radius: 0px;
+            border-bottom-left-radius: 0px;
+            border-top-right-radius: 3px !important;
+            border-bottom-right-radius: 3px !important;
+          }
+        }
+      }
+      
       .btnLeft {
         border-top-right-radius: 0px;
         border-bottom-right-radius: 0px;

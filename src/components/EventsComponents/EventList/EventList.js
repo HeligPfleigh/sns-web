@@ -72,8 +72,8 @@ EventList.propTypes = {
 };
 
 
-const listEventQuerys = gql`query ($limit: Int, $cusor: String){
-  listEvent (limit: $limit, cursor: $cusor){
+const listEventQuerys = gql`query ($limit: Int, $cursor: String){
+  listEvent (limit: $limit, cursor: $cursor){
     edges {
       _id
       privacy
@@ -109,6 +109,7 @@ export default compose(
     options: () => ({
       variables: {
         limit: 10,
+        cursor: null,
       },
       fetchPolicy: 'network-only',
     }),

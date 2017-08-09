@@ -24,13 +24,14 @@
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 .AddEventButton {
-  border-color: transparent;
+  border: 0px !important;
+  background: transparent !important;
 }
 .AddEventButton:hover{
-  border-color: transparent;
-  background: #fff;
+  border: 0px !important;
+  background: transparent !important;
 }
 .AddEventButton:active :focus{
-  border-color: transparent;
-  background: #fff;
+  border: 0px !important;
+  background: transparent !important;
 }
