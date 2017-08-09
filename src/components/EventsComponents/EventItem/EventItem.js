@@ -31,8 +31,8 @@ class EventItem extends React.Component {
           </div>
           <div className={s.bottom}>
             <div className={s.calendar}>
-              <p className={s.month}>{`THÁNG ${start.getMonth()}`}</p>
-              <h5 className={s.day}>{start.getDay()}</h5>
+              <p className={s.month}>{`THÁNG ${start.getMonth() + 1}`}</p>
+              <h5 className={s.day}>{start.getDate()}</h5>
             </div>
             <div className={s.contentSmall}>
               <h5 className={s.title}>{event.name}</h5>

@@ -109,30 +109,32 @@ class EventDetail extends React.Component {
                   </h5>
                   {
                     user.id == event.author._id ? <div className={s.actionsButton}>
-                      <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
-                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                        <span>Mời</span>
-                      </Button>
-                      <Button className={s.btnMiddle}>
-                        <i className="fa fa-picture-o" aria-hidden="true"></i>
-                        <span>Thêm ảnh bìa</span>
-                      </Button>
-                      <Button className={s.btnMiddle}>
-                        <i className="fa fa-pencil" aria-hidden="true"></i>
-                        <span>Chỉnh sửa</span>
-                      </Button>
-                      <Dropdown
-                        className={s.btnRight}
-                        style={{ marginRight: '5px' }}
-                        id={idRandom()}
-                      >
-                        <CustomToggle bsRole="toggle">
-                          <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
-                        </CustomToggle>
-                        <Dropdown.Menu onSelect={this.onSelectEtcMenu}>
-                          <MenuItem eventKey="DELETE_EVENT">Xóa sự kiện</MenuItem>
-                        </Dropdown.Menu>
-                      </Dropdown>
+                      <span>
+                        <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
+                          <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                          <span>Mời</span>
+                        </Button>
+                        <Button className={s.btnMiddle}>
+                          <i className="fa fa-picture-o" aria-hidden="true"></i>
+                          <span>Thêm ảnh bìa</span>
+                        </Button>
+                        <Button className={s.btnMiddle}>
+                          <i className="fa fa-pencil" aria-hidden="true"></i>
+                          <span>Chỉnh sửa</span>
+                        </Button>
+                        <Dropdown
+                          className={s.btnRight}
+                          style={{ marginRight: '5px' }}
+                          id={idRandom()}
+                        >
+                          <CustomToggle bsRole="toggle">
+                            <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+                          </CustomToggle>
+                          <Dropdown.Menu onSelect={this.onSelectEtcMenu}>
+                            <MenuItem eventKey="DELETE_EVENT">Xóa sự kiện</MenuItem>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </span>
                     </div> : <div className={s.actionsButton}>
                       <Button onClick={this.onJoinClick} className={s.btnLeft}>
                         <span>Tham gia</span>

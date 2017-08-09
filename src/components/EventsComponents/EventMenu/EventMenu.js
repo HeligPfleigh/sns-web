@@ -29,7 +29,6 @@ class EventMenu extends React.Component {
 
 
   onMenuSelected = (idx) => {
-    console.log(idx);
   }
 
   onCreateEvent = () => {
@@ -53,7 +52,7 @@ class EventMenu extends React.Component {
           closeModal={this.closeModal}
         />
         <i className={`fa fa-calendar-o ${s.iconCalender}`} aria-hidden="true">
-          <span>{currentDate.getDay()}</span>
+          <span>{currentDate.getDate()}</span>
         </i>
         <span className={s.eventTitle}>Sự Kiện</span>
         <MenuVertical
