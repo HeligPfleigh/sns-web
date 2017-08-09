@@ -147,58 +147,59 @@ class EventDetail extends React.Component {
                   }
                 </div>
               </div>
-              <Divider className={s.divider} />
-              <div className={s.timeLocationLayout}>
-                <p>
-                  <i className="fa fa-clock-o" aria-hidden="true"></i>
-                  {`${moment(start).calendar()} - ${moment(end).calendar()}`}
-                </p>
-                <p>
-                  <i className="fa fa-map-marker" aria-hidden="true"></i>
-                  {` ${event.location}`}
-                </p>
-              </div>
-              <Divider className={s.divider} />
-              <div className={s.inviteLayout}>
-                <div className={s.text}>
-                  <h5>
-                    {`${!event.joins ? 0 : event.joins.length} Người sẽ tham gia - Đã mời ${!event.invites ? 0 : event.invites.length}`}
-                  </h5>
-                  <div className={s.ListUserJoin}>
-                    <div className={s.WrapperItemUsers}>
-                      {
-                        event.joins.map(item => (
-                          <div className={s.ItemUserJoin}>
-                            <Image
-                              src={item.profile.picture}
-                            />
-                          </div>
-                        ))
-                      }
-                    </div>
-                  </div>
+              <Col md={12}>
+                <Divider className={s.divider} />
+                <div className={s.timeLocationLayout}>
+                  <p>
+                    <i className="fa fa-clock-o" aria-hidden="true"></i>
+                    {`${moment(start).calendar()} - ${moment(end).calendar()}`}
+                  </p>
+                  <p>
+                    <i className="fa fa-map-marker" aria-hidden="true"></i>
+                    {` ${event.location}`}
+                  </p>
                 </div>
-                {user.id == event.author._id &&
-                  <div className={s.btnInviteWrapper}>
-                    <div>
-                      <Button
-                        onClick={this.props.onOpenInviteModal}
-                        className={s.btnInvite}
-                      >
-                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                        <span>Mời</span>
-                      </Button>
+                <Divider className={s.divider} />
+                <div className={s.inviteLayout}>
+                  <div className={s.text}>
+                    <h5>
+                      {`${!event.joins ? 0 : event.joins.length} Người sẽ tham gia - Đã mời ${!event.invites ? 0 : event.invites.length}`}
+                    </h5>
+                    <div className={s.ListUserJoin}>
+                      <div className={s.WrapperItemUsers}>
+                        {
+                          event.joins.map(item => (
+                            <div className={s.ItemUserJoin}>
+                              <Image
+                                src={item.profile.picture}
+                              />
+                            </div>
+                          ))
+                        }
+                      </div>
                     </div>
                   </div>
-                }
-              </div>
-              <Divider className={s.divider} />
-              <div className={s.description}>
-                <span >
-                  <div dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(event.message))) }} />
-                </span>
-              </div>
-
+                  {user.id == event.author._id &&
+                    <div className={s.btnInviteWrapper}>
+                      <div>
+                        <Button
+                          onClick={this.props.onOpenInviteModal}
+                          className={s.btnInvite}
+                        >
+                          <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                          <span>Mời</span>
+                        </Button>
+                      </div>
+                    </div>
+                  }
+                </div>
+                <Divider className={s.divider} />
+                <div className={s.description}>
+                  <span >
+                    <div dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(event.message))) }} />
+                  </span>
+                </div>
+              </Col>
             </Col>
            }
         </Row>
