@@ -91,7 +91,7 @@ class Home extends Component {
                 feeds={feeds ? feeds.edges : []}
                 likePostEvent={this.props.likePost}
                 unlikePostEvent={this.props.unlikePost}
-                userInfo={me ? me : {}}
+                userInfo={me || {}}
                 loadMoreComments={loadMoreComments}
                 createNewComment={createNewComment}
                 deletePost={deletePost}
@@ -120,7 +120,7 @@ export default compose(
       fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
-      if (!data) { 
+      if (!data) {
         return;
       }
       const { fetchMore } = data;
@@ -129,7 +129,7 @@ export default compose(
           cursor: data.feeds.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
           const newEdges = fetchMoreResult.feeds.edges;
@@ -154,7 +154,7 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
 
@@ -215,11 +215,11 @@ export default compose(
         },
         update: (store, { data: { createNewPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ 
+          let data = store.readQuery({
             query: homePageQuery,
             variables: {
               cursor: null,
-            }, 
+            },
           });
           data = update(data, {
             feeds: {
@@ -229,11 +229,11 @@ export default compose(
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ 
+          store.writeQuery({
             query: homePageQuery,
             variables: {
               cursor: null,
-            }, 
+            },
             data,
           });
         },
@@ -351,6 +351,7 @@ export default compose(
           postId: post._id,
           message: post.message,
           photos: post.photos || [],
+          privacy: post.privacy || PUBLIC,
           isDelPostSharing,
         },
         optimisticResponse: {
@@ -390,7 +391,7 @@ export default compose(
           store.writeQuery({
             query: homePageQuery,
             variables: {
-              cursor: null,},
+              cursor: null },
             data,
           });
         },

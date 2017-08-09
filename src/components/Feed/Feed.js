@@ -462,8 +462,8 @@ Feed.fragments = {
 };
 
 Feed.mutation = {
-  editPost: gql`mutation editPost ($postId: String!, $message: String!, $photos: [String], $isDelPostSharing: Boolean!) {
-    editPost(_id: $postId, message: $message, photos: $photos, isDelPostSharing: $isDelPostSharing) {
+  editPost: gql`mutation editPost ($postId: String!, $message: String!, $photos: [String], $privacy: String, $isDelPostSharing: Boolean!) {
+    editPost(_id: $postId, message: $message, photos: $photos, privacy: $privacy, isDelPostSharing: $isDelPostSharing) {
       ...PostView
     }
   }

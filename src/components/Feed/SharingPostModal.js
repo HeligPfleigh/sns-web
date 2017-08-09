@@ -58,7 +58,7 @@ const compositeDecorator = new CompositeDecorator([{
 class SharingPostModal extends Component {
 
   /**
-   * 
+   *
    */
   constructor(props) {
     super(props);
@@ -70,7 +70,7 @@ class SharingPostModal extends Component {
   }
 
   /**
-   * 
+   *
    */
   componentWillReceiveProps(nextProps) {
     const { isFocus } = this.props;
@@ -80,7 +80,7 @@ class SharingPostModal extends Component {
   }
 
   /**
-   * 
+   *
    */
   onChange(editorState) {
     this.setState({
@@ -90,18 +90,18 @@ class SharingPostModal extends Component {
   }
 
   /**
-   * 
+   *
    */
   onSubmit(evt) {
     const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     this.props.clickModal(evt, {
-        message,
-        privacyPost: this.state.privacySelected,
+      message,
+      privacyPost: this.state.privacySelected,
     });
 
     // reset editor
     this.editor.blur();
-    
+
     this.setState({
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
@@ -109,14 +109,14 @@ class SharingPostModal extends Component {
   }
 
   /**
-   * 
+   *
    */
   focus() {
     return this.editor.focus();
   }
 
   /**
-   * 
+   *
    */
   onSelectPrivacy(privacySelected, event) {
     if ([PUBLIC, FRIEND, ONLY_ME].indexOf(privacySelected) === -1) {
@@ -128,7 +128,7 @@ class SharingPostModal extends Component {
   }
 
   /**
-   * 
+   *
    */
   showButtonToolbar() {
     const privacies = {
@@ -145,31 +145,31 @@ class SharingPostModal extends Component {
         label: 'Chỉ mình tôi',
       },
     };
-    
+
     const privacyKeys = Object.keys(privacies);
     const keySelected = privacyKeys.indexOf(this.state.privacySelected);
-    const selectedKey = keySelected > -1 ? privacyKeys[keySelected] :  PUBLIC;
+    const selectedKey = keySelected > -1 ? privacyKeys[keySelected] : PUBLIC;
     const selectedLabel = privacies[selectedKey].label;
     const selectedIcon = privacies[selectedKey].icon;
     delete privacies[selectedKey];
 
     return (
       <ButtonToolbar className="pull-right">
-        <Dropdown className={s.sharingPostModalButtonPrivacies} id={ Math.random() }>
+        <Dropdown className={s.sharingPostModalButtonPrivacies} id={Math.random()}>
           <Dropdown.Toggle>{ selectedIcon } { selectedLabel }</Dropdown.Toggle>
-          <Dropdown.Menu onSelect={ this.onSelectPrivacy.bind(this) }>
-              { Object.keys(privacies).map(type => <MenuItem key={ type } eventKey={ type }>{ privacies[type].icon } { privacies[type].label }</MenuItem>) }
+          <Dropdown.Menu onSelect={this.onSelectPrivacy.bind(this)}>
+            { Object.keys(privacies).map(type => <MenuItem key={type} eventKey={type}>{ privacies[type].icon } { privacies[type].label }</MenuItem>) }
           </Dropdown.Menu>
         </Dropdown>
 
-        <Button onClick={ this.props.closeModal.bind(this) }>Hủy</Button>
-        <Button bsStyle="primary" onClick={ this.onSubmit.bind(this) }>Chia sẻ bài viết</Button>
+        <Button onClick={this.props.closeModal.bind(this)}>Hủy</Button>
+        <Button bsStyle="primary" onClick={this.onSubmit.bind(this)}>Chia sẻ bài viết</Button>
       </ButtonToolbar>
     );
   }
 
   /**
-   * 
+   *
    */
   render() {
     return (
@@ -195,7 +195,7 @@ class SharingPostModal extends Component {
 
         </Modal.Body>
         <Modal.Footer>
-          { this.showButtonToolbar() }          
+          { this.showButtonToolbar() }
         </Modal.Footer>
       </Modal>
     );
