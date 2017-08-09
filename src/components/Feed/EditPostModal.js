@@ -86,7 +86,6 @@ class EditPostModal extends Component {
     const { dataPost: postData } = this.props;
     const { dataPost: { message, photos } } = this.props;
     const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    console.log(this.state, photos);
     if (content !== message || !isEqual(photos, this.state.photos)) {
       const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
       this.props.clickModal(evt, data, this.state.isDelPostSharing);
