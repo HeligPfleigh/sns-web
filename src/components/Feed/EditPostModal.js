@@ -125,7 +125,7 @@ class EditPostModal extends Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { dataPost: { sharing } } = this.props;
+    const { dataPost: { sharing }, isHideModalBehindBackdrop } = this.props;
     const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
     const delBlockStyle = {
       position: 'absolute',
@@ -135,7 +135,7 @@ class EditPostModal extends Component {
       cursor: 'pointer',
     };
     return (
-      <Modal show={this.props.show} onHide={this.props.closeModal}>
+      <Modal show={this.props.show} onHide={this.props.closeModal} style={{ zIndex: isHideModalBehindBackdrop ? 1039 : 1040 }}>
         <Modal.Header closeButton>
           <Modal.Title>Chỉnh sửa bài viết</Modal.Title>
         </Modal.Header>
@@ -217,6 +217,7 @@ EditPostModal.propTypes = {
   dataPost: PropTypes.object.isRequired,
   isFocus: PropTypes.bool,
   showDiscardChangesPostModal: PropTypes.func,
+  isHideModalBehindBackdrop: PropTypes.bool,
 };
 
 

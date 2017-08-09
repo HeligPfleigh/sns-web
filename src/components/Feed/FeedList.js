@@ -62,7 +62,7 @@ class FeedList extends Component {
   }
 
   onClickDiscardChangesPostModal = (evt) => {
-    evt.preventDefault();
+    evt && evt.preventDefault();
     this.setState(() => ({
       showEditPost: false,
       showDiscardChangesPost: false,
@@ -134,8 +134,7 @@ class FeedList extends Component {
     });
   }
 
-  closeDiscardChangesPostModal = (evt) => {
-    evt.preventDefault();
+  closeDiscardChangesPostModal = () => {
     this.setState({
       showDiscardChangesPost: false,
     });
@@ -183,6 +182,7 @@ class FeedList extends Component {
           clickModal={this.onClickEditPostModal}
           dataPost={this.state.dataPost}
           showDiscardChangesPostModal={this.discardChangesPost}
+          isHideModalBehindBackdrop={this.state.showDiscardChangesPost}
         />
         <DiscardChangesPostModal
           show={this.state.showDiscardChangesPost}
