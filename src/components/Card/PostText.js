@@ -8,38 +8,66 @@ import * as _ from 'lodash';
 
 import s from './PostText.scss';
 import ReadMore from './ReadMore';
+import VideoView from '../VideoView';
+import {
+  checkYoutubeUrl,
+} from '../../utils/regexUrl';
 
-const PostText = ({ children, html, className }) => {
-  if (!html) {
-    return <div/>;
+function strip_tags(input) {
+  if (!_.isString(input)) {
+    return false;
   }
-  const __html = stateToHTML(convertFromRaw(JSON.parse(html)));
-  if (!strip_tags(__html)) {
-    return <div/>;
-  }
-  return (
-    <div className={classNames(s.postContent, className)}>
-      <Clearfix />
-      <ReadMore className={s.postContent}>
-        <Col
-            dangerouslySetInnerHTML={{ __html, }}
-        />
-      </ReadMore>
-      {children}
-    </div>
-  ) 
-};
+  let tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, // Match any html tag
+    commentsTags = /<!--[\s\S]*?-->/gi, // Match <!--, -->
+    whiteSpace = /\s+/gi; // Match any whitespace
 
-function strip_tags (input) {
-    if (!_.isString(input)) {
-      return false;
-    }
-    var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, // Match any html tag
-        commentsTags = /<!--[\s\S]*?-->/gi, // Match <!--, -->
-        whiteSpace = /\s+/gi; // Match any whitespace
-
-    return input.replace(commentsTags, '').replace(tags, '').replace(whiteSpace, ''); // Just replace it by an empty string
+  return input.replace(commentsTags, '').replace(tags, '').replace(whiteSpace, ''); // Just replace it by an empty string
 }
+
+class PostText extends React.Component {
+
+  render() {
+    const { children, html, className } = this.props;
+    if (!html) {
+      return <div />;
+    }
+    const __html = stateToHTML(convertFromRaw(JSON.parse(html)));
+    if (!strip_tags(__html)) {
+      return <div />;
+    }
+
+    const data = JSON.parse(html);
+    let isShow = false;
+    let idVideo = '';
+    if (data.blocks) {
+      isShow = false;
+      data.blocks.forEach((block) => {
+        if (checkYoutubeUrl(block.text)) {
+          isShow = true;
+          idVideo = block.text.split('v=')[1];
+        }
+      });
+    }
+
+    return (
+      <div className={classNames(s.postContent, className)}>
+        <Clearfix />
+        <ReadMore className={s.postContent}>
+          <Col
+            dangerouslySetInnerHTML={{ __html }}
+          />
+        </ReadMore>
+        <VideoView
+          isShow={isShow}
+          src={idVideo}
+        />
+        {children}
+      </div>
+    );
+  }
+
+}
+
 
 PostText.propTypes = {
   children: PropTypes.node,
