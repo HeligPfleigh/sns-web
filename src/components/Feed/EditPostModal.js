@@ -22,8 +22,6 @@ const styles = {
   },
 };
 
-console.log();
-
 class EditPostModal extends Component {
   constructor(props) {
     super(props);
@@ -53,6 +51,7 @@ class EditPostModal extends Component {
     }
     this.setState({
       photos: Array.from(photos || []),
+      isSubmit: false,
     });
     if (nextProps.isFocus !== this.props.isFocus) {
       this.editor.focus();
