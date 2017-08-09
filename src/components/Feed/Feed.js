@@ -187,7 +187,6 @@ class Feed extends Component {
           }
         />
         {message && <PostText html={message} /> }
-        {!message && <div style={{ padding: '22px' }} /> }
         {sharing &&
           <SharingPost
             id={sharing._id}
