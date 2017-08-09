@@ -5,7 +5,7 @@ import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
 import EditPostModal from './EditPostModal';
 import DiscardChangesPostModal from './DiscardChangesPostModal';
-import { PUBLIC, FRIEND, ONLY_ME, ONLY_ADMIN_BUILDING, DELETE_POST_ACTION } from '../../constants';
+import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
 import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
 
@@ -148,13 +148,7 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
-      isBuilding,
     } = this.props;
-
-    let privacies = [PUBLIC, FRIEND, ONLY_ME];
-    if (isBuilding) {
-      privacies = [PUBLIC, ONLY_ADMIN_BUILDING];
-    }
 
     return (
       <div>
@@ -184,7 +178,6 @@ class FeedList extends Component {
           sharingFeed={this.state.sharingFeed}
         />
         <EditPostModal
-          privacies={privacies}
           show={this.state.showEditPost}
           closeModal={this.closeModal}
           clickModal={this.onClickEditPostModal}
@@ -217,7 +210,6 @@ FeedList.propTypes = {
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func,
-  isBuilding: PropTypes.bool,
 };
 
 export default connect(

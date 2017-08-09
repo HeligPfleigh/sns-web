@@ -53,7 +53,6 @@ class BuildingFeedTab extends Component {
             deletePost={deletePostOnBuilding}
             editPost={editPost}
             sharingPost={sharingPost}
-            isBuilding
           />
         </InfiniteScroll>
       </div>

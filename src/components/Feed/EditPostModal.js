@@ -153,7 +153,7 @@ class EditPostModal extends Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { dataPost: { sharing }, privacies: keys, isHideModalBehindBackdrop } = this.props;
+    const { dataPost: { sharing, building }, isHideModalBehindBackdrop } = this.props;
     const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
     const delBlockStyle = {
       position: 'absolute',
@@ -189,8 +189,8 @@ class EditPostModal extends Component {
     const selectedIcon = privacies[selectedKey].icon;
     delete privacies[selectedKey];
 
-    let types = keys;
-    if (!keys) {
+    let types = [PUBLIC, ONLY_ADMIN_BUILDING];
+    if (isEmpty(building)) {
       types = [PUBLIC, FRIEND, ONLY_ME];
     }
 
@@ -277,7 +277,6 @@ class EditPostModal extends Component {
 }
 
 EditPostModal.propTypes = {
-  privacies: PropTypes.array,
   show: PropTypes.bool,
   closeModal: PropTypes.func,
   clickModal: PropTypes.func,
