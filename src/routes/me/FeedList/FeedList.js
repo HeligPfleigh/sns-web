@@ -1,121 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from 'react-apollo';
-import { generate as idRandom } from 'shortid';
-import { DELETE_POST_ACTION, PUBLIC } from '../../../constants';
-import {
-  Feed,
-  DeletePostModal,
-  SharingPostModal,
-  EditPostModal,
-} from '../../../components/Feed';
+import FeedListComponent from '../../../components/Feed';
 import likePostMutation from './likePostMutation.graphql';
 import unlikePostMutation from './unlikePostMutation.graphql';
-import { openAlertGlobal } from '../../../reducers/alert';
 
 class FeedList extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: false,
-      showSharingPost: false,
-      showEditPost: false,
-      idDeletedPost: null,
-      idSharingPost: null,
-      idEditPost: null,
-      privacyPost: PUBLIC,
-      sharingFeed: {},
-      dataPost: {},
-    };
-  }
-
-  onClickModal = (evt, { privacyPost, message }) => {
-    evt.preventDefault();
-
-    const { idDeletedPost, idSharingPost } = this.state;
-    this.closeModal();
-    if (idDeletedPost) {
-      this.props.deletePost(idDeletedPost);
-    }
-    if (idSharingPost) {
-      this.props.sharingPost(idSharingPost, privacyPost, message).then(({ data }) => {
-        openAlertGlobal({
-          message: 'Bạn đã chia sẽ được thành công trên dòng thời gian của bạn',
-          open: true,
-          autoHideDuration: 0,
-        });
-      }).catch((error) => {
-        console.log('there was an error sending the query', error);
-      });
-    }
-  }
-
-  onClickEditPostModal = (evt, post, isDelPostSharing) => {
-    evt.preventDefault();
-    if (post._id) {
-      this.props.editPost(post, isDelPostSharing);
-    }
-    this.closeModal();
-  }
-
-  onSelectRightEvent = (eventKey, id) => {
-    this.setState(() => ({
-      idDeletedPost: id,
-    }));
-    if (DELETE_POST_ACTION === eventKey) {
-      this.openModal();
-    }
-  }
-
-  updateStateModal = (value) => {
-    this.setState(() => ({
-      show: value,
-    }));
-  }
-
-
-  closeModal = () => {
-    this.updateStateModal(false);
-    const { idDeletedPost, idSharingPost, idEditPost } = this.state;
-    if (idDeletedPost) {
-      this.setState(() => ({
-        idDeletedPost: null,
-      }));
-    }
-    if (idSharingPost) {
-      this.setState(() => ({
-        showSharingPost: false,
-        idSharingPost: null,
-      }));
-    }
-    if (idEditPost) {
-      this.setState(() => ({
-        showEditPost: false,
-        idEditPost: null,
-      }));
-    }
-  }
-
-  openModal = () => {
-    this.updateStateModal(true);
-  }
-
-  sharingPostEvent = (id, sharingFeed) => {
-    this.setState(() => ({
-      showSharingPost: true,
-      idSharingPost: id,
-      sharingFeed,
-    }));
-  }
-
-  editPostEvent = (id, dataPost) => {
-    this.setState(() => ({
-      showEditPost: true,
-      idEditPost: id,
-      dataPost,
-    }));
-  }
 
   likePostEvent = (postId, message, totalLikes) => {
     const {
@@ -204,39 +94,23 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
+      deletePost,
+      editPost,
+      sharingPost,
     } = this.props;
     return (
       <div>
-        {feeds && feeds.map(item => (
-          <Feed
-            key={idRandom()}
-            data={item}
-            likePostEvent={this.likePostEvent}
-            unlikePostEvent={this.unlikePostEvent}
-            onSelectRightEvent={this.onSelectRightEvent}
-            userInfo={userInfo}
-            loadMoreComments={loadMoreComments}
-            createNewComment={createNewComment}
-            editPostEvent={this.editPostEvent}
-            sharingPostEvent={this.sharingPostEvent}
-          />
-        ))}
-        <DeletePostModal
-          show={this.state.show}
-          closeModal={this.closeModal}
-          clickModal={this.onClickModal}
-        />
-        <SharingPostModal
-          show={this.state.showSharingPost}
-          closeModal={this.closeModal}
-          clickModal={this.onClickModal}
-          sharingFeed={this.state.sharingFeed}
-        />
-        <EditPostModal
-          show={this.state.showEditPost}
-          closeModal={this.closeModal}
-          clickModal={this.onClickEditPostModal}
-          dataPost={this.state.dataPost}
+        <FeedListComponent
+          feeds={feeds}
+          likePostEvent={this.likePostEvent}
+          unlikePostEvent={this.unlikePostEvent}
+          onSelectRightEvent={this.onSelectRightEvent}
+          userInfo={userInfo}
+          loadMoreComments={loadMoreComments}
+          createNewComment={createNewComment}
+          deletePost={deletePost}
+          editPost={editPost}
+          sharingPost={sharingPost}
         />
       </div>
     );

@@ -4,6 +4,7 @@ import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
 import EditPostModal from './EditPostModal';
+import DiscardChangesPostModal from './DiscardChangesPostModal';
 import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
 import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
@@ -16,6 +17,7 @@ class FeedList extends Component {
       show: false,
       showSharingPost: false,
       showEditPost: false,
+      showDiscardChangesPost: false,
       idDeletedPost: null,
       idSharingPost: null,
       idEditPost: null,
@@ -57,6 +59,15 @@ class FeedList extends Component {
       this.props.editPost(post, isDelPostSharing);
     }
     this.closeModal();
+  }
+
+  onClickDiscardChangesPostModal = (evt) => {
+    evt && evt.preventDefault();
+    this.setState(() => ({
+      showEditPost: false,
+      showDiscardChangesPost: false,
+      idEditPost: null,
+    }));
   }
 
   onSelectRightEvent = (eventKey, id) => {
@@ -117,6 +128,18 @@ class FeedList extends Component {
     }));
   }
 
+  discardChangesPost = () => {
+    this.setState({
+      showDiscardChangesPost: true,
+    });
+  }
+
+  closeDiscardChangesPostModal = () => {
+    this.setState({
+      showDiscardChangesPost: false,
+    });
+  }
+
   render() {
     const {
       feeds,
@@ -158,6 +181,13 @@ class FeedList extends Component {
           closeModal={this.closeModal}
           clickModal={this.onClickEditPostModal}
           dataPost={this.state.dataPost}
+          showDiscardChangesPostModal={this.discardChangesPost}
+          isHideModalBehindBackdrop={this.state.showDiscardChangesPost}
+        />
+        <DiscardChangesPostModal
+          show={this.state.showDiscardChangesPost}
+          closeModal={this.closeDiscardChangesPostModal}
+          clickModal={this.onClickDiscardChangesPostModal}
         />
       </div>
     );

@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import isEqual from 'lodash/isEqual';
 import { Modal, Button } from 'react-bootstrap';
 import {
   Editor,
@@ -21,6 +22,8 @@ const styles = {
   },
 };
 
+console.log();
+
 class EditPostModal extends Component {
   constructor(props) {
     super(props);
@@ -38,31 +41,21 @@ class EditPostModal extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dataPost: { message, photos }, isFocus } = nextProps;
-    if (message) {
-      const contentState = convertFromRaw(JSON.parse(message));
+    const { dataPost: { message, photos } } = nextProps;
+    if (message !== this.props.dataPost.message) {
+      let contentState = convertFromRaw(JSON.parse(message));
       // move focus to the end.
-      this.state.editorState = EditorState.createWithContent(contentState);
-      this.state.editorState = EditorState.moveFocusToEnd(this.state.editorState);
-    }
-    if (nextProps.isFocus !== isFocus) {
-      this.editor.focus();
+      contentState = EditorState.createWithContent(contentState);
+      contentState = EditorState.moveFocusToEnd(contentState);
+      this.setState({
+        editorState: contentState,
+      });
     }
     this.setState({
-      editorState: this.state.editorState,
       photos: Array.from(photos || []),
     });
-  }
-
-  onSubmit = (evt) => {
-    const { dataPost: postData } = this.props;
-    const { dataPost: { message, photos } } = this.props;
-    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (content === message && this.state.photos === photos) {
-      this.props.closeModal();
-    } else {
-      const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
-      this.props.clickModal(evt, data, this.state.isDelPostSharing);
+    if (nextProps.isFocus !== this.props.isFocus) {
+      this.editor.focus();
     }
   }
 
@@ -87,6 +80,28 @@ class EditPostModal extends Component {
       photos,
       isSubmit: false,
     });
+  }
+
+  onSubmit = (evt) => {
+    const { dataPost: postData } = this.props;
+    const { dataPost: { message, photos } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (content !== message || !isEqual(photos, this.state.photos)) {
+      const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
+      this.props.clickModal(evt, data, this.state.isDelPostSharing);
+    } else {
+      this.props.closeModal();
+    }
+  }
+
+  onCancel = () => {
+    const { dataPost: { message, photos } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (content !== message || !isEqual(photos, this.state.photos)) {
+      this.props.showDiscardChangesPostModal();
+    } else {
+      this.props.closeModal();
+    }
   }
 
   uploadImages = (files) => {
@@ -115,7 +130,7 @@ class EditPostModal extends Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { dataPost: { sharing } } = this.props;
+    const { dataPost: { sharing }, isHideModalBehindBackdrop } = this.props;
     const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
     const delBlockStyle = {
       position: 'absolute',
@@ -125,7 +140,7 @@ class EditPostModal extends Component {
       cursor: 'pointer',
     };
     return (
-      <Modal show={this.props.show} onHide={this.props.closeModal}>
+      <Modal show={this.props.show} onHide={this.props.closeModal} style={{ zIndex: isHideModalBehindBackdrop ? 1039 : 1040 }}>
         <Modal.Header closeButton>
           <Modal.Title>Chỉnh sửa bài viết</Modal.Title>
         </Modal.Header>
@@ -192,7 +207,7 @@ class EditPostModal extends Component {
               />
             </Button>
           </div>
-          <Button onClick={this.props.closeModal}>Hủy</Button>
+          <Button onClick={this.onCancel}>Hủy</Button>
           <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
         </Modal.Footer>
       </Modal>
@@ -206,6 +221,8 @@ EditPostModal.propTypes = {
   clickModal: PropTypes.func,
   dataPost: PropTypes.object.isRequired,
   isFocus: PropTypes.bool,
+  showDiscardChangesPostModal: PropTypes.func,
+  isHideModalBehindBackdrop: PropTypes.bool,
 };
 
 
