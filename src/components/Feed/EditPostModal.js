@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import isEqual from 'lodash/isEqual';
 import { Modal, Button } from 'react-bootstrap';
 import {
   Editor,
@@ -20,6 +21,8 @@ const styles = {
     padding: '10px 0px',
   },
 };
+
+console.log();
 
 class EditPostModal extends Component {
   constructor(props) {
@@ -46,33 +49,13 @@ class EditPostModal extends Component {
       contentState = EditorState.moveFocusToEnd(contentState);
       this.setState({
         editorState: contentState,
-        photos: Array.from(photos || []),
       });
     }
+    this.setState({
+      photos: Array.from(photos || []),
+    });
     if (nextProps.isFocus !== this.props.isFocus) {
       this.editor.focus();
-    }
-  }
-
-  onSubmit = (evt) => {
-    const { dataPost: postData } = this.props;
-    const { dataPost: { message, photos } } = this.props;
-    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (content !== message && this.state.photos !== photos) {
-      const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
-      this.props.clickModal(evt, data, this.state.isDelPostSharing);
-    } else {
-      this.props.closeModal();
-    }
-  }
-
-  onCancel = () => {
-    const { dataPost: { message, photos } } = this.props;
-    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (content !== message && this.state.photos !== photos) {
-      this.props.showDiscardChangesPostModal();
-    } else {
-      this.props.closeModal();
     }
   }
 
@@ -97,6 +80,28 @@ class EditPostModal extends Component {
       photos,
       isSubmit: false,
     });
+  }
+
+  onSubmit = (evt) => {
+    const { dataPost: postData } = this.props;
+    const { dataPost: { message, photos } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (content !== message || !isEqual(photos, this.state.photos)) {
+      const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
+      this.props.clickModal(evt, data, this.state.isDelPostSharing);
+    } else {
+      this.props.closeModal();
+    }
+  }
+
+  onCancel = () => {
+    const { dataPost: { message, photos } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (content !== message || !isEqual(photos, this.state.photos)) {
+      this.props.showDiscardChangesPostModal();
+    } else {
+      this.props.closeModal();
+    }
   }
 
   uploadImages = (files) => {
