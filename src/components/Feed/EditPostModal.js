@@ -40,7 +40,6 @@ class EditPostModal extends Component {
   componentWillReceiveProps(nextProps) {
     const { dataPost: { message, photos } } = nextProps;
     if (message !== this.props.dataPost.message) {
-      console.log(message, 'message');
       let contentState = convertFromRaw(JSON.parse(message));
       // move focus to the end.
       contentState = EditorState.createWithContent(contentState);
@@ -59,11 +58,21 @@ class EditPostModal extends Component {
     const { dataPost: postData } = this.props;
     const { dataPost: { message, photos } } = this.props;
     const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (content === message && this.state.photos === photos) {
-      this.props.closeModal();
-    } else {
+    if (content !== message && this.state.photos !== photos) {
       const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
       this.props.clickModal(evt, data, this.state.isDelPostSharing);
+    } else {
+      this.props.closeModal();
+    }
+  }
+
+  onCancel = () => {
+    const { dataPost: { message, photos } } = this.props;
+    const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+    if (content !== message && this.state.photos !== photos) {
+      this.props.showDiscardChangesPostModal();
+    } else {
+      this.props.closeModal();
     }
   }
 
@@ -193,7 +202,7 @@ class EditPostModal extends Component {
               />
             </Button>
           </div>
-          <Button onClick={this.props.closeModal}>Hủy</Button>
+          <Button onClick={this.onCancel}>Hủy</Button>
           <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
         </Modal.Footer>
       </Modal>
@@ -207,6 +216,7 @@ EditPostModal.propTypes = {
   clickModal: PropTypes.func,
   dataPost: PropTypes.object.isRequired,
   isFocus: PropTypes.bool,
+  showDiscardChangesPostModal: PropTypes.func,
 };
 
 

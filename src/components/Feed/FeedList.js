@@ -66,6 +66,7 @@ class FeedList extends Component {
     this.setState(() => ({
       showEditPost: false,
       showDiscardChangesPost: false,
+      idEditPost: null,
     }));
   }
 
@@ -100,7 +101,10 @@ class FeedList extends Component {
       }));
     }
     if (idEditPost) {
-      this.discardChangesPost();
+      this.setState(() => ({
+        showEditPost: false,
+        idEditPost: null,
+      }));
     }
   }
 
@@ -178,6 +182,7 @@ class FeedList extends Component {
           closeModal={this.closeModal}
           clickModal={this.onClickEditPostModal}
           dataPost={this.state.dataPost}
+          showDiscardChangesPostModal={this.discardChangesPost}
         />
         <DiscardChangesPostModal
           show={this.state.showDiscardChangesPost}
