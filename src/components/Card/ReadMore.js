@@ -65,8 +65,8 @@ class ReadMore extends Component {
 
 ReadMore.defaultProps = {
   lines: 3,
-  more: 'Read more',
-  less: 'Show less',
+  more: 'Xem thêm',
+  less: 'Rút gọn',
 };
 
 ReadMore.propTypes = {
