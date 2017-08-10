@@ -1,18 +1,29 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import TimeAgo from 'react-timeago';
-import vnStrings from 'react-timeago/lib/language-strings/vi';
-import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
+import timeagojs from 'timeago.js';
+
+import TimeAgo from './TimeAgo';
+import vnStrings from './locales/vi';
 import s from './TimeAgo.scss';
 
-const formatter = buildFormatter(vnStrings);
+timeagojs.register('vi', vnStrings);
 
-const TimeAgoWraper = ({ time }) => (
-  <TimeAgo date={time} formatter={formatter} className={s.time} />
+const TimeAgoWraper = ({ time, locale }) => (
+  <TimeAgo
+    datetime={time}
+    locale={locale}
+    className={s.time}
+  />
 );
 
 TimeAgoWraper.propTypes = {
   time: PropTypes.string.isRequired,
+  locale: PropTypes.string.isRequired,
+};
+
+TimeAgoWraper.defaultProps = {
+  locale: 'vi',
 };
 
 export default withStyles(s)(TimeAgoWraper);
