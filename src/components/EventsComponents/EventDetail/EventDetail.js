@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { graphql, compose } from 'react-apollo';
+import { compose } from 'react-apollo';
 import {
   Row,
   Col,
@@ -8,13 +8,14 @@ import {
   Dropdown,
   MenuItem,
 } from 'react-bootstrap';
-import moment from 'moment';
-import Divider from '../../Divider';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './EventDetail.scss';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import { generate as idRandom } from 'shortid';
+import moment from 'moment';
+
+import s from './EventDetail.scss';
+import Divider from '../../Divider';
 import history from '../../../core/history';
 
 const PRIVARY_TEXT = {
@@ -97,8 +98,8 @@ class EventDetail extends React.Component {
             <Col md={12}>
               <div className={s.titleLayout}>
                 <div className={s.left}>
-                  <h5>{`THÁNG ${start.getMonth()}`}</h5>
-                  <h4>{start.getDay()}</h4>
+                  <h5>{`THÁNG ${start.getMonth() + 1}`}</h5>
+                  <h4>{start.getDate()}</h4>
                 </div>
                 <div className={s.right}>
                   <h4>

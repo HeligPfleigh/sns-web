@@ -10,10 +10,11 @@ import debounce from 'lodash/debounce';
 import { withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import history from '../../core/history';
-import { InputField, DateTimeField, SelectField } from '../../components/FormFields';
-import Modal from '../../components/Modal';
-import fetchAPI from '../../utils/fetchAPI';
+import {
+  InputField,
+  DateTimeField,
+  SelectField,
+} from '../../components/FormFields';
 import {
   required,
   email,
@@ -26,6 +27,9 @@ import {
   chartFirstRequired,
   objRequired,
 } from '../../utils/validator';
+import history from '../../core/history';
+import Modal from '../../components/Modal';
+import fetchAPI from '../../utils/fetchAPI';
 import s from './Register.scss';
 
 const minDate = moment().subtract(120, 'years');
@@ -62,54 +66,32 @@ class Register extends React.Component {
     this.state = {
       showModal: false,
       saved: false,
-      buildings: [],
     };
   }
 
-  componentWillMount = () => {
-    this.getDataSelect();
-  }
-
-  getDataSelect = debounce((input) => {
-    const fooBar = async () => {
-      try {
-        const { data: { buildings } } = await this.props.client.query({
-          query: gql`query searchBuildingQuery ($query: String) {
-            buildings(query: $query) {
-              _id
-              display
-              apartments {
-                _id
-                name
-              }
-            }
-          }`,
-          variables: {
-            query: input || 'v',
-          },
-        });
-        if (buildings) {
-          return this.setState({
-            buildings,
-          });
-        }
-        return new Error();
-      } catch (e) {
-        return this.setState({
-          buildings: [],
-        });
-      }
-    };
-
-    fooBar().catch(() => {
-      this.setState({
-        buildings: [],
-      });
-    });
-  }, 300);
-
-  reloadSource = (value) => {
-    this.getDataSelect(value);
+  getOptions = async (input) => {
+    console.log(input);
+    // try {
+    //   const data = await this.props.client.query({
+    //     query: gql`query searchBoxQuery ($query: String) {
+    //       buildings(query: $query) {
+    //         _id
+    //         display
+    //         apartments {
+    //           _id
+    //           name
+    //         }
+    //       }
+    //     }`,
+    //     variables: {
+    //       query: input || 'v',
+    //     },
+    //   });
+    //   console.log(data);
+    //   return { options: data };
+    // } catch (e) {
+    return { options: [] };
+    // }
   }
 
   toLogin = () => {
@@ -198,7 +180,7 @@ class Register extends React.Component {
   }
 
   render() {
-    const { saved, buildings } = this.state;
+    const { saved } = this.state;
     const { apartments, handleSubmit, pristine, reset, submitting, valid, error } = this.props;
 
     const titleStyles = {
@@ -290,15 +272,15 @@ class Register extends React.Component {
 
             <hr />
             <Field
+              isAsync
               name="building"
               valueKey="_id"
               labelKey="display"
               component={SelectField}
-              dataSource={buildings}
+              dataSource={this.getOptions}
               placeholder="(*) Chọn tòa nhà bạn đang ở!"
               validate={[objRequired]}
               onChange={this.handleChangeBuilding}
-              onInputChange={this.reloadSource}
             />
 
             <Field
