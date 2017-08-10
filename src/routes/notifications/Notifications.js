@@ -158,6 +158,12 @@ class Notifications extends Component {
 export default compose(
   withStyles(s),
   graphql(notificationQuery, {
+    options: () => ({
+      variables: {
+        cursor: null,
+      },
+      fetchPolicy: 'cache-and-network',
+    }),
     props: ({ data }) => {
       const { fetchMore } = data;
       const loadMoreRows = () => fetchMore({
@@ -165,7 +171,6 @@ export default compose(
           cursor: data.notifications.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          console.log(fetchMoreResult);
           if (!fetchMoreResult) {
             return;
           }

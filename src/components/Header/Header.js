@@ -234,7 +234,9 @@ export default compose(
   withStyles(s),
   graphql(headerQuery, {
     options: () => ({
-      variables: {},
+      variables: {
+        cursor: null,
+      },
       // pollInterval: 30000,
     }),
     props: ({ data }) => {
