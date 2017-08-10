@@ -11,6 +11,7 @@
 
 .newPostEditor {
   padding: 5px;
+
 }
 
 .newPostControl {
@@ -45,4 +46,9 @@ button.addPhoto, button.addPhoto:hover, button.addPhoto:active {
 .privacyOptions {
   margin-top: 0 !important;
   margin-right: 5px;
+}
+.errorText{
+  color: red;
+  font-size: 12px;
+  font-style: italic;
 }
