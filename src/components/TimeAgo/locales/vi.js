@@ -1,0 +1,16 @@
+export default (number, index) => [
+    ['vừa xong', 'một lúc'],
+    ['cách đây %s giây trước', 'trong %s giây'],
+    ['cách đây 1 phút trước', 'trong 1 phút'],
+    ['cách đây %s phút trước', 'trong %s phút'],
+    ['cách đây 1 giờ trước', 'trong 1 giờ'],
+    ['cách đây %s giờ trước', 'trong %s giờ'],
+    ['cách đây 1 ngày trước', 'trong 1 ngày'],
+    ['cách đây %s ngày trước', 'trong %s ngày'],
+    ['cách đây 1 tuần trước', 'trong 1 tuần'],
+    ['cách đây %s tuần trước', 'trong %s tuần'],
+    ['cách đây 1 tháng trước', 'trong 1 tháng'],
+    ['cách đây %s tháng trước', 'trong %s tháng'],
+    ['cách đây 1 năm trước', 'trong 1 năm'],
+    ['cách đây %s năm trước', 'trong %s năm'],
+][index];
