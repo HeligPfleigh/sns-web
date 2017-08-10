@@ -9,17 +9,17 @@
 
 import React from 'react';
 
+const title = 'Test Graphql Query';
+
 export default {
 
-  path: '/about',
-
+  path: '/test',
   async action() {
-    const About = await require.ensure([], require => require('./About').default, 'about');
-
+    const Login = await require.ensure([], require => require('./Login').default, 'test');
     return {
-      title: 'SNS - About us',
-      chunk: 'about',
-      component: <About />,
+      title,
+      component: <Login title={title} />,
     };
   },
+
 };

@@ -6,6 +6,8 @@ import isEmpty from 'lodash/isEmpty';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './SelectField.scss';
 
+const doNothing = () => {};
+
 const SelectField = ({
   input,
   label,
@@ -24,6 +26,7 @@ const SelectField = ({
     touched,
     error,
   },
+  onInputChange,
 }) => (
   <div className="form-group">
     {label &&
@@ -50,6 +53,7 @@ const SelectField = ({
           input.onChange(value);
         }}
         loadingPlaceholder={loadingPlaceholder}
+        onInputChange={onInputChange || doNothing}
       /> }
 
       { isAsync && <Select.Async
@@ -71,6 +75,7 @@ const SelectField = ({
           input.onChange(value);
         }}
         loadingPlaceholder={loadingPlaceholder}
+        onInputChange={onInputChange || doNothing}
       /> }
 
       { (touched || error || warning) && <div style={{ height: '5px' }} /> }
@@ -97,5 +102,6 @@ SelectField.propTypes = {
   meta: PropTypes.object.isRequired,
   input: PropTypes.object.isRequired,
   dataSource: PropTypes.any.isRequired,
+  onInputChange: PropTypes.func,
 };
 export default withStyles(s)(SelectField);
