@@ -57,6 +57,7 @@ class EditPostModal extends Component {
 
     this.setState({
       photos: Array.from(photos || []),
+      isSubmit: false,
       privacySelected: privacy || PUBLIC,
     });
 
