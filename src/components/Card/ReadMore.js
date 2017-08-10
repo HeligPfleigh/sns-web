@@ -49,14 +49,14 @@ class ReadMore extends Component {
         <Truncate
           lines={!expanded && lines}
           ellipsis={(
-            <span>... <a href="#" onClick={this.toggleLines}>{more}</a></span>
+            <span>... <a href="#" onClick={this.toggleLines}><strong>{more}</strong></a></span>
           )}
           onTruncate={this.handleTruncate}
         >
           {children}
         </Truncate>
         {!truncated && expanded && (
-          <span> <a href="#" onClick={this.toggleLines}>{less}</a></span>
+          <span> <a href="#" onClick={this.toggleLines}><strong>{less}</strong></a></span>
         )}
       </div>
     );
@@ -64,7 +64,7 @@ class ReadMore extends Component {
 }
 
 ReadMore.defaultProps = {
-  lines: 3,
+  lines: 5,
   more: 'Xem thêm',
   less: 'Rút gọn',
 };

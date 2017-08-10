@@ -48,7 +48,7 @@ class FeedList extends Component {
           autoHideDuration: 0,
         });
       }).catch((error) => {
-        // console.log('there was an error sending the query', error);
+        console.log('there was an error sending the query', error);
       });
     }
   }
@@ -62,7 +62,7 @@ class FeedList extends Component {
   }
 
   onClickDiscardChangesPostModal = (evt) => {
-    evt && evt.preventDefault();
+    if (evt) evt.preventDefault();
     this.setState(() => ({
       showEditPost: false,
       showDiscardChangesPost: false,
@@ -149,6 +149,7 @@ class FeedList extends Component {
       loadMoreComments,
       createNewComment,
     } = this.props;
+
     return (
       <div>
         {feeds && feeds.map(item => (

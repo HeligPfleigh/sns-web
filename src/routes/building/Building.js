@@ -146,10 +146,10 @@ class Building extends Component {
   }
 
   accept(friend) {
-    return event => {
+    return (event) => {
       event.preventDefault();
       const xhr = this.props.acceptRequestForJoiningBuilding(friend);
-      xhr.catch(error => {
+      xhr.catch((error) => {
         this.setState({
           errorMessage: error.message,
         });
@@ -159,10 +159,10 @@ class Building extends Component {
   }
 
   cancel(friend) {
-    return event => {
+    return (event) => {
       event.preventDefault();
       const xhr = this.props.rejectRequestForJoiningBuilding(friend);
-      xhr.catch(error => {
+      xhr.catch((error) => {
         this.setState({
           errorMessage: error.message,
         });
@@ -248,7 +248,7 @@ class Building extends Component {
                     building={building}
                     likePost={likePost}
                     unlikePost={unlikePost}
-                    me={me ? me : {}}
+                    me={me || {}}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePostOnBuilding={deletePostOnBuilding}
@@ -319,9 +319,9 @@ export default compose(
       },
     }),
     props: ({ ownProps, data }) => {
-      if (!data) { 
+      if (!data) {
         return;
-      }      
+      }
       const { fetchMore } = data;
       const loadMoreFeeds = throttle(() => fetchMore({
         query: loadMorePostOnBuildingQuery,
@@ -330,7 +330,7 @@ export default compose(
           cursor: data.building.posts.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
           return update(previousResult, {
@@ -355,7 +355,7 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
           const index = previousResult.building.posts.edges.findIndex(item => item._id === postId);
@@ -374,7 +374,7 @@ export default compose(
             },
           });
         },
-      });      
+      });
       const loadMoreUsersAwaitingApproval = throttle(() => fetchMore({
         query: loadMoreUsersAwaitingApprovalBuildingQuery,
         variables: {
@@ -382,7 +382,7 @@ export default compose(
           cursor: data.building.requests.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
           return update(previousResult, {
@@ -551,6 +551,7 @@ export default compose(
           postId: post._id,
           message: post.message,
           photos: post.photos || [],
+          privacy: post.privacy || PUBLIC,
           isDelPostSharing,
         },
         optimisticResponse: {

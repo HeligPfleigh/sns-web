@@ -1,16 +1,21 @@
 import React, { Component, PropTypes } from 'react';
-import isEqual from 'lodash/isEqual';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, ButtonToolbar, Dropdown, Clearfix, MenuItem } from 'react-bootstrap';
 import {
   Editor,
   EditorState,
   convertToRaw,
   convertFromRaw,
 } from 'draft-js';
+import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
+import includes from 'lodash/includes';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
 import SharingPost from './SharingPost';
 import ListImagePreview from '../ListImagePreview';
+import { PUBLIC, FRIEND, ONLY_ME, ONLY_ADMIN_BUILDING } from '../../constants';
 import uploadImage from '../../utils/uploadImage';
+import s from './Feed.scss';
 
 const styles = {
   editor: {
@@ -39,8 +44,8 @@ class EditPostModal extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dataPost: { message, photos } } = nextProps;
-    if (message !== this.props.dataPost.message) {
+    const { dataPost: { message, photos, privacy }, isFocus } = nextProps;
+    if (!isEqual(message, this.props.dataPost.message)) {
       let contentState = convertFromRaw(JSON.parse(message));
       // move focus to the end.
       contentState = EditorState.createWithContent(contentState);
@@ -49,11 +54,14 @@ class EditPostModal extends Component {
         editorState: contentState,
       });
     }
+
     this.setState({
       photos: Array.from(photos || []),
       isSubmit: false,
+      privacySelected: privacy || PUBLIC,
     });
-    if (nextProps.isFocus !== this.props.isFocus) {
+
+    if (isFocus !== this.props.isFocus) {
       this.editor.focus();
     }
   }
@@ -82,11 +90,19 @@ class EditPostModal extends Component {
   }
 
   onSubmit = (evt) => {
-    const { dataPost: postData } = this.props;
-    const { dataPost: { message, photos } } = this.props;
+    const {
+      dataPost: postData,
+      dataPost: {
+        message,
+        photos: photosSource,
+        privacy: privacySource,
+      },
+    } = this.props;
+    const { photos = [], privacySelected: privacy = PUBLIC } = this.state;
     const content = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (content !== message || !isEqual(photos, this.state.photos)) {
-      const data = { ...postData, ...{ message: content, photos: this.state.photos || [] } };
+
+    if (!isEqual(content, message) || !isEqual(photos, photosSource) || !isEqual(privacy, privacySource)) {
+      const data = { ...postData, ...{ message: content, photos, privacy } };
       this.props.clickModal(evt, data, this.state.isDelPostSharing);
     } else {
       this.props.closeModal();
@@ -101,6 +117,15 @@ class EditPostModal extends Component {
     } else {
       this.props.closeModal();
     }
+  }
+
+  onSelectPrivacy = (privacySelected) => {
+    if ([PUBLIC, FRIEND, ONLY_ME, ONLY_ADMIN_BUILDING].indexOf(privacySelected) === -1) {
+      privacySelected = PUBLIC;
+    }
+    this.setState({
+      privacySelected,
+    });
   }
 
   uploadImages = (files) => {
@@ -129,7 +154,7 @@ class EditPostModal extends Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { dataPost: { sharing }, isHideModalBehindBackdrop } = this.props;
+    const { dataPost: { sharing, building }, isHideModalBehindBackdrop } = this.props;
     const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
     const delBlockStyle = {
       position: 'absolute',
@@ -138,6 +163,38 @@ class EditPostModal extends Component {
       right: '10px',
       cursor: 'pointer',
     };
+
+    const privacies = {
+      PUBLIC: {
+        icon: <i className="fa fa-globe" aria-hidden="true"></i>,
+        label: 'Công khai',
+      },
+      FRIEND: {
+        icon: <i className="fa fa-users" aria-hidden="true"></i>,
+        label: 'Bạn bè',
+      },
+      ONLY_ME: {
+        icon: <i className="fa fa-lock" aria-hidden="true"></i>,
+        label: 'Chỉ mình tôi',
+      },
+      ONLY_ADMIN_BUILDING: {
+        icon: <i className="fa fa-bell" aria-hidden="true"></i>,
+        label: 'Ban quản trị',
+      },
+    };
+
+    const privacyKeys = Object.keys(privacies);
+    const keySelected = privacyKeys.indexOf(this.state.privacySelected);
+    const selectedKey = keySelected > -1 ? privacyKeys[keySelected] : PUBLIC;
+    const selectedLabel = privacies[selectedKey].label;
+    const selectedIcon = privacies[selectedKey].icon;
+    delete privacies[selectedKey];
+
+    let types = [PUBLIC, ONLY_ADMIN_BUILDING];
+    if (isEmpty(building)) {
+      types = [PUBLIC, FRIEND, ONLY_ME];
+    }
+
     return (
       <Modal show={this.props.show} onHide={this.props.closeModal} style={{ zIndex: isHideModalBehindBackdrop ? 1039 : 1040 }}>
         <Modal.Header closeButton>
@@ -185,14 +242,12 @@ class EditPostModal extends Component {
           }
         </Modal.Body>
         <Modal.Footer>
-          <div style={{ float: 'left' }}>
+          <ButtonToolbar className="pull-left">
             <Button
               bsStyle="link"
-              style={{ color: '#4c4c4c', textDecorationLine: 'none' }}
+              style={{ color: '#4c4c4c', textDecorationLine: 'none', paddingLeft: '0px', outline: 'none' }}
               title="Đính kèm ảnh"
-              onClick={() => {
-                document.getElementById('fileInputOnEdit').click();
-              }}
+              onClick={() => document.getElementById('fileInputOnEdit').click()}
             >
               <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
               <strong>Ảnh</strong>
@@ -205,9 +260,17 @@ class EditPostModal extends Component {
                 multiple
               />
             </Button>
-          </div>
-          <Button onClick={this.onCancel}>Hủy</Button>
-          <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
+          </ButtonToolbar>
+          <ButtonToolbar className="pull-right">
+            <Dropdown className={s.sharingPostModalButtonPrivacies} id={Math.random()}>
+              <Dropdown.Toggle>{ selectedIcon } { selectedLabel }</Dropdown.Toggle>
+              <Dropdown.Menu onSelect={this.onSelectPrivacy}>
+                { Object.keys(privacies).map(type => includes(types, type) && <MenuItem key={type} eventKey={type}>{ privacies[type].icon } { privacies[type].label }</MenuItem>) }
+              </Dropdown.Menu>
+            </Dropdown>
+            <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
+          </ButtonToolbar>
+          <Clearfix />
         </Modal.Footer>
       </Modal>
     );
@@ -225,4 +288,4 @@ EditPostModal.propTypes = {
 };
 
 
-export default EditPostModal;
+export default withStyles(s)(EditPostModal);

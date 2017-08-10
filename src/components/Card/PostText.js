@@ -13,15 +13,15 @@ import {
   checkYoutubeUrl,
 } from '../../utils/regexUrl';
 
-function strip_tags(input) {
+function stripTags(input) {
   if (!_.isString(input)) {
     return false;
   }
-  let tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, // Match any html tag
-    commentsTags = /<!--[\s\S]*?-->/gi, // Match <!--, -->
-    whiteSpace = /\s+/gi; // Match any whitespace
+  const tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi; // Match any html tag
+  const commentsTags = /<!--[\s\S]*?-->/gi; // Match <!--, -->
+  const whiteSpace = /\s+/gi; // Match any whitespace
 
-  return input.replace(commentsTags, '').replace(tags, '').replace(whiteSpace, ''); // Just replace it by an empty string
+  return input.replace(tags, '').replace(commentsTags, '').replace(whiteSpace, ''); // Just replace it by an empty string
 }
 
 class PostText extends React.Component {
@@ -31,10 +31,11 @@ class PostText extends React.Component {
     if (!html) {
       return <div />;
     }
-    const __html = stateToHTML(convertFromRaw(JSON.parse(html)));
-    if (!strip_tags(__html)) {
+    let __html = stateToHTML(convertFromRaw(JSON.parse(html)));
+    if (!stripTags(__html)) {
       return <div />;
     }
+    __html = __html.replace(/<\/p>/gi, '<br/></p>');
 
     const data = JSON.parse(html);
     let isShow = false;
