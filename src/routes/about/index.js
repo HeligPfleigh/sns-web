@@ -8,21 +8,18 @@
  */
 
 import React from 'react';
-import Layout from '../../components/Layout';
-import Page from '../../components/Page';
 
 export default {
 
   path: '/about',
 
   async action() {
-    const data = await require.ensure([], require => require('./about.md'), 'about');
+    const About = await require.ensure([], require => require('./About').default, 'about');
 
     return {
-      title: data.title,
+      title: 'SNS - About us',
       chunk: 'about',
-      component: <Layout><Page {...data} /></Layout>,
+      component: <About />,
     };
   },
-
 };
