@@ -13,19 +13,23 @@ const uploadImage = async (file) => {
   const token = getCookie('id_token');
   const formData = new FormData();
   formData.append('file', file);
-  const response = await fetch(url, {
-    headers: new Headers({
-      authorization: token,
-    }),
-    method: 'post',
-    body: formData,
-  });
-  if (!response.ok) {
-    throw Error(response.statusText);
-  }
+  try {
+    const response = await fetch(url, {
+      headers: new Headers({
+        authorization: token,
+      }),
+      method: 'post',
+      body: formData,
+    });
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
 
-  const result = await response.json();
-  return result;
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    throw e;
+  }
 };
 
 export default uploadImage;

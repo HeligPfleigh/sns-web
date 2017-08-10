@@ -35,6 +35,7 @@ class EditPostModal extends Component {
       isSubmit: true,
       photos: Array.from([]),
       isDelPostSharing: true,
+      error: '',
     };
 
     this.onChange = editorStateChange => this.setState({
@@ -140,7 +141,18 @@ class EditPostModal extends Component {
           });
         }
       } catch (err) {
-        console.log(err);
+        const { photos } = this.state;
+        photos.splice(index, 1);
+        this.setState({
+          photos,
+          error: 'Ảnh quá nặng hoặc tính năng đăng ảnh lỗi',
+        });
+
+        setTimeout(() => {
+          this.setState({
+            error: '',
+          });
+        }, 2000);
       }
     });
   }
@@ -155,7 +167,7 @@ class EditPostModal extends Component {
 
   render() {
     const { dataPost: { sharing, building }, isHideModalBehindBackdrop } = this.props;
-    const { editorState, isSubmit, photos, isDelPostSharing } = this.state;
+    const { editorState, isSubmit, photos, isDelPostSharing, error } = this.state;
     const delBlockStyle = {
       position: 'absolute',
       zIndex: 1,
@@ -225,6 +237,7 @@ class EditPostModal extends Component {
                 </div> :
                 null
             }
+            {error.length > 0 ? <span className={s.errorText}>{error}</span> : null}
           </div>
           {sharing && !isEmpty(sharing) && isDelPostSharing &&
             <div style={{ position: 'relative' }}>

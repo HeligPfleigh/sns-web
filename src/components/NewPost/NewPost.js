@@ -81,6 +81,7 @@ class NewPost extends React.Component {
     privacy: PUBLIC,
     photos: [],
     glyph: 'globe',
+    error: '',
   };
 
   onChange = (editorState) => {
@@ -152,7 +153,18 @@ class NewPost extends React.Component {
           });
         }
       } catch (err) {
-        console.log(err);
+        const { photos } = this.state;
+        photos.splice(index, 1);
+        this.setState({
+          photos,
+          error: 'Ảnh quá nặng hoặc tính năng đăng ảnh lỗi',
+        });
+
+        setTimeout(() => {
+          this.setState({
+            error: '',
+          });
+        }, 2000);
       }
     });
   }
@@ -160,7 +172,7 @@ class NewPost extends React.Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { editorState, isSubmit, glyph, photos } = this.state;
+    const { editorState, isSubmit, glyph, photos, error } = this.state;
     const { displayPrivacy, privacy } = this.props;
     return (
       <div className={s.newPostPanel}>
@@ -189,6 +201,7 @@ class NewPost extends React.Component {
                 </div> :
                 null
             }
+            {error.length > 0 ? <span className={s.errorText}>{error}</span> : null}
           </div>
         </Col>
         <Col className={s.newPostControl}>
@@ -214,7 +227,7 @@ class NewPost extends React.Component {
             </Button>
           </Col>
           <Col className="pull-right" style={{ marginRight: '15px' }}>
-            {displayPrivacy && <Dropdown id={idRandom()} className={ s.privacyOptions }>
+            {displayPrivacy && <Dropdown id={idRandom()} className={s.privacyOptions}>
               <Dropdown.Toggle>
                 <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
               </Dropdown.Toggle>
