@@ -67,7 +67,6 @@ export function activeConversation({ conversation }) {
   return async (dispatch, getState, { chat }) => {
     try {
       if (conversation) {
-        console.log(conversation);
         const conversationId = Object.keys(conversation)[0];
         dispatch({
           type: CHAT_ACTIVE_CONVERSATION,

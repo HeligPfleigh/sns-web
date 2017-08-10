@@ -8,12 +8,12 @@ const FriendOnlineList = ({ className, friends, online, directMessages }) => (
     <ul>
       {
         friends.map(friend =>
-          <FriendOnlineItem
+          (friend && friend.chatId && <FriendOnlineItem
             key={friend.chatId}
             friend={friend}
             isOnline={online[friend.chatId]}
             conversationId={directMessages[friend.chatId.toString()]}
-          />)
+          />))
       }
     </ul>
   </div>

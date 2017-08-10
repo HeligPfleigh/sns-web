@@ -73,7 +73,6 @@ class ConversationList extends React.Component {
     for (let i = 0; i < conversations.length; i++) {
       const element = conversations[i];
       if (Object.keys(element)[0] === id) {
-        console.log('hihihihih');
         return element;
       }
     }
