@@ -36,15 +36,6 @@ const userFragment = gql`
         lastName
       }
     }
-    friendSuggestions {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
     building {
       _id
     }
