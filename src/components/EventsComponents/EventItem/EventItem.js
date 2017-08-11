@@ -16,6 +16,7 @@ class EventItem extends React.Component {
       <Col
         style={{
           cursor: 'pointer',
+          marginBottom: 10,
         }}
         md={6}
         onClick={async () => {
