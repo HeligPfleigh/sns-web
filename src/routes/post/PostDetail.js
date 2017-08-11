@@ -95,34 +95,30 @@ class PostDetail extends Component {
       deletePost,
     } = this.props;
     return (
-      <span>
-        {
-          post &&
-          <Grid>
-            <Loading show={loading} full>Loading ...</Loading>
-            <Row className={s.containerTop30}>
-              <Col md={8} sm={12} xs={12}>
-                { post && <FeedList
-                  feeds={[post]}
-                  likePostEvent={likePost}
-                  unlikePostEvent={unlikePost}
-                  userInfo={me}
-                  loadMoreComments={loadMoreComments}
-                  createNewComment={createNewComment}
-                  deletePost={deletePost}
-                  editPost={editPost}
-                  sharingPost={sharingPost}
-                />}
-              </Col>
-              <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
-                <Col md={4} smHidden xsHidden>
-                  <FriendSuggestions />
-                </Col>
-              </MediaQuery>
-            </Row>
-          </Grid>
-        }
-      </span>
+      <Grid>
+        <Loading show={loading} full>Loading ...</Loading>
+        <Row className={s.containerTop30}>
+          <Col md={8} sm={12} xs={12}>
+            { post && <FeedList
+              feeds={[post]}
+              likePostEvent={likePost}
+              unlikePostEvent={unlikePost}
+              userInfo={me}
+              loadMoreComments={loadMoreComments}
+              createNewComment={createNewComment}
+              deletePost={deletePost}
+              editPost={editPost}
+              sharingPost={sharingPost}
+            />}
+            { !post && <h3>Không tìm thấy bài viết !</h3> }
+          </Col>
+          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+            <Col md={4} smHidden xsHidden>
+              <FriendSuggestions />
+            </Col>
+          </MediaQuery>
+        </Row>
+      </Grid>
     );
   }
 }

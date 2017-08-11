@@ -209,7 +209,7 @@ class EditPostModal extends Component {
 
     return (
       <Modal show={this.props.show} onHide={this.props.closeModal} style={{ zIndex: isHideModalBehindBackdrop ? 1039 : 1040 }}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Chỉnh sửa bài viết</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -281,6 +281,7 @@ class EditPostModal extends Component {
                 { Object.keys(privacies).map(type => includes(types, type) && <MenuItem key={type} eventKey={type}>{ privacies[type].icon } { privacies[type].label }</MenuItem>) }
               </Dropdown.Menu>
             </Dropdown>
+            <Button onClick={this.onCancel}>Hủy</Button>
             <Button bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Chỉnh sửa xong</Button>
           </ButtonToolbar>
           <Clearfix />

@@ -17,6 +17,7 @@ import {
   EVENT_DELETED,
   ACCEPTED_JOIN_BUILDING,
   REJECTED_JOIN_BUILDING,
+  SHARING_POST,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
@@ -38,6 +39,7 @@ const getActorsContent = (currentUser, author, type, actors) => {
 };
 
 const collectionNotifyMessages = {
+  [SHARING_POST]: lastContent => ` chia sẻ bài viết ${lastContent}.`,
   [COMMENTS]: lastContent => ` vừa bình luận bài viết ${lastContent}.`,
   [NEW_POST]: () => ' vừa viết lên tường nhà bạn.',
   [ACCEPTED_FRIEND]: () => ' đã chấp nhận lời mời kết bạn của bạn',

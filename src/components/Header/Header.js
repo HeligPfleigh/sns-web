@@ -36,15 +36,6 @@ const userFragment = gql`
         lastName
       }
     }
-    friendSuggestions {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
     building {
       _id
     }
@@ -234,7 +225,9 @@ export default compose(
   withStyles(s),
   graphql(headerQuery, {
     options: () => ({
-      variables: {},
+      variables: {
+        cursor: null,
+      },
       // pollInterval: 30000,
     }),
     props: ({ data }) => {
