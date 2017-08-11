@@ -1,4 +1,5 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import isEmpty from 'lodash/isEmpty';
 import config from '../../config';
 
 const networkInterface = createNetworkInterface({
@@ -22,7 +23,9 @@ networkInterface.use([{
       req.options.headers = {};  // Create the header object if needed.
     }
     const token = getCookie('id_token');
-    req.options.headers.authorization = token ? `${token}` : null;
+    if (token && !isEmpty(token)) {
+      req.options.headers.authorization = token;
+    }
     next();
   },
 }]);

@@ -6,14 +6,14 @@ import { Field, reduxForm, formValueSelector, SubmissionError } from 'redux-form
 import { Circle } from 'better-react-spinkit';
 import { Button } from 'react-bootstrap';
 import map from 'lodash/map';
+import isEmpty from 'lodash/isEmpty';
 import debounce from 'lodash/debounce';
-import { withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import createApolloClient from '../../core/createApolloClient';
 import history from '../../core/history';
 import { InputField, DateTimeField, SelectField } from '../../components/FormFields';
 import Modal from '../../components/Modal';
-import fetchAPI from '../../utils/fetchAPI';
 import {
   required,
   email,
@@ -28,29 +28,48 @@ import {
 } from '../../utils/validator';
 import s from './Register.scss';
 
+const apolloClient = createApolloClient();
+
 const minDate = moment().subtract(120, 'years');
 const maxDate = moment().subtract(16, 'years');
+
+const checkExistUser = async (query = '') => {
+  try {
+    const { data: { checkExistUser: result } } = await apolloClient.query({
+      query: gql`query checkExistUserQuery ($query: String) {
+        checkExistUser(query: $query)
+      }`,
+      variables: {
+        query,
+      },
+    });
+    return result;
+  } catch (error) {
+    return false;
+  }
+};
 
 const asyncValidate = (fields) => {
   const { username, email: emailVal, phoneNumber: phoneNumberVal } = fields;
   const fooBar = async () => {
-    let result = {};
-    const { status: checkUsername } = (username && await fetchAPI('/auth/check_user', { username })) || {};
-    if (checkUsername) {
-      result = { ...result, ...{ username: 'Tên đăng nhập đã tồn tại trên hệ thống...' } };
-    }
+    try {
+      let result = {};
+      if (!isEmpty(username) && await checkExistUser(username)) {
+        result = { ...result, ...{ username: 'Tên đăng nhập đã tồn tại trên hệ thống...' } };
+      }
 
-    const { status: checkEmail } = (emailVal && await fetchAPI('/auth/check_user', { username: emailVal })) || {};
-    if (checkEmail) {
-      result = { ...result, ...{ email: 'Email đã tồn tại trên hệ thống...' } };
-    }
+      if (!isEmpty(emailVal) && await checkExistUser(emailVal)) {
+        result = { ...result, ...{ email: 'Email đã tồn tại trên hệ thống...' } };
+      }
 
-    const { status: checkPhone } = (phoneNumberVal && await fetchAPI('/auth/check_user', { username: phoneNumberVal })) || {};
-    if (checkPhone) {
-      result = { ...result, ...{ phoneNumber: 'Số điện thoại đã tồn tại trên hệ thống...' } };
-    }
+      if (!isEmpty(phoneNumberVal) && await checkExistUser(phoneNumberVal)) {
+        result = { ...result, ...{ phoneNumber: 'Số điện thoại đã tồn tại trên hệ thống...' } };
+      }
 
-    return result;
+      return result;
+    } catch (error) {
+      return new Error(error);
+    }
   };
   return fooBar().catch(() => ({ _error: 'Lỗi kết nối...' }));
 };
@@ -73,7 +92,7 @@ class Register extends React.Component {
   getDataSelect = debounce((input) => {
     const fooBar = async () => {
       try {
-        const { data: { buildings } } = await this.props.client.query({
+        const { data: { buildings } } = await apolloClient.query({
           query: gql`query searchBuildingQuery ($query: String) {
             buildings(query: $query) {
               _id
@@ -150,7 +169,6 @@ class Register extends React.Component {
       },
       phone: {
         number: phoneVal,
-        verified: false,
       },
       profile: {
         firstName,
@@ -163,19 +181,29 @@ class Register extends React.Component {
       apartments: map(apartments, '_id'),
     };
 
+    const createUserQuery = gql`mutation createUserQuery($user: CreateUserInput!) {
+      createUser(user: $user) {
+        _id
+      }
+    }`;
+
     this.setState({
       showModal: true,
     });
 
-    return fetchAPI('/auth/register', data).then(({ _id }) => {
-      if (_id) {
+    return apolloClient.mutate({
+      mutation: createUserQuery,
+      variables: {
+        user: data,
+      },
+    }).then(({ data: { createUser } }) => {
+      if (createUser && createUser._id) {
         this.props.reset();
         this.setState({ saved: true });
         return '';
       }
       throw new Error();
     }).catch(() => {
-      this.setState({ saved: false });
       throw new SubmissionError({
         _error: 'Lỗi đăng kí tài khoản!',
       });
@@ -232,12 +260,19 @@ class Register extends React.Component {
             </span>
           }
         >
-          { !saved && <div style={{ textAlign: 'center' }}>
+          { !saved && !error && <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Circle size={100} color="#4183f1" />
             </div>
             <br />
             <strong>Thao tác thêm mới đang được xử lý</strong><br />
+          </div> }
+
+          { !saved && error && <div style={{ textAlign: 'center' }}>
+            <i className="fa fa-ban fa-5x text-danger" aria-hidden="true"></i>
+            <br />
+            <strong>Thao tác tạo mới người dùng thất bại!</strong><br />
+            <strong>Vui lòng kiểm tra thông tin đăng kí và thực hiện đăng kí lại</strong><br />
           </div> }
 
           { saved && <div style={{ textAlign: 'center' }}>
@@ -391,14 +426,13 @@ Register.propTypes = {
   error: PropTypes.string,
   firstPassword: PropTypes.string,
   apartments: PropTypes.any,
-  client: PropTypes.any,
 };
 
 const RegisterForm = reduxForm({
   form: 'registerForm',
   asyncValidate,
   asyncBlurFields: ['username', 'email', 'phoneNumber'],
-})(withStyles(s)(withApollo(Register)));
+})(withStyles(s)(Register));
 
 const selector = formValueSelector('registerForm');
 const RegisterPage = connect((state) => {

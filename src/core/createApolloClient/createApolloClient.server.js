@@ -1,4 +1,5 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import isEmpty from 'lodash/isEmpty';
 import config from '../../config';
 
 export default function createApolloClient(options) {
@@ -16,7 +17,10 @@ export default function createApolloClient(options) {
         req.options.headers = {};  // Create the header object if needed.
       }
       const token = options.rootValue.request.cookies.id_token;
-      req.options.headers.authorization = token ? `${token}` : null;
+      if (token && !isEmpty(token)) {
+        req.options.headers.authorization = token;
+      }
+
       next();
     },
   }]);
