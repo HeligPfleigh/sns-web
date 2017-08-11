@@ -35,15 +35,15 @@ class EventItem extends React.Component {
               <h5 className={s.day}>{start.getDate()}</h5>
             </div>
             <div className={s.contentSmall}>
-              <h5 className={s.title}>{event.name}</h5>
+              <p className={s.title}>{event.name}</p>
               <p className={s.location}>{event.location}</p>
               <p className={s.care}>199 Người quan tâm</p>
-              <p>
-                <Button>
+              <div className={s.wrapperButtonRight}>
+                <Button className={s.BtnCare}>
                   <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
                     Quan tâm
                 </Button>
-              </p>
+              </div>
             </div>
           </div>
         </div>

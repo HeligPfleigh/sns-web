@@ -41,7 +41,6 @@ CustomToggle.propTypes = {
 };
 
 class Feed extends Component {
-
   onLikeCLick = (evt) => {
     evt.preventDefault();
     const {
