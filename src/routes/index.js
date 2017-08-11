@@ -7,7 +7,6 @@ export default {
 
   // Keep in mind, routes are evaluated in order
   children: [
-    require('./test').default,
     require('./home').default,
     require('./friends').default,
     require('./building').default,
