@@ -12,7 +12,6 @@ import s from './FriendSuggestions.css';
 class FriendSuggestions extends Component {
   render() {
     const { data: { loading, resident } } = this.props;
-    console.log(resident);
     return (
       <div>
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}

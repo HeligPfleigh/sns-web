@@ -214,7 +214,7 @@ export default compose(
       },
     }),
     props: ({ ownProps, data }) => {
-      if (!data) { 
+      if (!data) {
         return;
       }
 
@@ -343,6 +343,7 @@ export default compose(
           postId: post._id,
           message: post.message,
           photos: post.photos || [],
+          privacy: post.privacy || PUBLIC,
           isDelPostSharing,
         },
         optimisticResponse: {
