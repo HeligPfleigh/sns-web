@@ -1,0 +1,6 @@
+{
+  "name": "UserSelect",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./UserSelect.js"
+}
