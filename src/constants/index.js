@@ -15,7 +15,10 @@ export const PUBLIC_EVENT = 'PUBLIC_EVENT';
 export const EVENT_PRIVACY = [PRIVATE_EVENT, PUBLIC_EVENT];
 
 export const SET_RUNTIME_VARIABLE = 'SET_RUNTIME_VARIABLE';
-export const POST_TYPES = ['STATUS', 'EVENT'];
+
+export const POST_TYPE_STATUS = 'STATUS';
+export const POST_TYPE_EVENT = 'EVENT';
+export const POST_TYPES = [POST_TYPE_STATUS, POST_TYPE_EVENT];
 
 export const LIKES = 'LIKES';
 export const COMMENTS = 'COMMENTS';

@@ -19,46 +19,46 @@ class SharingPost extends Component {
     return (
       <div>
         <Post >
-            <PostHeader
-              avatar={
-                <span>
-                  { author &&
-                    <Link title={`${author.profile.firstName} ${author.profile.lastName}`} to={`/user/${author._id}`}>
-                      <Image src={author.profile.picture} circle />
-                    </Link>
-                  }
-                </span>
-              }
-              title={
-                <span>
-                  { author && <Link to={`/user/${author._id}`}>
-                    <strong>{`${author.profile.firstName} ${author.profile.lastName}`}</strong>
-                    </Link>
-                  }
-
-                  { ((user && (user._id !== author._id)) || building) &&
-                    <span style={{ margin: '0 6px' }}>
-                      <i className="fa fa-caret-right" aria-hidden="true"></i>
-                    </span>
-                  }
-
-                  { !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
-                    <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+          <PostHeader
+            avatar={
+              <span>
+                { author &&
+                  <Link title={`${author.profile.firstName} ${author.profile.lastName}`} to={`/user/${author._id}`}>
+                    <Image src={author.profile.picture} circle />
                   </Link>
-                  }
-                  { building && <Link to={`/building/${building._id}`}>
-                    <strong>{building.name}</strong>
+                }
+              </span>
+            }
+            title={
+              <span>
+                { author && <Link to={`/user/${author._id}`}>
+                  <strong>{`${author.profile.firstName} ${author.profile.lastName}`}</strong>
                   </Link>
-                  }
-                </span>
-              }
-              subtitle={<div>
-                { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
-                { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
-                { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
-                <Link to={`/post/${id}`}><TimeAgo time={createdAt} /></Link>
-              </div>}
-            />
+                }
+
+                { ((user && (user._id !== author._id)) || building) &&
+                  <span style={{ margin: '0 6px' }}>
+                    <i className="fa fa-caret-right" aria-hidden="true"></i>
+                  </span>
+                }
+
+                { !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
+                  <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+                </Link>
+                }
+                { building && <Link to={`/building/${building._id}`}>
+                  <strong>{building.name}</strong>
+                </Link>
+                }
+              </span>
+            }
+            subtitle={<div>
+              { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
+              { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
+              { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
+              <Link to={`/post/${id}`}><TimeAgo time={createdAt} /></Link>
+            </div>}
+          />
           <Clearfix />
           <PostText
             html={`${message || {}}`}

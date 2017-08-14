@@ -4,10 +4,17 @@ import {
   Image,
   MenuItem,
   Dropdown,
+  Col,
+  Button,
+  Grid,
+  Clearfix,
 } from 'react-bootstrap';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
 import { noop } from 'lodash';
+import classnames from 'classnames';
+import moment from 'moment';
+
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -22,6 +29,8 @@ import {
   DELETE_POST_ACTION,
   EDIT_POST_ACTION,
   ONLY_ADMIN_BUILDING,
+  POST_TYPE_STATUS,
+  POST_TYPE_EVENT,
   SHARE,
   SHARE_FRIEND,
 } from '../../constants';
@@ -109,12 +118,16 @@ class Feed extends Component {
         privacy,
         building,
         sharing,
+        type,
+        event,
       },
       userInfo,
       loadMoreComments,
       createNewComment,
       sharingPostModalOpenned,
     } = this.props;
+    const IS_POST_TYPE_STATUS = type === POST_TYPE_STATUS;
+    const IS_POST_TYPE_EVENT = type === POST_TYPE_EVENT;
     return (
       <Post>
         <PostHeader
@@ -185,7 +198,7 @@ class Feed extends Component {
             <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
           </div>}
           menuRight={
-            (author && userInfo && author._id === userInfo._id) ?
+            (author && userInfo && (author._id === userInfo._id) && IS_POST_TYPE_STATUS) ?
               <Dropdown id={idRandom()} pullRight>
                 <CustomToggle bsRole="toggle">
                   <span title="Tùy chọn">
@@ -202,7 +215,9 @@ class Feed extends Component {
               </Dropdown> : <div></div>
           }
         />
-        {message && <PostText html={message} /> }
+
+        {message && IS_POST_TYPE_STATUS && <PostText html={message} /> }
+
         {sharing &&
           <SharingPost
             id={sharing._id}
@@ -214,15 +229,44 @@ class Feed extends Component {
             createdAt={sharing.createdAt}
           />
         }
+
         {!sharing && photos && photos.length > 0 && <PostPhotos images={photos} />}
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
         </PostText>
-        { !sharingPostModalOpenned && (
+
+        { IS_POST_TYPE_EVENT && (<div className={classnames('row', s.event)}>
+          <div className="col-xs-12">
+            <div className="col-xs-2">
+              <div className={s.time}>
+                <span className={s.day}>{moment(event.start).format('D')}</span>
+                <span className={s.month}>{moment(event.start).format('MMM')}</span>
+              </div>
+            </div>
+            <div className={classnames('col-xs-10', s.description)}>
+              <div className={s.name}><span className={s.maxWith}>{event.name} {event.name} {event.name} {event.name}</span></div>
+              <div className={s.location}>
+                <div className={s.maxWith}>
+                  <span className="time">{moment(event.start).format('h:mm A')}</span>
+                  <span role="presentation" aria-hidden="true"> · </span>
+                  <a href="#">tại {event.location}</a>
+                </div>
+                <div className={classnames('pull-right', s.btnInterested)}>
+                  <Button type="button" className={s.btnOverride}><i className="fa fa-star" /> Quan tâm</Button>
+                </div>
+              </div>
+              <div className={s.stats}>183 people interested · 77 people going</div>
+            </div>
+          </div>
+          <Clearfix />
+        </div>) }
+
+        { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
         <Divider />
         ) }
-        { !sharingPostModalOpenned && (
+
+        { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
         <PostActions>
           <Icon
             onClick={this.onLikeCLick}
@@ -244,7 +288,8 @@ class Feed extends Component {
           </Dropdown>
         </PostActions>
         ) }
-        { !sharingPostModalOpenned && (
+
+        { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
         <PostContent className={s.commentPanel}>
           <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
         </PostContent>
@@ -367,6 +412,14 @@ const commentFragment = gql`fragment CommentView on Comment {
   }
 `;
 
+const eventFragment = gql`fragment EventView on PostEvent {
+    name
+    location
+    start
+    end
+  }
+`;
+
 Feed.fragments = {
   comment: commentFragment,
   requests: gql`
@@ -414,6 +467,7 @@ Feed.fragments = {
     fragment PostView on Post {
       _id
       message
+      type
       user {
         _id
         username
@@ -488,8 +542,12 @@ Feed.fragments = {
         },
         updatedAt
       }
+      event {
+        ...EventView
+      }
     }
     ${commentFragment}
+    ${eventFragment}
   `,
 };
 
