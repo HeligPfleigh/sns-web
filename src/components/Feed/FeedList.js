@@ -5,7 +5,7 @@ import DeletePostModal from './DeletePostModal';
 import SharingPostModal from './SharingPostModal';
 import EditPostModal from './EditPostModal';
 import DiscardChangesPostModal from './DiscardChangesPostModal';
-import { PUBLIC, DELETE_POST_ACTION } from '../../constants';
+import { SHARE, PUBLIC, DELETE_POST_ACTION } from '../../constants';
 import { openAlertGlobal } from '../../reducers/alert';
 import Feed from './Feed';
 
@@ -15,6 +15,7 @@ class FeedList extends Component {
     super(props);
     this.state = {
       show: false,
+      shareType: SHARE,
       showSharingPost: false,
       showEditPost: false,
       showDiscardChangesPost: false,
@@ -27,7 +28,7 @@ class FeedList extends Component {
     };
   }
 
-  onClickModal = (evt, { privacyPost, message }) => {
+  onClickModal = (evt, { privacyPost, message, userId }) => {
     evt.preventDefault();
 
     const { idDeletedPost, idSharingPost } = this.state;
@@ -40,7 +41,7 @@ class FeedList extends Component {
 
     if (idSharingPost) {
       this.props
-      .sharingPost(idSharingPost, privacyPost, message)
+      .sharingPost(idSharingPost, privacyPost, message, userId)
       .then(() => {
         openAlertGlobalAction({
           message: 'Bạn đã chia sẽ được thành công trên dòng thời gian của bạn',
@@ -112,11 +113,12 @@ class FeedList extends Component {
     this.updateStateModal(true);
   }
 
-  sharingPostEvent = (idSharingPost, sharingFeed) => {
+  sharingPostEvent = (idSharingPost, sharingFeed, shareType) => {
     this.setState({
       showSharingPost: true,
       idSharingPost,
       sharingFeed,
+      shareType,
     });
   }
 
@@ -176,6 +178,8 @@ class FeedList extends Component {
           closeModal={this.closeModal}
           clickModal={this.onClickModal}
           sharingFeed={this.state.sharingFeed}
+          friends={userInfo.friends || []}
+          shareType={this.state.shareType}
         />
         <EditPostModal
           show={this.state.showEditPost}

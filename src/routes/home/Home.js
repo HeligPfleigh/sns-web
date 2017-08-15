@@ -35,6 +35,15 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
       firstName,
       lastName
     }
+    friends {
+      _id
+      fullName
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
   },
 }
 ${Feed.fragments.post}`;
@@ -367,11 +376,12 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: (postId, privacy, message) => mutate({
+      sharingPost: (postId, privacy, message, userId) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
           message,
+          userId,
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
