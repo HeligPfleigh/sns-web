@@ -47,7 +47,6 @@ export default function chat(state = initialState, action) {
         },
       };
     case CHAT_ACTIVE_CONVERSATION:
-      console.log(action.payload);
       return {
         ...state,
         newChat: {

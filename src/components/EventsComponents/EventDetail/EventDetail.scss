@@ -7,9 +7,10 @@
 }
 .divider {
   margin: 12px;
+  margin-top: -1px;
 }
 .titleLayout {
-  padding-bottom: 72px;
+  display: flex;
   .left {
     width: 120px;
     float: left;
@@ -22,6 +23,7 @@
     }
   }
   .right{
+    font-size: 12px !important;
     h4 {
       font-size: 20px;
       font-weight: normal;
@@ -95,7 +97,7 @@
 }
 
 .inviteLayout{
-  display: inline-block;
+  display: flex;
   width: 100%;
   padding-left: 12px;
   padding-top: 12px;
@@ -109,6 +111,7 @@
   }
   .btnInviteWrapper {
     float: right;
+    padding-top: 37px;
     div {
       display: table-cell;
       height: 70px;
@@ -142,4 +145,55 @@
 
 .description{
   padding: 12px;
+}
+
+.actionsButton {
+  float: right;
+  margin-right: 12px;
+  font-size: 12px;
+  padding-bottom: 20px;
+  button {
+    background-color: #f6f7f9;
+    i {
+    }
+    span {
+      font-weight: bold;
+      margin-left: 3px;
+    }
+  }
+  span {
+    button:nth-child(2){
+      border-right: 0px;
+      border-left: 0px;
+    }
+    button:nth-child(3){
+      border-right: 0px;
+    }
+    div {
+      button{
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-top-right-radius: 3px !important;
+        border-bottom-right-radius: 3px !important;
+      }
+    }
+  }
+  
+  .btnLeft {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  .btnMiddle {
+    border-radius: 0px;
+  }
+  .btnRight {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    button{
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+  }
 }

@@ -22,6 +22,8 @@ import {
   DELETE_POST_ACTION,
   EDIT_POST_ACTION,
   ONLY_ADMIN_BUILDING,
+  SHARE,
+  SHARE_FRIEND,
 } from '../../constants';
 import s from './Feed.scss';
 
@@ -79,7 +81,7 @@ class Feed extends Component {
     }
   }
 
-  onSelectShareButton = (event) => {
+  onSelectShareButton = (eventKey, event) => {
     event.preventDefault();
     const {
       data: {
@@ -88,7 +90,7 @@ class Feed extends Component {
       },
       sharingPostEvent = doNothing,
     } = this.props;
-    sharingPostEvent(_id, sharing || this.props.data);
+    sharingPostEvent(_id, sharing || this.props.data, eventKey || null);
   }
 
   render() {
@@ -132,17 +134,17 @@ class Feed extends Component {
                 </Link>
               }
 
-              { ((user && (user._id !== author._id)) || building) &&
+              { !sharing && ((user && (user._id !== author._id)) || building) &&
                 <span style={{ margin: '0 6px' }}>
                   <i className="fa fa-caret-right" aria-hidden="true"></i>
                 </span>
               }
 
-              { !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
+              { !sharing && !building && user && (user._id !== author._id) && <Link to={`/user/${user._id}`}>
                 <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
               </Link>
               }
-              { building && <Link to={`/building/${building._id}`}>
+              { !sharing && building && <Link to={`/building/${building._id}`}>
                 <strong>{building.name}</strong>
               </Link>
               }
@@ -151,12 +153,27 @@ class Feed extends Component {
           sharingPostTitle={
             <span>
               {sharing && author._id !== sharing.author._id &&
-                <Link to={`/user/${sharing.author._id}`}>
-                đã chia sẻ bài viết của <strong>{`${sharing.author.profile.firstName} ${sharing.author.profile.lastName}`}</strong>
-                </Link>
+                <span>
+                  đã chia sẻ bài viết của &nbsp;
+                  <Link to={`/user/${sharing.author._id}`}>
+                    <strong>{`${sharing.author.profile.firstName} ${sharing.author.profile.lastName}`}</strong>
+                  </Link>
+                </span>
               }
-              { sharing && author._id === sharing.author._id &&
-                <span>đã chia sẻ bài viết của mình</span>
+              { sharing && (author._id === sharing.author._id) &&
+                <span>
+                  { author._id !== user._id &&
+                    <span>
+                      đã chia sẻ bài viết với &nbsp;
+                      <Link to={`/user/${user._id}`}>
+                        <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+                      </Link>
+                    </span>
+                  }
+                  { author._id === user._id &&
+                    <span> đã chia sẻ bài viết của mình.</span>
+                  }
+                </span>
               }
             </span>
           }
@@ -213,7 +230,18 @@ class Feed extends Component {
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
           <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
-          <Icon onClick={this.onSelectShareButton} title="Chia sẻ" icons="fa fa-share fa-lg" />
+          { /* <Icon onClick={this.onSelectShareButton} title="Chia sẻ" icons="fa fa-share fa-lg" /> */ }
+          <Dropdown id={idRandom()}>
+            <CustomToggle bsRole="toggle">
+              <span title="Chia sẻ">
+                <i className="fa fa-share fa-lg" aria-hidden="true"></i> Chia sẻ
+              </span>
+            </CustomToggle>
+            <Dropdown.Menu onSelect={this.onSelectShareButton}>
+              <MenuItem eventKey={SHARE}>Chia sẻ...</MenuItem>
+              <MenuItem eventKey={SHARE_FRIEND}>Chia sẻ trên dòng thời gian của bạn bè</MenuItem>
+            </Dropdown.Menu>
+          </Dropdown>
         </PostActions>
         ) }
         { !sharingPostModalOpenned && (
@@ -487,8 +515,8 @@ Feed.mutation = {
     }
   }
   `,
-  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!, $message: String!) {
-    sharingPost(_id: $_id, privacy: $privacy, message: $message) {
+  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!, $message: String!, $userId: String) {
+    sharingPost(_id: $_id, privacy: $privacy, message: $message, userId: $userId) {
       ...PostView
     }
   }

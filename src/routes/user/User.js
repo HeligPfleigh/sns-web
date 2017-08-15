@@ -36,6 +36,15 @@ const usersPageQuery = gql`query usersPageQuery($_id: String!) {
       firstName
       lastName
     },
+    friends {
+      _id
+      fullName
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    },
   }
 }
 ${Feed.fragments.post}`;
@@ -137,13 +146,13 @@ export default compose(
   withStyles(s),
   graphql(usersPageQuery, {
     options: props => ({
-      variables: { 
+      variables: {
         _id: props.id,
         fetchPolicy: 'cache-and-network',
       },
     }),
     props: ({ data }) => {
-      if (!data) { 
+      if (!data) {
         return;
       }
       const { fetchMore } = data;
@@ -288,16 +297,15 @@ export default compose(
     }),
   }),
   graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate, ownProps }) => ({
-      sharingPost: (postId, privacy, message) => mutate({
+    props: ({ mutate }) => ({
+      sharingPost: (postId, privacy, message, userId) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
           message,
+          userId,
         },
       }),
-      update: (store, { data: { sharingPost } }) => {
-      },
     }),
   }),
   graphql(Feed.mutation.editPost, {
