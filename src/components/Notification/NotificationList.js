@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { generate as idRandom } from 'shortid';
 import NotificationItem from './NotificationItem';
 import s from './NotificationList.scss';
 
@@ -11,20 +12,17 @@ class NotificationList extends React.Component {
       }),
     ).isRequired,
     userInfo: PropTypes.object.isRequired,
-    isHeader: PropTypes.bool,
     updateIsRead: PropTypes.func.isRequired,
     hidePopup: PropTypes.func,
   };
 
   render() {
-    const { notifications, userInfo, isHeader, updateIsRead, hidePopup } = this.props;
-    const header = isHeader || false;
-
+    const { notifications, userInfo, updateIsRead, hidePopup } = this.props;
     return (
       <span>
         { notifications && notifications.map(item => (
           item.user && <NotificationItem
-            key={`notification-${header ? 'header' : 'page'}-${item._id}`}
+            key={idRandom()}
             data={item}
             userInfo={userInfo}
             updateIsRead={updateIsRead}
