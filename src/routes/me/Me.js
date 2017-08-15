@@ -40,6 +40,24 @@ const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: Str
       }
     }
   },
+  me {
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    },
+    friends {
+      _id
+      fullName
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    },
+  }
 }
 ${Feed.fragments.post}
 `;
@@ -87,6 +105,7 @@ class Me extends React.Component {
   render() {
     const {
       data: {
+        me: userInfo,
         resident,
         loading,
       },
@@ -138,7 +157,7 @@ class Me extends React.Component {
                   >
                     { me && me.posts && <FeedList
                       feeds={me.posts.edges}
-                      userInfo={me}
+                      userInfo={userInfo}
                       loadMoreComments={loadMoreComments}
                       createNewComment={createNewComment}
                       deletePost={deletePost}
@@ -180,14 +199,14 @@ class Me extends React.Component {
 Me.propTypes = {
   data: PropTypes.shape({
     me: PropTypes.shape({
-      posts: PropTypes.arrayOf(PropTypes.object).isRequired,
+      posts: PropTypes.arrayOf(PropTypes.object),
       profile: PropTypes.shape({
-        picture: PropTypes.string.isRequired,
-        firstName: PropTypes.string.isRequired,
-        lastName: PropTypes.string.isRequired,
-      }).isRequired,
+        picture: PropTypes.string,
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
+      }),
     }),
-  }).isRequired,
+  }),
   createNewComment: PropTypes.func.isRequired,
   createNewPost: PropTypes.func.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
@@ -401,11 +420,12 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ ownProps, mutate }) => ({
-      sharingPost: (postId, privacy, message) => mutate({
+      sharingPost: (postId, privacy, message, userId) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
           message,
+          userId,
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
