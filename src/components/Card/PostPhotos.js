@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image } from 'react-bootstrap';
-import Gallery from 'react-grid-gallery';
+import Gallery from './Gallery';
 import s from './PostPhotos.scss';
 
 class PostPhotos extends React.Component {
@@ -11,28 +11,21 @@ class PostPhotos extends React.Component {
     const imagesToView = images.map(image => ({
       src: image,
       thumbnail: image,
-      thumbnailWidth: 0,
-      thumbnailHeight: 0,
     }));
     return (
-      <div
-        className={s.listImage}
-      >
+      <div>
         {
-        images.length > 1 ? <Gallery
-          images={imagesToView}
-          enableLightbox
-          enableImageSelection={false}
-        /> :
-        <Image
-          style={{
-            margin: 'auto',
-          }}
-          src={images[0]}
-          responsive
-        />
-      }
-
+          images.length > 1 ? <Gallery
+            images={imagesToView}
+          /> :
+          <Image
+            style={{
+              margin: 'auto',
+            }}
+            src={images[0]}
+            responsive
+          />
+        }
       </div>
     );
   }
