@@ -95,7 +95,7 @@ class EventDetail extends React.Component {
         <Row>
           {
             event &&
-            <Col md={12}>
+            <Col md={12} style={{ display: 'initial' }}>
               <div className={s.titleLayout}>
                 <div className={s.left}>
                   <h5>{`THÁNG ${start.getMonth() + 1}`}</h5>
@@ -108,7 +108,9 @@ class EventDetail extends React.Component {
                   <h5>
                     {PRIVARY_TEXT[event.privacy]} - Tổ chức bởi <b>{`${event.author.profile.firstName} ${event.author.profile.lastName}`}</b>
                   </h5>
-                  {
+                </div>
+              </div>
+              {
                     user.id == event.author._id ? <div className={s.actionsButton}>
                       <span>
                         <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
@@ -148,8 +150,6 @@ class EventDetail extends React.Component {
                       </Button>
                     </div>
                   }
-                </div>
-              </div>
               <Col md={12}>
                 <Divider className={s.divider} />
                 <div className={s.timeLocationLayout}>
