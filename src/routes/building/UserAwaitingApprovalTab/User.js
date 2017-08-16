@@ -26,7 +26,9 @@ class User extends React.Component {
     const {
       edge: {
         user,
-        requestInformation,
+        requestInformation: {
+          apartments,
+        },
       },
     } = this.props;
     return (
@@ -37,9 +39,15 @@ class User extends React.Component {
         <Col xs={8} md={9}>
           <label className={s.fullName}>{`${user.profile.firstName} ${user.profile.lastName}`}</label>
           <div className={s.moreInfo}>
-            {/* { user.apartments.map(apartment => (
-              <div key={apartment._id}><small><i>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</i></small></div>
-            )) } */}
+            <div>
+              <small>
+                <i>Địa chỉ:
+                  Căn hộ { apartments.map(apartment => (
+                    <i> {apartment.name} </i>
+                  ))}
+                </i>
+              </small>
+            </div>
             <div><small><i>Số điện thoại: { user.phone ? user.phone.number : 'None' }</i></small></div>
             <div><small><i>Email: { user.emails ? user.emails.address : 'None' }</i></small></div>
           </div>
@@ -68,6 +76,7 @@ User.propTypes = {
   edge: PropTypes.shape({
     _id: PropTypes.string,
     user: PropTypes.object,
+    building: PropTypes.object,
     requestInformation: PropTypes.object,
   }).isRequired,
   onAccept: PropTypes.func.isRequired,

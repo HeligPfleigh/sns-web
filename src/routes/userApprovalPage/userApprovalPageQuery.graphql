@@ -22,6 +22,7 @@ query userApprovalPageQuery($requestId: String!) {
     }
     building {
       _id
+      name
       address {
         basisPoint
         province
@@ -31,8 +32,8 @@ query userApprovalPageQuery($requestId: String!) {
       }
     }
     requestInformation {
-      apartment {
-        number
+      apartments {
+        name
       }
     }
   }

@@ -73,9 +73,11 @@ class UserApprovalPage extends Component {
     const { data: { loading, requestsToJoinBuilding } } = this.props;
     let user = null;
     let building = null;
+    let requestInformation = null;
     if (!loading && requestsToJoinBuilding) {
       user = requestsToJoinBuilding.user;
       building = requestsToJoinBuilding.building;
+      requestInformation = requestsToJoinBuilding.requestInformation;
     }
     return (
       <div>
@@ -92,7 +94,7 @@ class UserApprovalPage extends Component {
                   Không tìm thấy thông tin yêu cầu xin vào tòa nhà
                 </h4>
               }
-              {requestsToJoinBuilding && user && building &&
+              {requestsToJoinBuilding && user && building && requestInformation &&
               <div>
                 <ul>
                   <li>
@@ -120,9 +122,11 @@ class UserApprovalPage extends Component {
                     </div>
                     <div className={s.pullRight}>
                       <span>
-                        {/* {requestsToJoinBuilding.requestInformation.apartment.number} */}
-                        {getAddress(building.address)}
+                        Căn hộ { requestInformation.apartments.map(apartment => (
+                          <span> {apartment.name}, </span>
+                        ))}
                       </span>
+                      Tòa nhà { building.name }
                     </div>
                   </li>
                   <li>

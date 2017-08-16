@@ -393,6 +393,7 @@ Feed.fragments = {
       }
       building {
         _id
+        name
         address {
           basisPoint
           province
@@ -402,8 +403,8 @@ Feed.fragments = {
         }
       }
       requestInformation {
-        apartment {
-          number
+        apartments {
+          name
         }
       }
     }
