@@ -103,15 +103,33 @@ class BuildingAnnouncementTab extends Component {
         </Panel>
         <BuildingAnnouncementList>
           {
-            building && building.announcements && building.announcements.edges.map(a =>
-              <BuildingAnnouncementItem
-                key={a._id}
-                data={a}
-                onDelete={this.deleteAnnouncement}
-                onEdit={this.editAnnouncement}
-                displayAction
-              />,
-            )
+            building && building.announcements && building.announcements.edges.map((a) => {
+              let newMessage = null;
+              const oldMessageLength = a.message.length;
+              if (oldMessageLength > 52) {
+                newMessage = a.message.slice(0, 51).concat('...');
+                return (
+                  <BuildingAnnouncementItem
+                    key={a._id}
+                    data={a}
+                    message={newMessage}
+                    onDelete={this.deleteAnnouncement}
+                    onEdit={this.editAnnouncement}
+                    displayAction
+                  />
+                );
+              }
+              return (
+                <BuildingAnnouncementItem
+                  key={a._id}
+                  data={a}
+                  message={a.message}
+                  onDelete={this.deleteAnnouncement}
+                  onEdit={this.editAnnouncement}
+                  displayAction
+                />
+              );
+            })
           }
         </BuildingAnnouncementList>
         <DeleteBuildingAnnouncementModal

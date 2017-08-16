@@ -20,17 +20,34 @@ class BuildingAnnouncement extends Component {
     return (
       <div>
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
-        <BuildingAnnouncementList>
-          <BuildingAnnouncementHeader />
-          {
-            !loading && building && building.announcements && building.announcements.edges.map(a =>
-              <BuildingAnnouncementItem
-                key={a._id}
-                data={a}
-              />,
-            )
-          }
-        </BuildingAnnouncementList>
+        {!loading && building &&
+          <BuildingAnnouncementList buildingId={building._id}>
+            <BuildingAnnouncementHeader />
+            {
+              building.announcements && building.announcements.edges.map((a) => {
+                let newMessage = null;
+                const oldMessageLength = a.message.length;
+                if (oldMessageLength > 21) {
+                  newMessage = a.message.slice(0, 20).concat('...');
+                  return (
+                    <BuildingAnnouncementItem
+                      key={a._id}
+                      data={a}
+                      message={newMessage}
+                    />
+                  );
+                }
+                return (
+                  <BuildingAnnouncementItem
+                    key={a._id}
+                    data={a}
+                    message={a.message}
+                  />
+                );
+              })
+            }
+          </BuildingAnnouncementList>
+        }
       </div>
     );
   }
