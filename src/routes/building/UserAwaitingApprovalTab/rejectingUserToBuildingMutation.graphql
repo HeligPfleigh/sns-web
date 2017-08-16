@@ -1,0 +1,9 @@
+mutation rejectingUserToBuildingMutation ($input: RejectingUserToBuildingInput!) {
+  rejectingUserToBuilding(input: $input) {
+    request {
+      _id
+      type
+      status
+    }
+  }
+}

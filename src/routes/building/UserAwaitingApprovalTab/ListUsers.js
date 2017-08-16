@@ -1,194 +1,104 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
+import React, { PropTypes } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
-import update from 'immutability-helper';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Panel, Image, Col, Row, Clearfix, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
-import * as _ from 'lodash';
+import { connect } from 'react-redux';
+import { graphql, compose } from 'react-apollo';
+import update from 'immutability-helper';
+import { Panel } from 'react-bootstrap';
 import classNames from 'classnames';
-
-import Errors from '../Errors';
-import UserDetail from './UserDetail';
+import User from './User';
+import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
+import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
+import { openAlertGlobal } from '../../../reducers/alert';
 import s from './UserAwaitingApproval.scss';
 
-class ListUsers extends Component {
-  /**
-   * 
-   * @param {*} props 
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      userDetail: {},
-      showModal: false,
-    };
-  }
+class ListUsers extends React.Component {
 
-  /**
-   * 
-   */
-  onCloseUserDetailModal() {
-    this.setState({
-      showModal: false,
-      userDetail: {},
+  acceptUser = (evt, requestsToJoinBuildingId) => {
+    evt.preventDefault();
+    const {
+      approvingUserToBuilding,
+      openAlertGlobalAction,
+    } = this.props;
+    approvingUserToBuilding(requestsToJoinBuildingId)
+    .then(() => {
+      openAlertGlobalAction({
+        message: 'Bạn đã xác nhận yêu cầu của user thành công',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
     });
   }
 
-  onOpenUserDetailModal(userDetail) {
-    return () => this.setState({
-      showModal: true,
-      userDetail,
+  rejectUser = (evt, requestsToJoinBuildingId) => {
+    evt.preventDefault();
+    const {
+      rejectingUserToBuilding,
+      openAlertGlobalAction,
+    } = this.props;
+    rejectingUserToBuilding(requestsToJoinBuildingId)
+    .then(() => {
+      openAlertGlobalAction({
+        message: 'Bạn đã hủy yêu cầu của user thành công',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
     });
   }
 
-  /**
-   * 
-   */
-  render() {
-    return (
-      <Panel header="Danh sách thành viên của tòa nhà" className={ s.usersAwaitingApproval }>
-        <Errors
-          open
-          message={ this.props.error }
-          autoHideDuration={ 4000 }
-        />
-        
-        <UserDetail 
-          show={ this.state.showModal }
-          closeModal={ this.onCloseUserDetailModal.bind(this) }
-          onCancel={ this.props.onCancel.bind(this) }
-          onAccept={ this.props.onAccept.bind(this) }
-          data={ this.state.userDetail }
-        />
-        { this.props.loading ? this.__renderLoadingIcon() : this.__renderListUsers() }
-      </Panel>
-    );
-  }
+  renderLoadingIcon = () => (
+    <div className={classNames(s.noRecordsFound, 'text-center')}>
+      <i className="fa fa-spinner fa-spin" aria-hidden="true"></i> Đang tải dữ liệu ...
+    </div>
+  )
 
-  /**
-   * 
-   */
-  __renderLoadingIcon() {
-    return (
-      <div className={ classNames(s.noRecordsFound, 'text-center') }>
-        <i className="fa fa-spinner fa-spin" aria-hidden="true"></i> Đang tải dữ liệu ...
-      </div>
-    );
-  }
+  renderNoRecordsFound = () => (
+    <div className={classNames(s.noRecordsFound, 'text-center')}>
+      Hiện tại chưa có yêu cầu từ cư dân của tòa nhà
+    </div>
+  )
 
-  /**
-   * 
-   */
-  __renderNoRecordsFound() {
-    return (
-      <div className={ classNames(s.noRecordsFound, 'text-center') }>
-        Hiện tại chưa có yêu cầu từ cư dân của tòa nhà
-      </div>
-    );
-  }
-
-  /**
-   * 
-   */
-  __renderListUsers() {
-    if (this.props.data.edges.length === 0) {
-      return this.__renderNoRecordsFound();
+  renderListUsers = () => {
+    const {
+      data: {
+        edges,
+        pageInfo: {
+          hasNextPage,
+        },
+      },
+      loadMore,
+    } = this.props;
+    if (edges.length === 0) {
+      return this.renderNoRecordsFound();
     }
-
-    const buildingID = this.props.building;
-    const users = [];
-    this.props.data.edges.forEach(obj => {      
-      if (!_.isArray(obj.building) || !_.isArray(obj.apartments) || (obj.building.length === 0) || (obj.apartments.length === 0)) {
-        return;
-      }
-
-      // Clone object
-      const user = _.clone(obj);
-
-      // Determine whether valid buildings belong to itself
-      user.buildings = user.building.filter(b => b._id === buildingID);
-      delete user.building;
-      
-      // Validate buidlings belongs to itself
-      if (_.isUndefined(user.buildings) || !_.isArray(user.buildings) || (user.buildings.length === 0)) {
-        return;
-      }
-
-      // Determine whether valid apartments belong to itself
-      user.apartments = user.apartments.filter(a => a.building._id === buildingID);
-
-      // Validate buidlings belongs to itself
-      if (_.isUndefined(user.apartments) || !_.isArray(user.apartments) || (user.apartments.length === 0)) {
-        return;
-      }
-
-      // Determine whether valid phones belong to itself
-      user.phones = (_.isUndefined(user.phone) || !_.isObject(user.phone) ? {} : user.phone);
-      delete user.phone;
-
-      // Determine whether valid emails belong to itself
-      user.emails = (_.isUndefined(user.emails) || !_.isObject(user.emails) ? {} : user.emails);
-
-      // Apply into valid users
-      users.push(user);
-    });
-
-    if (users.length === 0) {
-      return this.__renderNoRecordsFound();
-    }
-    
     return (
       <InfiniteScroll
-          loadMore={ this.props.loadMore }
-          hasMore={ this.props.data.pageInfo.hasNextPage }
-          loader={ this.__renderLoadingIcon() }
-        >
-        { users.map(user => {
-          return (
-            <Row className={ s.item } key={ Math.random() }>
-              <Col xs={4} md={3}>
-                <Image src={ user.profile.picture || '/avatar-default.jpg' } thumbnail responsive />
-              </Col>
-              <Col xs={8} md={9}>
-                <label className={ s.fullName }>{`${user.profile.firstName} ${user.profile.lastName}`}</label>
-                
-                <div className={ s.moreInfo }>
-                  { user.apartments.map(apartment => {
-                    return <div key={ apartment._id }><small><i>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</i></small></div>;
-                  }) }
-
-                  { user.phones.number && <div><small><i>Số điện thoại: { user.phones.number }</i></small></div> }
-                  
-                  { user.emails.address && <div><small><i>Email: { user.emails.address }</i></small></div> }
-                </div>
-
-                <ButtonToolbar>
-
-                  <Button title="Xem thông tin của thành viên" bsStyle="info" bsSize="xsmall" onClick={ this.onOpenUserDetailModal(user) }>
-                    <i className="fa fa-info-circle" /> Xem thông tin
-                  </Button>
-
-                  <ButtonGroup>
-
-                    <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" bsSize="xsmall" onClick={ this.props.onAccept(user) }>
-                      <i className="fa fa-check" /> Đồng ý
-                    </Button>
-
-                    <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="danger" bsSize="xsmall" onClick={ this.props.onCancel(user) }>
-                      <i className="fa fa-remove" /> Từ chối
-                    </Button>
-
-                  </ButtonGroup>
-
-                </ButtonToolbar>
-              </Col>
-              <Clearfix />
-            </Row>
-          )
-        } ) } 
+        loadMore={loadMore}
+        hasMore={hasNextPage}
+        loader={this.renderLoadingIcon()}
+      >
+        { edges.map(edge => (
+          <User
+            edge={edge}
+            onAccept={this.acceptUser}
+            onCancel={this.rejectUser}
+            key={Math.random()}
+          />
+        ))}
       </InfiniteScroll>
+    );
+  }
+
+  render() {
+    const { loading } = this.props;
+    return (
+      <Panel header="Danh sách thành viên của tòa nhà" className={s.usersAwaitingApproval}>
+        { loading ? this.renderLoadingIcon() : this.renderListUsers() }
+      </Panel>
     );
   }
 }
@@ -198,22 +108,117 @@ ListUsers.defaultProps = {
     edges: [],
     pageInfo: {
       hasNextPage: false,
-    }
-  }
+    },
+  },
 };
 
-ListUsers.PropTypes = {
+ListUsers.propTypes = {
   data: PropTypes.shape({
     edges: PropTypes.arrayOf(PropTypes.object),
     pageInfo: PropTypes.object,
   }).isRequired,
   loadMore: PropTypes.func.isRequired,
-  onAccept: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  error: PropTypes.object.isRequired,
-  building: PropTypes.string.isRequired,
-  error: PropTypes.string,
+  approvingUserToBuilding: PropTypes.func.isRequired,
+  rejectingUserToBuilding: PropTypes.func.isRequired,
+  openAlertGlobalAction: PropTypes.func.isRequired,
 };
 
-export default withStyles(s)(ListUsers);
+export default compose(
+  withStyles(s),
+  graphql(approvingUserToBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      approvingUserToBuilding: id => mutate({
+        variables: {
+          input: {
+            requestsToJoinBuildingId: id,
+          },
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          approvingUserToBuilding: {
+            __typename: 'ApprovingUserToBuildingPayload',
+            request: {
+              __typename: 'RequestsToJoinBuilding',
+              _id: id,
+              type: null,
+              status: null,
+            },
+          },
+        },
+        update: (store, { data: { approvingUserToBuilding } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+          });
+          const r = approvingUserToBuilding.request;
+          data = update(data, {
+            building: {
+              requests: {
+                edges: {
+                  $unset: [r._id],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+            data,
+          });
+        },
+      }),
+    }),
+  }),
+  graphql(rejectingUserToBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      rejectingUserToBuilding: id => mutate({
+        variables: {
+          input: {
+            requestsToJoinBuildingId: id,
+          },
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectingUserToBuilding: {
+            __typename: 'RejectingUserToBuildingPayload',
+            request: {
+              __typename: 'RequestsToJoinBuilding',
+              _id: id,
+              type: null,
+              status: null,
+            },
+          },
+        },
+        update: (store, { data: { rejectingUserToBuilding } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+          });
+          const r = rejectingUserToBuilding.request;
+          data = update(data, {
+            building: {
+              requests: {
+                edges: {
+                  $unset: [r._id],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+            data,
+          });
+        },
+      }),
+    }),
+  }),
+)(connect(
+  null,
+  { openAlertGlobalAction: openAlertGlobal },
+)(ListUsers));

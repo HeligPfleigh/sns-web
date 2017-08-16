@@ -1,7 +1,7 @@
 import ListUsers from './ListUsers';
-import UserDetail from './UserDetail';
+import User from './User';
 
 export {
   ListUsers as ListUsersAwaitingApproval,
-  UserDetail as UserDetailAwaitingApproval,
+  User,
 };

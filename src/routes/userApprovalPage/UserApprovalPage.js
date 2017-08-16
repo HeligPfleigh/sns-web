@@ -120,7 +120,7 @@ class UserApprovalPage extends Component {
                     </div>
                     <div className={s.pullRight}>
                       <span>
-                        {requestsToJoinBuilding.requestInformation.apartment.number}
+                        {/* {requestsToJoinBuilding.requestInformation.apartment.number} */}
                         {getAddress(building.address)}
                       </span>
                     </div>
