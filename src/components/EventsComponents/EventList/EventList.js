@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { graphql, compose } from 'react-apollo';
+import InfiniteScroll from 'react-infinite-scroller';
 import {
   Row,
   Col,
@@ -10,7 +11,7 @@ import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './EventList.scss';
 import EventItem from '../EventItem/EventItem';
-import InfiniteScroll from 'react-infinite-scroller';
+import interestEvent from './interestEvent.graphql';
 
 class EventList extends React.Component {
   constructor(props) {
@@ -33,6 +34,7 @@ class EventList extends React.Component {
         listEvent,
       },
       loadMoreRows,
+      user,
     } = this.props;
 
     let hasNextPage = false;
@@ -53,6 +55,8 @@ class EventList extends React.Component {
                 listEvent && listEvent.edges && listEvent.edges.map(event => (
                   <EventItem
                     event={event}
+                    user={user}
+                    interestEvent={this.props.interestEvent}
                   />
                 ))
               }
@@ -69,6 +73,8 @@ EventList.propTypes = {
     loading: PropTypes.bool.isRequired,
   }).isRequired,
   loadMoreRows: PropTypes.func.isRequired,
+  interestEvent: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 
@@ -93,8 +99,18 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
       start
       end
       message
+      isInterest
+      interests {
+        _id
+        username
+        profile {
+          picture
+          firstName
+          lastName
+        }
+      }
     }
-    pageInfo{
+    pageInfo {
     	hasNextPage
       total
       limit
@@ -105,6 +121,35 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
 
 export default compose(
   withStyles(s),
+  graphql(interestEvent, {
+    props: ({ mutate }) => ({
+      interestEvent: (eventId, newInterestList) => mutate({
+        variables: {
+          eventId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          interestEvent: {
+            __typename: 'Event',
+            interests: newInterestList,
+            isInterest: true,
+          },
+        },
+        update: (store, { interestEvent }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({ query: interestEvent });
+          data = update(data, {
+            event: {
+              isInterest: interestEvent.event.isInterest,
+              interests: interestEvent.event.interests,
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({ query: interestEvent, data });
+        },
+      }),
+    }),
+  }),
   graphql(listEventQuerys, {
     options: () => ({
       variables: {

@@ -9,8 +9,21 @@ import {
 } from 'react-bootstrap';
 
 class EventItem extends React.Component {
+
+  onInterestClicked = () => {
+    const { user, event } = this.props;
+    let newInterest = [];
+    newInterest = event.interests.slice();
+    newInterest.push({
+      _id: user._id,
+      username: user.username,
+      profile: user.profile,
+    });
+    this.props.interestEvent(event._id, newInterest);
+  }
+
   render() {
-    const { event } = this.props;
+    const { event, user } = this.props;
     const start = new Date(event.start);
     return (
       <Col
@@ -19,31 +32,82 @@ class EventItem extends React.Component {
           marginBottom: 10,
         }}
         md={6}
-        onClick={async () => {
-          history.push(`/events/${event._id}`);
-        }}
       >
         <div className={s.eventItem}>
           <div className={s.photo}>
             <Image
               src={event.photos[0]}
+              style={{
+                cursor: 'pointer',
+              }}
               responsive
+              onClick={async () => {
+                history.push(`/events/${event._id}`);
+              }}
             />
           </div>
           <div className={s.bottom}>
-            <div className={s.calendar}>
+            <div
+              className={s.calendar}
+              style={{
+                cursor: 'pointer',
+              }}
+              onClick={async () => {
+                history.push(`/events/${event._id}`);
+              }}
+            >
               <p className={s.month}>{`THÁNG ${start.getMonth() + 1}`}</p>
               <h5 className={s.day}>{start.getDate()}</h5>
             </div>
             <div className={s.contentSmall}>
-              <p className={s.title}>{event.name}</p>
-              <p className={s.location}>{event.location}</p>
-              <p className={s.care}>199 Người quan tâm</p>
+              <p
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={async () => {
+                  history.push(`/events/${event._id}`);
+                }}
+                className={s.title}
+              >{event.name}</p>
+              <p
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={async () => {
+                  history.push(`/events/${event._id}`);
+                }}
+                className={s.location}
+              >{event.location}</p>
+              <p
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={async () => {
+                  history.push(`/events/${event._id}`);
+                }}
+                className={s.care}
+              >{`${event.interests.length} Người quan tâm`}</p>
               <div className={s.wrapperButtonRight}>
-                <Button className={s.BtnCare}>
-                  <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
-                    Quan tâm
-                </Button>
+                {
+                  !event.isInterest && user.id !== event.author._id ?
+                    <Button
+                      className={s.BtnCare}
+                      onClick={this.onInterestClicked}
+                    >
+                      <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                      Quan tâm
+                    </Button> :
+                    <Button
+                      disabled
+                      className={s.BtnCare}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        height: 33,
+                      }}
+                    />
+                }
+
               </div>
             </div>
           </div>
@@ -55,6 +119,8 @@ class EventItem extends React.Component {
 
 EventItem.propTypes = {
   event: PropTypes.object.isRequired,
+  interestEvent: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 export default withStyles(s)(EventItem);

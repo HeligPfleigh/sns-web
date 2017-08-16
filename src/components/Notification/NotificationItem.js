@@ -18,6 +18,7 @@ import {
   ACCEPTED_JOIN_BUILDING,
   REJECTED_JOIN_BUILDING,
   SHARING_POST,
+  INTEREST_EVENT,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
@@ -51,6 +52,7 @@ const collectionNotifyMessages = {
   [EVENT_DELETED]: () => ' đã xóa sự kiện',
   [ACCEPTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã được chấp nhận tham gia vào tòa nhà' : ' được chấp nhận tham gia vào tòa nhà'),
   [REJECTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã bị từ chối tham gia vào tòa nhà' : ' bị từ chối tham gia vào tòa nhà'),
+  [INTEREST_EVENT]: () => ' vừa quan tâm sự kiện bạn tạo',
 };
 
 export const getNotifyContent = (currentUser, author, type, actors) => {

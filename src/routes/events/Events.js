@@ -1,11 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { graphql, compose } from 'react-apollo';
+import { connect } from 'react-redux';
+import { compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
-import gql from 'graphql-tag';
 import MediaQuery from 'react-responsive';
-import InfiniteScroll from 'react-infinite-scroller';
-import update from 'immutability-helper';
 import Loading from '../../components/Loading';
 import {
   EventList,
@@ -34,7 +32,9 @@ class Events extends Component {
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
-            <EventList />
+            <EventList
+              user={this.props.user}
+            />
           </Col>
         </Row>
       </Grid>
@@ -43,10 +43,13 @@ class Events extends Component {
 }
 
 Events.propTypes = {
-
+  user: PropTypes.object.isRequired,
 };
 
 export default compose(
+  connect(state => ({
+    user: state.user,
+  })),
   withStyles(s),
 )(Events);
 
