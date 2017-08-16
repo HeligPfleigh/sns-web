@@ -43,7 +43,7 @@ class User extends React.Component {
               <small>
                 <i>Địa chỉ:
                   Căn hộ { apartments.map(apartment => (
-                    <i> {apartment.name} </i>
+                    <i key={Math.random()}> {apartment.name} </i>
                   ))}
                 </i>
               </small>
