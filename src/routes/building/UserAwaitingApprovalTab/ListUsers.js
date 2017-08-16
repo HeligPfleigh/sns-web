@@ -10,9 +10,17 @@ import User from './User';
 import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
 import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
 import { openAlertGlobal } from '../../../reducers/alert';
+import Errors from '../Errors';
 import s from './UserAwaitingApproval.scss';
 
 class ListUsers extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      errorMessage: '',
+    };
+  }
 
   acceptUser = (evt, requestsToJoinBuildingId) => {
     evt.preventDefault();
@@ -28,7 +36,9 @@ class ListUsers extends React.Component {
         autoHideDuration: 0,
       });
     }).catch((error) => {
-      console.log('there was an error sending the query', error);
+      this.setState({
+        errorMessage: error.message,
+      });
     });
   }
 
@@ -46,7 +56,9 @@ class ListUsers extends React.Component {
         autoHideDuration: 0,
       });
     }).catch((error) => {
-      console.log('there was an error sending the query', error);
+      this.setState({
+        errorMessage: error.message,
+      });
     });
   }
 
@@ -97,6 +109,11 @@ class ListUsers extends React.Component {
     const { loading } = this.props;
     return (
       <Panel header="Danh sách thành viên của tòa nhà" className={s.usersAwaitingApproval}>
+        <Errors
+          open
+          message={this.state.errorMessage}
+          autoHideDuration={4000}
+        />
         { loading ? this.renderLoadingIcon() : this.renderListUsers() }
       </Panel>
     );
