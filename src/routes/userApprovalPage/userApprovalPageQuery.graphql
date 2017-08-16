@@ -31,10 +31,6 @@ query userApprovalPageQuery($requestId: String!) {
         street
       }
     }
-    requestInformation {
-      apartments {
-        name
-      }
-    }
+    requestInformation
   }
 }

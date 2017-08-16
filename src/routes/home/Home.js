@@ -16,6 +16,7 @@ import FeedList, { Feed } from '../../components/Feed';
 import ChatSideBar from '../ChatSideBar';
 import { PUBLIC } from '../../constants';
 import s from './Home.scss';
+import Loading from '../../components/Loading';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
@@ -81,8 +82,13 @@ class Home extends Component {
       sharingPost,
     } = this.props;
 
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     let hasNextPage = false;
-    if (!loading && feeds && feeds.pageInfo) {
+    if (feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
 
@@ -251,13 +257,27 @@ export default compose(
   }),
   graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes) => mutate({
+      likePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
             __typename: 'Post',
             _id: postId,
+            message,
+            type: null,
+            user: null,
+            author: null,
+            building: null,
+            sharing: null,
+            event: null,
+            privacy: null,
+            photos: null,
+            comments: [],
+            createdAt: (new Date()).toString(),
+            totalLikes: totalLikes + 1,
+            totalComments,
+            isLiked: true,
           },
         },
         updateQueries: {
@@ -290,6 +310,16 @@ export default compose(
             __typename: 'Post',
             _id: postId,
             message,
+            type: null,
+            user: null,
+            author: null,
+            building: null,
+            sharing: null,
+            event: null,
+            privacy: null,
+            photos: null,
+            comments: [],
+            createdAt: (new Date()).toString(),
             totalLikes: totalLikes - 1,
             totalComments,
             isLiked: false,

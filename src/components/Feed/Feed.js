@@ -245,7 +245,7 @@ class Feed extends Component {
               </div>
             </div>
             <div className={classnames('col-xs-10', s.description)}>
-              <div className={s.name}><span className={s.maxWith}>{event.name} {event.name} {event.name} {event.name}</span></div>
+              <div className={s.name}><span className={s.maxWith}>{event.name}</span></div>
               <div className={s.location}>
                 <div className={s.maxWith}>
                   <span className="time">{moment(event.start).format('h:mm A')}</span>
@@ -412,7 +412,7 @@ const commentFragment = gql`fragment CommentView on Comment {
   }
 `;
 
-const eventFragment = gql`fragment EventView on Event {
+const eventFragment = gql`fragment EventDetails on Event {
     name
     location
     start
@@ -583,7 +583,7 @@ Feed.fragments = {
         updatedAt
       }
       event {
-        ...EventView
+        ...EventDetails
       }
     }
     ${commentFragment}

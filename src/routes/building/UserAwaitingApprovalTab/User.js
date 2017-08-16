@@ -34,7 +34,7 @@ class User extends React.Component {
     return (
       <Row className={s.item}>
         <Col xs={4} md={3}>
-          <Image src={user.profile.picture || '/avatar-default.jpg'} thumbnail responsive />
+          <Image src={user.profile.picture || 'avatar-default.jpg'} thumbnail responsive />
         </Col>
         <Col xs={8} md={9}>
           <label className={s.fullName}>{`${user.profile.firstName} ${user.profile.lastName}`}</label>

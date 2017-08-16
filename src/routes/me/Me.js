@@ -17,17 +17,11 @@ import { Feed } from '../../components/Feed';
 import FeedList from './FeedList';
 import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './Me.scss';
+import Loading from '../../components/Loading';
 
 const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
   resident(_id: $_id) {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName,
-      gender
-    }
+    _id
     posts (cursor: $cursor) {
       pageInfo {
         endCursor
@@ -39,7 +33,7 @@ const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: Str
         ...PostView
       }
     }
-  },
+  }
   me {
     _id
     username
@@ -47,7 +41,8 @@ const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: Str
       picture
       firstName
       lastName
-    },
+      gender
+    }
     friends {
       _id
       fullName
@@ -55,8 +50,9 @@ const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: Str
         picture
         firstName
         lastName
+        gender
       }
-    },
+    }
   }
 }
 ${Feed.fragments.post}
@@ -64,6 +60,7 @@ ${Feed.fragments.post}
 
 const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: String!, $cursor: String) {
   resident(_id: $_id) {
+    _id
     posts (cursor: $cursor) {
       pageInfo {
         endCursor
@@ -75,7 +72,7 @@ const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: Str
         ...PostView
       }
     }
-  },
+  }
 }
 ${Feed.fragments.post}
 `;
@@ -105,7 +102,7 @@ class Me extends React.Component {
   render() {
     const {
       data: {
-        me: userInfo,
+        me,
         resident,
         loading,
       },
@@ -117,19 +114,26 @@ class Me extends React.Component {
       deletePost,
       sharingPost,
     } = this.props;
-    const me = resident;
-    const avatar = (me && me.profile && me.profile.picture) || '';
-    const profile = me && me.profile;
 
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
+    const profile = me && me.profile;
+    const avatar = profile ? profile.picture : '';
     const numbers = 100;
+
     let tab = MY_TIME_LINE;
     if (query.tab) {
       tab = MY_INFO;
     }
+
     let hasNextPage = false;
-    if (!loading && me && me.posts && me.posts.pageInfo) {
-      hasNextPage = me.posts.pageInfo.hasNextPage;
+    if (resident && resident.posts && resident.posts.pageInfo) {
+      hasNextPage = resident.posts.pageInfo.hasNextPage;
     }
+
     return (
       <Grid className={s.margintop30}>
         <Row>
@@ -155,9 +159,9 @@ class Me extends React.Component {
                     hasMore={hasNextPage}
                     loader={<div className="loader">Loading ...</div>}
                   >
-                    { me && me.posts && <FeedList
-                      feeds={me.posts.edges}
-                      userInfo={userInfo}
+                    <FeedList
+                      feeds={resident.posts.edges}
+                      userInfo={me}
                       loadMoreComments={loadMoreComments}
                       createNewComment={createNewComment}
                       deletePost={deletePost}
@@ -169,7 +173,7 @@ class Me extends React.Component {
                         cursor: null,
                       }}
                       updatePost={this.updatePostInList}
-                    />}
+                    />
                   </InfiniteScroll>
 
                 </div>
@@ -229,12 +233,11 @@ export default compose(
       variables: {
         _id: ownProps.user.id,
         cursor: null,
-        fetchPolicy: 'cache-and-network',
       },
     }),
     props: ({ ownProps, data }) => {
       if (!data) {
-        return;
+        return null;
       }
 
       const { fetchMore } = data;
@@ -301,20 +304,12 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: ownProps.data.resident._id,
-              username: ownProps.data.resident.username,
-              profile: ownProps.data.resident.profile,
-            },
-            author: {
-              __typename: 'UserSchemas',
-              _id: ownProps.data.resident._id,
-              username: ownProps.data.resident.username,
-              profile: ownProps.data.resident.profile,
-            },
+            type: null,
+            user: null,
+            author: null,
             building: null,
             sharing: null,
+            event: null,
             privacy,
             photos,
             comments: [],
