@@ -26,6 +26,7 @@ class User extends React.Component {
     const {
       edge: {
         user,
+        requestInformation,
       },
     } = this.props;
     return (
@@ -39,8 +40,8 @@ class User extends React.Component {
             {/* { user.apartments.map(apartment => (
               <div key={apartment._id}><small><i>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</i></small></div>
             )) } */}
-            { user.phone && user.phone.number && <div><small><i>Số điện thoại: { user.phone.number }</i></small></div> }
-            { user.emails && user.emails.address && <div><small><i>Email: { user.emails.address }</i></small></div> }
+            <div><small><i>Số điện thoại: { user.phone ? user.phone.number : 'None' }</i></small></div>
+            <div><small><i>Email: { user.emails ? user.emails.address : 'None' }</i></small></div>
           </div>
 
           <ButtonToolbar>
