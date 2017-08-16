@@ -123,7 +123,7 @@ class UserApprovalPage extends Component {
                     <div className={s.pullRight}>
                       <span>
                         Căn hộ { requestInformation.apartments.map(apartment => (
-                          <span> {apartment.name}, </span>
+                          <span key={Math.random()}> {apartment.name}, </span>
                         ))}
                       </span>
                       Tòa nhà { building.name }
