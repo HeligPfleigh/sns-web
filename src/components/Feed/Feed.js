@@ -370,37 +370,42 @@ const commentFragment = gql`fragment CommentView on Comment {
 Feed.fragments = {
   comment: commentFragment,
   requests: gql`
-    fragment UsersAwaitingApproval on Friend {
+    fragment UsersAwaitingApproval on RequestsToJoinBuilding {
       _id
-      username
-      phone {
-        number
-        verified
-      }
-      emails {
-        address
-        verified
-      }
-      profile {
-        picture
-        firstName
-        lastName
-        gender
-      }
-      apartments {
+      type
+      status
+      user {
         _id
-        number
-        isOwner
-        building {
-          _id
-          name
-          isAdmin
+        emails {
+          address
+          verified
+        }
+        phone {
+          number
+          verified
+        }
+        profile {
+          picture
+          firstName
+          lastName
+          gender
         }
       }
       building {
         _id
         name
-        isAdmin
+        address {
+          basisPoint
+          province
+          district
+          ward
+          street
+        }
+      }
+      requestInformation {
+        apartments {
+          name
+        }
       }
     }
   `,

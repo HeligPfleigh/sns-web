@@ -1,0 +1,9 @@
+mutation approvingUserToBuildingMutation ($input: ApprovingUserToBuildingInput!) {
+  approvingUserToBuilding(input: $input) {
+    request {
+      _id
+      type
+      status
+    }
+  }
+}
