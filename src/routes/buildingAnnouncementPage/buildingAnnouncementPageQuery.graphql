@@ -1,0 +1,19 @@
+query buildingAnnouncementPageQuery ($buildingId: String!) {
+  building (_id : $buildingId) {
+    _id
+    announcements (skip: 0, limit: 1000) {
+      pageInfo {
+        skip
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        _id
+        message
+        date
+        type
+      }
+    }
+  }
+}
