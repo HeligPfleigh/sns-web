@@ -140,7 +140,6 @@ class Navigation extends React.Component {
     } = this.props;
 
     const { isOpen, isOpenGroup } = this.state;
-
     let hasNextPage = false;
     if (!loading && pageInfo) {
       hasNextPage = pageInfo.hasNextPage;
@@ -250,6 +249,7 @@ class Navigation extends React.Component {
               <MenuItem header className={s.headerItem}>Thông báo</MenuItem>
               <div className={s.boxNotificationList}>
                 <InfiniteScroll
+                  height={300}
                   next={loadMoreRows}
                   hasMore={hasNextPage}
                   scrollThreshold={0.7}

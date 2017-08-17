@@ -33,18 +33,24 @@ class BuildingAnnouncementItem extends Component {
   }
 
   render() {
-    const { data, displayAction } = this.props;
-
+    const {
+      data: {
+        type,
+        date,
+      },
+      message,
+      displayAction,
+    } = this.props;
     return (
       <li>
         <div className={s.buildingAnnouncementItem}>
           <div className={s.buildingAnnouncementIcon}>
-            <i className="fa fa-bullhorn fa-2x" style={{ backgroundColor: `${data.type === TYPE1 ? '#006400' : '#FF8C00'}` }} aria-hidden="true"></i>
+            <i className="fa fa-bullhorn fa-2x" style={{ backgroundColor: `${type === TYPE1 ? '#006400' : '#FF8C00'}` }} aria-hidden="true"></i>
           </div>
           <div className={s.buildingAnnouncementInfo}>
-            <strong>{data.message}</strong>
+            <strong>{message}</strong>
             <br />
-            <small>{moment(data.date).format('HH:mm DD/MM/YYYY')}</small>
+            <small>{moment(date).format('HH:mm DD/MM/YYYY')}</small>
           </div>
           { displayAction && <div className={s.buildingAnnouncementButtons}>
             <Button
@@ -65,6 +71,7 @@ class BuildingAnnouncementItem extends Component {
 
 BuildingAnnouncementItem.propTypes = {
   data: PropTypes.object,
+  message: PropTypes.string,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   displayAction: PropTypes.bool,

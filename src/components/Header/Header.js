@@ -237,13 +237,13 @@ export default compose(
           cursor: data.notifications.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
           return update(previousResult, {
             notifications: {
               edges: {
-                $unshift: fetchMoreResult.notifications.edges,
+                $push: fetchMoreResult.notifications.edges,
               },
               pageInfo: {
                 $set: fetchMoreResult.notifications.pageInfo,
