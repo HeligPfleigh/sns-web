@@ -17,22 +17,24 @@ class BuildingAnnouncementPage extends React.Component {
       },
     } = this.props;
     return (
-      <Grid>
-        {loading && <div> Đang tải dữ liệu...</div>}
-        <Row>
-          <Col md={8} sm={12} xs={12} style={{ listStyle: 'none' }}>
-            {
-              !loading && building && building.announcements && building.announcements.edges.map(a => (
-                <BuildingAnnouncementItem
-                  key={a._id}
-                  data={a}
-                  message={a.message}
-                />
-              ))
-            }
-          </Col>
-        </Row>
-      </Grid>
+      <div className={s.containerTop30}>
+        <Grid>
+          {loading && <div> Đang tải dữ liệu...</div>}
+          <Row>
+            <Col md={8} sm={12} xs={12} style={{ listStyle: 'none' }}>
+              {
+                !loading && building && building.announcements && building.announcements.edges.map(a => (
+                  <BuildingAnnouncementItem
+                    key={a._id}
+                    data={a}
+                    message={a.message}
+                  />
+                ))
+              }
+            </Col>
+          </Row>
+        </Grid>
+      </div>
     );
   }
 }
