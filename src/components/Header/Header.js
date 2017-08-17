@@ -240,10 +240,11 @@ export default compose(
           if (!fetchMoreResult) { 
             return;
           }
+          console.log(fetchMoreResult.notifications.edges);
           return update(previousResult, {
             notifications: {
               edges: {
-                $unshift: fetchMoreResult.notifications.edges,
+                $push: fetchMoreResult.notifications.edges,
               },
               pageInfo: {
                 $set: fetchMoreResult.notifications.pageInfo,
