@@ -101,7 +101,7 @@ class BuildingAnnouncementTab extends Component {
             }}
           />
         </Panel>
-        <BuildingAnnouncementList>
+        <BuildingAnnouncementList buildingId={building._id}>
           {
             building && building.announcements && building.announcements.edges.map((a) => {
               let newMessage = null;
