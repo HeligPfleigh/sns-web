@@ -407,7 +407,6 @@ CreateEventModal.fragments = {
     fragment EventView on Event{
       _id
       privacy
-      isDeleted
       author {
         _id
         username

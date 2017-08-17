@@ -15,7 +15,7 @@ class Layout extends Component {
   render() {
     return (
       <StickyContainer>
-        <Sticky className="navbar-static-top">
+        <Sticky className="navbar navbar-default navbar-static-top">
           <Header />
         </Sticky>
 

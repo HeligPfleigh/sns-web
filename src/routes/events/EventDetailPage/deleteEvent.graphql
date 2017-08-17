@@ -2,7 +2,6 @@ mutation deleteEvent($eventId: String!){
   deleteEvent(eventId: $eventId){
     _id
     privacy
-    isDeleted
     author {
        _id
       username
@@ -51,6 +50,5 @@ mutation deleteEvent($eventId: String!){
     }
     createdAt
     updatedAt
-    isAuthor
   }
 }

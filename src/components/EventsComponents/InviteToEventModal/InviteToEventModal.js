@@ -62,6 +62,7 @@ class InviteToEventModal extends React.Component {
               {
                 friends.map(friend => (
                   <table
+                    key={Math.random()}
                     style={{
                       cursor: 'pointer',
                     }}

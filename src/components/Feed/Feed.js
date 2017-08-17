@@ -256,7 +256,7 @@ class Feed extends Component {
                   <Button type="button" className={s.btnOverride}><i className="fa fa-star" /> Quan tâm</Button>
                 </div>
               </div>
-              <div className={s.stats}>183 people interested · 77 people going</div>
+              <div className={s.stats}>{`${event.joins.length} người sẽ tham gia · ${event.can_joins.length} người có thể tham gia`}</div>
             </div>
           </div>
           <Clearfix />
@@ -412,53 +412,93 @@ const commentFragment = gql`fragment CommentView on Comment {
   }
 `;
 
-const eventFragment = gql`fragment EventView on PostEvent {
+const eventFragment = gql`fragment EventView on Event {
     name
     location
     start
     end
+    invites {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    joins {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    can_joins {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    cant_joins {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    interests {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    isAuthor
   }
 `;
 
 Feed.fragments = {
   comment: commentFragment,
   requests: gql`
-    fragment UsersAwaitingApproval on RequestsToJoinBuilding {
+    fragment UsersAwaitingApproval on Friend {
       _id
-      type
-      status
-      user {
+      emails {
+        address
+        verified
+      }
+      phone {
+        number
+        verified
+      }
+      profile {
+        picture
+        firstName
+        lastName
+        gender
+      }
+      apartments {
         _id
-        emails {
-          address
-          verified
-        }
-        phone {
-          number
-          verified
-        }
-        profile {
-          picture
-          firstName
-          lastName
-          gender
+        number
+        isOwner
+        building {
+          _id
+          name
+          isAdmin
         }
       }
       building {
         _id
         name
-        address {
-          basisPoint
-          province
-          district
-          ward
-          street
-        }
-      }
-      requestInformation {
-        apartments {
-          name
-        }
+        isAdmin
       }
     }
   `,

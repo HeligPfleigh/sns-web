@@ -3,9 +3,9 @@ import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
-import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
+import * as _ from 'lodash';
 import Loading from '../../../components/Loading';
 import getFriendsQuery from '../../ChatSideBar/getFriendsQuery.graphql';
 import inviteResidentsJoinEvent from './inviteResidentsJoinEvent.graphql';
@@ -13,69 +13,13 @@ import joinEvent from './joinEvent.graphql';
 import canJoinEvent from './canJoinEvent.graphql';
 import cantJoinEvent from './cantJoinEvent.graphql';
 import deleteEvent from './deleteEvent.graphql';
+import fetchEventDetails from './fetchEventDetails.graphql';
 import {
   EventMenu,
   EventDetail,
   InviteToEventModal,
 } from '../../../components/EventsComponents';
 import s from './EventDetailPage.scss';
-
-const eventDetailQuery = gql`query eventDetailQuery ($eventId: String!) {
-  event (_id: $eventId) {
-    _id
-    privacy
-    isDeleted
-    author {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    building {
-      _id
-      name
-    }
-    photos
-    name
-    location
-    start
-    end
-    message
-    invites {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    joins {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    interests {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    createdAt
-    updatedAt
-    isAuthor
-  }
-}`;
 
 class EventDetailPage extends Component {
   state= {
@@ -108,14 +52,27 @@ class EventDetailPage extends Component {
   }
 
   render() {
-    const { loading } = this.state;
-    const { data, friends } = this.props;
+    const { data: {
+      loading,
+      event,
+    }, friends } = this.props;
+
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
+    // Hide all invited users.
+    const joiners = [];
+    _.concat(event.joins, event.can_joins, event.cant_joins).forEach(u => joiners.push(u._id));
+    const validFriends = friends.filter(f => joiners.indexOf(f._id) === -1);
+
     return (
       <div>
         <InviteToEventModal
           show={this.state.showModalInvite}
-          friends={friends}
-          invites={data.event ? data.event.invites : []}
+          friends={validFriends}
+          invites={event ? event.invites : []}
           closeModal={this.closeModal}
           onSendInviteClicked={this.onSendInviteClicked}
         />
@@ -132,7 +89,7 @@ class EventDetailPage extends Component {
             <Col md={9} sm={12} xs={12}>
               <EventDetail
                 onOpenInviteModal={this.onOpenInviteModal}
-                event={data.event}
+                event={event}
                 user={this.props.user}
                 joinEvent={this.props.joinEvent}
                 canJoinEvent={this.props.canJoinEvent}
@@ -153,6 +110,8 @@ EventDetailPage.propTypes = {
       _id: PropTypes.string,
       interests: PropTypes.array,
       joins: PropTypes.array,
+      can_joins: PropTypes.array,
+      cant_joins: PropTypes.array,
       invites: PropTypes.array,
     }),
     loading: PropTypes.bool.isRequired,
@@ -171,7 +130,7 @@ export default compose(
   connect(state => ({
     user: state.user,
   })),
-  graphql(eventDetailQuery, {
+  graphql(fetchEventDetails, {
     options: props => ({
       variables: {
         eventId: props.eventId,
@@ -208,22 +167,14 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           joinEvent: {
+            _id: eventId,
             __typename: 'Event',
             invites: newInvitesList,
             joins: newJoinList,
+            can_joins: [],
+            cant_joins: [],
+            interests: [],
           },
-        },
-        update: (store, { joinEvent }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: joinEvent });
-          data = update(data, {
-            event: {
-              invites: joinEvent.event.invites,
-              joins: joinEvent.event.joins,
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: joinEvent, data });
         },
       }),
     }),
@@ -237,22 +188,14 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           canJoinEvent: {
+            _id: eventId,
             __typename: 'Event',
             invites: newInvitesList,
-            joins: newJoinList,
+            joins: [],
+            can_joins: newJoinList,
+            cant_joins: [],
+            interests: [],
           },
-        },
-        update: (store, { canJoinEvent }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: canJoinEvent });
-          data = update(data, {
-            event: {
-              invites: canJoinEvent.event.invites,
-              joins: canJoinEvent.event.joins,
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: canJoinEvent, data });
         },
       }),
     }),
@@ -266,56 +209,24 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           cantJoinEvent: {
+            _id: eventId,
             __typename: 'Event',
             invites: newInvitesList,
-            joins: newJoinList,
+            joins: [],
+            can_joins: [],
+            cant_joins: newJoinList,
+            interests: [],
           },
-        },
-        update: (store, { cantJoinEvent }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: cantJoinEvent });
-          data = update(data, {
-            event: {
-              invites: cantJoinEvent.event.invites,
-              joins: cantJoinEvent.event.joins,
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: cantJoinEvent, data });
         },
       }),
     }),
   }),
   graphql(inviteResidentsJoinEvent, {
-    props: ({ mutate, ownProps: { friends } }) => ({
+    props: ({ mutate }) => ({
       inviteResidentsJoinEvent: (eventId, residentsId) => mutate({
         variables: {
           eventId,
           residentsId,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          inviteResidentsJoinEvent: {
-            __typename: 'Event',
-            invites: residentsId.map((id) => {
-              friends.forEach((friend) => {
-                if (friend._id === id) {
-                  return friend;
-                }
-              });
-            }),
-          },
-        },
-        update: (store, { inviteResidentsJoinEvent }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: inviteResidentsJoinEvent });
-          data = update(data, {
-            event: {
-              invites: inviteResidentsJoinEvent.event.invites,
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: inviteResidentsJoinEvent, data });
         },
       }),
     }),

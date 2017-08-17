@@ -9,8 +9,10 @@ import update from 'immutability-helper';
 import throttle from 'lodash/throttle';
 import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
 import s from './EventList.scss';
 import EventItem from '../EventItem/EventItem';
+import Loading from '../../../components/Loading';
 import interestEvent from './interestEvent.graphql';
 
 class EventList extends React.Component {
@@ -37,10 +39,16 @@ class EventList extends React.Component {
       user,
     } = this.props;
 
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     let hasNextPage = false;
-    if (!loading && listEvent && listEvent.pageInfo) {
+    if (listEvent.pageInfo) {
       hasNextPage = listEvent.pageInfo.hasNextPage;
     }
+
     return (
       <div className={s.eventContentList}>
         <h4>Dòng sự kiện</h4>
@@ -51,15 +59,12 @@ class EventList extends React.Component {
               hasMore={hasNextPage}
               loader={<div className="loader">Đang tải ...</div>}
             >
-              {
-                listEvent && listEvent.edges && listEvent.edges.map(event => (
-                  <EventItem
-                    event={event}
-                    user={user}
-                    interestEvent={this.props.interestEvent}
-                  />
-                ))
-              }
+              { listEvent.edges.map(event => <EventItem
+                key={Math.random()}
+                event={event}
+                user={user}
+                interestEvent={this.props.interestEvent}
+              />) }
             </InfiniteScroll>
           </Col>
         </Row>
@@ -83,7 +88,6 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
     edges {
       _id
       privacy
-      isDeleted
       author {
         _id
         username
@@ -111,11 +115,11 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
       }
     }
     pageInfo {
-    	hasNextPage
+      hasNextPage
       total
       limit
       endCursor
-  	}
+    }
   }
 }`;
 
@@ -135,17 +139,17 @@ export default compose(
             isInterest: true,
           },
         },
-        update: (store, { interestEvent }) => {
+        update: (store, { data: { interestEvent: query } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({ query: interestEvent });
+          let data = store.readQuery({ query });
           data = update(data, {
             event: {
-              isInterest: interestEvent.event.isInterest,
-              interests: interestEvent.event.interests,
+              isInterest: query.event.isInterest,
+              interests: query.event.interests,
             },
           });
           // Write our data back to the cache.
-          store.writeQuery({ query: interestEvent, data });
+          store.writeQuery({ query, data });
         },
       }),
     }),
