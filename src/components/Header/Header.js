@@ -237,10 +237,9 @@ export default compose(
           cursor: data.notifications.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) { 
+          if (!fetchMoreResult) {
             return;
           }
-          console.log(fetchMoreResult.notifications.edges);
           return update(previousResult, {
             notifications: {
               edges: {
