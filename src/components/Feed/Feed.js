@@ -150,7 +150,7 @@ class Feed extends Component {
     } = this.props;
     const IS_POST_TYPE_STATUS = type === POST_TYPE_STATUS;
     const IS_POST_TYPE_EVENT = type === POST_TYPE_EVENT;
-    const isInterested = IS_POST_TYPE_EVENT && _.isArray(event.interests) && event.interests.filter(u => u._id === userInfo._id).length > 0;
+    const isInterested = (IS_POST_TYPE_EVENT && _.isArray(event.interests) && event.interests.filter(u => u._id === userInfo._id).length > 0) || this.state.isInterested;
 
     return (
       <Post>
