@@ -6,8 +6,7 @@ export default function createApolloClient(options) {
   const networkInterface = createNetworkInterface({
     uri: config.server.graphql,
     opts: {
-      // credentials: 'same-origin',
-      credentials: 'include',
+      credentials: process.env.BROWSER_IP ? 'include' : 'same-origin',
     },
   });
 

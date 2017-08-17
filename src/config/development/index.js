@@ -8,10 +8,6 @@ export const analytics = {
 
 };
 
-// server run dev config
-// const serverIp = 'http://server:3005';
-// const browserIp = 'http://api-sns.mttjsc.com';
-
 // local run dev config
 const serverIp = process.env.APP_IP || 'http://localhost:3005';
 const browserIp = 'http://localhost:3005';
