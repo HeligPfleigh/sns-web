@@ -5,8 +5,7 @@ import config from '../../config';
 const networkInterface = createNetworkInterface({
   uri: config.server.graphqlBrowser,
   opts: {
-    // credentials: 'same-origin',
-    credentials: 'include',
+    credentials: process.env.BROWSER_IP ? 'include' : 'same-origin',
   },
 });
 
