@@ -7,10 +7,14 @@ export const analytics = {
 
 };
 
-// local run production config
 const serverIp = process.env.APP_IP || 'http://server:8081';
-const ipBrowser = process.env.BROWSER_IP || 'http://localhost:8081';
 const authPath = process.env.APP_AUTH_PATH || '/auth';
+
+// local run local production config
+// const ipBrowser = process.env.BROWSER_IP || 'http://localhost:8081';
+
+// local run server production config
+const ipBrowser = process.env.BROWSER_IP || 'http://api-sns.mttjsc.com';
 
 export const server = {
   // internal url

@@ -1,12 +1,13 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import isEmpty from 'lodash/isEmpty';
+import includes from 'lodash/includes';
 import config from '../../config';
 
 export default function createApolloClient(options) {
   const networkInterface = createNetworkInterface({
     uri: config.server.graphql,
     opts: {
-      credentials: process.env.BROWSER_IP ? 'include' : 'same-origin',
+      credentials: includes(config.server.graphqlBrowser, 'localhost') ? 'same-origin' : 'include',
     },
   });
 
