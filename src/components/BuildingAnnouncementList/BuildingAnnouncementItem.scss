@@ -1,6 +1,4 @@
 .buildingAnnouncementItem {
-  // display: flex;
-  // align-items: center;
   display: flow-root;
   padding: 1em;
   border-bottom: 1px solid #dedede;
@@ -8,7 +6,6 @@
     margin-right: 10px;
     float: left;
     i {
-      // background-color: #006400;
       color: #fff;
       vertical-align: middle;
       border-radius: 50%;
@@ -18,8 +15,10 @@
     }
   }
   .buildingAnnouncementInfo {
-    display: inline-block;
+    word-break: break-word;
+    overflow-wrap: break-word;
     margin-top: 8px;
+    display: table-cell;
     small {
       color: #888888;
     }
