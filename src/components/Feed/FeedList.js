@@ -150,6 +150,8 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
+      queryData,
+      paramData,
     } = this.props;
 
     return (
@@ -166,6 +168,8 @@ class FeedList extends Component {
             createNewComment={createNewComment}
             editPostEvent={this.editPostEvent}
             sharingPostEvent={this.sharingPostEvent}
+            queryData={queryData}
+            paramData={paramData}
           />
         ))}
         <DeletePostModal
@@ -214,6 +218,8 @@ FeedList.propTypes = {
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func,
+  queryData: PropTypes.object.isRequired,
+  paramData: PropTypes.object.isRequired,
 };
 
 export default connect(

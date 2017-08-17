@@ -162,7 +162,6 @@ export default compose(
       variables: {
         cursor: null,
       },
-      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;

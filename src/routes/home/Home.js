@@ -112,6 +112,10 @@ class Home extends Component {
                 deletePost={deletePost}
                 editPost={editPost}
                 sharingPost={sharingPost}
+                queryData={homePageQuery}
+                paramData={{
+                  cursor: null,
+                }}
               />
             </InfiniteScroll>
           </Col>
@@ -132,21 +136,14 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
-      if (!data) {
-        return;
-      }
       const { fetchMore } = data;
       const loadMoreRows = throttle(() => fetchMore({
         variables: {
           cursor: data.feeds.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return;
-          }
           const newEdges = fetchMoreResult.feeds.edges;
           const pageInfo = fetchMoreResult.feeds.pageInfo;
           return update(previousResult, {
@@ -169,10 +166,6 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return;
-          }
-
           const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
           const updatedPost = update(previousResult.feeds.edges[index], {
             comments: {
@@ -205,6 +198,7 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
+            type: null,
             user: {
               __typename: 'Friend',
               _id: ownProps.data.me._id,
@@ -218,6 +212,7 @@ export default compose(
               profile: ownProps.data.me.profile,
             },
             sharing: null,
+            event: null,
             building: null,
             privacy,
             photos,

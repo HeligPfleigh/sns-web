@@ -3,7 +3,6 @@ import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
-import update from 'immutability-helper';
 import MediaQuery from 'react-responsive';
 import * as _ from 'lodash';
 import Loading from '../../../components/Loading';
@@ -19,6 +18,7 @@ import {
   EventDetail,
   InviteToEventModal,
 } from '../../../components/EventsComponents';
+import interestEvent from '../../../components/EventsComponents/EventList/interestEvent.graphql';
 import s from './EventDetailPage.scss';
 
 class EventDetailPage extends Component {
@@ -95,6 +95,7 @@ class EventDetailPage extends Component {
                 canJoinEvent={this.props.canJoinEvent}
                 cantJoinEvent={this.props.cantJoinEvent}
                 deleteEvent={this.props.deleteEvent}
+                interestEvent={this.props.interestEvent}
               />
             </Col>
           </Row>
@@ -117,11 +118,12 @@ EventDetailPage.propTypes = {
     loading: PropTypes.bool.isRequired,
   }).isRequired,
   friends: PropTypes.array.isRequired,
-  inviteResidentsJoinEvent: PropTypes.any.isRequired,
-  joinEvent: PropTypes.any.isRequired,
-  canJoinEvent: PropTypes.any.isRequired,
-  cantJoinEvent: PropTypes.any.isRequired,
-  deleteEvent: PropTypes.any.isRequired,
+  inviteResidentsJoinEvent: PropTypes.func.isRequired,
+  joinEvent: PropTypes.func.isRequired,
+  canJoinEvent: PropTypes.func.isRequired,
+  cantJoinEvent: PropTypes.func.isRequired,
+  deleteEvent: PropTypes.func.isRequired,
+  interestEvent: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -227,6 +229,15 @@ export default compose(
         variables: {
           eventId,
           residentsId,
+        },
+      }),
+    }),
+  }),
+  graphql(interestEvent, {
+    props: ({ mutate }) => ({
+      interestEvent: eventId => mutate({
+        variables: {
+          eventId,
         },
       }),
     }),

@@ -159,10 +159,10 @@ class Building extends Component {
   }
 
   onAccept(friend) {
-    return event => {
+    return (event) => {
       event.preventDefault();
       const xhr = this.props.acceptRequestForJoiningBuilding(friend);
-      xhr.catch(error => {
+      xhr.catch((error) => {
         this.setState({
           errorMessage: error.message,
         });
@@ -172,10 +172,10 @@ class Building extends Component {
   }
 
   onCancel(friend) {
-    return event => {
+    return (event) => {
       event.preventDefault();
       const xhr = this.props.rejectRequestForJoiningBuilding(friend);
-      xhr.catch(error => {
+      xhr.catch((error) => {
         this.setState({
           errorMessage: error.message,
         });
@@ -267,6 +267,11 @@ class Building extends Component {
                     deletePostOnBuilding={deletePostOnBuilding}
                     editPost={editPost}
                     sharingPost={sharingPost}
+                    queryData={loadBuildingQuery}
+                    paramData={{
+                      cursor: null,
+                      buildingId: building._id,
+                    }}
                   />
                   }
                 </Tab.Pane>
@@ -336,7 +341,6 @@ export default compose(
       variables: {
         buildingId: props.buildingId,
         limit: 1000, // FIXME: paging,
-        fetchPolicy: 'cache-and-network',
       },
     }),
     props: ({ data }) => {
@@ -444,6 +448,7 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
+            type: null,
             user: null,
             author: {
               __typename: 'Author',
@@ -457,6 +462,7 @@ export default compose(
               name: ownProps.data.building.name,
             },
             sharing: null,
+            event: null,
             privacy,
             photos,
             comments: [],

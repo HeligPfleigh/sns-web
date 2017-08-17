@@ -53,7 +53,6 @@ export default compose(
         _id: ownProps.user.id,
         cursor: null,
       },
-      fetchPolicy: 'network-only',
     }),
   }),
   graphql(sendFriendRequestMutation, {

@@ -51,8 +51,7 @@ class EventDetail extends React.Component {
 
   async onInterestClick(e) {
     e.preventDefault();
-    // const { event, user } = this.props;
-    // await this.props.joinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
+    this.props.interestEvent(this.props.event._id);
   }
 
   async onJoinClick(e) {
@@ -231,6 +230,7 @@ EventDetail.propTypes = {
   canJoinEvent: PropTypes.func.isRequired,
   cantJoinEvent: PropTypes.func.isRequired,
   deleteEvent: PropTypes.func.isRequired,
+  interestEvent: PropTypes.func.isRequired,
 };
 
 export default compose(

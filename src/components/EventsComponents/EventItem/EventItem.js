@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './EventItem.scss';
-import history from '../../../core/history';
 import {
   Col,
   Image,
   Button,
 } from 'react-bootstrap';
+import s from './EventItem.scss';
+import history from '../../../core/history';
 
 class EventItem extends React.Component {
 

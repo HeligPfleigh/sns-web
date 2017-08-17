@@ -4,14 +4,14 @@ import {
   Image,
   MenuItem,
   Dropdown,
-  Col,
   Button,
-  Grid,
   Clearfix,
 } from 'react-bootstrap';
+import { graphql, compose } from 'react-apollo';
+import update from 'immutability-helper';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import { noop } from 'lodash';
+import * as _ from 'lodash';
 import classnames from 'classnames';
 import moment from 'moment';
 
@@ -34,6 +34,7 @@ import {
   SHARE,
   SHARE_FRIEND,
 } from '../../constants';
+import interestEvent from '../EventsComponents/EventList/interestEvent.graphql';
 import s from './Feed.scss';
 
 function doNothing(e) {
@@ -52,6 +53,27 @@ CustomToggle.propTypes = {
 };
 
 class Feed extends Component {
+
+  constructor(...args) {
+    super(...args);
+
+    this.state = {
+      isInterested: false,
+    };
+
+    this.onInterestClick = this.onInterestClick.bind(this);
+    this.onLikeCLick = this.onLikeCLick.bind(this);
+    this.onSelectRightEvent = this.onSelectRightEvent.bind(this);
+    this.onSelectShareButton = this.onSelectShareButton.bind(this);
+  }
+
+  async onInterestClick(event) {
+    event.preventDefault();
+    await this.props.interestEvent(this.props.data._id)
+      .then(() => this.setState({ isInterested: true }))
+      .catch(() => this.setState({ isInterested: false }));
+  }
+
   onLikeCLick = (evt) => {
     evt.preventDefault();
     const {
@@ -128,6 +150,8 @@ class Feed extends Component {
     } = this.props;
     const IS_POST_TYPE_STATUS = type === POST_TYPE_STATUS;
     const IS_POST_TYPE_EVENT = type === POST_TYPE_EVENT;
+    const isInterested = IS_POST_TYPE_EVENT && _.isArray(event.interests) && event.interests.filter(u => u._id === userInfo._id).length > 0;
+
     return (
       <Post>
         <PostHeader
@@ -253,7 +277,7 @@ class Feed extends Component {
                   <a href="#">tại {event.location}</a>
                 </div>
                 <div className={classnames('pull-right', s.btnInterested)}>
-                  <Button type="button" className={s.btnOverride}><i className="fa fa-star" /> Quan tâm</Button>
+                  <Button type="button" className={s.btnOverride} disabled={isInterested} onClick={this.onInterestClick}><i className="fa fa-star" /> Quan tâm</Button>
                 </div>
               </div>
               <div className={s.stats}>{`${event.joins.length} người sẽ tham gia · ${event.can_joins.length} người có thể tham gia`}</div>
@@ -363,6 +387,8 @@ Feed.propTypes = {
   editPostEvent: PropTypes.func.isRequired,
   sharingPostEvent: PropTypes.func.isRequired,
   sharingPostModalOpenned: PropTypes.bool,
+  queryData: PropTypes.object.isRequired,
+  paramData: PropTypes.object.isRequired,
 };
 
 Feed.defaultProps = {
@@ -372,13 +398,13 @@ Feed.defaultProps = {
   },
   userInfo: {},
   sharingPostModalOpenned: false,
-  onSelectRightEvent: noop,
-  editPostEvent: noop,
-  likePostEvent: noop,
-  unlikePostEvent: noop,
-  loadMoreComments: noop,
-  createNewComment: noop,
-  sharingPostEvent: noop,
+  onSelectRightEvent: _.noop,
+  editPostEvent: _.noop,
+  likePostEvent: _.noop,
+  unlikePostEvent: _.noop,
+  loadMoreComments: _.noop,
+  createNewComment: _.noop,
+  sharingPostEvent: _.noop,
 };
 
 /**
@@ -485,20 +511,18 @@ Feed.fragments = {
         lastName
         gender
       }
-      apartments {
-        _id
-        number
-        isOwner
-        building {
+      requestInformation {
+        apartments {
           _id
+          building {
+            _id
+            name
+            display
+            isAdmin
+          }
+          number
           name
-          isAdmin
         }
-      }
-      building {
-        _id
-        name
-        isAdmin
       }
     }
   `,
@@ -627,4 +651,70 @@ Feed.mutation = {
   `,
 };
 
-export default withStyles(s)(Feed);
+export default compose(
+  withStyles(s),
+  graphql(interestEvent, {
+    props: ({ mutate, ownProps }) => ({
+      interestEvent: eventId => mutate({
+        variables: {
+          eventId,
+        },
+        // optimisticResponse: {
+        //   __typename: 'Mutation',
+        //   interestEvent: {
+        //     __typename: 'Event',
+        //     _id: idRandom(),
+        //     isInterest: true,
+        //     message: null,
+        //     type: null,
+        //     user: null,
+        //     author: null,
+        //     sharing: null,
+        //     event: null,
+        //     building: null,
+        //     privacy: null,
+        //     name: null,
+        //     location: null,
+        //     start: (new Date()).toString(),
+        //     end: (new Date()).toString(),
+        //     invites: [],
+        //     joins: [],
+        //     can_joins: [],
+        //     cant_joins: [],
+        //     interests: [],
+        //     photos: [],
+        //     comments: [],
+        //     createdAt: (new Date()).toString(),
+        //     updatedAt: (new Date()).toString(),
+        //     totalLikes: 0,
+        //     totalComments: 0,
+        //     isLiked: false,
+        //     isAuthor: false,
+        //   },
+        // },
+        // update: (store, { data: { interestEvent: query } }) => {
+        //   // Read the data from our cache for this query.
+        //   let data = store.readQuery({
+        //     query: ownProps.queryData,
+        //     variables: ownProps.paramData,
+        //   });
+        //   console.log(data);
+
+        //   // data = update(data, {
+        //   //   event: {
+        //   //     isInterest: query.event.isInterest,
+        //   //     interests: query.event.interests,
+        //   //   },
+        //   // });
+
+        //   // Write our data back to the cache.
+        //   store.writeQuery({
+        //     query: ownProps.queryData,
+        //     variables: ownProps.paramData,
+        //     data,
+        //   });
+        // },
+      }),
+    }),
+  }),
+)(Feed);

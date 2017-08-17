@@ -127,29 +127,9 @@ export default compose(
   withStyles(s),
   graphql(interestEvent, {
     props: ({ mutate }) => ({
-      interestEvent: (eventId, newInterestList) => mutate({
+      interestEvent: eventId => mutate({
         variables: {
           eventId,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          interestEvent: {
-            __typename: 'Event',
-            interests: newInterestList,
-            isInterest: true,
-          },
-        },
-        update: (store, { data: { interestEvent: query } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query });
-          data = update(data, {
-            event: {
-              isInterest: query.event.isInterest,
-              interests: query.event.interests,
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query, data });
         },
       }),
     }),
@@ -160,7 +140,6 @@ export default compose(
         limit: 10,
         cursor: null,
       },
-      fetchPolicy: 'network-only',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -170,7 +149,6 @@ export default compose(
             limit: 5,
             cursor: data.listEvent.pageInfo.endCursor,
           },
-          fetchPolicy: 'network-only',
           updateQuery: (previousResult, { fetchMoreResult }) => {
             const newEdges = fetchMoreResult.listEvent.edges;
             const pageInfo = fetchMoreResult.listEvent.pageInfo;
