@@ -231,7 +231,7 @@ class Building extends Component {
     return (
       <Grid>
         <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={Math.random()}>
-          <Row className="clearfix">
+          <Row className={s.containerTop30}>
             <Col sm={2}>
               <Nav bsStyle="pills" stacked>
                 <NavItem title="Tất cả bài viết" eventKey={POST_TAB}>
@@ -291,10 +291,9 @@ class Building extends Component {
                 {/* Users awaiting approval */}
                 { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <ListUsersAwaitingApproval
-                    data={building.requests}
                     loadMore={this.loadMoreUsersAwaitingApproval}
                     loading={loading}
-                    building={building._id}
+                    building={building}
                     onAccept={this.onAccept}
                     onCancel={this.onCancel}
                     error={this.state.errorMessage}

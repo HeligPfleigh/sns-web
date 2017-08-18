@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Panel, Image, Col, Row, Clearfix, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+import { Image, Col, Row, Clearfix, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
 import * as _ from 'lodash';
 import classNames from 'classnames';
 
 import Errors from '../Errors';
 import UserDetail from './UserDetail';
+import BuildingInformationTab from '../BuildingInformationTab';
 import s from './UserAwaitingApproval.scss';
 
 class ListUsers extends Component {
@@ -69,13 +70,13 @@ class ListUsers extends Component {
    *
    */
   __renderListUsers() {
-    if (this.props.data.edges.length === 0) {
+    if (this.props.building.requests.edges.length === 0) {
       return this.__renderNoRecordsFound();
     }
 
-    const buildingID = this.props.building;
+    const buildingID = this.props.building._id;
     const users = [];
-    this.props.data.edges.forEach((obj) => {
+    this.props.building.requests.edges.forEach((obj) => {
       // Clone object
       const user = _.clone(obj);
 
@@ -110,7 +111,7 @@ class ListUsers extends Component {
     return (
       <InfiniteScroll
         loadMore={this.props.loadMore}
-        hasMore={this.props.data.pageInfo.hasNextPage}
+        hasMore={this.props.building.requests.pageInfo.hasNextPage}
         loader={this.__renderLoadingIcon()}
       >
         { users.map(user => (
@@ -119,14 +120,14 @@ class ListUsers extends Component {
               <Image src={user.profile.picture || 'avatar-default.jpg'} thumbnail responsive />
             </Col>
             <Col xs={8} md={9}>
-              <label className={s.fullName}>{`${user.profile.firstName} ${user.profile.lastName}`}</label>
+              <h4 className={s.fullName}>{`${user.profile.fullName}`}</h4>
 
               <div className={s.moreInfo}>
-                { user.apartments.map(apartment => <div key={apartment._id}><small><i>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.display || apartment.building.name }</i></small></div>) }
+                { user.apartments && (<div className={s.line}><b>Căn hộ:</b> {user.apartments.map(apartment => <span key={apartment._id}>{ apartment.name }</span>).reduce((prev, curr) => [prev, ' - ', curr]) }</div>) }
 
-                { user.phones.number && <div><small><i>Số điện thoại: { user.phones.number }</i></small></div> }
+                { user.phones.number && (<div className={s.line}><b>Số điện thoại:</b> { user.phones.number }</div>) }
 
-                { user.emails.address && <div><small><i>Email: { user.emails.address }</i></small></div> }
+                { user.emails.address && (<div className={s.line}><b>Email:</b> { user.emails.address }</div>) }
               </div>
 
               <ButtonToolbar>
@@ -161,45 +162,59 @@ class ListUsers extends Component {
    */
   render() {
     return (
-      <Panel header="Danh sách thành viên của tòa nhà" className={s.usersAwaitingApproval}>
-        <Errors
-          open
-          message={this.props.error}
-          autoHideDuration={4000}
-        />
+      <div>
+        <BuildingInformationTab building={this.props.building} />
+        <div className={classNames('panel', 'panel-default', s.usersAwaitingApproval)}>
+          <Errors
+            open
+            message={this.props.error}
+            autoHideDuration={4000}
+          />
 
-        <UserDetail
-          show={this.state.showModal}
-          closeModal={this.onCloseUserDetailModal}
-          onCancel={this.props.onCancel}
-          onAccept={this.props.onAccept}
-          data={this.state.userDetail}
-        />
-        { this.props.loading ? this.__renderLoadingIcon() : this.__renderListUsers() }
-      </Panel>
+          <div className={classNames('panel-heading', s.panelHeading)}>
+            <h3>Danh sách đăng ký thành viên</h3>
+            <div className={s.hr}></div>
+          </div>
+
+          <UserDetail
+            show={this.state.showModal}
+            closeModal={this.onCloseUserDetailModal}
+            onCancel={this.props.onCancel}
+            onAccept={this.props.onAccept}
+            data={this.state.userDetail}
+          />
+          <div className={classNames('panel-body', s.panelBody)}>
+            { this.props.loading ? this.__renderLoadingIcon() : this.__renderListUsers() }
+          </div>
+        </div>
+      </div>
     );
   }
 }
 
 ListUsers.defaultProps = {
-  data: {
-    edges: [],
-    pageInfo: {
-      hasNextPage: false,
+  building: {
+    requests: {
+      edges: [],
+      pageInfo: {
+        hasNextPage: false,
+      },
     },
   },
 };
 
 ListUsers.PropTypes = {
-  data: PropTypes.shape({
-    edges: PropTypes.arrayOf(PropTypes.object),
-    pageInfo: PropTypes.object,
+  building: PropTypes.shape({
+    requests: PropTypes.shape({
+      edges: PropTypes.arrayOf(PropTypes.object),
+      pageInfo: PropTypes.object,
+    }),
+    _id: PropTypes.string,
   }).isRequired,
   loadMore: PropTypes.func.isRequired,
   onAccept: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  building: PropTypes.string.isRequired,
   error: PropTypes.string.isRequired,
 };
 

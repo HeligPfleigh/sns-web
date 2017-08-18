@@ -276,9 +276,9 @@ class Feed extends Component {
                   <span role="presentation" aria-hidden="true"> · </span>
                   <a href="#">tại {event.location}</a>
                 </div>
-                <div className={classnames('pull-right', s.btnInterested)}>
+                { !event.isAuthor && (<div className={classnames('pull-right', s.btnInterested)}>
                   <Button type="button" className={s.btnOverride} disabled={isInterested} onClick={this.onInterestClick}><i className="fa fa-star" /> Quan tâm</Button>
-                </div>
+                </div>) }
               </div>
               <div className={s.stats}>{`${event.joins.length} người sẽ tham gia · ${event.can_joins.length} người có thể tham gia`}</div>
             </div>
@@ -507,6 +507,7 @@ Feed.fragments = {
       }
       profile {
         picture
+        fullName
         firstName
         lastName
         gender
@@ -654,66 +655,11 @@ Feed.mutation = {
 export default compose(
   withStyles(s),
   graphql(interestEvent, {
-    props: ({ mutate, ownProps }) => ({
+    props: ({ mutate }) => ({
       interestEvent: eventId => mutate({
         variables: {
           eventId,
         },
-        // optimisticResponse: {
-        //   __typename: 'Mutation',
-        //   interestEvent: {
-        //     __typename: 'Event',
-        //     _id: idRandom(),
-        //     isInterest: true,
-        //     message: null,
-        //     type: null,
-        //     user: null,
-        //     author: null,
-        //     sharing: null,
-        //     event: null,
-        //     building: null,
-        //     privacy: null,
-        //     name: null,
-        //     location: null,
-        //     start: (new Date()).toString(),
-        //     end: (new Date()).toString(),
-        //     invites: [],
-        //     joins: [],
-        //     can_joins: [],
-        //     cant_joins: [],
-        //     interests: [],
-        //     photos: [],
-        //     comments: [],
-        //     createdAt: (new Date()).toString(),
-        //     updatedAt: (new Date()).toString(),
-        //     totalLikes: 0,
-        //     totalComments: 0,
-        //     isLiked: false,
-        //     isAuthor: false,
-        //   },
-        // },
-        // update: (store, { data: { interestEvent: query } }) => {
-        //   // Read the data from our cache for this query.
-        //   let data = store.readQuery({
-        //     query: ownProps.queryData,
-        //     variables: ownProps.paramData,
-        //   });
-        //   console.log(data);
-
-        //   // data = update(data, {
-        //   //   event: {
-        //   //     isInterest: query.event.isInterest,
-        //   //     interests: query.event.interests,
-        //   //   },
-        //   // });
-
-        //   // Write our data back to the cache.
-        //   store.writeQuery({
-        //     query: ownProps.queryData,
-        //     variables: ownProps.paramData,
-        //     data,
-        //   });
-        // },
       }),
     }),
   }),
