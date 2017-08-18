@@ -59,6 +59,7 @@ a {
       font-weight: bold;
       line-height: 18px;
       padding-bottom: 5px;
+      display: inline-block;
     }
     .location {
       width: 100%;
@@ -70,6 +71,7 @@ a {
       font-size: 12px;
       line-height: 16px;
       color: #90949c;
+      display: inline-block;
     }
   }
 
@@ -121,6 +123,14 @@ a {
         color: #fff;
         background-color: #FF8C00;
       }
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  .event {
+    .btnInterested {
+      display: none;
     }
   }
 }

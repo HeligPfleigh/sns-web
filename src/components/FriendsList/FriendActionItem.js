@@ -1,9 +1,10 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button, ButtonToolbar } from 'react-bootstrap';
 import s from './FriendItem.scss';
 
-class FriendActionItem extends React.Component {
+class FriendActionItem extends Component {
 
   onAcceptCLick = (evt) => {
     evt.preventDefault();

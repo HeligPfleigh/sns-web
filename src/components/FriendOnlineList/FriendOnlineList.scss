@@ -1,20 +1,72 @@
 .friendList {
-  font-family: 'Roboto';
-  padding: 11px;
-  >h4 {
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  h4 {
     padding: 0.5em 0 0 1em;
     font-size: 14px;
   }
-  >ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    li {
-      // border-bottom: 1px solid #dedede;
-      border: none;
+
+  ul {
+    a:hover {
+      text-decoration: none;
     }
-    li:last-child {
-      border-bottom: none;
+
+    &.listUnstyled {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    
+    li {
+      padding: 6px;
+
+      &:hover {
+        background: #428bca none repeat scroll 0 0;
+        color: #fff;
+        cursor:pointer;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .chatBody {
+        margin-left: 47px;
+        margin-top: 0;
+        line-height: 34px;
+      }
+
+      .chatImg img {
+        height: 34px;
+        width: 34px;
+      }
+
+      .friendChatItem {
+        height: 44px;
+        line-height: 44px;
+        display: flex;
+        text-align: left;
+        margin-bottom: 8px;
+      }
+
+      .textName {
+        font-weight: bold;
+        margin-left: 13px;
+        color: #4c4c4c;
+        font-family: Roboto;
+      }
+
+      .nameContainer {
+        flex-grow: 1;
+      }
+
+      .iconOnline{
+        font-size: 7px;
+        color: #42b72a;
+        text-align: left;
+        line-height: 44px;
+      }
     }
   }
 }

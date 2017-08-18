@@ -1,8 +1,9 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './InputWithValidation.scss';
 
-class InputWithValidation extends React.Component {
+class InputWithValidation extends Component {
   state={
     value: '',
     showHelper: false,

@@ -1,9 +1,10 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image } from 'react-bootstrap';
 import s from './TimeLine.scss';
 
-class TimeContent extends React.Component {
+class TimeContent extends Component {
 
   static propTypes = {
     images: PropTypes.array.isRequired,

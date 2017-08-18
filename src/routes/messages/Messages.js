@@ -7,7 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
 import classnames from 'classnames';
@@ -15,7 +16,7 @@ import ConversationList from '../../components/Chat/ConversationList';
 import ConversationView from '../../components/Chat/ConversationView';
 import s from './Messages.scss';
 
-class Messages extends React.Component {
+class Messages extends Component {
   constructor() {
     super();
     this.state = {

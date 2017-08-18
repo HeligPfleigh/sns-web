@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react';
-import { graphql, compose } from 'react-apollo';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { compose } from 'react-apollo';
 import { Button } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './EventMenu.scss';
@@ -19,7 +20,7 @@ const menus = [{
   key: 'calendar',
 }];
 
-class EventMenu extends React.Component {
+class EventMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,7 +29,7 @@ class EventMenu extends React.Component {
   }
 
 
-  onMenuSelected = (idx) => {
+  onMenuSelected = () => {
   }
 
   onCreateEvent = () => {

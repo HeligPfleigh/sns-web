@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import moment from 'moment';
 import { connect } from 'react-redux';
@@ -74,7 +75,7 @@ const asyncValidate = (fields) => {
   return fooBar().catch(() => ({ _error: 'Lỗi kết nối...' }));
 };
 
-class Register extends React.Component {
+class Register extends Component {
 
   constructor(props) {
     super(props);

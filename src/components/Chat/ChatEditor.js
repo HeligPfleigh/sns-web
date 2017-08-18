@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Editor, EditorState, getDefaultKeyBinding } from 'draft-js';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { stateToHTML } from 'draft-js-export-html';
 import s from './ChatEditor.scss';
 
-class ChatEditor extends React.Component {
+class ChatEditor extends Component {
   static propTypes = {
     handleAction: PropTypes.func.isRequired,
   };

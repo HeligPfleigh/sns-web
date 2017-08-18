@@ -1,7 +1,7 @@
-import React, { PropTypes } from 'react';
-import MediaQuery from 'react-responsive';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-class VideoView extends React.Component {
+class VideoView extends Component {
   render() {
     return (
       <div>

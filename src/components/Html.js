@@ -7,7 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import serialize from 'serialize-javascript';
 import config from '../config';
 
@@ -16,7 +17,7 @@ const { auth: {
  },
 } = config;
 
-class Html extends React.Component {
+class Html extends Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,

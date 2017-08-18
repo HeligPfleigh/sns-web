@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import throttle from 'lodash/throttle';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
@@ -77,7 +78,7 @@ const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: Str
 ${Feed.fragments.post}
 `;
 
-class Me extends React.Component {
+class Me extends Component {
 
   updatePostInList = (data, index, post) => (update(data, {
     resident: {

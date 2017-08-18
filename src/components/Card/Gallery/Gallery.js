@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Lightbox from 'react-images';
 import { generate as idRandom } from 'shortid';
 import s from './Gallery.scss';
 
-class Gallery extends React.Component {
+class Gallery extends Component {
   constructor() {
     super();
     this.state = {

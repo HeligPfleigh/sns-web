@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import find from 'lodash/find';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
@@ -73,7 +74,7 @@ const compositeDecorator = new CompositeDecorator([{
 }]);
 
 /** NewPost Component */
-class NewPost extends React.Component {
+class NewPost extends Component {
 
   state = {
     editorState: EditorState.createEmpty(compositeDecorator),

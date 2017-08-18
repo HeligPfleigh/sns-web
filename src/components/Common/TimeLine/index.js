@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import TimeContent from './TimeContent';
 import TimeEvent from './TimeEvent';
 import s from './TimeLine.scss';
 
-class TimeLine extends React.Component {
+class TimeLine extends Component {
 
   static propTypes = {
     events: PropTypes.array.isRequired,

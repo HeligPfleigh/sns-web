@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { compose } from 'react-apollo';
 import {
   Row,
@@ -37,7 +38,7 @@ CustomToggle.propTypes = {
   children: PropTypes.node,
 };
 
-class EventDetail extends React.Component {
+class EventDetail extends Component {
 
   constructor(...args) {
     super(...args);

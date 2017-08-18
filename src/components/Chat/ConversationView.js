@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -18,7 +19,7 @@ import { formatStatus } from '../../utils/time';
   }),
   { sendMessage, loadMessageHistory },
 )
-class ConversationView extends React.Component {
+class ConversationView extends Component {
   static propTypes = {
     chatState: PropTypes.object,
     sendMessage: PropTypes.func.isRequired,

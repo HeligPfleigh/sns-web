@@ -1,14 +1,16 @@
-import React, { PropTypes, Component } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import {
   Image,
   MenuItem,
   Dropdown,
   Button,
+  Row,
+  Col,
   Clearfix,
 } from 'react-bootstrap';
 import { graphql, compose } from 'react-apollo';
-import update from 'immutability-helper';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
 import * as _ from 'lodash';
@@ -260,15 +262,15 @@ class Feed extends Component {
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
         </PostText>
 
-        { IS_POST_TYPE_EVENT && (<div className={classnames('row', s.event)}>
-          <div className="col-xs-12">
-            <div className="col-xs-2">
+        { IS_POST_TYPE_EVENT && (<Row className={s.event}>
+          <Col xs={12}>
+            <Col md={2} xs={4}>
               <div className={s.time}>
                 <span className={s.day}>{moment(event.start).format('D')}</span>
                 <span className={s.month}>{moment(event.start).format('MMM')}</span>
               </div>
-            </div>
-            <div className={classnames('col-xs-10', s.description)}>
+            </Col>
+            <Col md={10} xs={8} className={s.description}>
               <div className={s.name}><span className={s.maxWith}>{event.name}</span></div>
               <div className={s.location}>
                 <div className={s.maxWith}>
@@ -281,10 +283,10 @@ class Feed extends Component {
                 </div>) }
               </div>
               <div className={s.stats}>{`${event.joins.length} người sẽ tham gia · ${event.can_joins.length} người có thể tham gia`}</div>
-            </div>
-          </div>
+            </Col>
+          </Col>
           <Clearfix />
-        </div>) }
+        </Row>) }
 
         { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
         <Divider />

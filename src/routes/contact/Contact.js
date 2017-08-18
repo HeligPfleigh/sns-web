@@ -7,11 +7,12 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Contact.css';
 
-class Contact extends React.Component {
+class Contact extends Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
   };

@@ -1,5 +1,5 @@
-import React, { Component, PropTypes } from 'react';
-import classNames from 'classnames';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button, Grid, Row, Col, Clearfix } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import * as _ from 'lodash';

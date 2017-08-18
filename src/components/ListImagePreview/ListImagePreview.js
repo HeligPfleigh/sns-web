@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image } from 'react-bootstrap';
 import { generate as idRandom } from 'shortid';
 import s from './ListImagePreview.scss';
 
 
-class ListImagePreview extends React.Component {
+class ListImagePreview extends Component {
   render() {
     const { images } = this.props;
     return (
