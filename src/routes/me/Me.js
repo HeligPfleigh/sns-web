@@ -234,6 +234,7 @@ export default compose(
         _id: ownProps.user.id,
         cursor: null,
       },
+      fetchPolicy: 'network-only',
     }),
     props: ({ ownProps, data }) => {
       if (!data) {
