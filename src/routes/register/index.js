@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import isEmpty from 'lodash/isEmpty';
 
 const title = 'Đăng kí tài khoản';
 
@@ -17,7 +18,7 @@ export default {
 
   async action({ store }) {
     const state = store.getState();
-    if (state.user) {
+    if (state.user && !isEmpty(state.user.buildings)) {
       return { redirect: '/' };
     }
 
