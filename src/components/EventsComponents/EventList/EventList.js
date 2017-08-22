@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import InfiniteScroll from 'react-infinite-scroller';
 import {
@@ -15,7 +16,7 @@ import EventItem from '../EventItem/EventItem';
 import Loading from '../../../components/Loading';
 import interestEvent from './interestEvent.graphql';
 
-class EventList extends React.Component {
+class EventList extends Component {
   constructor(props) {
     super(props);
     this.state = {

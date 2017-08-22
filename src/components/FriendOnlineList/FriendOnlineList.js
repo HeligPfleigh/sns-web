@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import FriendOnlineItem from './FriendOnlineItem';
 import s from './FriendOnlineList.scss';
 
 const FriendOnlineList = ({ className, friends, online, directMessages }) => (
   <div className={`${s.friendList} ${className}`}>
-    <ul>
+    <ul className={s.listUnstyled}>
       {
         friends.map(friend =>
           (friend && friend.chatId && <FriendOnlineItem

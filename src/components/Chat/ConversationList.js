@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import s from './Conversation.scss';
@@ -15,7 +16,7 @@ import Loading from '../Loading';
   }),
   { ...chatActions },
 )
-class ConversationList extends React.Component {
+class ConversationList extends Component {
   static propTypes = {
     user: PropTypes.object,
     newChat: PropTypes.object,

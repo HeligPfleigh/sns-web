@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -37,7 +38,7 @@ const newMessageQuery = gql`query newMessageQuery {
 @connect(
   null,
   { addNewUserToConversation })
-class NewMessage extends React.Component {
+class NewMessage extends Component {
   static propTypes = {
     data: PropTypes.shape({
       loading: PropTypes.bool.isRequired,

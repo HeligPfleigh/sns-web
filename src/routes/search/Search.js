@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -19,7 +20,7 @@ const searchPageQuery = gql`query searchPageQuery ($keyword: String!, $numberOfF
   }
 }`;
 
-class Search extends React.Component {
+class Search extends Component {
   render() {
     const { data: { search } } = this.props;
     return (

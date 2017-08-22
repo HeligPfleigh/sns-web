@@ -7,7 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image, Dropdown, MenuItem } from 'react-bootstrap';
 import history from '../../core/history';
@@ -15,7 +16,7 @@ import Link from '../Link';
 import CustomToggle from '../Common/DropdownMenu/CustomToggle';
 import s from './NavRight.scss';
 
-class NavRight extends React.Component {
+class NavRight extends Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
   }

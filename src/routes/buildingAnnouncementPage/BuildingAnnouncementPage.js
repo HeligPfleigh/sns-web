@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import { Grid, Row, Col } from 'react-bootstrap';
@@ -8,7 +9,7 @@ import {
 } from '../../components/BuildingAnnouncementList';
 import s from './BuildingAnnouncementPage.scss';
 
-class BuildingAnnouncementPage extends React.Component {
+class BuildingAnnouncementPage extends Component {
   render() {
     const {
       data: {

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import {
   Col,
@@ -8,7 +9,7 @@ import {
 import s from './EventItem.scss';
 import history from '../../../core/history';
 
-class EventItem extends React.Component {
+class EventItem extends Component {
 
   onInterestClicked = () => {
     const { user, event } = this.props;

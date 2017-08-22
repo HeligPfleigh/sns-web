@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Row,
   Col,
@@ -77,7 +78,6 @@ class SharingPostModal extends Component {
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
       privacySelected: PUBLIC,
-      friend: {},
     };
   }
 
@@ -152,7 +152,7 @@ class SharingPostModal extends Component {
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
       privacySelected: PUBLIC,
-      friend: {},
+      friend: undefined,
     });
     closeModal();
   }
@@ -219,12 +219,12 @@ class SharingPostModal extends Component {
         </Modal.Header>
         <Modal.Body>
           { (shareType === SHARE_FRIEND) && <Row style={{ marginBottom: '10px' }}>
-            <Col md={1} style={lblStyle}>Bạn bè: </Col>
-            <Col md={11} style={{ padding: 0 }}>
+            <Col sm={1} xsHidden style={lblStyle}>Bạn bè: </Col>
+            <Col sm={11} style={{ padding: 0 }}>
               <UserSelect
                 style={{ borderRadius: 0 }}
                 name="user-select"
-                value={this.state.friend}
+                value={this.state.friend || undefined}
                 options={friends}
                 onChange={this.logChange}
                 clearable={!isEmpty(this.state.friend)}
@@ -237,8 +237,9 @@ class SharingPostModal extends Component {
             <Editor
               editorState={this.state.editorState}
               onChange={this.onChange}
+              // eslint-disable-next-line
               ref={editor => (this.editor = editor)}
-              placeholder="Nói gì đó về nó ..."
+              placeholder="Nói gì đó về nó..."
               spellCheck
             />
           </div>

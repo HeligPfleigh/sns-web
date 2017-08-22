@@ -1,8 +1,9 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './MenuVertical.scss';
 
-class MenuVertical extends React.Component {
+class MenuVertical extends Component {
   constructor(props) {
     super(props);
     this.state = {

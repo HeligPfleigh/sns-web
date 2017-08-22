@@ -5,6 +5,7 @@ query getFriendsQuery{
       _id
       profile {
         picture
+        fullName
         lastName
         firstName
         gender

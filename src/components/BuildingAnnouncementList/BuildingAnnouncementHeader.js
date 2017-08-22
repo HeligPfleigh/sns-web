@@ -6,6 +6,4 @@ const BuildingAnnouncementHeader = () => (
   <li className={s.root}></li>
 );
 
-BuildingAnnouncementHeader.propTypes = {};
-
 export default withStyles(s)(BuildingAnnouncementHeader);

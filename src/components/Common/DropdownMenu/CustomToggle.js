@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-class CustomToggle extends React.Component {
+class CustomToggle extends Component {
   static propTypes = {
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.any,
-    styles: React.PropTypes.any,
+    onClick: PropTypes.func,
+    children: PropTypes.any,
+    styles: PropTypes.any,
   }
 
   constructor(props, context) {

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Image } from 'react-bootstrap';
 // import { convertFromRaw } from 'draft-js';
 // import { stateToHTML } from 'draft-js-export-html';
@@ -78,7 +79,7 @@ export const getNotifyContent = (currentUser, author, type, actors) => {
   return '';
 };
 
-class NotificationItem extends React.Component {
+class NotificationItem extends Component {
 
   onClick = (e) => {
     e.preventDefault();

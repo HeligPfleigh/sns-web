@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import throttle from 'lodash/throttle';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
@@ -77,7 +78,7 @@ const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: Str
 ${Feed.fragments.post}
 `;
 
-class Me extends React.Component {
+class Me extends Component {
 
   updatePostInList = (data, index, post) => (update(data, {
     resident: {
@@ -425,30 +426,32 @@ export default compose(
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.user.id,
-              cursor: null,
-            },
-          });
-          data = update(data, {
-            resident: {
-              posts: {
-                edges: {
-                  $unshift: [sharingPost],
+          if (ownProps.user.id === (sharingPost.user && sharingPost.user._id)) {
+            let data = store.readQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.user.id,
+                cursor: null,
+              },
+            });
+            data = update(data, {
+              resident: {
+                posts: {
+                  edges: {
+                    $unshift: [sharingPost],
+                  },
                 },
               },
-            },
-          });
-          store.writeQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.user.id,
-              cursor: null,
-            },
-            data,
-          });
+            });
+            store.writeQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.user.id,
+                cursor: null,
+              },
+              data,
+            });
+          }
         },
       }),
     }),

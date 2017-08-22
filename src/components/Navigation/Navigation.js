@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import MediaQuery from 'react-responsive';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Dropdown, MenuItem } from 'react-bootstrap';
@@ -31,7 +32,7 @@ const getNotificationCount = (chatNotification, current) => {
   }),
   { makeNotificationRead },
 )
-class Navigation extends React.Component {
+class Navigation extends Component {
 
   constructor(props) {
     super(props);
@@ -289,19 +290,19 @@ Navigation.defaultProps = {
 };
 
 Navigation.propTypes = {
-  isMobile: React.PropTypes.bool,
-  chatNotification: React.PropTypes.object,
-  location: React.PropTypes.object,
-  current: React.PropTypes.string,
-  makeNotificationRead: React.PropTypes.func,
-  user: React.PropTypes.object,
-  data: React.PropTypes.object,
-  loadMoreRows: React.PropTypes.func,
-  updateSeen: React.PropTypes.func.isRequired,
-  updateIsRead: React.PropTypes.func.isRequired,
-  rejectFriendAction: React.PropTypes.func.isRequired,
-  acceptFriendAction: React.PropTypes.func.isRequired,
-  friends: React.PropTypes.array,
+  isMobile: PropTypes.bool,
+  chatNotification: PropTypes.object,
+  location: PropTypes.object,
+  current: PropTypes.string,
+  makeNotificationRead: PropTypes.func,
+  user: PropTypes.object,
+  data: PropTypes.object,
+  loadMoreRows: PropTypes.func,
+  updateSeen: PropTypes.func.isRequired,
+  updateIsRead: PropTypes.func.isRequired,
+  rejectFriendAction: PropTypes.func.isRequired,
+  acceptFriendAction: PropTypes.func.isRequired,
+  friends: PropTypes.array,
 };
 
 export default withStyles(s)(Navigation);

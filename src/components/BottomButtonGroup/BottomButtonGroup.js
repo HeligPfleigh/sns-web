@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
-import s from './BottomButtonGroup.scss';
+import React, { Component } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button } from 'react-bootstrap';
-import CreateEventModal from '../CreateEventModal';
 
-class BottomButtonGroup extends React.Component {
+import CreateEventModal from '../CreateEventModal';
+import s from './BottomButtonGroup.scss';
+
+class BottomButtonGroup extends Component {
   state = {
     showCreateEventModal: false,
   }
@@ -43,8 +44,5 @@ class BottomButtonGroup extends React.Component {
     );
   }
 }
-BottomButtonGroup.propTypes = {
-  // onCreateEventClick: PropTypes.func.isRequired,
-};
 
 export default withStyles(s)(BottomButtonGroup);

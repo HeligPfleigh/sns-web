@@ -120,10 +120,12 @@ class ListUsers extends React.Component {
 }
 
 ListUsers.defaultProps = {
-  data: {
-    edges: [],
-    pageInfo: {
-      hasNextPage: false,
+  building: {
+    requests: {
+      edges: [],
+      pageInfo: {
+        hasNextPage: false,
+      },
     },
   },
 };

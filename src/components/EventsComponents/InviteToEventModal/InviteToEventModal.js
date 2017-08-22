@@ -1,9 +1,10 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './InviteToEventModal.scss';
 
-class InviteToEventModal extends React.Component {
+class InviteToEventModal extends Component {
   constructor(props) {
     super(props);
     const { invites } = props;

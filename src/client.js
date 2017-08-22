@@ -9,7 +9,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FastClick from 'fastclick';
 import UniversalRouter from 'universal-router';
 import queryString from 'query-string';
 import update from 'immutability-helper';
@@ -25,10 +24,11 @@ import createApolloClient from './core/createApolloClient';
 import chat from './core/chat';
 import { setRuntimeVariable } from './actions/runtime';
 
-moment.defineLocale('vi', {
-  parentLocale: 'vi',
-  monthsShort: 'T01_T02_T03_T04_T05_T06_T07_T08_T09_T10_T11_T12'.split('_'),
-});
+// moment.updateLocale('vi', {
+//   monthsShort: 'T01_T02_T03_T04_T05_T06_T07_T08_T09_T10_T11_T12'.split('_'),
+// });
+
+moment.locale('vi');
 
 update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
 
@@ -104,9 +104,6 @@ let onRenderComplete = function initialRenderComplete() {
     store.dispatch(setRuntimeVariable({ name: 'location', value: location }));
   };
 };
-
-// Make taps on links and buttons work fast on mobiles
-FastClick.attach(document.body);
 
 const container = document.getElementById('app');
 let appInstance;

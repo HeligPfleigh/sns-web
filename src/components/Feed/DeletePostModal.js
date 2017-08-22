@@ -1,7 +1,10 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
 
 class DeletePostModal extends Component {
+
+  onClick = evt => this.props.clickModal(evt, {});
 
   render() {
     return (
@@ -17,7 +20,7 @@ class DeletePostModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeModal}>Hủy</Button>
-          <Button bsStyle="primary" onClick={this.props.clickModal}>Xóa bài viết</Button>
+          <Button bsStyle="primary" onClick={this.onClick}>Xóa bài viết</Button>
         </Modal.Footer>
       </Modal>
     );

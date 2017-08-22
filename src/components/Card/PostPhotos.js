@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image, Row } from 'react-bootstrap';
 import Gallery from './Gallery';
 import s from './PostPhotos.scss';
 
-class PostPhotos extends React.Component {
+class PostPhotos extends Component {
 
   render() {
     const { images } = this.props;

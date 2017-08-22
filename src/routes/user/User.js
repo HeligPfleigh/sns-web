@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import { connect } from 'react-redux';
@@ -437,30 +438,32 @@ export default compose(
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.id,
-              cursor: null,
-            },
-          });
-          data = update(data, {
-            resident: {
-              posts: {
-                edges: {
-                  $unshift: [sharingPost],
+          if (ownProps.id === (sharingPost.user && sharingPost.user._id)) {
+            let data = store.readQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.id,
+                cursor: null,
+              },
+            });
+            data = update(data, {
+              resident: {
+                posts: {
+                  edges: {
+                    $unshift: [sharingPost],
+                  },
                 },
               },
-            },
-          });
-          store.writeQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.id,
-              cursor: null,
-            },
-            data,
-          });
+            });
+            store.writeQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.id,
+                cursor: null,
+              },
+              data,
+            });
+          }
         },
       }),
     }),
