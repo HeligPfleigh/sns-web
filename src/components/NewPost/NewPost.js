@@ -238,7 +238,7 @@ class NewPost extends React.Component {
                     {item.name === PUBLIC && 'Công khai'}
                     {item.name === FRIEND && 'Bạn bè' }
                     {item.name === ONLY_ME && 'Chỉ mình tôi' }
-                    {item.name === ONLY_ADMIN_BUILDING && 'Ban quản trị'}
+                    {item.name === ONLY_ADMIN_BUILDING && 'Ban quản lý'}
                   </MenuItem>
                 ))}
               </Dropdown.Menu>
