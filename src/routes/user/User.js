@@ -438,30 +438,32 @@ export default compose(
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.id,
-              cursor: null,
-            },
-          });
-          data = update(data, {
-            resident: {
-              posts: {
-                edges: {
-                  $unshift: [sharingPost],
+          if (ownProps.id === (sharingPost.user && sharingPost.user._id)) {
+            let data = store.readQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.id,
+                cursor: null,
+              },
+            });
+            data = update(data, {
+              resident: {
+                posts: {
+                  edges: {
+                    $unshift: [sharingPost],
+                  },
                 },
               },
-            },
-          });
-          store.writeQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.id,
-              cursor: null,
-            },
-            data,
-          });
+            });
+            store.writeQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.id,
+                cursor: null,
+              },
+              data,
+            });
+          }
         },
       }),
     }),
