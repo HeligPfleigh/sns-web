@@ -256,6 +256,7 @@ class Building extends Component {
                 {/* Users awaiting approval */}
                 { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <ListUsersAwaitingApproval
+                    data={building.requests}
                     loadMore={this.loadMoreUsersAwaitingApproval}
                     loading={loading}
                     loadBuildingQuery={loadBuildingQuery}

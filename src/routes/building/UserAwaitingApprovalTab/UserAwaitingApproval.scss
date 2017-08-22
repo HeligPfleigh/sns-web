@@ -1,54 +1,28 @@
 @import "../../../theme/resources.scss";
 
 .usersAwaitingApproval {
-  .panelHeading {
-    background-color: transparent;
-    border-bottom: none;
-    padding: 15px;
+  .item {
+    padding-bottom: 15px;
+    padding-top: 15px;
+    border-bottom: 1px solid #ccc;
 
-    h3 {
-      font-weight: 100;
-      color: #6e7179;
-      margin-top: 0;
+    .moreInfo {
+      padding-top: 10px;
+      padding-bottom: 10px;
     }
 
-    .hr {
-      border-top: 1px solid #e7eaec;
-      color: transparent;
-      background-color: transparent;
-      height: 1px;
-      margin: 10px 0;
+    .fullName {
+      font-weight: bold;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
     }
   }
 
-  .panelBody {
-    .item {
-      padding-bottom: 15px;
-      padding-top: 15px;
-      border-bottom: 1px solid #ccc;
-
-      .moreInfo {
-        padding-top: 8px;
-        padding-bottom: 8px;
-
-        .line {
-          font-size: 13px;
-        }
-      }
-
-      .fullName {
-        font-weight: bold;
-      }
-
-      &:last-child {
-        padding-bottom: 0;
-        border-bottom: none;
-      }
-    }
-
-    .noRecordsFound {
-      padding-top: 10px;
-    }
+  .noRecordsFound {
+    padding-top: 10px;
   }
 }
 .userDetailAwaitingApproval {
