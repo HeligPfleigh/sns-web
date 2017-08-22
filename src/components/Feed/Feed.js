@@ -531,6 +531,7 @@ Feed.fragments = {
       }
       requestInformation {
         apartments {
+          _id
           name
         }
       }

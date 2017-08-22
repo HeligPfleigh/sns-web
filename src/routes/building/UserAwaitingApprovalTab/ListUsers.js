@@ -3,6 +3,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
+import update from 'immutability-helper';
 import { Panel } from 'react-bootstrap';
 import classNames from 'classnames';
 import User from './User';
@@ -145,23 +146,93 @@ ListUsers.propTypes = {
 export default compose(
   withStyles(s),
   graphql(approvingUserToBuildingMutation, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       approvingUserToBuilding: id => mutate({
         variables: {
           input: {
             requestsToJoinBuildingId: id,
           },
         },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          approvingUserToBuilding: {
+            __typename: 'ApprovingUserToBuildingPayload',
+            request: {
+              __typename: 'RequestsToJoinBuilding',
+              _id: id,
+              type: null,
+              status: null,
+            },
+          },
+        },
+        update: (store, { data: { approvingUserToBuilding } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+          });
+          const r = approvingUserToBuilding.request;
+          data = update(data, {
+            building: {
+              requests: {
+                edges: {
+                  $unset: [r._id],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+            data,
+          });
+        },
       }),
     }),
   }),
   graphql(rejectingUserToBuildingMutation, {
-    props: ({ mutate }) => ({
+    props: ({ ownProps, mutate }) => ({
       rejectingUserToBuilding: id => mutate({
         variables: {
           input: {
             requestsToJoinBuildingId: id,
           },
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectingUserToBuilding: {
+            __typename: 'RejectingUserToBuildingPayload',
+            request: {
+              __typename: 'RequestsToJoinBuilding',
+              _id: id,
+              type: null,
+              status: null,
+            },
+          },
+        },
+        update: (store, { data: { rejectingUserToBuilding } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+          });
+          const r = rejectingUserToBuilding.request;
+          data = update(data, {
+            building: {
+              requests: {
+                edges: {
+                  $unset: [r._id],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: ownProps.loadBuildingQuery,
+            variables: ownProps.param,
+            data,
+          });
         },
       }),
     }),
