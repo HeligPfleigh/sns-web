@@ -1,132 +1,102 @@
-import React, { Component, PropTypes } from 'react';
-import classNames from 'classnames';
-import { Modal, Button, Grid, Row, Col, Clearfix } from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Clearfix, ButtonToolbar, ButtonGroup, Button, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import * as _ from 'lodash';
-
+import history from '../../../core/history';
+import {
+  APPROVED,
+  REJECTED,
+  PENDING,
+} from '../../../constants';
 import s from './UserAwaitingApproval.scss';
 
-class User extends Component {
-  /**
-   * 
-   * @param {*} props 
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoading: false,
-    };
+class User extends React.Component {
+
+  approveUser = (evt) => {
+    const requestsToJoinBuildingId = this.props.edge._id;
+    this.props.onAccept(evt, requestsToJoinBuildingId);
   }
 
-  /**
-   * 
-   */
-  onCancel(event) {
-    this.setState({
-      isLoading: true,
-    });
-    return this.props.onAccept(this.props.data)
-      .call(this, event)
-      .then(() => this.onCloseModal())
-      .catch(() => this.onCloseModal());  
+  rejectUser = (evt) => {
+    const requestsToJoinBuildingId = this.props.edge._id;
+    this.props.onCancel(evt, requestsToJoinBuildingId);
   }
 
-  /**
-   * 
-   */
-  onAccept(event) {
-    this.setState({
-      isLoading: true,
-    });
-    return this.props.onAccept(this.props.data)
-      .call(this, event)
-      .then(() => this.onCloseModal())
-      .catch(() => this.onCloseModal());  
+  useDetail = (evt) => {
+    evt.preventDefault();
+    const requestsToJoinBuildingId = this.props.edge._id;
+    history.push(`/user-approval/${requestsToJoinBuildingId}`);
   }
 
-  /**
-   * 
-   */
-  onCloseModal() {
-    this.setState({
-      isLoading: false,
-    });
-    this.props.closeModal();
-  }
-
-  /**
-   * 
-   */
   render() {
+    const {
+      edge: {
+        user,
+        status,
+        requestInformation: {
+          apartments,
+        },
+      },
+    } = this.props;
     return (
-      <Modal show={ this.props.show } onHide={ this.onCloseModal.bind(this) }>
-        <Modal.Header closeButton>
-          <Modal.Title>Thông tin thành viên</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Grid className={ s.userDetailAwaitingApproval } fluid>
-            { this.props.data.profile && (
+      <Row className={s.item}>
+        <Col xs={4} md={3}>
+          <Image src={user.profile.picture || '/avatar-default.jpg'} thumbnail responsive />
+        </Col>
+        <Col xs={8} md={9}>
+          <label className={s.fullName}>{`${user.profile.firstName} ${user.profile.lastName}`}</label>
+          <div className={s.moreInfo}>
             <div>
-              <Row className={ s.item }>              
-                <Col sm={4} md={2} className={ s.label }><i className="fa fa-user-o" /> Họ và tên:</Col>
-                <Col sm={8} md={10}>{ this.props.data.profile.firstName } { this.props.data.profile.lastName }</Col>
-                <Clearfix visibleSmBlock/>              
-              </Row>
-
-              <Row className={ s.item }>              
-                <Col sm={4} md={2} className={ s.label }><i className="fa fa-circle-o" /> Giới tính:</Col>
-                <Col sm={8} md={10}>{ this.props.data.profile.gender === 'male' ? 'Nam' : 'Nữ' }</Col>
-                <Clearfix visibleSmBlock/>              
-              </Row>
+              <small>
+                <i>Địa chỉ:
+                  Căn hộ { apartments.map(apartment => (
+                    <i key={Math.random()}> {apartment.name} </i>
+                  ))}
+                </i>
+              </small>
             </div>
-            ) }
+            <div><small><i>Số điện thoại: { user.phone ? user.phone.number : 'None' }</i></small></div>
+            <div><small><i>Email: { user.emails ? user.emails.address : 'None' }</i></small></div>
+            { status && status === APPROVED && <div style={{ color: '#337ab7' }}><small><i>Trạng thái: Đã đồng ý</i></small></div> }
+            { status && status === REJECTED && <div style={{ color: '#d9534f' }}><small><i>Trạng thái: Không đồng ý</i></small></div> }
+          </div>
 
-            { this.props.data.phones && this.props.data.phones.number && (
-            <Row className={ s.item }>              
-              <Col sm={4} md={2} className={ s.label }><i className="fa fa-phone" /> Số điện thoại:</Col>
-              <Col sm={8} md={10}>{ this.props.data.phones.number }</Col>
-              <Clearfix visibleSmBlock/>              
-            </Row>
-            ) }
-
-            { this.props.data.emails && this.props.data.emails.address && (
-            <Row className={ s.item }>              
-              <Col sm={4} md={2} className={ s.label }><i className="fa fa-envelope-open-o" /> Email:</Col>
-              <Col sm={8} md={10}>{ this.props.data.emails.address }</Col>
-              <Clearfix visibleSmBlock/>              
-            </Row>
-            ) }
-
-            { this.props.data.apartments && (
-            <Row className={ s.item }>              
-              <Col sm={4} md={2} className={ s.label }><i className="fa fa-address-book-o" /> Địa chỉ:</Col>
-              <Col sm={8} md={10}>{ this.props.data.apartments.map(apartment => <p key={ Math.random() }>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</p>) }</Col>
-              <Clearfix visibleSmBlock/>              
-            </Row>
-            ) }
-            
-          </Grid>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button bsStyle="danger" onClick={ this.onCancel.bind(this) } disabled={ this.state.isLoading }><i className="fa fa-remove" /> { this.state.isLoading ? 'Loading...' : 'Từ chối' }</Button>
-          <Button bsStyle="primary" onClick={ this.onAccept.bind(this) } disabled={ this.state.isLoading }><i className="fa fa-check" /> { this.state.isLoading ? 'Loading...' : 'Đồng ý' }</Button>
-        </Modal.Footer>
-      </Modal>
+          <ButtonToolbar>
+            <Button title="Xem thông tin của thành viên" bsStyle="info" bsSize="xsmall" onClick={this.useDetail}>
+              <i className="fa fa-info-circle" /> Xem thông tin
+            </Button>
+            { status && status === PENDING &&
+              <ButtonGroup>
+                <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" bsSize="xsmall" onClick={this.approveUser}>
+                  <i className="fa fa-check" /> Đồng ý
+                </Button>
+                <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="danger" bsSize="xsmall" onClick={this.rejectUser}>
+                  <i className="fa fa-remove" /> Từ chối
+                </Button>
+              </ButtonGroup>
+            }
+          </ButtonToolbar>
+        </Col>
+        <Clearfix />
+      </Row>
     );
   }
 }
 
 User.propTypes = {
-  show: PropTypes.bool,
-  data: PropTypes.object.isRequired,
-  closeModal: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  edge: PropTypes.shape({
+    _id: PropTypes.string,
+    user: PropTypes.object,
+    status: PropTypes.string,
+    building: PropTypes.object,
+    requestInformation: PropTypes.object,
+  }).isRequired,
   onAccept: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 
 User.defaultProps = {
-  show: false,
+  edge: {},
 };
 
 export default withStyles(s)(User);

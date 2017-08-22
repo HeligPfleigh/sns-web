@@ -32,7 +32,7 @@ query userApprovalPageQuery($requestId: String!) {
       }
     }
     requestInformation {
-      apartment {
+      apartments {
         number
         name
       }

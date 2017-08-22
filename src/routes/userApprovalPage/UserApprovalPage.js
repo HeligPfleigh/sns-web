@@ -71,7 +71,6 @@ class UserApprovalPage extends Component {
 
   render() {
     const { data: { loading, requestsToJoinBuilding } } = this.props;
-    console.log(this.props);
     let user = null;
     let building = null;
     let requestInformation = null;

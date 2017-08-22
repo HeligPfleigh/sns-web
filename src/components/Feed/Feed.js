@@ -4,17 +4,10 @@ import {
   Image,
   MenuItem,
   Dropdown,
-  Button,
-  Clearfix,
 } from 'react-bootstrap';
-import { graphql, compose } from 'react-apollo';
-import update from 'immutability-helper';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import * as _ from 'lodash';
-import classnames from 'classnames';
-import moment from 'moment';
-
+import { noop } from 'lodash';
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -29,12 +22,9 @@ import {
   DELETE_POST_ACTION,
   EDIT_POST_ACTION,
   ONLY_ADMIN_BUILDING,
-  POST_TYPE_STATUS,
-  POST_TYPE_EVENT,
   SHARE,
   SHARE_FRIEND,
 } from '../../constants';
-import interestEvent from '../EventsComponents/EventList/interestEvent.graphql';
 import s from './Feed.scss';
 
 function doNothing(e) {
@@ -53,27 +43,6 @@ CustomToggle.propTypes = {
 };
 
 class Feed extends Component {
-
-  constructor(...args) {
-    super(...args);
-
-    this.state = {
-      isInterested: false,
-    };
-
-    this.onInterestClick = this.onInterestClick.bind(this);
-    this.onLikeCLick = this.onLikeCLick.bind(this);
-    this.onSelectRightEvent = this.onSelectRightEvent.bind(this);
-    this.onSelectShareButton = this.onSelectShareButton.bind(this);
-  }
-
-  async onInterestClick(event) {
-    event.preventDefault();
-    await this.props.interestEvent(this.props.data._id)
-      .then(() => this.setState({ isInterested: true }))
-      .catch(() => this.setState({ isInterested: false }));
-  }
-
   onLikeCLick = (evt) => {
     evt.preventDefault();
     const {
@@ -140,18 +109,12 @@ class Feed extends Component {
         privacy,
         building,
         sharing,
-        type,
-        event,
       },
       userInfo,
       loadMoreComments,
       createNewComment,
       sharingPostModalOpenned,
     } = this.props;
-    const IS_POST_TYPE_STATUS = type === POST_TYPE_STATUS;
-    const IS_POST_TYPE_EVENT = type === POST_TYPE_EVENT;
-    const isInterested = (IS_POST_TYPE_EVENT && _.isArray(event.interests) && event.interests.filter(u => u._id === userInfo._id).length > 0) || this.state.isInterested;
-
     return (
       <Post>
         <PostHeader
@@ -222,7 +185,7 @@ class Feed extends Component {
             <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
           </div>}
           menuRight={
-            (author && userInfo && (author._id === userInfo._id) && IS_POST_TYPE_STATUS) ?
+            (author && userInfo && author._id === userInfo._id) ?
               <Dropdown id={idRandom()} pullRight>
                 <CustomToggle bsRole="toggle">
                   <span title="Tùy chọn">
@@ -239,9 +202,7 @@ class Feed extends Component {
               </Dropdown> : <div></div>
           }
         />
-
-        {message && IS_POST_TYPE_STATUS && <PostText html={message} /> }
-
+        {message && <PostText html={message} /> }
         {sharing &&
           <SharingPost
             id={sharing._id}
@@ -253,44 +214,15 @@ class Feed extends Component {
             createdAt={sharing.createdAt}
           />
         }
-
         {!sharing && photos && photos.length > 0 && <PostPhotos images={photos} />}
         <PostText className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
         </PostText>
-
-        { IS_POST_TYPE_EVENT && (<div className={classnames('row', s.event)}>
-          <div className="col-xs-12">
-            <div className="col-xs-2">
-              <div className={s.time}>
-                <span className={s.day}>{moment(event.start).format('D')}</span>
-                <span className={s.month}>{moment(event.start).format('MMM')}</span>
-              </div>
-            </div>
-            <div className={classnames('col-xs-10', s.description)}>
-              <div className={s.name}><span className={s.maxWith}>{event.name}</span></div>
-              <div className={s.location}>
-                <div className={s.maxWith}>
-                  <span className="time">{moment(event.start).format('h:mm A')}</span>
-                  <span role="presentation" aria-hidden="true"> · </span>
-                  <a href="#">tại {event.location}</a>
-                </div>
-                <div className={classnames('pull-right', s.btnInterested)}>
-                  <Button type="button" className={s.btnOverride} disabled={isInterested} onClick={this.onInterestClick}><i className="fa fa-star" /> Quan tâm</Button>
-                </div>
-              </div>
-              <div className={s.stats}>{`${event.joins.length} người sẽ tham gia · ${event.can_joins.length} người có thể tham gia`}</div>
-            </div>
-          </div>
-          <Clearfix />
-        </div>) }
-
-        { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
+        { !sharingPostModalOpenned && (
         <Divider />
         ) }
-
-        { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
+        { !sharingPostModalOpenned && (
         <PostActions>
           <Icon
             onClick={this.onLikeCLick}
@@ -312,8 +244,7 @@ class Feed extends Component {
           </Dropdown>
         </PostActions>
         ) }
-
-        { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
+        { !sharingPostModalOpenned && (
         <PostContent className={s.commentPanel}>
           <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
         </PostContent>
@@ -387,8 +318,6 @@ Feed.propTypes = {
   editPostEvent: PropTypes.func.isRequired,
   sharingPostEvent: PropTypes.func.isRequired,
   sharingPostModalOpenned: PropTypes.bool,
-  queryData: PropTypes.object.isRequired,
-  paramData: PropTypes.object.isRequired,
 };
 
 Feed.defaultProps = {
@@ -398,13 +327,13 @@ Feed.defaultProps = {
   },
   userInfo: {},
   sharingPostModalOpenned: false,
-  onSelectRightEvent: _.noop,
-  editPostEvent: _.noop,
-  likePostEvent: _.noop,
-  unlikePostEvent: _.noop,
-  loadMoreComments: _.noop,
-  createNewComment: _.noop,
-  sharingPostEvent: _.noop,
+  onSelectRightEvent: noop,
+  editPostEvent: noop,
+  likePostEvent: noop,
+  unlikePostEvent: noop,
+  loadMoreComments: noop,
+  createNewComment: noop,
+  sharingPostEvent: noop,
 };
 
 /**
@@ -438,89 +367,43 @@ const commentFragment = gql`fragment CommentView on Comment {
   }
 `;
 
-const eventFragment = gql`fragment EventDetails on Event {
-    name
-    location
-    start
-    end
-    invites {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    joins {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    can_joins {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    cant_joins {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    interests {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    isAuthor
-  }
-`;
-
 Feed.fragments = {
   comment: commentFragment,
   requests: gql`
-    fragment UsersAwaitingApproval on Friend {
+    fragment UsersAwaitingApproval on RequestsToJoinBuilding {
       _id
-      emails {
-        address
-        verified
+      type
+      status
+      user {
+        _id
+        emails {
+          address
+          verified
+        }
+        phone {
+          number
+          verified
+        }
+        profile {
+          picture
+          firstName
+          lastName
+          gender
+        }
       }
-      phone {
-        number
-        verified
-      }
-      profile {
-        picture
-        firstName
-        lastName
-        gender
+      building {
+        _id
+        name
+        address {
+          basisPoint
+          province
+          district
+          ward
+          street
+        }
       }
       requestInformation {
         apartments {
-          _id
-          building {
-            _id
-            name
-            display
-            isAdmin
-          }
-          number
           name
         }
       }
@@ -531,7 +414,6 @@ Feed.fragments = {
     fragment PostView on Post {
       _id
       message
-      type
       user {
         _id
         username
@@ -606,12 +488,8 @@ Feed.fragments = {
         },
         updatedAt
       }
-      event {
-        ...EventDetails
-      }
     }
     ${commentFragment}
-    ${eventFragment}
   `,
 };
 
@@ -651,70 +529,4 @@ Feed.mutation = {
   `,
 };
 
-export default compose(
-  withStyles(s),
-  graphql(interestEvent, {
-    props: ({ mutate, ownProps }) => ({
-      interestEvent: eventId => mutate({
-        variables: {
-          eventId,
-        },
-        // optimisticResponse: {
-        //   __typename: 'Mutation',
-        //   interestEvent: {
-        //     __typename: 'Event',
-        //     _id: idRandom(),
-        //     isInterest: true,
-        //     message: null,
-        //     type: null,
-        //     user: null,
-        //     author: null,
-        //     sharing: null,
-        //     event: null,
-        //     building: null,
-        //     privacy: null,
-        //     name: null,
-        //     location: null,
-        //     start: (new Date()).toString(),
-        //     end: (new Date()).toString(),
-        //     invites: [],
-        //     joins: [],
-        //     can_joins: [],
-        //     cant_joins: [],
-        //     interests: [],
-        //     photos: [],
-        //     comments: [],
-        //     createdAt: (new Date()).toString(),
-        //     updatedAt: (new Date()).toString(),
-        //     totalLikes: 0,
-        //     totalComments: 0,
-        //     isLiked: false,
-        //     isAuthor: false,
-        //   },
-        // },
-        // update: (store, { data: { interestEvent: query } }) => {
-        //   // Read the data from our cache for this query.
-        //   let data = store.readQuery({
-        //     query: ownProps.queryData,
-        //     variables: ownProps.paramData,
-        //   });
-        //   console.log(data);
-
-        //   // data = update(data, {
-        //   //   event: {
-        //   //     isInterest: query.event.isInterest,
-        //   //     interests: query.event.interests,
-        //   //   },
-        //   // });
-
-        //   // Write our data back to the cache.
-        //   store.writeQuery({
-        //     query: ownProps.queryData,
-        //     variables: ownProps.paramData,
-        //     data,
-        //   });
-        // },
-      }),
-    }),
-  }),
-)(Feed);
+export default withStyles(s)(Feed);
