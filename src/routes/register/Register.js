@@ -437,10 +437,33 @@ const RegisterForm = reduxForm({
 
 const selector = formValueSelector('registerForm');
 const RegisterPage = connect((state) => {
+  const { user } = state;
+  let initialValues = {};
+  if (user) {
+    const {
+      username,
+      profile: {
+        firstName,
+        lastName,
+        gender,
+      },
+      email: emailVal,
+      phone,
+    } = user;
+
+    initialValues = {
+      username: username || '',
+      fullName: `${firstName} ${lastName}`,
+      gender: gender || 'female',
+      email: emailVal || '',
+      phoneNumber: phone || '',
+    };
+  }
+
   const firstPassword = selector(state, 'firstPassword');
   const building = selector(state, 'building');
   const apartments = (building && building.apartments) || [];
-  return { firstPassword, apartments };
+  return { initialValues, firstPassword, apartments };
 })(RegisterForm);
 
 export default RegisterPage;
