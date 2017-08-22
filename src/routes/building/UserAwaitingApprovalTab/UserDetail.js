@@ -29,7 +29,7 @@ class UserDetail extends Component {
     this.setState({
       isLoading: true,
     });
-    return this.props.onAccept(this.props.data)
+    return this.props.onCancel(this.props.data)
       .call(this, event)
       .then(() => this.onCloseModal())
       .catch(() => this.onCloseModal());
