@@ -3,7 +3,7 @@ import { Row, Col, Clearfix, ButtonToolbar, ButtonGroup, Button, Image } from 'r
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import history from '../../../core/history';
 import {
-  APPROVED,
+  ACCEPTED,
   REJECTED,
   PENDING,
 } from '../../../constants';
@@ -56,7 +56,7 @@ class User extends React.Component {
             </div>
             <div><small><i>Số điện thoại: { user.phone ? user.phone.number : 'None' }</i></small></div>
             <div><small><i>Email: { user.emails ? user.emails.address : 'None' }</i></small></div>
-            { status && status === APPROVED && <div style={{ color: '#337ab7' }}><small><i>Trạng thái: Đã đồng ý</i></small></div> }
+            { status && status === ACCEPTED && <div style={{ color: '#337ab7' }}><small><i>Trạng thái: Đã đồng ý</i></small></div> }
             { status && status === REJECTED && <div style={{ color: '#d9534f' }}><small><i>Trạng thái: Không đồng ý</i></small></div> }
           </div>
 
