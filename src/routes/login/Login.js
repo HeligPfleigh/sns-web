@@ -7,7 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import { Field, reduxForm, SubmissionError } from 'redux-form';
@@ -54,7 +55,7 @@ const fetchAPI = async (url, data) => {
 };
 
 @connect(null, { loginSuccess })
-class Login extends React.Component {
+class Login extends Component {
   static propTypes = {
     loginSuccess: PropTypes.func.isRequired,
   };

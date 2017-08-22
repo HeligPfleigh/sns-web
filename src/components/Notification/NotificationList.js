@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { generate as idRandom } from 'shortid';
 import NotificationItem from './NotificationItem';
 import s from './NotificationList.scss';
 
-class NotificationList extends React.Component {
+class NotificationList extends Component {
   static propTypes = {
     notifications: PropTypes.arrayOf(
       PropTypes.shape({

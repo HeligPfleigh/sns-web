@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Clearfix } from 'react-bootstrap';
@@ -10,7 +11,7 @@ import NewComment from './NewComment';
 
 configureAnchors({ offset: -160, scrollDuration: 200 });
 
-class CommentList extends React.Component {
+class CommentList extends Component {
 
   constructor(props) {
     super(props);

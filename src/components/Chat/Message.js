@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import _ from 'lodash';
 import moment from 'moment';
@@ -6,7 +7,7 @@ import classnames from 'classnames';
 import Link from '../Link';
 import s from './Message.scss';
 
-class Message extends React.Component {
+class Message extends Component {
   static propTypes = {
     message: PropTypes.object.isRequired,
     members: PropTypes.array.isRequired,
@@ -29,7 +30,7 @@ class Message extends React.Component {
         <div className={classnames(s.root, { [s.rootOwner]: isOwner })} >
           <div className={s.chatUser}>
             <Link to={`/user/${user.id}`}>
-              <img alt="Xem thông tin" src={picture || '/tile.png'} />
+              <img alt="Xem thông tin" src={picture || 'avatar-default.jpg'} />
             </Link>
           </div>
           <div className={s.message}>

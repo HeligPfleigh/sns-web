@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import throttle from 'lodash/throttle';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -16,6 +17,7 @@ import FeedList, { Feed } from '../../components/Feed';
 import ChatSideBar from '../ChatSideBar';
 import { PUBLIC } from '../../constants';
 import s from './Home.scss';
+import Loading from '../../components/Loading';
 
 const homePageQuery = gql`query homePageQuery ($cursor: String) {
   feeds (cursor: $cursor) {
@@ -81,8 +83,13 @@ class Home extends Component {
       sharingPost,
     } = this.props;
 
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     let hasNextPage = false;
-    if (!loading && feeds && feeds.pageInfo) {
+    if (feeds && feeds.pageInfo) {
       hasNextPage = feeds.pageInfo.hasNextPage;
     }
 
@@ -106,6 +113,10 @@ class Home extends Component {
                 deletePost={deletePost}
                 editPost={editPost}
                 sharingPost={sharingPost}
+                queryData={homePageQuery}
+                paramData={{
+                  cursor: null,
+                }}
               />
             </InfiniteScroll>
           </Col>
@@ -126,21 +137,15 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'network-only',
     }),
     props: ({ data }) => {
-      if (!data) {
-        return;
-      }
       const { fetchMore } = data;
       const loadMoreRows = throttle(() => fetchMore({
         variables: {
           cursor: data.feeds.pageInfo.endCursor,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return;
-          }
           const newEdges = fetchMoreResult.feeds.edges;
           const pageInfo = fetchMoreResult.feeds.pageInfo;
           return update(previousResult, {
@@ -163,10 +168,6 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return;
-          }
-
           const index = previousResult.feeds.edges.findIndex(item => item._id === fetchMoreResult.post._id);
           const updatedPost = update(previousResult.feeds.edges[index], {
             comments: {
@@ -199,6 +200,7 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
+            type: null,
             user: {
               __typename: 'Friend',
               _id: ownProps.data.me._id,
@@ -212,6 +214,7 @@ export default compose(
               profile: ownProps.data.me.profile,
             },
             sharing: null,
+            event: null,
             building: null,
             privacy,
             photos,
@@ -251,13 +254,27 @@ export default compose(
   }),
   graphql(Feed.mutation.likePost, {
     props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes) => mutate({
+      likePost: (postId, message, totalLikes, totalComments) => mutate({
         variables: { postId },
         optimisticResponse: {
           __typename: 'Mutation',
           likePost: {
             __typename: 'Post',
             _id: postId,
+            message,
+            type: null,
+            user: null,
+            author: null,
+            building: null,
+            sharing: null,
+            event: null,
+            privacy: null,
+            photos: null,
+            comments: [],
+            createdAt: (new Date()).toString(),
+            totalLikes: totalLikes + 1,
+            totalComments,
+            isLiked: true,
           },
         },
         updateQueries: {
@@ -290,6 +307,16 @@ export default compose(
             __typename: 'Post',
             _id: postId,
             message,
+            type: null,
+            user: null,
+            author: null,
+            building: null,
+            sharing: null,
+            event: null,
+            privacy: null,
+            photos: null,
+            comments: [],
+            createdAt: (new Date()).toString(),
             totalLikes: totalLikes - 1,
             totalComments,
             isLiked: false,

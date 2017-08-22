@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Button } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
@@ -133,7 +134,7 @@ const updateReadQuery = gql`mutation updateRead ($_id: String!) {
   }
 }${NotifyFragment}`;
 
-class Header extends React.Component {
+class Header extends Component {
 
   gotoHomePage =() => {
     history.push('/');

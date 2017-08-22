@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button, ButtonToolbar } from 'react-bootstrap';
 import { PENDING, NONE, ACCEPTED, REJECTED } from '../../constants';
 import s from './FriendStyle.scss';
 
-class Friend extends React.Component {
+class Friend extends Component {
   handleClickFriend = () => {
     const { friend, handleFriendAction, friendType } = this.props;
     if (friendType === ACCEPTED) {

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Col, Clearfix } from 'react-bootstrap';
 import { convertFromRaw } from 'draft-js';
@@ -24,7 +25,7 @@ function stripTags(input) {
   return input.replace(tags, '').replace(commentsTags, '').replace(whiteSpace, ''); // Just replace it by an empty string
 }
 
-class PostText extends React.Component {
+class PostText extends Component {
 
   render() {
     const { children, html, className } = this.props;

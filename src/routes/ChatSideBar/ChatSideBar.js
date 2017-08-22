@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FriendOnlineList from '../../components/FriendOnlineList';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
-import getFriendsQuery from './getFriendsQuery.graphql';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
+import getFriendsQuery from './getFriendsQuery.graphql';
 import * as chatActions from '../../actions/chat';
+import FriendOnlineList from '../../components/FriendOnlineList';
 
 import s from './ChatSideBar.scss';
 
@@ -47,7 +48,7 @@ export default compose(
   graphql(getFriendsQuery, {
     props: ({ data }) => {
       const { me } = data;
-      const friends = me && me.friends || [];
+      const friends = me && me.friends ? me.friends : [];
       return {
         data,
         friends,

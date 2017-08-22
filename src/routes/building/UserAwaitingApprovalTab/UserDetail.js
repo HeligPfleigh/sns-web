@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 
 import s from './UserAwaitingApproval.scss';
 
-class User extends Component {
+class UserDetail extends Component {
   /**
    *
    * @param {*} props
@@ -16,6 +16,10 @@ class User extends Component {
     this.state = {
       isLoading: false,
     };
+
+    this.onCloseModal = this.onCloseModal.bind(this);
+    this.onCancel = this.onCancel.bind(this);
+    this.onAccept = this.onAccept.bind(this);
   }
 
   /**
@@ -25,7 +29,7 @@ class User extends Component {
     this.setState({
       isLoading: true,
     });
-    return this.props.onAccept(this.props.data)
+    return this.props.onCancel(this.props.data)
       .call(this, event)
       .then(() => this.onCloseModal())
       .catch(() => this.onCloseModal());
@@ -59,7 +63,7 @@ class User extends Component {
    */
   render() {
     return (
-      <Modal show={this.props.show} onHide={this.onCloseModal.bind(this)}>
+      <Modal show={this.props.show} onHide={this.onCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Thông tin thành viên</Modal.Title>
         </Modal.Header>
@@ -68,14 +72,14 @@ class User extends Component {
             { this.props.data.profile && (
             <div>
               <Row className={s.item}>
-                <Col sm={4} md={2} className={s.label}><i className="fa fa-user-o" /> Họ và tên:</Col>
-                <Col sm={8} md={10}>{ this.props.data.profile.firstName } { this.props.data.profile.lastName }</Col>
+                <Col xs={6} sm={4} md={3} className={s.label}><i className="fa fa-user-o" /> Họ và tên:</Col>
+                <Col xs={6} sm={8} md={9}>{ this.props.data.profile.fullName }</Col>
                 <Clearfix visibleSmBlock />
               </Row>
 
               <Row className={s.item}>
-                <Col sm={4} md={2} className={s.label}><i className="fa fa-circle-o" /> Giới tính:</Col>
-                <Col sm={8} md={10}>{ this.props.data.profile.gender === 'male' ? 'Nam' : 'Nữ' }</Col>
+                <Col xs={6} sm={4} md={3} className={s.label}><i className="fa fa-circle-o" /> Giới tính:</Col>
+                <Col xs={6} sm={8} md={9}>{ this.props.data.profile.gender === 'male' ? 'Nam' : 'Nữ' }</Col>
                 <Clearfix visibleSmBlock />
               </Row>
             </div>
@@ -83,24 +87,24 @@ class User extends Component {
 
             { this.props.data.phones && this.props.data.phones.number && (
             <Row className={s.item}>
-              <Col sm={4} md={2} className={s.label}><i className="fa fa-phone" /> Số điện thoại:</Col>
-              <Col sm={8} md={10}>{ this.props.data.phones.number }</Col>
+              <Col xs={6} sm={4} md={3} className={s.label}><i className="fa fa-phone" /> Số điện thoại:</Col>
+              <Col xs={6} sm={8} md={9}>{ this.props.data.phones.number }</Col>
               <Clearfix visibleSmBlock />
             </Row>
             ) }
 
             { this.props.data.emails && this.props.data.emails.address && (
             <Row className={s.item}>
-              <Col sm={4} md={2} className={s.label}><i className="fa fa-envelope-open-o" /> Email:</Col>
-              <Col sm={8} md={10}>{ this.props.data.emails.address }</Col>
+              <Col xs={6} sm={4} md={3} className={s.label}><i className="fa fa-envelope-open-o" /> Email:</Col>
+              <Col xs={6} sm={8} md={9}>{ this.props.data.emails.address }</Col>
               <Clearfix visibleSmBlock />
             </Row>
             ) }
 
             { this.props.data.apartments && (
             <Row className={s.item}>
-              <Col sm={4} md={2} className={s.label}><i className="fa fa-address-book-o" /> Địa chỉ:</Col>
-              <Col sm={8} md={10}>{ this.props.data.apartments.map(apartment => <p key={Math.random()}>Căn hộ số #{ apartment.number }, thuộc tòa nhà { apartment.building.name }</p>) }</Col>
+              <Col xs={6} sm={4} md={3} className={s.label}><i className="fa fa-address-book-o" /> Căn hộ:</Col>
+              <Col xs={6} sm={8} md={9}>{ this.props.data.apartments.map(apartment => <span key={Math.random()}>{ apartment.number }</span>).reduce((prev, curr) => [prev, ' - ', curr]) }</Col>
               <Clearfix visibleSmBlock />
             </Row>
             ) }
@@ -108,15 +112,15 @@ class User extends Component {
           </Grid>
         </Modal.Body>
         <Modal.Footer>
-          <Button bsStyle="danger" onClick={this.onCancel.bind(this)} disabled={this.state.isLoading}><i className="fa fa-remove" /> { this.state.isLoading ? 'Loading...' : 'Từ chối' }</Button>
-          <Button bsStyle="primary" onClick={this.onAccept.bind(this)} disabled={this.state.isLoading}><i className="fa fa-check" /> { this.state.isLoading ? 'Loading...' : 'Đồng ý' }</Button>
+          <Button bsStyle="danger" onClick={this.onCancel} disabled={this.state.isLoading}><i className="fa fa-remove" /> { this.state.isLoading ? 'Loading...' : 'Từ chối' }</Button>
+          <Button bsStyle="primary" onClick={this.onAccept} disabled={this.state.isLoading}><i className="fa fa-check" /> { this.state.isLoading ? 'Loading...' : 'Đồng ý' }</Button>
         </Modal.Footer>
       </Modal>
     );
   }
 }
 
-User.propTypes = {
+UserDetail.propTypes = {
   show: PropTypes.bool,
   data: PropTypes.object.isRequired,
   closeModal: PropTypes.func.isRequired,
@@ -125,9 +129,9 @@ User.propTypes = {
 };
 
 
-User.defaultProps = {
+UserDetail.defaultProps = {
   show: false,
 };
 
-export default withStyles(s)(User);
+export default withStyles(s)(UserDetail);
 

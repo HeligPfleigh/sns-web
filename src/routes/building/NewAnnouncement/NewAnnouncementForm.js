@@ -8,26 +8,49 @@ import {
   minLength2,
 } from '../../../utils/validator';
 import {
-  ANNOUNCEMENT_TYPE,
+  TYPE1,
+  TYPE2,
 } from '../../../constants';
 import s from './NewAnnouncementForm.scss';
 
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
+const renderTextField = ({ input, placeholder, type, meta: { touched, error, warning } }) => (
   <div>
     <FormControl
       {...input}
-      placeholder={label}
+      placeholder={placeholder}
       type={type}
     />
     {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
   </div>
 );
 
-renderField.propTypes = {
-  label: PropTypes.string,
+renderTextField.propTypes = {
+  placeholder: PropTypes.string,
   input: PropTypes.any,
   type: PropTypes.string,
   meta: PropTypes.object,
+};
+
+const renderSelectField = ({ input, placeholder, options, type, meta: { touched, error, warning } }) => (
+  <div>
+    <FormControl
+      componentClass="select"
+      {...input}
+      placeholder={placeholder}
+      type={type}
+    >
+      {options && options.map(option => <option key={Math.random()} value={option.value}>{option.label}</option>)}
+    </FormControl>
+    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
+  </div>
+);
+
+renderSelectField.propTypes = {
+  placeholder: PropTypes.string,
+  input: PropTypes.any,
+  type: PropTypes.string,
+  meta: PropTypes.object,
+  options: PropTypes.arrayOf(PropTypes.object),
 };
 
 class NewAnnouncementForm extends Component {
@@ -36,31 +59,40 @@ class NewAnnouncementForm extends Component {
     const {
       handleSubmit,
     } = this.props;
+    const types = [
+      {
+        label: 'Loại #1',
+        value: TYPE1,
+      },
+      {
+        label: 'Loại #2',
+        value: TYPE2,
+      },
+    ];
     return (
       <div>
         <form onSubmit={handleSubmit}>
           <FormGroup>
             <ControlLabel>Kiểu thông báo</ControlLabel>
-            <br />
-            <Field name="type" component="select">
-              {
-                ANNOUNCEMENT_TYPE.map(t =>
-                  <option key={t} value={t}>{t}</option>,
-                )
-              }
-            </Field>
+            <Field
+              name="type"
+              type="select"
+              component={renderSelectField}
+              placeholder="Loại thông báo"
+              options={types}
+            />
           </FormGroup>
           <FormGroup>
             <ControlLabel>Tiêu đề</ControlLabel>
             <Field
               name="message"
               type="text"
-              component={renderField}
-              label="Message"
+              component={renderTextField}
+              placeholder="Tiêu đề"
               validate={[required, minLength2]}
             />
           </FormGroup>
-          <button type="submit">
+          <button type="submit" className="btn btn-primary">
             Cập nhật
           </button>
         </form>

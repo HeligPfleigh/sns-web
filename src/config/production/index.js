@@ -7,13 +7,29 @@ export const analytics = {
 
 };
 
+const serverIp = process.env.APP_IP || 'http://server:8081';
+const authPath = process.env.APP_AUTH_PATH || '/auth';
+
+// local run local production config
+// const ipBrowser = process.env.BROWSER_IP || 'http://localhost:8081';
+
+// local run server production config
+const ipBrowser = process.env.BROWSER_IP || 'http://api-sns.mttjsc.com';
+
 export const server = {
-  ip: process.env.APP_IP || 'http://server:8081',
-  graphql: process.env.APP_GRAPHQL_URL || 'http://server:8081/graphql',
-  ipBrowser: process.env.BROWSER_IP || 'http://api-sns.mttjsc.com',
-  graphqlBrowser: process.env.BROWSER_GRAPHQL_URL || 'http://api-sns.mttjsc.com/graphql',
-  authPath: process.env.APP_AUTH_PATH || '/auth',
-  imageUpload: 'http://api-sns.mttjsc.com/upload/image',
+  // internal url
+  ip: serverIp,
+  graphql: `${serverIp}/graphql`,
+
+  // proxy path
+  authPath,
+
+  // public url
+  ipBrowser,
+  graphqlBrowser: `${ipBrowser}/graphql`,
+
+  // parent path upload images url
+  imageUpload: `${ipBrowser}/upload/image`,
 };
 
 export const auth = {

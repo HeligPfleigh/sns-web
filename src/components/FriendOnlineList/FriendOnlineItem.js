@@ -1,13 +1,14 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Image } from 'react-bootstrap';
-import s from './FriendOnlineItem.scss';
+import { Image, Clearfix } from 'react-bootstrap';
 import moment from 'moment';
+import classNames from 'classnames';
+
 import Link from '../Link';
+import s from './FriendOnlineList.scss';
 
-moment.locale('vi');
-
-class FriendOnlineItem extends React.Component {
+class FriendOnlineItem extends Component {
 
   onCLick = (evt) => {
     evt.preventDefault();
@@ -24,7 +25,7 @@ class FriendOnlineItem extends React.Component {
     let status;
 
     if (typeof (isOnline) === 'boolean') {
-      status = <i className={`fa fa-circle ${s.iconOnline}`} aria-hidden="true"></i>;
+      status = <i className={classNames('fa fa-circle', s.iconOnline)} aria-hidden="true"></i>;
     } else if (typeof (isOnline) === 'number') {
       status = moment(isOnline).fromNow();
     } else {
@@ -32,30 +33,29 @@ class FriendOnlineItem extends React.Component {
     }
 
     return (
-      <Link
-        title="T"
-        to={`/messages/${conversationIdToRedirect}`}
-      >
-        <li>
-          <div onClick={this.handleClickFriend} className={s.friendChatItem}>
-            <div>
+      <li className={classNames('clearfix')}>
+        <Link
+          title="T"
+          to={`/messages/${conversationIdToRedirect}`}
+        >
+          <div onClick={this.handleClickFriend}>
+            <span className={classNames('pull-left', s.chatImg)}>
               <Image
-                className={s.avatarCircle}
-                alt={friend.profile && friend.profile.firstName}
+                alt={friend.profile && friend.profile.fullName}
                 src={friend.profile && friend.profile.picture}
-                title={friend.profile && `${friend.profile.firstName} ${friend.profile.lastName}`}
+                title={friend.profile && `${friend.profile.fullName}`}
                 circle
+                responsive
               />
+            </span>
+            <div className={classNames(s.chatBody, 'clearfix')}>
+              <strong>{friend.profile.fullName}</strong>
+              <span className="pull-right">{status}</span>
             </div>
-            <div className={s.nameContainer}>
-              <div className={s.textName}>
-                <span>{friend.profile.firstName} {friend.profile.lastName}</span>
-              </div>
-            </div>
-            {status}
           </div>
-        </li>
-      </Link>
+          <Clearfix />
+        </Link>
+      </li>
     );
   }
 }

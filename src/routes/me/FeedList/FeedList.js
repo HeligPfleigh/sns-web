@@ -97,6 +97,8 @@ class FeedList extends Component {
       deletePost,
       editPost,
       sharingPost,
+      queryData,
+      paramData,
     } = this.props;
     return (
       <div>
@@ -111,6 +113,8 @@ class FeedList extends Component {
           deletePost={deletePost}
           editPost={editPost}
           sharingPost={sharingPost}
+          queryData={queryData}
+          paramData={paramData}
         />
       </div>
     );
@@ -129,10 +133,10 @@ FeedList.propTypes = {
   deletePost: PropTypes.func.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
-  queryData: PropTypes.object.isRequired,
-  paramData: PropTypes.object.isRequired,
   client: PropTypes.object.isRequired,
   updatePost: PropTypes.func.isRequired,
+  queryData: PropTypes.object.isRequired,
+  paramData: PropTypes.object.isRequired,
 };
 
 export default withApollo(FeedList);

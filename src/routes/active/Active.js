@@ -7,7 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Field, reduxForm, SubmissionError } from 'redux-form';
 import { Circle } from 'better-react-spinkit';
@@ -20,7 +21,7 @@ import fetchAPI from '../../utils/fetchAPI';
 import { required } from '../../utils/validator';
 import s from './Active.scss';
 
-class Activated extends React.Component {
+class Activated extends Component {
 
   constructor(props) {
     super(props);

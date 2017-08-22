@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Image, Col, Clearfix } from 'react-bootstrap';
 import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
@@ -13,7 +14,7 @@ import CommentList from '../Comments/CommentList';
 
 const formatter = buildFormatter(vnStrings);
 
-class Post extends React.Component {
+class Post extends Component {
   static propTypes = {
     data: PropTypes.shape({
       _id: PropTypes.string,

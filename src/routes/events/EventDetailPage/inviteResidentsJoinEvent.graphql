@@ -1,56 +1,5 @@
 mutation inviteResidentsJoinEvent($eventId: String!, $residentsId: [String]!){
   inviteResidentsJoinEvent(eventId: $eventId, residentsId: $residentsId){
     _id
-    privacy
-    isDeleted
-    author {
-       _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    building {
-      _id
-      name
-    }
-    photos
-    name
-    location
-    start
-    end
-    message
-    invites {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    joins {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    interests {
-      _id
-      username
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-    createdAt
-    updatedAt
-    isAuthor
   }
 }

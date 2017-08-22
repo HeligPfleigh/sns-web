@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { generate as idRandom } from 'shortid';
 import DeletePostModal from './DeletePostModal';
@@ -150,6 +151,8 @@ class FeedList extends Component {
       userInfo,
       loadMoreComments,
       createNewComment,
+      queryData,
+      paramData,
     } = this.props;
 
     return (
@@ -166,6 +169,8 @@ class FeedList extends Component {
             createNewComment={createNewComment}
             editPostEvent={this.editPostEvent}
             sharingPostEvent={this.sharingPostEvent}
+            queryData={queryData}
+            paramData={paramData}
           />
         ))}
         <DeletePostModal
@@ -214,6 +219,8 @@ FeedList.propTypes = {
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func,
+  queryData: PropTypes.object.isRequired,
+  paramData: PropTypes.object.isRequired,
 };
 
 export default connect(

@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Image } from 'react-bootstrap';
 import Link from '../../Link';
 
-class CustomMenu extends React.Component {
+class CustomMenu extends Component {
   static propTypes = {
-    user: React.PropTypes.any,
-    children: React.PropTypes.any,
+    user: PropTypes.any,
+    children: PropTypes.any,
   }
 
   render() {

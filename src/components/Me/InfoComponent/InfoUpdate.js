@@ -1,10 +1,11 @@
-import React, { Component, PropTypes } from 'react';
-import { Field, reduxForm, initialize } from 'redux-form';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Field, reduxForm } from 'redux-form';
 import { FormGroup, Col, FormControl, Button, ControlLabel } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Info.scss';
 
-const validate = (values) => {
+const validate = () => {
   const errors = [];
   return errors;
 };

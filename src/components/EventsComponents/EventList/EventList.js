@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import InfiniteScroll from 'react-infinite-scroller';
 import {
@@ -9,11 +10,13 @@ import update from 'immutability-helper';
 import throttle from 'lodash/throttle';
 import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
 import s from './EventList.scss';
 import EventItem from '../EventItem/EventItem';
+import Loading from '../../../components/Loading';
 import interestEvent from './interestEvent.graphql';
 
-class EventList extends React.Component {
+class EventList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,10 +40,16 @@ class EventList extends React.Component {
       user,
     } = this.props;
 
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     let hasNextPage = false;
-    if (!loading && listEvent && listEvent.pageInfo) {
+    if (listEvent.pageInfo) {
       hasNextPage = listEvent.pageInfo.hasNextPage;
     }
+
     return (
       <div className={s.eventContentList}>
         <h4>Dòng sự kiện</h4>
@@ -51,15 +60,12 @@ class EventList extends React.Component {
               hasMore={hasNextPage}
               loader={<div className="loader">Đang tải ...</div>}
             >
-              {
-                listEvent && listEvent.edges && listEvent.edges.map(event => (
-                  <EventItem
-                    event={event}
-                    user={user}
-                    interestEvent={this.props.interestEvent}
-                  />
-                ))
-              }
+              { listEvent.edges.map(event => <EventItem
+                key={Math.random()}
+                event={event}
+                user={user}
+                interestEvent={this.props.interestEvent}
+              />) }
             </InfiniteScroll>
           </Col>
         </Row>
@@ -83,7 +89,6 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
     edges {
       _id
       privacy
-      isDeleted
       author {
         _id
         username
@@ -111,11 +116,11 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
       }
     }
     pageInfo {
-    	hasNextPage
+      hasNextPage
       total
       limit
       endCursor
-  	}
+    }
   }
 }`;
 
@@ -123,29 +128,9 @@ export default compose(
   withStyles(s),
   graphql(interestEvent, {
     props: ({ mutate }) => ({
-      interestEvent: (eventId, newInterestList) => mutate({
+      interestEvent: eventId => mutate({
         variables: {
           eventId,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          interestEvent: {
-            __typename: 'Event',
-            interests: newInterestList,
-            isInterest: true,
-          },
-        },
-        update: (store, { interestEvent }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({ query: interestEvent });
-          data = update(data, {
-            event: {
-              isInterest: interestEvent.event.isInterest,
-              interests: interestEvent.event.interests,
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({ query: interestEvent, data });
         },
       }),
     }),
@@ -156,7 +141,6 @@ export default compose(
         limit: 10,
         cursor: null,
       },
-      fetchPolicy: 'network-only',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
@@ -166,7 +150,6 @@ export default compose(
             limit: 5,
             cursor: data.listEvent.pageInfo.endCursor,
           },
-          fetchPolicy: 'network-only',
           updateQuery: (previousResult, { fetchMoreResult }) => {
             const newEdges = fetchMoreResult.listEvent.edges;
             const pageInfo = fetchMoreResult.listEvent.pageInfo;

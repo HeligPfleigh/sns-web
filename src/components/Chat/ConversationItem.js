@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classnames from 'classnames';
 import formatTime from '../../utils/time';
 import s from './Conversation.scss';
 
-class ConversationItem extends React.Component {
+class ConversationItem extends Component {
   static propTypes = {
     conversation: PropTypes.object,
     active: PropTypes.bool,
@@ -23,10 +24,7 @@ class ConversationItem extends React.Component {
     return (
       <div className={classnames(s.conversationItem, { [s.activeNew]: active })}>
         <div className={s.friendAvata}>
-          { receiver &&
-            <img alt={name} src={picture || '/tile.png'} />
-          }
-          { !picture && <img alt={name} src={'/tile.png'} /> }
+          { receiver && <img alt={name} src={picture || 'avatar-default.jpg'} /> }
         </div>
         <div onClick={onClick} className={s.friendInfo}>
           <div className={s.friendName}>

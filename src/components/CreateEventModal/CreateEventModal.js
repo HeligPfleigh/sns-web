@@ -1,12 +1,19 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button, Image, Dropdown, MenuItem } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './CreateEventModal.scss';
 import { graphql, compose } from 'react-apollo';
-import InputWithValidation from './InputWithValidation';
-import history from '../../core/history';
 import moment from 'moment';
+import gql from 'graphql-tag';
+import DateTime from 'react-datetime';
+import Draft, {
+  Editor,
+  EditorState,
+  CompositeDecorator,
+  convertToRaw,
+} from 'draft-js';
 import { generate as idRandom } from 'shortid';
+import history from '../../core/history';
 import uploadImage from '../../utils/uploadImage';
 import {
   HANDLE_REGEX,
@@ -15,19 +22,10 @@ import {
   FRIEND,
   ONLY_ME,
 } from '../../constants';
-import Draft from 'draft-js';
-import gql from 'graphql-tag';
-import {
-  Editor,
-  EditorState,
-  CompositeDecorator,
-  convertToRaw,
-} from 'draft-js';
-
+import InputWithValidation from './InputWithValidation';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
-
-import DateTime from 'react-datetime';
+import s from './CreateEventModal.scss';
 
 // const DateTimeField = require('react-bootstrap-datetimepicker');
 
@@ -358,7 +356,6 @@ class CreateEventModal extends Component {
                   }}
                 >
                   <Editor
-
                     editorState={editorState}
                     onChange={this.onChangeMessage}
                     placeholder="Mô tả sự kiện"
@@ -400,14 +397,13 @@ class CreateEventModal extends Component {
 CreateEventModal.propTypes = {
   show: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
-  createNewEvent: PropTypes.func,
+  createNewEvent: PropTypes.func.isRequired,
 };
 CreateEventModal.fragments = {
   event: gql`
     fragment EventView on Event{
       _id
       privacy
-      isDeleted
       author {
         _id
         username

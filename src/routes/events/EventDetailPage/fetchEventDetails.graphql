@@ -1,6 +1,26 @@
-mutation canJoinEvent($eventId: String!){
-  canJoinEvent(eventId: $eventId){
+query fetchEventDetails ($eventId: String!) {
+  event (_id: $eventId) {
     _id
+    privacy
+    author {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    building {
+      _id
+      name
+    }
+    photos
+    name
+    location
+    start
+    end
+    message
     invites {
       _id
       username
@@ -46,5 +66,8 @@ mutation canJoinEvent($eventId: String!){
         lastName
       }
     }
+    isAuthor
+    createdAt
+    updatedAt
   }
 }

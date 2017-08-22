@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
@@ -93,6 +94,7 @@ class PostDetail extends Component {
       createNewComment,
       sharingPost,
       deletePost,
+      postId,
     } = this.props;
     return (
       <Grid>
@@ -109,6 +111,10 @@ class PostDetail extends Component {
               deletePost={deletePost}
               editPost={editPost}
               sharingPost={sharingPost}
+              queryData={postDetailQuery}
+              paramData={{
+                postId,
+              }}
             />}
             { !post && <h3>Không tìm thấy bài viết !</h3> }
           </Col>
@@ -146,6 +152,7 @@ PostDetail.propTypes = {
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
+  postId: PropTypes.string.isRequired,
 };
 
 export default compose(

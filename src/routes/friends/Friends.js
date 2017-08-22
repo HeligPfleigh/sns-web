@@ -50,7 +50,6 @@ const mapResultsToProps = ({ data }) => {
 const mapPropsToOptions = () => ({
   variables: {},
   // pollInterval: 30000,
-  // fetchPolicy: 'cache-and-network',
 });
 
 class Friends extends Component {

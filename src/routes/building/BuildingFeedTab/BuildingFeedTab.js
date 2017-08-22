@@ -22,6 +22,8 @@ class BuildingFeedTab extends Component {
       deletePostOnBuilding,
       editPost,
       sharingPost,
+      queryData,
+      paramData,
     } = this.props;
     return (
       <div>
@@ -53,6 +55,8 @@ class BuildingFeedTab extends Component {
             deletePost={deletePostOnBuilding}
             editPost={editPost}
             sharingPost={sharingPost}
+            queryData={queryData}
+            paramData={paramData}
           />
         </InfiniteScroll>
       </div>
@@ -73,6 +77,8 @@ BuildingFeedTab.propTypes = {
   // buildingId: PropTypes.string.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
+  queryData: PropTypes.object.isRequired,
+  paramData: PropTypes.object.isRequired,
 };
 
 export default withStyles(s)(BuildingFeedTab);

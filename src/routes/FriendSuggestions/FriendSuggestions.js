@@ -17,7 +17,7 @@ class FriendSuggestions extends Component {
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
         {!loading && resident && resident.friendSuggestions && resident.friendSuggestions.edges.length > 0 && <FriendsList>
           <li style={{ paddingLeft: '10px' }}>
-            <Label label="Giới thiệu bạn bè" />
+            <Label label="Gợi ý kết bạn" />
           </li>
           {
             resident.friendSuggestions.edges.map(friend =>
@@ -52,8 +52,8 @@ export default compose(
       variables: {
         _id: ownProps.user.id,
         cursor: null,
+        limit: 4,
       },
-      fetchPolicy: 'network-only',
     }),
   }),
   graphql(sendFriendRequestMutation, {

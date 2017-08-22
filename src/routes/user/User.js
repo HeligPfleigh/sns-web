@@ -1,32 +1,46 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
+import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
+import throttle from 'lodash/throttle';
+import InfiniteScroll from 'react-infinite-scroller';
 import Tab from '../../components/Me/TabComponent/Tab';
 import Info from '../../components/Me/InfoComponent/Info';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import CommentList from '../../components/Comments/CommentList';
-import FeedList, { Feed } from '../../components/Feed';
+import FeedList from '../me/FeedList';
+import { Feed } from '../../components/Feed';
 import { PUBLIC, FRIEND, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './User.scss';
+import Loading from '../../components/Loading';
 
-const usersPageQuery = gql`query usersPageQuery($_id: String!) {
-  user(_id : $_id){
+const profilePageQuery = gql`query profilePageQuery($_id: String!, $cursor: String) {
+  resident(_id: $_id) {
     _id
-    username
+    isFriend
+    posts (cursor: $cursor) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        ...PostView
+      }
+    }
     profile {
       picture
       firstName
       lastName
+      gender
     }
-    posts {
-      ...PostView
-    }
-    isFriend
   }
   me {
     _id
@@ -35,7 +49,7 @@ const usersPageQuery = gql`query usersPageQuery($_id: String!) {
       picture
       firstName
       lastName
-    },
+    }
     friends {
       _id
       fullName
@@ -44,22 +58,94 @@ const usersPageQuery = gql`query usersPageQuery($_id: String!) {
         firstName
         lastName
       }
-    },
+    }
   }
 }
 ${Feed.fragments.post}`;
 
+const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: String!, $cursor: String) {
+  resident(_id: $_id) {
+    _id
+    isFriend
+    posts (cursor: $cursor) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        ...PostView
+      }
+    }
+    profile {
+      picture
+      firstName
+      lastName
+      gender
+    }
+  }
+}
+${Feed.fragments.post}
+`;
+
 class User extends Component {
 
+  updatePostInList = (data, index, post) => (update(data, {
+    resident: {
+      posts: {
+        edges: {
+          $splice: [[index, 1, post]],
+        },
+      },
+    },
+  }));
+
+  loadMoreRows = () => {
+    const {
+      loadMoreRows,
+      query,
+    } = this.props;
+    if (query && query.tab !== MY_INFO) {
+      loadMoreRows();
+    }
+  }
+
   render() {
-    const { data: { user, me }, query, id } = this.props;
-    const posts = user ? user.posts : [];
-    const avatar = user && user.profile && user.profile.picture;
-    const profile = user && user.profile;
+    const {
+      data: {
+        me,
+        resident,
+        loading,
+      },
+      query,
+      id,
+      createNewComment,
+      loadMoreComments,
+      editPost,
+      createNewPost,
+      deletePost,
+      sharingPost,
+    } = this.props;
+
+    // Show loading
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
+    const isFriend = resident && (resident.isFriend || resident._id === me._id);
+    const profile = resident && resident.profile;
+    const avatar = profile ? profile.picture : '';
     const numbers = 100;
+
     let tab = MY_TIME_LINE;
     if (query.tab) {
       tab = MY_INFO;
+    }
+
+    let hasNextPage = false;
+    if (resident && resident.posts && resident.posts.pageInfo) {
+      hasNextPage = resident.posts.pageInfo.hasNextPage;
     }
 
     return (
@@ -79,32 +165,42 @@ class User extends Component {
               </div>
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
-                  <div className={s.parent}>
-                    { me && user && user.isFriend && <NewPost
-                      createNewPost={this.props.createNewPost} friend={user}
-                      privacy={[
-                        {
-                          name: PUBLIC,
-                          glyph: 'globe',
-                        },
-                        {
-                          name: FRIEND,
-                          glyph: 'user',
-                        },
-                      ]}
-                    /> }
-                  </div>
-                  { me && posts && <FeedList
-                    feeds={posts}
-                    likePostEvent={this.props.likePost}
-                    unlikePostEvent={this.props.unlikePost}
-                    userInfo={me}
-                    deletePost={this.props.deletePost}
-                    loadMoreComments={this.props.loadMoreComments}
-                    createNewComment={this.props.createNewComment}
-                    editPost={this.props.editPost}
-                    sharingPost={this.props.sharingPost}
-                  />}
+
+                  { isFriend && (<div className={s.parent}><NewPost
+                    createNewPost={createNewPost} friend={resident}
+                    privacy={[
+                      {
+                        name: PUBLIC,
+                        glyph: 'globe',
+                      },
+                      {
+                        name: FRIEND,
+                        glyph: 'user',
+                      },
+                    ]}
+                  /></div>) }
+
+                  <InfiniteScroll
+                    loadMore={this.loadMoreRows}
+                    hasMore={hasNextPage}
+                    loader={<div className="loader">Loading ...</div>}
+                  >
+                    <FeedList
+                      feeds={resident.posts.edges}
+                      userInfo={me}
+                      loadMoreComments={loadMoreComments}
+                      createNewComment={createNewComment}
+                      deletePost={deletePost}
+                      editPost={editPost}
+                      sharingPost={sharingPost}
+                      queryData={profilePageQuery}
+                      paramData={{
+                        _id: resident._id,
+                        cursor: null,
+                      }}
+                      updatePost={this.updatePostInList}
+                    />
+                  </InfiniteScroll>
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
                   {profile && <Info profile={profile} isMe={false} />}
@@ -124,14 +220,15 @@ User.propTypes = {
     feeds: PropTypes.object,
     loading: PropTypes.bool.isRequired,
   }).isRequired,
-  createNewPost: PropTypes.func.isRequired,
-  likePost: PropTypes.func.isRequired,
-  unlikePost: PropTypes.func.isRequired,
-  loadMoreComments: PropTypes.func.isRequired,
-  createNewComment: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
+  createNewComment: PropTypes.func.isRequired,
+  createNewPost: PropTypes.func.isRequired,
+  loadMoreRows: PropTypes.func.isRequired,
   deletePost: PropTypes.func.isRequired,
-  query: PropTypes.object.isRequired,
+  loadMoreComments: PropTypes.func.isRequired,
+  query: PropTypes.shape({
+    tab: PropTypes.string,
+  }),
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
 };
@@ -144,18 +241,42 @@ User.defaultProps = {
 
 export default compose(
   withStyles(s),
-  graphql(usersPageQuery, {
-    options: props => ({
+  connect(state => ({
+    user: state.user,
+  })),
+  graphql(profilePageQuery, {
+    options: ownProps => ({
       variables: {
-        _id: props.id,
-        fetchPolicy: 'cache-and-network',
+        _id: ownProps.id,
+        cursor: null,
       },
     }),
-    props: ({ data }) => {
-      if (!data) {
-        return;
-      }
+    props: ({ ownProps, data }) => {
       const { fetchMore } = data;
+      const loadMoreRows = throttle(() => fetchMore({
+        variables: {
+          _id: ownProps.id,
+          cursor: data.resident.posts.pageInfo.endCursor,
+        },
+        query: morePostsProfilePageQuery,
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newEdges = fetchMoreResult.resident.posts.edges;
+          const pageInfo = fetchMoreResult.resident.posts.pageInfo;
+          return update(previousResult, {
+            resident: {
+              posts: {
+                edges: {
+                  $push: newEdges,
+                },
+                pageInfo: {
+                  $set: pageInfo,
+                },
+              },
+            },
+          });
+        },
+      }), 300);
+
       const loadMoreComments = (commentId, postId, limit = 5) => fetchMore({
         variables: {
           commentId,
@@ -164,15 +285,15 @@ export default compose(
         },
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const index = previousResult.user.posts.findIndex(item => item._id === fetchMoreResult.post._id);
+          const index = previousResult.resident.posts.findIndex(item => item._id === fetchMoreResult.post._id);
 
-          const updatedPost = update(previousResult.user.posts[index], {
+          const updatedPost = update(previousResult.resident.posts[index], {
             comments: {
               $push: fetchMoreResult.post.comments,
             },
           });
           return update(previousResult, {
-            user: {
+            resident: {
               posts: {
                 $splice: [[index, 1, updatedPost]],
               },
@@ -182,128 +303,63 @@ export default compose(
       });
       return {
         data,
+        loadMoreRows,
         loadMoreComments,
       };
     },
   }),
   graphql(NewPost.mutation.createNewPost, {
     props: ({ ownProps, mutate }) => ({
-      createNewPost: (message, privacy, photos, friend) => mutate({
-        variables: { message, privacy, photos, userId: friend._id },
+      createNewPost: (message, privacy, photos) => mutate({
+        variables: { message, privacy, photos },
         optimisticResponse: {
           __typename: 'Mutation',
           createNewPost: {
-            __typename: 'PostSchemas',
+            __typename: 'Post',
             _id: idRandom(),
             message,
-            user: {
-              __typename: 'UserSchemas',
-              _id: friend._id,
-              username: friend.username,
-              profile: friend.profile,
-            },
-            author: {
-              __typename: 'UserSchemas',
-              _id: ownProps.data.me._id,
-              username: ownProps.data.me.username,
-              profile: ownProps.data.me.profile,
-            },
-            privacy,
+            type: null,
+            user: null,
+            author: null,
             building: null,
             sharing: null,
-            comments: [],
+            event: null,
+            privacy,
             photos,
+            comments: [],
             createdAt: (new Date()).toString(),
             totalLikes: 0,
             totalComments: 0,
             isLiked: false,
           },
         },
-        updateQueries: {
-          usersPageQuery: (previousResult, { mutationResult }) => {
-            const newPost = mutationResult.data.createNewPost;
-            return update(previousResult, {
-              user: {
-                posts: {
-                  $unshift: [newPost],
+        update: (store, { data: { createNewPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.id,
+              cursor: null,
+            },
+          });
+          data = update(data, {
+            resident: {
+              posts: {
+                edges: {
+                  $unshift: [createNewPost],
                 },
               },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.likePost, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          likePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-          },
-        },
-        updateQueries: {
-          usersPageQuery: (previousResult, { mutationResult }) => {
-            let updatedPost = mutationResult.data.likePost;
-            const index = previousResult.user.posts.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.user.posts[index], {
-              totalLikes: totalLikes + 1,
-              isLiked: true,
-            });
-            return update(previousResult, {
-              user: {
-                posts: {
-                  $splice: [[index, 1, updatedPost]],
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.unlikePost, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          unlikePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-          },
-        },
-        updateQueries: {
-          usersPageQuery: (previousResult, { mutationResult }) => {
-            let updatedPost = mutationResult.data.unlikePost;
-            const index = previousResult.user.posts.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.user.posts[index], {
-              totalLikes: totalLikes - 1,
-              isLiked: false,
-            });
-            return update(previousResult, {
-              user: {
-                posts: {
-                  $splice: [[index, 1, updatedPost]],
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.sharingPost, {
-    props: ({ mutate }) => ({
-      sharingPost: (postId, privacy, message, userId) => mutate({
-        variables: {
-          _id: postId,
-          privacy: privacy || PUBLIC,
-          message,
-          userId,
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.id,
+              cursor: null,
+            },
+            data,
+          });
         },
       }),
     }),
@@ -314,6 +370,8 @@ export default compose(
         variables: {
           postId: post._id,
           message: post.message,
+          photos: post.photos || [],
+          privacy: post.privacy || PUBLIC,
           isDelPostSharing,
         },
         optimisticResponse: {
@@ -341,23 +399,66 @@ export default compose(
         update: (store, { data: { deletePost } }) => {
           // Read the data from our cache for this query.
           let data = store.readQuery({
-            query: usersPageQuery,
+            query: profilePageQuery,
             variables: {
               _id: ownProps.id,
+              cursor: null,
             },
           });
           data = update(data, {
-            user: {
+            resident: {
               posts: {
-                $unset: [deletePost._id],
+                edges: {
+                  $unset: [deletePost._id],
+                },
               },
             },
           });
           // Write our data back to the cache.
           store.writeQuery({
-            query: usersPageQuery,
+            query: profilePageQuery,
             variables: {
               _id: ownProps.id,
+              cursor: null,
+            },
+            data,
+          });
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.sharingPost, {
+    props: ({ ownProps, mutate }) => ({
+      sharingPost: (postId, privacy, message, userId) => mutate({
+        variables: {
+          _id: postId,
+          privacy: privacy || PUBLIC,
+          message,
+          userId,
+        },
+        update: (store, { data: { sharingPost } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.id,
+              cursor: null,
+            },
+          });
+          data = update(data, {
+            resident: {
+              posts: {
+                edges: {
+                  $unshift: [sharingPost],
+                },
+              },
+            },
+          });
+          store.writeQuery({
+            query: profilePageQuery,
+            variables: {
+              _id: ownProps.id,
+              cursor: null,
             },
             data,
           });
@@ -372,11 +473,11 @@ export default compose(
         optimisticResponse: {
           __typename: 'Mutation',
           createNewComment: {
-            __typename: 'CommentSchemas',
-            _id: 'TENPORARY_ID_OF_THE_COMMENT_OPTIMISTIC_UI',
+            __typename: 'Comment',
+            _id: idRandom(),
             message,
             user: {
-              __typename: 'UserSchemas',
+              __typename: 'Author',
               _id: user._id,
               username: user.username,
               profile: user.profile,
@@ -387,10 +488,11 @@ export default compose(
           },
         },
         updateQueries: {
-          usersPageQuery: (previousResult, { mutationResult }) => {
+          profilePageQuery: (previousResult, { mutationResult }) => {
             const newComment = mutationResult.data.createNewComment;
-            const index = previousResult.user.posts.findIndex(item => item._id === postId);
-            const currentPost = previousResult.user.posts[index];
+            const index = previousResult.resident.posts.edges.findIndex(item => item._id === postId);
+            const currentPost = previousResult.resident.posts.edges[index];
+
             let updatedPost = null;
             if (currentPost._id !== postId) {
               return previousResult;
@@ -404,7 +506,6 @@ export default compose(
               if (!commentItem.reply) {
                 commentItem.reply = [];
               }
-
               // push value into property reply
               commentItem.reply.push(newComment);
               updatedPost = update(currentPost, {
@@ -421,11 +522,12 @@ export default compose(
                 },
               });
             }
-
             return update(previousResult, {
-              user: {
+              resident: {
                 posts: {
-                  $splice: [[index, 1, updatedPost]],
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
                 },
               },
             });

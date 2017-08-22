@@ -20,7 +20,7 @@ class BuildingAnnouncement extends Component {
     return (
       <div>
         {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
-        {!loading && building &&
+        {!loading && building && building.announcements && building.announcements.edges.length > 0 &&
           <BuildingAnnouncementList buildingId={building._id}>
             <BuildingAnnouncementHeader />
             {
@@ -70,7 +70,6 @@ export default compose(
         userId: ownProps.user.id,
         limit: 3,
       },
-      fetchPolicy: 'network-only',
     }),
   }),
 )(BuildingAnnouncement);

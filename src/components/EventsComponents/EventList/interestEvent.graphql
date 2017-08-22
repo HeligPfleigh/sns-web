@@ -2,7 +2,6 @@ mutation interestEvent($eventId: String!){
   interestEvent(eventId: $eventId){
     _id
     privacy
-    isDeleted
     author {
        _id
       username

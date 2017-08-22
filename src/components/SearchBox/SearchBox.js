@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -56,13 +57,13 @@ function renderSuggestion(suggestion, { query }) {
   return (
     <Link to={`/user/${suggestion.userId}`} style={{ textDecoration: 'none' }}>
       <span className={'suggestion-content '}>
-        <img className={'suggestion-avatar'} src={suggestion.picture} />
+        <img className={'suggestion-avatar'} src={suggestion.picture} alt={suggestion.picture} />
         <span className="name">
           {
-            parts.map((part, index) => {
+            parts.map((part) => {
               const className = part.highlight ? 'highlight' : null;
               return (
-                <span className={className} key={index}>{part.text}</span>
+                <span className={className} key={Math.random()}>{part.text}</span>
               );
             })
           }
@@ -88,7 +89,7 @@ function renderSuggestion(suggestion, { query }) {
 //   );
 // }
 
-class SearchBox extends React.Component {
+class SearchBox extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -236,7 +237,7 @@ SearchBox.defaultProps = {
   isMobile: false,
 };
 SearchBox.propTypes = {
-  isMobile: React.PropTypes.bool.isRequired,
+  isMobile: PropTypes.bool.isRequired,
 };
 
 export default withStyles(s)(withApollo(SearchBox));

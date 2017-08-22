@@ -23,6 +23,7 @@ export default {
         const redirect = checkAuth(store);
         if (redirect) return redirect;
         const EventDetailPage = await require.ensure([], require => require('./EventDetailPage/EventDetailPage').default, 'events');
+
         return {
           title: 'SNS - Sự kiện sắp tới',
           component: <Layout><EventDetailPage eventId={context.params.eventId} /></Layout>,

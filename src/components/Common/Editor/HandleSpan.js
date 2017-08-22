@@ -1,5 +1,5 @@
-/** HandleSpan Componet */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const styles = {
   handle: {
@@ -24,8 +24,8 @@ HandleSpan.defaultProps = {
 };
 
 HandleSpan.propTypes = {
-  offsetKey: React.PropTypes.string,
-  children: React.PropTypes.arrayOf(React.PropTypes.any),
+  offsetKey: PropTypes.string,
+  children: PropTypes.arrayOf(PropTypes.any),
 };
 
 export default HandleSpan;

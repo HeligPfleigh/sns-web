@@ -33,3 +33,104 @@ a {
     font-size: 12px;
     font-style: italic;
 }
+
+.event {
+  border-top: 1px solid #cdcdcd;
+  padding-top: 15px;
+
+  .description {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .maxWith {
+      width: 75%;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .name {
+      width: 100%;
+      color: #1d2129;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 18px;
+      padding-bottom: 5px;
+      display: inline-block;
+    }
+    .location {
+      width: 100%;
+      font-size: 12px;
+      line-height: 16px;
+    }
+    .stats {
+      padding-top: 2px;
+      font-size: 12px;
+      line-height: 16px;
+      color: #90949c;
+      display: inline-block;
+    }
+  }
+
+  .time {
+    display: inline-block;
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    text-transform: uppercase;
+    
+    span {
+      width: 100%;
+      display: block;
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+      white-space: nowrap;
+
+      &.day {
+        color: #fa3e3e;
+        font-size: 20px;
+        line-height: 20px;
+        font-family: inherit;
+      }
+    
+      &.month {
+        font-size: 24px;
+        line-height: 28px;
+        margin: 2px 0 0 0;
+        font-weight: 300;
+        font-family: inherit;
+      }
+    }
+  }
+
+  .btnInterested {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    
+    .btnOverride {
+      border-color: #FF8C00;
+      color: #FF8C00;
+      border-radius: 15px;
+      outline: none !important;
+
+      &:hover, &:active, &:focus, &:disabled {
+        border-color: #fff;
+        color: #fff;
+        background-color: #FF8C00;
+      }
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  .event {
+    .btnInterested {
+      display: none;
+    }
+  }
+}
