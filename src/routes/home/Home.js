@@ -137,6 +137,7 @@ export default compose(
   withStyles(s),
   graphql(homePageQuery, {
     options: () => ({
+      fetchPolicy: 'network-only',
     }),
     props: ({ data }) => {
       const { fetchMore } = data;

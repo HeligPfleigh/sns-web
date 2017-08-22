@@ -51,6 +51,7 @@ export default compose(
       variables: {
         buildingId: ownProps.buildingId,
       },
+      fetchPolicy: 'network-only',
     }),
   }),
 )(BuildingAnnouncementPage);
