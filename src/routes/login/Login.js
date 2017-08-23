@@ -16,7 +16,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import history from '../../core/history';
 import { required, normalLength } from '../../utils/validator';
-import loginSuccess from '../../actions/user';
+import loginSuccess, { remove } from '../../actions/user';
 import s from './Login.scss';
 
 const renderField = ({ className, input, placeholder, type, addOn, meta: { touched, error } }) => (
@@ -54,11 +54,11 @@ const fetchAPI = async (url, data) => {
   return user;
 };
 
-@connect(null, { loginSuccess })
+@connect(null, {
+  loginSuccess,
+  removeStateUser: remove,
+})
 class Login extends Component {
-  static propTypes = {
-    loginSuccess: PropTypes.func.isRequired,
-  };
 
   loginAction = (values) => {
     const { username, password } = values;
@@ -75,8 +75,11 @@ class Login extends Component {
         try {
           const user = await fetchAPI('/auth/login', { username, password });
           this.props.loginSuccess(user);
-          if (isEmpty(user.buildings) || user.isActive === 0) {
+          if (isEmpty(user.buildings)) {
             history.push('/register');
+          } else if (user.isActive === 0) {
+            this.props.removeStateUser();
+            history.push('/waiting');
           } else {
             history.push('/');
           }
@@ -103,8 +106,11 @@ class Login extends Component {
           try {
             const user = await fetchAPI('/auth/facebook', { access_token });
             this.props.loginSuccess(user);
-            if (isEmpty(user.buildings) || user.isActive === 0) {
+            if (isEmpty(user.buildings)) {
               history.push('/register');
+            } else if (user.isActive === 0) {
+              this.props.removeStateUser();
+              history.push('/waiting');
             } else {
               history.push('/');
             }
@@ -125,7 +131,7 @@ class Login extends Component {
     return (
       <section className={`container ${s.login_form}`}>
         <section>
-          <form autoComplete="off" onSubmit={handleSubmit(this.loginAction)}>
+          <form autoComplete="off" onSubmit={handleSubmit(this.loginAction)} method="POST">
             <img src="/logo2.png" alt="" className="img-responsive" />
             {error && <div style={{ backgroundColor: '#E53935', color: 'white', fontSize: '1.1em' }}><i>{error}</i></div>}
 
@@ -186,8 +192,9 @@ class Login extends Component {
 
 Login.propTypes = {
   error: PropTypes.any,
-  handleSubmit: PropTypes.func,
   submitting: PropTypes.bool,
+  handleSubmit: PropTypes.func,
+  removeStateUser: PropTypes.func,
 };
 
 export default reduxForm({
