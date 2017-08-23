@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 export default role => (route) => {
   const newRoute = {
@@ -34,16 +34,24 @@ export const requireAuth = (route) => {
     },
   };
   const children = route && route.children;
-  if (!_.isEmpty(children)) {
+  if (!isEmpty(children)) {
     newRoute.children = children.map(childRoute => requireAuth(childRoute));
   }
   return newRoute;
 };
 export const checkAuth = (store) => {
   const state = store.getState();
-  if (!state.user || !state.user.id) {
+  if (isEmpty(state.user)) {
     return {
       redirect: '/login',
+    };
+  } else if (isEmpty(state.user.buildings)) {
+    return {
+      redirect: '/register',
+    };
+  } else if (state.user.isActive === 0) {
+    return {
+      redirect: '/waiting',
     };
   }
   return false;
