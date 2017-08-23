@@ -146,93 +146,23 @@ ListUsers.propTypes = {
 export default compose(
   withStyles(s),
   graphql(approvingUserToBuildingMutation, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       approvingUserToBuilding: id => mutate({
         variables: {
           input: {
             requestsToJoinBuildingId: id,
           },
         },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          approvingUserToBuilding: {
-            __typename: 'ApprovingUserToBuildingPayload',
-            request: {
-              __typename: 'RequestsToJoinBuilding',
-              _id: id,
-              type: null,
-              status: null,
-            },
-          },
-        },
-        update: (store, { data: { approvingUserToBuilding } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: ownProps.loadBuildingQuery,
-            variables: ownProps.param,
-          });
-          const r = approvingUserToBuilding.request;
-          data = update(data, {
-            building: {
-              requests: {
-                edges: {
-                  $unset: [r._id],
-                },
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: ownProps.loadBuildingQuery,
-            variables: ownProps.param,
-            data,
-          });
-        },
       }),
     }),
   }),
   graphql(rejectingUserToBuildingMutation, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       rejectingUserToBuilding: id => mutate({
         variables: {
           input: {
             requestsToJoinBuildingId: id,
           },
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          rejectingUserToBuilding: {
-            __typename: 'RejectingUserToBuildingPayload',
-            request: {
-              __typename: 'RequestsToJoinBuilding',
-              _id: id,
-              type: null,
-              status: null,
-            },
-          },
-        },
-        update: (store, { data: { rejectingUserToBuilding } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: ownProps.loadBuildingQuery,
-            variables: ownProps.param,
-          });
-          const r = rejectingUserToBuilding.request;
-          data = update(data, {
-            building: {
-              requests: {
-                edges: {
-                  $unset: [r._id],
-                },
-              },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: ownProps.loadBuildingQuery,
-            variables: ownProps.param,
-            data,
-          });
         },
       }),
     }),
