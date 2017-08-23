@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   Row,
-  Col,
   Modal,
   Button,
   MenuItem,
   Dropdown,
   ButtonToolbar,
+  InputGroup,
 } from 'react-bootstrap';
 import {
   Editor,
@@ -204,13 +204,6 @@ class SharingPostModal extends Component {
    */
   render() {
     const { shareType, friends, sharingFeed, show } = this.props;
-    const lblStyle = {
-      padding: '7.6px 0px',
-      border: '1px solid #CCCCCC',
-      borderLeft: 0,
-      textAlign: 'center',
-      backgroundColor: '#ECF0F7',
-    };
 
     return (
       <Modal show={show} onHide={this.closeModal}>
@@ -219,8 +212,10 @@ class SharingPostModal extends Component {
         </Modal.Header>
         <Modal.Body>
           { (shareType === SHARE_FRIEND) && <Row style={{ marginBottom: '10px' }}>
-            <Col sm={1} xsHidden style={lblStyle}>Bạn bè: </Col>
-            <Col sm={11} style={{ padding: 0 }}>
+            <InputGroup>
+              <InputGroup.Addon style={{ borderRadius: 0 }}>
+                Bạn bè
+              </InputGroup.Addon>
               <UserSelect
                 style={{ borderRadius: 0 }}
                 name="user-select"
@@ -231,7 +226,7 @@ class SharingPostModal extends Component {
                 valueKey="_id"
                 labelKey="fullName"
               />
-            </Col>
+            </InputGroup>
           </Row> }
           <div style={styles.editor} onClick={this.focus}>
             <Editor
