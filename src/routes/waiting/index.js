@@ -8,26 +8,23 @@
  */
 
 import React from 'react';
-import isEmpty from 'lodash/isEmpty';
 
-const title = 'Đăng kí tài khoản';
+const title = 'Kích hoạt tài khoản';
 
 export default {
-
-  path: '/register',
+  path: '/waiting',
 
   async action({ store }) {
     const state = store.getState();
-    if (state.user && !isEmpty(state.user.buildings)) {
+    if (state.user) {
       return { redirect: '/' };
     }
 
-    const Register = await require.ensure([], require => require('./Register').default, 'register');
+    const Waiting = await require.ensure([], require => require('./Waiting').default, 'waiting');
 
     return {
       title,
-      component: <Register title={title} />,
+      component: <Waiting title={title} />,
     };
   },
-
 };

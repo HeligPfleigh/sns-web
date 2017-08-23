@@ -1,0 +1,32 @@
+@import "../../theme/resources.scss";
+
+/***** Start Format Login Page *****/
+* {
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+	outline: none;
+}
+
+body {
+	// background: url('/login_background.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+/***** Mobile Style *****/
+@media (orientation: portrait) {
+  .div_blank {
+    padding-top: 105px;
+  }
+}
+
+@media (orientation: landscape) {
+  .div_blank {
+    padding-top: 25px;
+  }
+}
+
+/***** End Format Login Form *****/
