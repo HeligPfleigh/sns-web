@@ -24,6 +24,7 @@ class UploadFeeFile extends React.Component {
           <div className={s.title}>
             <i className="fa fa-money" aria-hidden="true"></i>
             <h4>Upload biểu phí</h4>
+            <a href="http://api-sns.mttjsc.com/images/template_fee.xlsx" className={s.downloadFile}><i className="fa fa-download" aria-hidden="true"> File Mẫu</i></a>
           </div>
           <ul className={s.list}>
             <li>
