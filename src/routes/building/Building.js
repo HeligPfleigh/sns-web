@@ -18,8 +18,6 @@ import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
-import acceptRequestForJoiningBuildingMutation from './graphql/acceptRequestForJoiningBuildingMutation.graphql';
-import rejectRequestForJoiningBuildingMutation from './graphql/rejectRequestForJoiningBuildingMutation.graphql';
 import deletePostOnBuildingMutation from './graphql/deletePostOnBuildingMutation.graphql';
 import Sponsored from './Sponsored';
 import BuildingFeedTab from './BuildingFeedTab';
@@ -148,39 +146,7 @@ class Building extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      errorMessage: '',
       activeTab: POST_TAB,
-    };
-
-    this.onAccept = this.onAccept.bind(this);
-    this.onCancel = this.onCancel.bind(this);
-    this.loadMoreUsersAwaitingApproval = this.loadMoreUsersAwaitingApproval.bind(this);
-    this.loadMoreFeeds = this.loadMoreFeeds.bind(this);
-  }
-
-  onAccept(friend) {
-    return (event) => {
-      event.preventDefault();
-      const xhr = this.props.acceptRequestForJoiningBuilding(friend);
-      xhr.catch((error) => {
-        this.setState({
-          errorMessage: error.message,
-        });
-      });
-      return xhr;
-    };
-  }
-
-  onCancel(friend) {
-    return (event) => {
-      event.preventDefault();
-      const xhr = this.props.rejectRequestForJoiningBuilding(friend);
-      xhr.catch((error) => {
-        this.setState({
-          errorMessage: error.message,
-        });
-      });
-      return xhr;
     };
   }
 
@@ -227,7 +193,6 @@ class Building extends Component {
     if (query.tab) {
       tab = query.tab;
     }
-
     return (
       <Grid>
         <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={Math.random()}>
@@ -291,12 +256,14 @@ class Building extends Component {
                 {/* Users awaiting approval */}
                 { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <ListUsersAwaitingApproval
+                    data={building.requests}
                     loadMore={this.loadMoreUsersAwaitingApproval}
                     loading={loading}
-                    building={building}
-                    onAccept={this.onAccept}
-                    onCancel={this.onCancel}
-                    error={this.state.errorMessage}
+                    loadBuildingQuery={loadBuildingQuery}
+                    param={{
+                      buildingId: building._id,
+                      limit: 1000,
+                    }}
                   />
                 </Tab.Pane>) }
               </Tab.Content>
@@ -329,8 +296,6 @@ Building.propTypes = {
   query: PropTypes.object.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
-  acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
-  rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -340,9 +305,10 @@ export default compose(
       variables: {
         buildingId: props.buildingId,
         limit: 1000, // FIXME: paging,
+        fetchPolicy: 'cache-and-network',
       },
     }),
-    props: ({ data }) => {
+    props: ({ ownProps, data }) => {
       if (!data) {
         return;
       }
@@ -447,7 +413,6 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
-            type: null,
             user: null,
             author: {
               __typename: 'Author',
@@ -461,7 +426,6 @@ export default compose(
               name: ownProps.data.building.name,
             },
             sharing: null,
-            event: null,
             privacy,
             photos,
             comments: [],
@@ -695,74 +659,6 @@ export default compose(
                 posts: {
                   edges: {
                     $splice: [[index, 1, updatedPost]],
-                  },
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(acceptRequestForJoiningBuildingMutation, {
-    props: ({ ownProps, mutate }) => ({
-      acceptRequestForJoiningBuilding: data => mutate({
-        variables: {
-          buildingId: ownProps.buildingId,
-          userId: data._id,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          acceptRequestForJoiningBuilding: {
-            __typename: 'Friend',
-            _id: data._id,
-          },
-        },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            if (!mutationResult) {
-              return;
-            }
-            const r = mutationResult.data.acceptRequestForJoiningBuilding;
-            return update(previousResult, {
-              building: {
-                requests: {
-                  edges: {
-                    $unset: [r._id],
-                  },
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(rejectRequestForJoiningBuildingMutation, {
-    props: ({ ownProps, mutate }) => ({
-      rejectRequestForJoiningBuilding: data => mutate({
-        variables: {
-          buildingId: ownProps.buildingId,
-          userId: data._id,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          rejectRequestForJoiningBuilding: {
-            __typename: 'Friend',
-            _id: data._id,
-          },
-        },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            if (!mutationResult) {
-              return;
-            }
-            const r = mutationResult.data.rejectRequestForJoiningBuilding;
-            return update(previousResult, {
-              building: {
-                requests: {
-                  edges: {
-                    $unset: [r._id],
                   },
                 },
               },

@@ -497,33 +497,41 @@ const eventFragment = gql`fragment EventDetails on Event {
 Feed.fragments = {
   comment: commentFragment,
   requests: gql`
-    fragment UsersAwaitingApproval on Friend {
+    fragment UsersAwaitingApproval on RequestsToJoinBuilding {
       _id
-      emails {
-        address
-        verified
+      type
+      status
+      user {
+        _id
+        emails {
+          address
+          verified
+        }
+        phone {
+          number
+          verified
+        }
+        profile {
+          picture
+          firstName
+          lastName
+          gender
+        }
       }
-      phone {
-        number
-        verified
-      }
-      profile {
-        picture
-        fullName
-        firstName
-        lastName
-        gender
+      building {
+        _id
+        name
+        address {
+          basisPoint
+          province
+          district
+          ward
+          street
+        }
       }
       requestInformation {
         apartments {
           _id
-          building {
-            _id
-            name
-            display
-            isAdmin
-          }
-          number
           name
         }
       }
