@@ -185,7 +185,7 @@ class Me extends Component {
                       profile={profile}
                       queryData={profilePageQuery}
                       paramData={{
-                        _id: resident._id,
+                        _id: me._id,
                         cursor: null,
                       }}
                     />
