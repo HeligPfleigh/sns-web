@@ -3,7 +3,6 @@ import InfiniteScroll from 'react-infinite-scroller';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-import update from 'immutability-helper';
 import { Panel } from 'react-bootstrap';
 import classNames from 'classnames';
 import User from './User';
@@ -11,6 +10,11 @@ import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.g
 import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
 import { openAlertGlobal } from '../../../reducers/alert';
 import Errors from '../Errors';
+import {
+  ACCEPTED,
+  REJECTED,
+  MEMBER,
+} from '../../../constants';
 import s from './UserAwaitingApproval.scss';
 
 class ListUsers extends React.Component {
@@ -153,6 +157,18 @@ export default compose(
             requestsToJoinBuildingId: id,
           },
         },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          approvingUserToBuilding: {
+            __typename: 'ApprovingUserToBuildingPayload',
+            request: {
+              __typename: 'RequestsToJoinBuilding',
+              _id: id,
+              type: MEMBER,
+              status: ACCEPTED,
+            },
+          },
+        },
       }),
     }),
   }),
@@ -162,6 +178,18 @@ export default compose(
         variables: {
           input: {
             requestsToJoinBuildingId: id,
+          },
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectingUserToBuilding: {
+            __typename: 'RejectingUserToBuildingPayload',
+            request: {
+              __typename: 'RequestsToJoinBuilding',
+              _id: id,
+              type: MEMBER,
+              status: REJECTED,
+            },
           },
         },
       }),
