@@ -18,6 +18,8 @@ import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
+import acceptRequestForJoiningBuildingMutation from './graphql/acceptRequestForJoiningBuildingMutation.graphql';
+import rejectRequestForJoiningBuildingMutation from './graphql/rejectRequestForJoiningBuildingMutation.graphql';
 import deletePostOnBuildingMutation from './graphql/deletePostOnBuildingMutation.graphql';
 import Sponsored from './Sponsored';
 import BuildingFeedTab from './BuildingFeedTab';
@@ -146,7 +148,39 @@ class Building extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      errorMessage: '',
       activeTab: POST_TAB,
+    };
+
+    this.onAccept = this.onAccept.bind(this);
+    this.onCancel = this.onCancel.bind(this);
+    this.loadMoreUsersAwaitingApproval = this.loadMoreUsersAwaitingApproval.bind(this);
+    this.loadMoreFeeds = this.loadMoreFeeds.bind(this);
+  }
+
+  onAccept(friend) {
+    return (event) => {
+      event.preventDefault();
+      const xhr = this.props.acceptRequestForJoiningBuilding(friend);
+      xhr.catch((error) => {
+        this.setState({
+          errorMessage: error.message,
+        });
+      });
+      return xhr;
+    };
+  }
+
+  onCancel(friend) {
+    return (event) => {
+      event.preventDefault();
+      const xhr = this.props.rejectRequestForJoiningBuilding(friend);
+      xhr.catch((error) => {
+        this.setState({
+          errorMessage: error.message,
+        });
+      });
+      return xhr;
     };
   }
 
@@ -178,6 +212,8 @@ class Building extends Component {
   render() {
     const {
       data: { building, me, loading },
+      likePost,
+      unlikePost,
       createNewComment,
       loadMoreComments,
       createNewPostOnBuilding,
@@ -191,6 +227,7 @@ class Building extends Component {
     if (query.tab) {
       tab = query.tab;
     }
+
     return (
       <Grid>
         <Tab.Container onSelect={this.handleSelect} activeKey={tab} id={Math.random()}>
@@ -222,12 +259,19 @@ class Building extends Component {
                     loadMoreFeeds={this.loadMoreFeeds}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
+                    likePost={likePost}
+                    unlikePost={unlikePost}
                     me={me || {}}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePostOnBuilding={deletePostOnBuilding}
                     editPost={editPost}
                     sharingPost={sharingPost}
+                    queryData={loadBuildingQuery}
+                    paramData={{
+                      cursor: null,
+                      buildingId: building._id,
+                    }}
                   />
                   }
                 </Tab.Pane>
@@ -250,6 +294,10 @@ class Building extends Component {
                     data={building.requests}
                     loadMore={this.loadMoreUsersAwaitingApproval}
                     loading={loading}
+                    building={building}
+                    onAccept={this.onAccept}
+                    onCancel={this.onCancel}
+                    error={this.state.errorMessage}
                     loadBuildingQuery={loadBuildingQuery}
                     param={{
                       buildingId: building._id,
@@ -276,6 +324,8 @@ Building.propTypes = {
     }),
     loading: PropTypes.bool.isRequired,
   }).isRequired,
+  likePost: PropTypes.func.isRequired,
+  unlikePost: PropTypes.func.isRequired,
   loadMoreFeeds: PropTypes.func.isRequired,
   loadMoreUsersAwaitingApproval: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
@@ -285,6 +335,8 @@ Building.propTypes = {
   query: PropTypes.object.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
+  acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
+  rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -293,14 +345,9 @@ export default compose(
     options: props => ({
       variables: {
         buildingId: props.buildingId,
-        limit: 1000, // FIXME: paging,
-        fetchPolicy: 'cache-and-network',
       },
     }),
-    props: ({ ownProps, data }) => {
-      if (!data) {
-        return null;
-      }
+    props: ({ data }) => {
       const { fetchMore } = data;
       const loadMoreFeeds = throttle(() => fetchMore({
         query: loadMorePostOnBuildingQuery,
@@ -402,6 +449,7 @@ export default compose(
             __typename: 'Post',
             _id: idRandom(),
             message,
+            type: null,
             user: null,
             author: {
               __typename: 'Author',
@@ -415,6 +463,7 @@ export default compose(
               name: ownProps.data.building.name,
             },
             sharing: null,
+            event: null,
             privacy,
             photos,
             comments: [],
@@ -451,6 +500,74 @@ export default compose(
             },
             data,
           });
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.likePost, {
+    props: ({ mutate }) => ({
+      likePost: (postId, message, totalLikes) => mutate({
+        variables: {
+          postId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          likePost: {
+            __typename: 'PostSchemas',
+            _id: postId,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            let updatedPost = mutationResult.data.likePost;
+            const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.building.posts.edges[index], {
+              totalLikes: totalLikes + 1,
+              isLiked: true,
+            });
+            return update(previousResult, {
+              building: {
+                posts: {
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.unlikePost, {
+    props: ({ mutate }) => ({
+      unlikePost: (postId, message, totalLikes) => mutate({
+        variables: { postId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          unlikePost: {
+            __typename: 'PostSchemas',
+            _id: postId,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            let updatedPost = mutationResult.data.unlikePost;
+            const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
+            updatedPost = Object.assign({}, previousResult.building.posts.edges[index], {
+              totalLikes: totalLikes - 1,
+              isLiked: false,
+            });
+            return update(previousResult, {
+              building: {
+                posts: {
+                  edges: {
+                    $splice: [[index, 1, updatedPost]],
+                  },
+                },
+              },
+            });
+          },
         },
       }),
     }),

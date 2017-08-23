@@ -292,7 +292,7 @@ class Feed extends Component {
               </span>
             </CustomToggle>
             <Dropdown.Menu onSelect={this.onSelectShareButton}>
-              <MenuItem eventKey={SHARE}>Chia sẻ...</MenuItem>
+              <MenuItem eventKey={SHARE}>Chia sẻ ...</MenuItem>
               <MenuItem eventKey={SHARE_FRIEND}>Chia sẻ trên dòng thời gian của bạn bè</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
