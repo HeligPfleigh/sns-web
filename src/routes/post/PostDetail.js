@@ -10,8 +10,6 @@ import FriendSuggestions from '../FriendSuggestions';
 import Loading from '../../components/Loading';
 import history from '../../core/history';
 import FeedList, { Feed } from '../../components/Feed';
-import likePostMutation from './likePostMutation.graphql';
-import unlikePostMutation from './unlikePostMutation.graphql';
 import editPostMutation from './editPostMutation.graphql';
 import sharingPostMutation from './sharingPostMutation.graphql';
 import deletePostMutation from './deletePostMutation.graphql';
@@ -87,14 +85,11 @@ class PostDetail extends Component {
         post,
         me,
       },
-      likePost,
-      unlikePost,
       editPost,
       loadMoreComments,
       createNewComment,
       sharingPost,
       deletePost,
-      postId,
     } = this.props;
     return (
       <Grid>
@@ -103,18 +98,12 @@ class PostDetail extends Component {
           <Col md={8} sm={12} xs={12}>
             { post && <FeedList
               feeds={[post]}
-              likePostEvent={likePost}
-              unlikePostEvent={unlikePost}
               userInfo={me}
               loadMoreComments={loadMoreComments}
               createNewComment={createNewComment}
               deletePost={deletePost}
               editPost={editPost}
               sharingPost={sharingPost}
-              queryData={postDetailQuery}
-              paramData={{
-                postId,
-              }}
             />}
             { !post && <h3>Không tìm thấy bài viết !</h3> }
           </Col>
@@ -145,8 +134,6 @@ PostDetail.propTypes = {
     }),
     loading: PropTypes.bool.isRequired,
   }).isRequired,
-  likePost: PropTypes.func.isRequired,
-  unlikePost: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   editPost: PropTypes.func.isRequired,
@@ -186,39 +173,6 @@ export default compose(
       };
     },
   }),
-  graphql(likePostMutation, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          likePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-          },
-        },
-        update: (store) => {
-          // Read the data from our cache for this query.
-          const data = store.readQuery({
-            query: postDetailQuery,
-            variables: {
-              postId,
-            },
-          });
-          // Do we need create new Object ?
-          data.post.totalLikes = totalLikes + 1;
-          data.post.isLiked = true;
-          store.writeQuery({
-            query: postDetailQuery,
-            variables: {
-              postId,
-            },
-            data,
-          });
-        },
-      }),
-    }),
-  }),
   graphql(sharingPostMutation, {
     props: ({ mutate }) => ({
       sharingPost: postId => mutate({
@@ -242,39 +196,6 @@ export default compose(
           setTimeout(() => {
             history.push('/');
           }, 700);
-        },
-      }),
-    }),
-  }),
-  graphql(unlikePostMutation, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          unlikePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-          },
-        },
-        update: (store) => {
-          // Read the data from our cache for this query.
-          const data = store.readQuery({
-            query: postDetailQuery,
-            variables: {
-              postId,
-            },
-          });
-          // Do we need create new Object ?
-          data.post.totalLikes = totalLikes - 1;
-          data.post.isLiked = false;
-          store.writeQuery({
-            query: postDetailQuery,
-            variables: {
-              postId,
-            },
-            data,
-          });
         },
       }),
     }),

@@ -24,11 +24,10 @@ import createApolloClient from './core/createApolloClient';
 import chat from './core/chat';
 import { setRuntimeVariable } from './actions/runtime';
 
-// moment.updateLocale('vi', {
-//   monthsShort: 'T01_T02_T03_T04_T05_T06_T07_T08_T09_T10_T11_T12'.split('_'),
-// });
-
 moment.locale('vi');
+moment.updateLocale('vi', {
+  monthsShort: 'T01_T02_T03_T04_T05_T06_T07_T08_T09_T10_T11_T12'.split('_'),
+});
 
 update.extend('$unset', (_idsToRemove, original) => original.filter(v => _idsToRemove.indexOf(v._id) === -1));
 

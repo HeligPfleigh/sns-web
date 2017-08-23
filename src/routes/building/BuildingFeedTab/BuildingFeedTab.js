@@ -14,16 +14,12 @@ class BuildingFeedTab extends Component {
       createNewPostOnBuilding,
       loadMoreFeeds,
       building,
-      likePost,
-      unlikePost,
       me,
       loadMoreComments,
       createNewComment,
       deletePostOnBuilding,
       editPost,
       sharingPost,
-      queryData,
-      paramData,
     } = this.props;
     return (
       <div>
@@ -47,16 +43,12 @@ class BuildingFeedTab extends Component {
         >
           <FeedList
             feeds={building ? building.posts.edges : []}
-            likePostEvent={likePost}
-            unlikePostEvent={unlikePost}
             userInfo={me}
             loadMoreComments={loadMoreComments}
             createNewComment={createNewComment}
             deletePost={deletePostOnBuilding}
             editPost={editPost}
             sharingPost={sharingPost}
-            queryData={queryData}
-            paramData={paramData}
           />
         </InfiniteScroll>
       </div>
@@ -68,17 +60,12 @@ BuildingFeedTab.propTypes = {
   createNewPostOnBuilding: PropTypes.func.isRequired,
   building: PropTypes.object.isRequired,
   me: PropTypes.object.isRequired,
-  likePost: PropTypes.func.isRequired,
-  unlikePost: PropTypes.func.isRequired,
   loadMoreFeeds: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   deletePostOnBuilding: PropTypes.func.isRequired,
-  // buildingId: PropTypes.string.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
-  queryData: PropTypes.object.isRequired,
-  paramData: PropTypes.object.isRequired,
 };
 
 export default withStyles(s)(BuildingFeedTab);

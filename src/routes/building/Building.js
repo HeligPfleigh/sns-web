@@ -178,8 +178,6 @@ class Building extends Component {
   render() {
     const {
       data: { building, me, loading },
-      likePost,
-      unlikePost,
       createNewComment,
       loadMoreComments,
       createNewPostOnBuilding,
@@ -224,19 +222,12 @@ class Building extends Component {
                     loadMoreFeeds={this.loadMoreFeeds}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
-                    likePost={likePost}
-                    unlikePost={unlikePost}
                     me={me || {}}
                     loadMoreComments={loadMoreComments}
                     createNewComment={createNewComment}
                     deletePostOnBuilding={deletePostOnBuilding}
                     editPost={editPost}
                     sharingPost={sharingPost}
-                    queryData={loadBuildingQuery}
-                    paramData={{
-                      cursor: null,
-                      buildingId: building._id,
-                    }}
                   />
                   }
                 </Tab.Pane>
@@ -285,8 +276,6 @@ Building.propTypes = {
     }),
     loading: PropTypes.bool.isRequired,
   }).isRequired,
-  likePost: PropTypes.func.isRequired,
-  unlikePost: PropTypes.func.isRequired,
   loadMoreFeeds: PropTypes.func.isRequired,
   loadMoreUsersAwaitingApproval: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
@@ -310,7 +299,7 @@ export default compose(
     }),
     props: ({ ownProps, data }) => {
       if (!data) {
-        return;
+        return null;
       }
       const { fetchMore } = data;
       const loadMoreFeeds = throttle(() => fetchMore({
@@ -321,7 +310,7 @@ export default compose(
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return;
+            return null;
           }
           return update(previousResult, {
             building: {
@@ -346,7 +335,7 @@ export default compose(
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return;
+            return null;
           }
           const index = previousResult.building.posts.edges.findIndex(item => item._id === postId);
           const updatedPost = update(previousResult.building.posts[index], {
@@ -373,7 +362,7 @@ export default compose(
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return;
+            return null;
           }
           return update(previousResult, {
             building: {
@@ -462,74 +451,6 @@ export default compose(
             },
             data,
           });
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.likePost, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes) => mutate({
-        variables: {
-          postId,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          likePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-          },
-        },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            let updatedPost = mutationResult.data.likePost;
-            const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.building.posts.edges[index], {
-              totalLikes: totalLikes + 1,
-              isLiked: true,
-            });
-            return update(previousResult, {
-              building: {
-                posts: {
-                  edges: {
-                    $splice: [[index, 1, updatedPost]],
-                  },
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.unlikePost, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          unlikePost: {
-            __typename: 'PostSchemas',
-            _id: postId,
-          },
-        },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            let updatedPost = mutationResult.data.unlikePost;
-            const index = previousResult.building.posts.edges.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.building.posts.edges[index], {
-              totalLikes: totalLikes - 1,
-              isLiked: false,
-            });
-            return update(previousResult, {
-              building: {
-                posts: {
-                  edges: {
-                    $splice: [[index, 1, updatedPost]],
-                  },
-                },
-              },
-            });
-          },
         },
       }),
     }),
@@ -659,6 +580,74 @@ export default compose(
                 posts: {
                   edges: {
                     $splice: [[index, 1, updatedPost]],
+                  },
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(acceptRequestForJoiningBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      acceptRequestForJoiningBuilding: data => mutate({
+        variables: {
+          buildingId: ownProps.buildingId,
+          userId: data._id,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          acceptRequestForJoiningBuilding: {
+            __typename: 'Friend',
+            _id: data._id,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            if (!mutationResult) {
+              return null;
+            }
+            const r = mutationResult.data.acceptRequestForJoiningBuilding;
+            return update(previousResult, {
+              building: {
+                requests: {
+                  edges: {
+                    $unset: [r._id],
+                  },
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(rejectRequestForJoiningBuildingMutation, {
+    props: ({ ownProps, mutate }) => ({
+      rejectRequestForJoiningBuilding: data => mutate({
+        variables: {
+          buildingId: ownProps.buildingId,
+          userId: data._id,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectRequestForJoiningBuilding: {
+            __typename: 'Friend',
+            _id: data._id,
+          },
+        },
+        updateQueries: {
+          loadBuildingQuery: (previousResult, { mutationResult }) => {
+            if (!mutationResult) {
+              return null;
+            }
+            const r = mutationResult.data.rejectRequestForJoiningBuilding;
+            return update(previousResult, {
+              building: {
+                requests: {
+                  edges: {
+                    $unset: [r._id],
                   },
                 },
               },

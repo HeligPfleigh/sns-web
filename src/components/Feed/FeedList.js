@@ -146,13 +146,9 @@ class FeedList extends Component {
   render() {
     const {
       feeds,
-      likePostEvent,
-      unlikePostEvent,
       userInfo,
       loadMoreComments,
       createNewComment,
-      queryData,
-      paramData,
     } = this.props;
 
     return (
@@ -161,16 +157,12 @@ class FeedList extends Component {
           <Feed
             key={idRandom()}
             data={item}
-            likePostEvent={likePostEvent}
-            unlikePostEvent={unlikePostEvent}
             onSelectRightEvent={this.onSelectRightEvent}
             userInfo={userInfo}
             loadMoreComments={loadMoreComments}
             createNewComment={createNewComment}
             editPostEvent={this.editPostEvent}
             sharingPostEvent={this.sharingPostEvent}
-            queryData={queryData}
-            paramData={paramData}
           />
         ))}
         <DeletePostModal
@@ -210,8 +202,6 @@ FeedList.propTypes = {
       _id: PropTypes.string.isRequired,
     }),
   ).isRequired,
-  likePostEvent: PropTypes.func.isRequired,
-  unlikePostEvent: PropTypes.func.isRequired,
   userInfo: PropTypes.object.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
@@ -219,8 +209,6 @@ FeedList.propTypes = {
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
   openAlertGlobalAction: PropTypes.func,
-  queryData: PropTypes.object.isRequired,
-  paramData: PropTypes.object.isRequired,
 };
 
 export default connect(
