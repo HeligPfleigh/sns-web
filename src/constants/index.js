@@ -7,6 +7,7 @@ export const MALE = 'MALE';
 export const FEMALE = 'FEMALE';
 export const GENDER = [MALE, FEMALE];
 
+export const REMOVE_USER = 'REMOVE_USER';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
 
