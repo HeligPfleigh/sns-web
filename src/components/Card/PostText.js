@@ -6,13 +6,11 @@ import { convertFromRaw } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import classNames from 'classnames';
 import * as _ from 'lodash';
+import ReactPlayer from 'react-player';
 
 import s from './PostText.scss';
 import ReadMore from './ReadMore';
-import VideoView from '../VideoView';
-import {
-  checkYoutubeUrl,
-} from '../../utils/regexUrl';
+import regexUrl from '../../utils/regexUrl';
 
 function stripTags(input) {
   if (!_.isString(input)) {
@@ -39,14 +37,11 @@ class PostText extends Component {
     __html = __html.replace(/<\/p>/gi, '<br/></p>');
 
     const data = JSON.parse(html);
-    let isShow = false;
-    let idVideo = '';
+    const videoUrls = [];
     if (data.blocks) {
-      isShow = false;
       data.blocks.forEach((block) => {
-        if (checkYoutubeUrl(block.text)) {
-          isShow = true;
-          idVideo = block.text.split('v=')[1];
+        if (regexUrl(block.text.trim())) {
+          videoUrls.push(block.text.trim());
         }
       });
     }
@@ -59,10 +54,7 @@ class PostText extends Component {
             dangerouslySetInnerHTML={{ __html }}
           />
         </ReadMore>
-        <VideoView
-          isShow={isShow}
-          src={idVideo}
-        />
+        { videoUrls.map(url => <ReactPlayer url={url} key={Math.random()} width="auto" height="360px" />) }
         {children}
       </div>
     );

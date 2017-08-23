@@ -1,6 +1,5 @@
 @global-import 'react-datetime/css/react-datetime.css';
-.BodyModal {
-}
+@global-import 'draft-js/dist/Draft.css';
 
 .leftColumn {
   width: 30%;
@@ -21,21 +20,32 @@
 .btnUpload{
   border-color: transparent;
   color: #5c6f7c;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+
+  &:hover, &:active, &:focus, &:disabled, &:active:focus {
+    text-decoration: none;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
 }
 
-.btnUpload:hover{
-  border-color: transparent;
-  background: #fff;
-}
+.layoutForButtonUpload {
+  border: solid 1px #dedede;
 
-.layoutForButtonUpload{
-  padding: 10px;
-  text-align: center left;
-  border-bottom: solid 1px #dedede;
-}
+  .buttonToolbar {
+    padding: 10px;
+  }
 
-.wrapperImage {
-  padding: 15px;
+  .imgThumbnail {
+    border-top: solid 1px #dedede;
+
+    .imgResponsive {
+      padding: 5px;
+    }
+  }
 }
 
 .fieldNameCenter{
@@ -57,6 +67,12 @@
   min-height: 200px;
   padding: 5px;
   border: solid 1px #dedede;
+}
+
+.editor {
+  padding: 8px;
+  border: solid 1px #dedede;
+  min-height: 200px;
 }
 
 .errorText{

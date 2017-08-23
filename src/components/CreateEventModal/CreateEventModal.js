@@ -1,6 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button, Image, Dropdown, MenuItem } from 'react-bootstrap';
+import {
+  Modal,
+  Button,
+  Image,
+  Dropdown,
+  MenuItem,
+  Col,
+  ControlLabel,
+  FormGroup,
+  Clearfix,
+ } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
@@ -12,6 +22,7 @@ import Draft, {
   CompositeDecorator,
   convertToRaw,
 } from 'draft-js';
+import classNames from 'classnames';
 import { generate as idRandom } from 'shortid';
 import history from '../../core/history';
 import uploadImage from '../../utils/uploadImage';
@@ -26,8 +37,6 @@ import InputWithValidation from './InputWithValidation';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 import s from './CreateEventModal.scss';
-
-// const DateTimeField = require('react-bootstrap-datetimepicker');
 
 const PRIVARY_TEXT = {
   ONLY_ME: 'Chỉ mình tôi',
@@ -85,6 +94,7 @@ class CreateEventModal extends Component {
     location: '',
     privacy: PUBLIC,
     validateDescriptionText: '',
+    hasFocusEditor: false,
   };
 
   onEventNameChange = (value) => {
@@ -241,53 +251,57 @@ class CreateEventModal extends Component {
           <Modal.Title>Tạo sự kiện</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className={s.BodyModal}>
-            <div className={s.rowItem}>
-              <div className={s.leftColumn}><strong>Ảnh sự kiện</strong></div>
-              <div className={`${s.rightColumn} ${s.border}`}>
+          <Col className="form-horizontal" xs={12}>
+
+            <FormGroup>
+              <ControlLabel className="col-sm-3">Ảnh sự kiện</ControlLabel>
+              <Col sm={9}>
                 <div className={s.layoutForButtonUpload}>
-                  <Button
-                    onClick={() => {
-                      document.getElementById('fileInEvent').click();
-                    }}
-                    className={s.btnUpload}
-                  >
-                    <i className="fa fa-camera" aria-hidden="true"></i>
-                    <strong>  Đăng hình</strong>
-                    <input
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      id="fileInEvent"
-                      type="file"
-                      onChange={this.onFilePicked}
-                    />
-                  </Button>
+                  <div className={s.buttonToolbar}>
+                    <Button
+                      onClick={() => {
+                        document.getElementById('fileInEvent').click();
+                      }}
+                      className={s.btnUpload}
+                    >
+                      <i className="fa fa-camera" aria-hidden="true"></i>
+                      <strong>  Đăng hình</strong>
+                      <input
+                        accept="image/*"
+                        className="hide"
+                        id="fileInEvent"
+                        type="file"
+                        onChange={this.onFilePicked}
+                      />
+                    </Button>
+                  </div>
+                  {this.state.photos.length > 0 ?
+                    <div className={s.imgThumbnail}>
+                      <Image
+                        src={this.state.photos}
+                        responsive
+                        className={s.imgResponsive}
+                      />
+                    </div> : null}
                 </div>
-                {this.state.photos.length > 0 ?
-                  <div className={s.wrapperImage}>
-                    <Image
-                      style={{ maxHeight: '100%' }}
-                      src={this.state.photos}
-                      responsive
-                    />
-                  </div> : null}
-              </div>
-            </div>
-            <div className={s.rowItem}>
-              <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Tên sự kiện</strong></div>
-              <div className={s.rightColumn}>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <ControlLabel className="col-sm-3">Tên sự kiện</ControlLabel>
+              <Col sm={9}>
                 <InputWithValidation
                   id="nameEventId"
                   validationState={this.validationForNameEvent}
                   helpText="Tên sự kiện quá ngắn"
-                  textHolder=""
                   onTextChange={this.onEventNameChange}
                 />
-              </div>
-            </div>
-            <div className={s.rowItem}>
-              <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Vị trí</strong></div>
-              <div className={s.rightColumn}>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <ControlLabel className="col-sm-3">Vị trí</ControlLabel>
+              <Col sm={9}>
                 <InputWithValidation
                   id="locationEventId"
                   validationState={this.validationForNameEvent}
@@ -295,17 +309,17 @@ class CreateEventModal extends Component {
                   textHolder=""
                   onTextChange={this.onEventLocationChange}
                 />
-              </div>
-            </div>
-            <div className={s.rowItem}>
-              <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Bắt đầu</strong></div>
-              <div className={s.rightColumn}>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <ControlLabel className="col-sm-3">Bắt đầu</ControlLabel>
+              <Col sm={9}>
                 <DateTime
-                  locale="vi"
                   inputProps={{
                     readOnly: true,
-                    placeholder: 'hihi',
                   }}
+                  disableOnClickOutside
                   closeOnSelect
                   closeOnTab
                   input
@@ -316,19 +330,18 @@ class CreateEventModal extends Component {
                     });
                   }}
                   value={this.state.start}
-                  style={{ marginBottom: '5px' }}
                 />
-              </div>
-            </div>
-            <div className={s.rowItem}>
-              <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Kết thúc</strong></div>
-              <div className={s.rightColumn}>
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <ControlLabel className="col-sm-3">Kết thúc</ControlLabel>
+              <Col sm={9}>
                 <DateTime
-                  locale="vi"
                   inputProps={{
                     readOnly: true,
-                    placeholder: 'hihi',
                   }}
+                  disableOnClickOutside
                   closeOnSelect
                   closeOnTab
                   input
@@ -339,32 +352,30 @@ class CreateEventModal extends Component {
                     });
                   }}
                   value={this.state.end}
-                  style={{ marginBottom: '5px' }}
                 />
-              </div>
-            </div>
-            <div className={s.rowItem}>
-              <div className={s.leftColumn}><strong className={s.fieldNameCenter}>Miêu tả</strong></div>
-              <div className={s.rightColumn}>
-                <div
-                  style={{
-                    padding: '8px',
-                    border: 'solid 1px #dedede',
-                    minHeight: '200px',
-                  }}
-                >
+              </Col>
+            </FormGroup>
+
+            <FormGroup>
+              <ControlLabel className="col-sm-3">Miêu tả</ControlLabel>
+              <Col sm={9}>
+                <div className={classNames('form-control', s.editor, { focus: this.state.hasFocusEditor })} onClick={() => this.editor.focus()}>
                   <Editor
                     editorState={editorState}
                     onChange={this.onChangeMessage}
                     placeholder="Mô tả sự kiện"
-                    ref={(editor) => { this.editor = editor; }}
+                    ref={editor => this.editor = editor}
+                    onFocus={() => this.setState({ hasFocusEditor: true })}
+                    onBlur={() => this.setState({ hasFocusEditor: false })}
                     spellCheck
                   />
                 </div>
                 {this.state.validateDescriptionText.length > 0 ? <div className={s.errorText}>{this.state.validateDescriptionText}</div> : null}
-              </div>
-            </div>
-          </div>
+              </Col>
+            </FormGroup>
+
+          </Col>
+          <Clearfix />
         </Modal.Body>
         <Modal.Footer>
           <Dropdown
