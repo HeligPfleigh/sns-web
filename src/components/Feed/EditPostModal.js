@@ -11,6 +11,7 @@ import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
 import includes from 'lodash/includes';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 import SharingPost from './SharingPost';
 import ListImagePreview from '../ListImagePreview';
@@ -166,6 +167,15 @@ class EditPostModal extends Component {
 
   focus = () => this.editor.focus();
 
+  handleImageScroll = (e) => {
+    const scrollLeft = this.scrollImages.getScrollLeft();
+    if (e.deltaY && e.deltaY > 0) {
+      this.scrollImages.scrollLeft(scrollLeft + 50);
+    } else {
+      this.scrollImages.scrollLeft(scrollLeft - 50);
+    }
+  }
+
   render() {
     const { dataPost: { sharing, building }, isHideModalBehindBackdrop } = this.props;
     const { editorState, isSubmit, photos, isDelPostSharing, error } = this.state;
@@ -217,7 +227,6 @@ class EditPostModal extends Component {
           <div
             style={styles.editor}
             onClick={this.focus}
-            title="Chỉnh sửa bài viết của bạn"
           >
             <Editor
               spellCheck
@@ -228,21 +237,24 @@ class EditPostModal extends Component {
             />
             {
               photos.length > 0 ?
-                <div
-                  className="listImagePreview"
+                <Scrollbars
+                  autoHide
+                  ref={(node) => { this.scrollImages = node; }}
+                  onWheel={this.handleImageScroll}
+                  style={{ height: '118px', marginTop: '10px', marginBottom: '-20px' }}
                 >
                   <ListImagePreview
                     images={photos}
                     onDeleteImage={this.onDeleteImage}
                   />
-                </div> :
+                </Scrollbars> :
                 null
             }
             {error.length > 0 ? <span className={s.errorText}>{error}</span> : null}
           </div>
           {sharing && !isEmpty(sharing) && isDelPostSharing &&
             <div style={{ position: 'relative' }}>
-              <i className="fa fa-times" style={delBlockStyle} aria-hidden="true" onClick={this.delPostSharing}></i>
+              <i className="fa fa-times" style={delBlockStyle} title="Xóa bài viết" aria-hidden="true" onClick={this.delPostSharing}></i>
               <SharingPost
                 id={sharing._id}
                 message={sharing.message}
