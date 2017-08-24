@@ -76,7 +76,12 @@ class Login extends Component {
           const user = await fetchAPI('/auth/login', { username, password });
           this.props.loginSuccess(user);
           if (isEmpty(user.buildings)) {
-            history.push('/register');
+            if (user.id) {
+              this.props.removeStateUser();
+              history.push('/waiting');
+            } else {
+              history.push('/register');
+            }
           } else if (user.isActive === 0) {
             this.props.removeStateUser();
             history.push('/waiting');
@@ -107,7 +112,12 @@ class Login extends Component {
             const user = await fetchAPI('/auth/facebook', { access_token });
             this.props.loginSuccess(user);
             if (isEmpty(user.buildings)) {
-              history.push('/register');
+              if (user.id) {
+                this.props.removeStateUser();
+                history.push('/waiting');
+              } else {
+                history.push('/register');
+              }
             } else if (user.isActive === 0) {
               this.props.removeStateUser();
               history.push('/waiting');
