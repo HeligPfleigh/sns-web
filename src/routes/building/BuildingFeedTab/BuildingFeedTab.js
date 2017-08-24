@@ -25,16 +25,7 @@ class BuildingFeedTab extends Component {
       <div>
         <NewPost
           createNewPost={createNewPostOnBuilding}
-          privacy={[
-            {
-              name: PUBLIC,
-              glyph: 'globe',
-            },
-            {
-              name: ONLY_ADMIN_BUILDING,
-              glyph: 'bell',
-            },
-          ]}
+          ADMIN_BUILDING
         />
         <InfiniteScroll
           loadMore={loadMoreFeeds}

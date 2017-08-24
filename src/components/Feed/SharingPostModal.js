@@ -4,8 +4,6 @@ import {
   Row,
   Modal,
   Button,
-  MenuItem,
-  Dropdown,
   ButtonToolbar,
   InputGroup,
 } from 'react-bootstrap';
@@ -18,11 +16,12 @@ import {
 import isEmpty from 'lodash/isEmpty';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
-import { SHARE_FRIEND, PUBLIC, FRIEND, ONLY_ME, HANDLE_REGEX, HASHTAG_REGEX } from '../../constants';
+import { SHARE_FRIEND, HANDLE_REGEX, HASHTAG_REGEX } from '../../constants';
 import HandleSpan from '../../components/Common/Editor/HandleSpan';
 import HashtagSpan from '../../components/Common/Editor/HashtagSpan';
 import Feed from '../../components/Feed/Feed';
 import UserSelect from '../../components/UserSelect';
+import { Privacy } from '../Dropdown';
 import s from './Feed.scss';
 
 /**
@@ -77,7 +76,6 @@ class SharingPostModal extends Component {
     this.state = {
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
-      privacySelected: PUBLIC,
     };
   }
 
@@ -109,7 +107,7 @@ class SharingPostModal extends Component {
     const { friend } = this.state;
     this.props.clickModal(evt, {
       message,
-      privacyPost: this.state.privacySelected,
+      privacyPost: this.privacy.getCurrentValue(),
       userId: friend && friend._id,
     });
 
@@ -119,18 +117,6 @@ class SharingPostModal extends Component {
     this.setState({
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
-    });
-  }
-
-  /**
-   *
-   */
-  onSelectPrivacy = (privacySelected) => {
-    if ([PUBLIC, FRIEND, ONLY_ME].indexOf(privacySelected) === -1) {
-      privacySelected = PUBLIC;
-    }
-    this.setState({
-      privacySelected,
     });
   }
 
@@ -151,7 +137,6 @@ class SharingPostModal extends Component {
     this.setState({
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
-      privacySelected: PUBLIC,
       friend: undefined,
     });
     closeModal();
@@ -161,37 +146,10 @@ class SharingPostModal extends Component {
    *
    */
   showButtonToolbar() {
-    const privacies = {
-      PUBLIC: {
-        icon: <i className="fa fa-globe" aria-hidden="true"></i>,
-        label: 'Công khai',
-      },
-      FRIEND: {
-        icon: <i className="fa fa-users" aria-hidden="true"></i>,
-        label: 'Bạn bè',
-      },
-      ONLY_ME: {
-        icon: <i className="fa fa-lock" aria-hidden="true"></i>,
-        label: 'Chỉ mình tôi',
-      },
-    };
-
-    const privacyKeys = Object.keys(privacies);
-    const keySelected = privacyKeys.indexOf(this.state.privacySelected);
-    const selectedKey = keySelected > -1 ? privacyKeys[keySelected] : PUBLIC;
-    const selectedLabel = privacies[selectedKey].label;
-    const selectedIcon = privacies[selectedKey].icon;
-    delete privacies[selectedKey];
-
     const { shareType } = this.props;
     return (
       <ButtonToolbar className="pull-right">
-        <Dropdown className={s.sharingPostModalButtonPrivacies} id={Math.random()}>
-          <Dropdown.Toggle>{ selectedIcon } { selectedLabel }</Dropdown.Toggle>
-          <Dropdown.Menu onSelect={this.onSelectPrivacy}>
-            { Object.keys(privacies).map(type => <MenuItem key={type} eventKey={type}>{ privacies[type].icon } { privacies[type].label }</MenuItem>) }
-          </Dropdown.Menu>
-        </Dropdown>
+        <Privacy className={s.sharingPostModalButtonPrivacies} ref={privacy => this.privacy = privacy} />
 
         <Button onClick={this.closeModal}>Hủy</Button>
         <Button bsStyle="primary" onClick={this.onSubmit} disabled={(shareType === SHARE_FRIEND) && isEmpty(this.state.friend)}>Chia sẻ bài viết</Button>

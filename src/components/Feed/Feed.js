@@ -203,7 +203,7 @@ class Feed extends Component {
           subtitle={<div>
             { PUBLIC === privacy && <Icon onClick={doNothing} icons="fa fa-globe fa-1" /> }
             { FRIEND === privacy && <Icon onClick={doNothing} icons="fa fa-users fa-1" /> }
-            { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-user fa-1" /> }
+            { ONLY_ME === privacy && <Icon onClick={doNothing} icons="fa fa-lock fa-1" /> }
             { ONLY_ADMIN_BUILDING === privacy && <Icon onClick={doNothing} icons="fa fa-bell fa-1" /> }
             <Link to={`/post/${_id}`}><TimeAgo time={createdAt} /></Link>
           </div>}
@@ -536,6 +536,7 @@ Feed.fragments = {
       sharing {
         _id
         message
+        type
         author {
           _id
           username

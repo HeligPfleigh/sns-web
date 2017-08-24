@@ -42,6 +42,7 @@ class MultipleUploadFile extends Component {
         onChange={this.onChange}
         className={this.props.className}
         ref={this.props.inputRef}
+        accept={this.props.accept}
       />
     );
   }
@@ -53,12 +54,14 @@ MultipleUploadFile.propTypes = {
   multipleUploadFile: PropTypes.func.isRequired,
   className: PropTypes.any,
   inputRef: PropTypes.func.isRequired,
+  accept: PropTypes.string.isRequired,
 };
 
 MultipleUploadFile.defaultProps = {
   onSuccess: () => undefined,
   onError: () => undefined,
   inputRef: () => undefined,
+  accept: 'image/*',
 };
 
 export default compose(graphql(mutationMultipleUploadFile, {

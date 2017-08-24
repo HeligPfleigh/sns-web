@@ -54,7 +54,7 @@ class PostText extends Component {
             dangerouslySetInnerHTML={{ __html }}
           />
         </ReadMore>
-        { videoUrls.map(url => <ReactPlayer url={url} key={Math.random()} width="auto" height="360px" />) }
+        { videoUrls.map(url => <ReactPlayer url={url} key={Math.random()} width="100%" height="360px" />) }
         {children}
       </div>
     );
