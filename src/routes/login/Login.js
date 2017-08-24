@@ -209,4 +209,6 @@ Login.propTypes = {
 
 export default reduxForm({
   form: 'loginForm',
+  touchOnBlur: true,
+  touchOnChange: true,
 })(withStyles(s)(Login));
