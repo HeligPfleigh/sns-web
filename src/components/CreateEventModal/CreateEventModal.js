@@ -22,7 +22,7 @@ import { SingleUploadFile } from '../ApolloUpload';
 import InputWithValidation from './InputWithValidation';
 import { Privacy } from '../Dropdown';
 import { DraftEditor } from '../Editor';
-import { required, maxLength, hasSpecialChart } from '../../utils/validator';
+import { required } from '../../utils/validator';
 import s from './CreateEventModal.scss';
 
 const CustomToggle = ({ onClick, children }) => (
@@ -36,17 +36,16 @@ CustomToggle.propTypes = {
   children: PropTypes.node,
 };
 
-const ReduxFormControl = ({ input, meta: { error, touched, warning }, ...props }) => {
-  console.log(error, touched, warning);
-  return (<div>
-    <FormControl {...props} {...input} />
-    {touched && ((error && <HelpBlock>{error}</HelpBlock>) || (warning && <HelpBlock>{warning}</HelpBlock>))}
-  </div>);
-};
+const ReduxFormControl = ({ feedbackIcon, input, meta: { error, touched, warning }, ...props }) => (<div>
+  <FormControl {...props} {...input} />
+  {feedbackIcon && <FormControl.Feedback />}
+  {touched && ((error || warning) && <HelpBlock>{error || warning}</HelpBlock>)}
+</div>);
 
 ReduxFormControl.propTypes = {
   input: PropTypes.object,
   meta: PropTypes.object,
+  feedbackIcon: PropTypes.bool,
 };
 
 class CreateEventModal extends Component {
@@ -213,6 +212,7 @@ class CreateEventModal extends Component {
         eventName,
       ],
     } = this.props;
+    console.log(this.props);
     return (
       <Modal show={this.props.show} onHide={this.props.closeModal} keyboard={false} backdrop="static">
         <form className="form-horizontal" onSubmit={handleSubmit(this.onSubmit)}>
@@ -248,7 +248,7 @@ class CreateEventModal extends Component {
                 </Col>
               </FormGroup>
 
-              <FormGroup controlId={eventName}>
+              <FormGroup controlId={eventName} validationState="success">
                 <ControlLabel className="col-sm-3">Tên sự kiện</ControlLabel>
                 <Col sm={9}>
                   <Field
@@ -257,7 +257,8 @@ class CreateEventModal extends Component {
                     id={eventName}
                     placeholder="Nhập tên sự kiện"
                     component={ReduxFormControl}
-                    validate={[required, maxLength(10), hasSpecialChart]}
+                    validate={[required]}
+                    feedbackIcon
                   />
                 </Col>
               </FormGroup>
