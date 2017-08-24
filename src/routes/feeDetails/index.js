@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { checkAuth } from '../../utils/role';
 
 export default {
-  path: '/building/:buildingId/fee/:feeId',
+  path: '/fee/:feeId',
   children: [
     {
       path: '/',
