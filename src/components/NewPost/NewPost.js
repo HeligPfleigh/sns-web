@@ -32,6 +32,7 @@ import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 import { Feed } from '../Feed';
+import { MultipleUploadFile } from '../ApolloUpload';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -76,14 +77,38 @@ const compositeDecorator = new CompositeDecorator([{
 /** NewPost Component */
 class NewPost extends Component {
 
-  state = {
-    editorState: EditorState.createEmpty(compositeDecorator),
-    isSubmit: true,
-    privacy: PUBLIC,
-    photos: [],
-    glyph: 'globe',
-    error: '',
-  };
+  constructor(...args) {
+    super(...args);
+
+    this.state = {
+      editorState: EditorState.createEmpty(compositeDecorator),
+      isSubmit: true,
+      privacy: PUBLIC,
+      photos: [],
+      glyph: 'globe',
+      error: '',
+      inputUpload: null,
+    };
+
+    this.onUploadClick = this.onUploadClick.bind(this);
+    this.onUploadSuccess = this.onUploadSuccess.bind(this);
+  }
+
+  onUploadSuccess({ uploadMultiFile }) {
+    const photos = [];
+    uploadMultiFile.files.forEach((file) => {
+      photos.push(file.url);
+    });
+
+    this.setState({
+      photos,
+      isSubmit: false,
+    });
+  }
+
+  onUploadClick() {
+    this.state.inputUpload.click();
+  }
 
   onChange = (editorState) => {
     this.setState(prevState => ({
@@ -211,20 +236,11 @@ class NewPost extends Component {
               bsStyle="link"
               className={s.addPhoto}
               title="Đính kèm ảnh"
-              onClick={() => {
-                document.getElementById('fileInput').click();
-              }}
+              onClick={this.onUploadClick}
             >
               <i className="fa fa-camera fa-lg" aria-hidden="true"></i>&nbsp;
               <strong>Ảnh</strong>
-              <input
-                accept="image/*"
-                style={{ display: 'none' }}
-                id="fileInput"
-                type="file"
-                onChange={this.onFilePicked}
-                multiple
-              />
+              <MultipleUploadFile inputRef={input => this.state.inputUpload = input} onSuccess={this.onUploadSuccess} className="hide" />
             </Button>
           </Col>
           <Col className="pull-right" style={{ marginRight: '15px' }}>

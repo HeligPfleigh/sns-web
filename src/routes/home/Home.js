@@ -58,8 +58,6 @@ class Home extends Component {
     }).isRequired,
     createNewPost: PropTypes.func.isRequired,
     loadMoreRows: PropTypes.func.isRequired,
-    likePost: PropTypes.func.isRequired,
-    unlikePost: PropTypes.func.isRequired,
     loadMoreComments: PropTypes.func.isRequired,
     createNewComment: PropTypes.func.isRequired,
     deletePost: PropTypes.func.isRequired,
@@ -105,18 +103,12 @@ class Home extends Component {
             >
               <FeedList
                 feeds={feeds ? feeds.edges : []}
-                likePostEvent={this.props.likePost}
-                unlikePostEvent={this.props.unlikePost}
                 userInfo={me || {}}
                 loadMoreComments={loadMoreComments}
                 createNewComment={createNewComment}
                 deletePost={deletePost}
                 editPost={editPost}
                 sharingPost={sharingPost}
-                queryData={homePageQuery}
-                paramData={{
-                  cursor: null,
-                }}
               />
             </InfiniteScroll>
           </Col>
@@ -252,96 +244,7 @@ export default compose(
       }),
     }),
   }),
-  graphql(Feed.mutation.likePost, {
-    props: ({ mutate }) => ({
-      likePost: (postId, message, totalLikes, totalComments) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          likePost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
-            type: null,
-            user: null,
-            author: null,
-            building: null,
-            sharing: null,
-            event: null,
-            privacy: null,
-            photos: null,
-            comments: [],
-            createdAt: (new Date()).toString(),
-            totalLikes: totalLikes + 1,
-            totalComments,
-            isLiked: true,
-          },
-        },
-        updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
-            let updatedPost = mutationResult.data.likePost;
-            const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.feeds.edges[index], {
-              totalLikes: totalLikes + 1,
-              isLiked: true,
-            });
-            return update(previousResult, {
-              feeds: {
-                edges: {
-                  $splice: [[index, 1, updatedPost]],
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(Feed.mutation.unlikePost, {
-    props: ({ mutate }) => ({
-      unlikePost: (postId, message, totalLikes, totalComments) => mutate({
-        variables: { postId },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          unlikePost: {
-            __typename: 'Post',
-            _id: postId,
-            message,
-            type: null,
-            user: null,
-            author: null,
-            building: null,
-            sharing: null,
-            event: null,
-            privacy: null,
-            photos: null,
-            comments: [],
-            createdAt: (new Date()).toString(),
-            totalLikes: totalLikes - 1,
-            totalComments,
-            isLiked: false,
-          },
-        },
-        updateQueries: {
-          homePageQuery: (previousResult, { mutationResult }) => {
-            let updatedPost = mutationResult.data.unlikePost;
-            const index = previousResult.feeds.edges.findIndex(item => item._id === updatedPost._id);
-            updatedPost = Object.assign({}, previousResult.feeds.edges[index], {
-              totalLikes: totalLikes - 1,
-              isLiked: false,
-            });
-            return update(previousResult, {
-              feeds: {
-                edges: {
-                  $splice: [[index, 1, updatedPost]],
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
+
   graphql(Feed.mutation.deletePost, {
     props: ({ mutate }) => ({
       deletePost: postId => mutate({

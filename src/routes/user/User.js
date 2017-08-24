@@ -193,11 +193,6 @@ class User extends Component {
                       deletePost={deletePost}
                       editPost={editPost}
                       sharingPost={sharingPost}
-                      queryData={profilePageQuery}
-                      paramData={{
-                        _id: resident._id,
-                        cursor: null,
-                      }}
                       updatePost={this.updatePostInList}
                     />
                   </InfiniteScroll>

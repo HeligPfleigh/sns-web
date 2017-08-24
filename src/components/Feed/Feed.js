@@ -63,38 +63,22 @@ class Feed extends Component {
       isInterested: false,
     };
 
-    this.onInterestClick = this.onInterestClick.bind(this);
-    this.onLikeCLick = this.onLikeCLick.bind(this);
+    this.onInterested = this.onInterested.bind(this);
+    this.onLike = this.onLike.bind(this);
     this.onSelectRightEvent = this.onSelectRightEvent.bind(this);
     this.onSelectShareButton = this.onSelectShareButton.bind(this);
   }
 
-  async onInterestClick(event) {
+  async onInterested(event) {
     event.preventDefault();
     await this.props.interestEvent(this.props.data._id)
       .then(() => this.setState({ isInterested: true }))
       .catch(() => this.setState({ isInterested: false }));
   }
 
-  onLikeCLick = (evt) => {
+  onLike(evt) {
     evt.preventDefault();
-    const {
-      data: {
-        _id,
-        message,
-        user,
-        totalLikes,
-        isLiked,
-        totalComments = 0,
-      },
-      likePostEvent = doNothing,
-      unlikePostEvent = doNothing,
-    } = this.props;
-    if (!isLiked) {
-      likePostEvent(_id, message, totalLikes, totalComments, user);
-    } else {
-      unlikePostEvent(_id, message, totalLikes, totalComments, user);
-    }
+    this.props.data.isLiked ? this.props.unlikePost(this.props.data._id) : this.props.likePost(this.props.data._id);
   }
 
   onSelectRightEvent = (eventKey, event) => {
@@ -279,7 +263,7 @@ class Feed extends Component {
                   <a href="#">tại {event.location}</a>
                 </div>
                 { !event.isAuthor && (<div className={classnames('pull-right', s.btnInterested)}>
-                  <Button type="button" className={s.btnOverride} disabled={isInterested} onClick={this.onInterestClick}><i className="fa fa-star" /> Quan tâm</Button>
+                  <Button type="button" className={s.btnOverride} disabled={isInterested} onClick={this.onInterested}><i className="fa fa-star" /> Quan tâm</Button>
                 </div>) }
               </div>
               <div className={s.stats}>{`${event.joins.length} người sẽ tham gia · ${event.can_joins.length} người có thể tham gia`}</div>
@@ -295,7 +279,7 @@ class Feed extends Component {
         { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
         <PostActions>
           <Icon
-            onClick={this.onLikeCLick}
+            onClick={this.onLike}
             title="Thích"
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
@@ -308,7 +292,7 @@ class Feed extends Component {
               </span>
             </CustomToggle>
             <Dropdown.Menu onSelect={this.onSelectShareButton}>
-              <MenuItem eventKey={SHARE}>Chia sẻ...</MenuItem>
+              <MenuItem eventKey={SHARE}>Chia sẻ ...</MenuItem>
               <MenuItem eventKey={SHARE_FRIEND}>Chia sẻ trên dòng thời gian của bạn bè</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
@@ -328,6 +312,7 @@ class Feed extends Component {
 Feed.propTypes = {
   data: PropTypes.shape({
     _id: PropTypes.string,
+    isLiked: PropTypes.bool,
     message: PropTypes.string,
     user: PropTypes.shape({
       _id: PropTypes.string,
@@ -373,8 +358,8 @@ Feed.propTypes = {
     createdAt: PropTypes.string,
     comments: PropTypes.array,
   }),
-  likePostEvent: PropTypes.func.isRequired,
-  unlikePostEvent: PropTypes.func.isRequired,
+  likePost: PropTypes.func.isRequired,
+  unlikePost: PropTypes.func.isRequired,
   onSelectRightEvent: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
@@ -389,8 +374,6 @@ Feed.propTypes = {
   editPostEvent: PropTypes.func.isRequired,
   sharingPostEvent: PropTypes.func.isRequired,
   sharingPostModalOpenned: PropTypes.bool,
-  queryData: PropTypes.object.isRequired,
-  paramData: PropTypes.object.isRequired,
 };
 
 Feed.defaultProps = {
@@ -402,8 +385,6 @@ Feed.defaultProps = {
   sharingPostModalOpenned: false,
   onSelectRightEvent: _.noop,
   editPostEvent: _.noop,
-  likePostEvent: _.noop,
-  unlikePostEvent: _.noop,
   loadMoreComments: _.noop,
   createNewComment: _.noop,
   sharingPostEvent: _.noop,
@@ -669,6 +650,24 @@ export default compose(
       interestEvent: eventId => mutate({
         variables: {
           eventId,
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.likePost, {
+    props: ({ mutate }) => ({
+      likePost: postId => mutate({
+        variables: {
+          postId,
+        },
+      }),
+    }),
+  }),
+  graphql(Feed.mutation.unlikePost, {
+    props: ({ mutate }) => ({
+      unlikePost: postId => mutate({
+        variables: {
+          postId,
         },
       }),
     }),
