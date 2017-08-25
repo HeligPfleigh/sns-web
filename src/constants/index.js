@@ -90,6 +90,7 @@ export const EDIT_POST_ACTION = 'EDIT_POST_ACTION';
 
 export const OPEN_ALERT_GLOBAL = 'sns/OPEN_ALERT_GLOBAL';
 export const LOAD_PROFILE = 'sns/Me/LOAD_PROFILE';
+export const LOAD_FEE = 'LOAD_FEE';
 
 export const TYPE1 = 'TYPE1';
 export const TYPE2 = 'TYPE2';
@@ -100,3 +101,7 @@ export const RESOURCE_UPDATED_FAILURE = 'RESOURCE_UPDATED_FAILURE';
 
 export const SHARE = 'SHARE';
 export const SHARE_FRIEND = 'SHARE_FRIEND';
+
+// Fee
+export const PAID = 'PAID';
+export const UNPAID = 'UNPAID';
