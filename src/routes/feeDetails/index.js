@@ -13,7 +13,7 @@ export default {
         const FeeDetails = await require.ensure([], require => require('./FeeDetails').default, 'feedetails');
         return {
           title: 'Báo cáo chi tiết về phí dịch vụ',
-          component: <Layout><FeeDetails buildingId={params.buildingId} feeId={params.feeId} /></Layout>,
+          component: <Layout><FeeDetails feeId={params.feeId} /></Layout>,
         };
       },
     },
