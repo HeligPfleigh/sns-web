@@ -1,25 +1,27 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { compose } from 'react-apollo';
+import { compose, graphql } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import Loading from '../../components/Loading';
 import s from './FeeManagement.scss';
+import getFeeTypes from './getFeeTypes.graphql';
 import {
   UploadFeeFile,
   Menu,
 } from '../../components/FeeManagement';
+import config from '../../config';
 
 class FeeManagement extends Component {
   state= {
     loading: false,
   }
+
   render() {
     const { loading } = this.state;
-    const { buildingId, user } = this.props;
-    console.log(buildingId);
+    const { buildingId, user, feeTypes } = this.props;
     return (
       <Grid>
         <Loading show={loading} full>Đang tải ...</Loading>
@@ -30,7 +32,10 @@ class FeeManagement extends Component {
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
-            <UploadFeeFile />
+            <UploadFeeFile
+              buildingId={buildingId}
+              feeTypes={feeTypes}
+            />
           </Col>
         </Row>
       </Grid>
@@ -40,6 +45,8 @@ class FeeManagement extends Component {
 
 FeeManagement.propTypes = {
   user: PropTypes.object.isRequired,
+  feeTypes: PropTypes.array.isRequired,
+  buildingId: PropTypes.string.isRequired,
 };
 
 export default compose(
@@ -47,5 +54,13 @@ export default compose(
     user: state.user,
   })),
   withStyles(s),
+  graphql(getFeeTypes, {
+    options: () => ({
+      fetchPolicy: 'network-only',
+    }),
+    props: ({ data }) => ({
+      feeTypes: data.getFeeTypes,
+    }),
+  }),
 )(FeeManagement);
 
