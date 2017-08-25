@@ -5,6 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, FormControl } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
+import Loading from '../../components/Loading';
 import s from './FeeDetails.scss';
 
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
@@ -27,7 +28,6 @@ renderField.propTypes = {
 
 function formatDate(datetring) {
   const date = new Date(datetring);
-  console.log(date.getMonth());
   let day = date.getDate();
   let month = date.getMonth();
   const year = date.getFullYear();
@@ -78,16 +78,22 @@ class FeeDetails extends Component {
   render() {
     const {
       data: {
+        loading,
         fee,
       },
     } = this.props;
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
     const { isTotalUpdate, isStatusUpdate } = this.state;
     return (
       <form onSubmit={this.handleSubmit}>
-        { fee &&
-          <Grid>
-            <Row className={s.containerTop30}>
-              <Col md={3}></Col>
+        <Grid>
+          <Row className={s.containerTop30}>
+            <Col md={3}>
+              { !fee && <h3>Not found page</h3> }
+            </Col>
+            { !loading && fee &&
               <Col md={9} sm={12} xs={12} className={s.fee}>
                 <div className={s.header}>
                   <i className="fa fa-money" aria-hidden="true"></i>
@@ -203,9 +209,9 @@ class FeeDetails extends Component {
                   </ul>
                 </div>
               </Col>
-            </Row>
-          </Grid>
-        }
+            }
+          </Row>
+        </Grid>
       </form>
     );
   }
