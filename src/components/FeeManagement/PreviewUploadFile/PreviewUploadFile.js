@@ -113,7 +113,7 @@ class PreviewUpload extends React.Component {
                         <td>{item.apartment_number}</td>
                         <td>{type.name}</td>
                         <td>{`${item.total}`}</td>
-                        <th>{item.paid ? '' : 'OK'}</th>
+                        <th>{item.paid ? 'Đã nộp' : 'Chưa nộp'}</th>
                       </tr>
                     ))
                   }
