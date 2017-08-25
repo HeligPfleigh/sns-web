@@ -5,6 +5,7 @@ import {
   EditorState,
   CompositeDecorator,
   convertToRaw,
+  convertFromRaw,
 } from 'draft-js';
 import classNames from 'classnames';
 
@@ -15,50 +16,58 @@ import {
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 
+function findWithRegex(regex, context, callback) {
+  const text = context.getText();
+  let matchArr = regex.exec(text);
+  while (matchArr !== null) {
+    const start = matchArr.index;
+    callback(start, start + matchArr[0].length);
+    matchArr = regex.exec(text);
+  }
+}
+
+function handleStrategy(context, callback) {
+  findWithRegex(HANDLE_REGEX, context, callback);
+}
+
+function hashtagStrategy(context, callback) {
+  findWithRegex(HASHTAG_REGEX, context, callback);
+}
+
+const compositeDecorator = new CompositeDecorator([{
+  strategy: handleStrategy,
+  component: HandleSpan,
+},
+{
+  strategy: hashtagStrategy,
+  component: HashtagSpan,
+}]);
+
+export function createEditorState(value = null) {
+  let editorState = EditorState.createEmpty(compositeDecorator);
+  if (value) {
+    if (value instanceof EditorState) {
+      editorState = value;
+    } else {
+      editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(value)));
+    }
+      // editorState = EditorState.moveFocusToEnd(editorState);
+  }
+
+  return editorState;
+}
+
 export default class DraftEditor extends Component {
-  constructor(...args) {
-    super(...args);
+  constructor(props) {
+    super(props);
 
-    this.compositeDecorator = new CompositeDecorator([{
-      strategy: this.handleStrategy.bind(this),
-      component: HandleSpan,
-    },
-    {
-      strategy: this.hashtagStrategy.bind(this),
-      component: HashtagSpan,
-    }]);
-
-    this.editor = null;
-
-    this.reset();
+    this.reset(props);
     this.onChange = this.onChange.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.onClick = this.onClick.bind(this);
     this.getCurrentContent = this.getCurrentContent.bind(this);
     this.inputRef = this.inputRef.bind(this);
-  }
-
-  findWithRegex(regex, context, callback) {
-    const text = context.getText();
-    let matchArr = regex.exec(text);
-    while (matchArr !== null) {
-      const start = matchArr.index;
-      callback(start, start + matchArr[0].length);
-      matchArr = regex.exec(text);
-    }
-  }
-
-  handleStrategy(context, callback) {
-    this.findWithRegex(HANDLE_REGEX, context, callback);
-  }
-
-  hashtagStrategy(context, callback) {
-    this.findWithRegex(HASHTAG_REGEX, context, callback);
-  }
-
-  inputRef(editor) {
-    this.editor = editor;
   }
 
   onFocus(...args) {
@@ -72,6 +81,7 @@ export default class DraftEditor extends Component {
     this.setState({
       hasFocusEditor: false,
     });
+
     this.props.onBlur.apply(this, ...args);
   }
 
@@ -81,23 +91,27 @@ export default class DraftEditor extends Component {
   }
 
   onChange(editorState) {
-    this.setState(prevState => ({
-      ...prevState,
-      editorState,
-    }));
+    this.setState({ editorState });
 
     this.props.onChange.call(this, editorState);
   }
 
-  reset() {
-    this.state = {
-      editorState: EditorState.createEmpty(this.compositeDecorator),
-      hasFocusEditor: false,
-    };
+  getCurrentContent() {
+    return JSON.stringify(convertToRaw(this.props.editorState.getCurrentContent()));
   }
 
-  getCurrentContent() {
-    return JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
+  reset(props) {
+    this.state = {
+      hasFocusEditor: false,
+    };
+
+    if (!(this.props.editorState instanceof EditorState)) {
+      this.state.editorState = createEditorState(props.value);
+    }
+  }
+
+  inputRef(editor) {
+    this.editor = editor;
   }
 
   render() {
@@ -125,6 +139,7 @@ DraftEditor.propTypes = {
   spellCheck: PropTypes.bool,
   placeholder: PropTypes.string,
   className: PropTypes.string,
+  editorState: PropTypes.object.isRequired,
 };
 
 DraftEditor.defaultProps = {
@@ -132,4 +147,6 @@ DraftEditor.defaultProps = {
   onBlur: () => undefined,
   onClick: () => undefined,
   onChange: () => undefined,
+  editorState: {
+  },
 };

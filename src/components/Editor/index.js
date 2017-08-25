@@ -1,5 +1,8 @@
-import DraftEditor from './DraftEditor';
+import * as DraftEditor from 'draft-js';
+import RTE, { createEditorState } from './DraftEditor';
 
 export {
- DraftEditor,
+  DraftEditor,
+  RTE,
+  createEditorState,
 };

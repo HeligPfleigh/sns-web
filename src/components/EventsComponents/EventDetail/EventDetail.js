@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 import s from './EventDetail.scss';
 import Divider from '../../Divider';
 import history from '../../../core/history';
+import EditEventModal from '../EditEvent';
 
 const PRIVARY_TEXT = {
   ONLY_ME: 'Chỉ mình tôi',
@@ -42,12 +43,14 @@ class EventDetail extends Component {
 
   constructor(...args) {
     super(...args);
-
+    this.reset();
     this.onJoinClick = this.onJoinClick.bind(this);
     this.onCanJoinClick = this.onCanJoinClick.bind(this);
     this.onCantJoinClick = this.onCantJoinClick.bind(this);
     this.onSelectEtcMenu = this.onSelectEtcMenu.bind(this);
     this.onInterestClick = this.onInterestClick.bind(this);
+    this.showEditEventModal = this.showEditEventModal.bind(this);
+    this.hideEditEventModal = this.hideEditEventModal.bind(this);
   }
 
   async onInterestClick(e) {
@@ -80,13 +83,32 @@ class EventDetail extends Component {
       history.push('/events');
     }
   }
+
+  showEditEventModal = () => {
+    this.setState({
+      showEditFormModal: true,
+    });
+  }
+
+  reset() {
+    this.state = {
+      showEditFormModal: false,
+    };
+  }
+
+  hideEditEventModal() {
+    this.setState({
+      showEditFormModal: false,
+    });
+  }
+
   __renderButtons(isAuthor) {
     const { event, user } = this.props;
     const isJoined = _.isArray(event.joins) && event.joins.filter(u => u._id === user.id).length > 0;
     const isCanJoined = _.isArray(event.can_joins) && event.can_joins.filter(u => u._id === user.id).length > 0;
     const isCantJoined = _.isArray(event.cant_joins) && event.cant_joins.filter(u => u._id === user.id).length > 0;
     const ignore = !isAuthor && !isJoined && !isCanJoined && !isCantJoined && _.isArray(event.invites) && event.invites.filter(u => u._id === user.id).length === 0;
-
+    const canEdit = isAuthor && (moment(event.start) > moment.now());
     if (isAuthor) {
       return (<div className={s.actionsButton}>
         <span>
@@ -98,7 +120,7 @@ class EventDetail extends Component {
             <i className="fa fa-picture-o" aria-hidden="true"></i>
             <span>Thêm ảnh bìa</span>
           </Button>
-          <Button className={s.btnMiddle}>
+          <Button className={s.btnMiddle} onClick={this.showEditEventModal} disabled={!canEdit}>
             <i className="fa fa-pencil" aria-hidden="true"></i>
             <span>Chỉnh sửa</span>
           </Button>
@@ -146,6 +168,11 @@ class EventDetail extends Component {
     const end = !event ? new Date() : new Date(event.end);
     return (
       <Row className={s.eventDetailContent}>
+        <EditEventModal
+          show={this.state.showEditFormModal}
+          onHide={this.hideEditEventModal}
+          initialValues={event}
+        />
         {
           event &&
           <Col md={12}>

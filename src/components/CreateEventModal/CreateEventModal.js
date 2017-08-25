@@ -432,7 +432,7 @@ CreateEventModal.fragments = {
   `,
 };
 CreateEventModal.mutation = {
-  createNewEvent: gql`mutation createNewEvent ($input: CreateNewEventAnnouncementInput!) {
+  createNewEvent: gql`mutation createNewEvent ($input: CreateEventInput!) {
     createNewEvent (input: $input) {
       ...EventView
     }
