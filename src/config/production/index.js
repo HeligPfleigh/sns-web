@@ -30,6 +30,7 @@ export const server = {
 
   // parent path upload images url
   imageUpload: `${ipBrowser}/upload/image`,
+  documentUpload: `${ipBrowser}/upload/document`,
 };
 
 export const auth = {
