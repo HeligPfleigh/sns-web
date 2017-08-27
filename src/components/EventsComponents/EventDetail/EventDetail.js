@@ -11,16 +11,15 @@ import {
   Glyphicon,
 } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { convertFromRaw } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
 import { generate as idRandom } from 'shortid';
 import moment from 'moment';
 import * as _ from 'lodash';
 
-import s from './EventDetail.scss';
+import { DraftToHTML } from '../../Editor';
 import Divider from '../../Divider';
 import history from '../../../core/history';
 import EditEventModal from '../EditEvent';
+import s from './EventDetail.scss';
 
 const PRIVARY_TEXT = {
   ONLY_ME: 'Chỉ mình tôi',
@@ -239,7 +238,7 @@ class EventDetail extends Component {
               <Divider className={s.divider} />
               <div className={s.description}>
                 <span >
-                  <div dangerouslySetInnerHTML={{ __html: stateToHTML(convertFromRaw(JSON.parse(event.message))) }} />
+                  <div dangerouslySetInnerHTML={{ __html: DraftToHTML(event.message) }} />
                 </span>
               </div>
             </Col>

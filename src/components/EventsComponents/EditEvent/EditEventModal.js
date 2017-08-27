@@ -9,84 +9,154 @@ import {
   FormGroup,
   FormControl,
   Clearfix,
+  HelpBlock,
  } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
-import gql from 'graphql-tag';
 import DateTime from 'react-datetime';
 import { reduxForm, Field } from 'redux-form';
-import * as _ from 'lodash';
-import Editor, { EditorState } from 'draft-js';
+import isArray from 'lodash/isArray';
+import head from 'lodash/head';
+import isUndefined from 'lodash/isUndefined';
+import isFunction from 'lodash/isFunction';
 
 import { Privacy } from '../../Dropdown';
-import { DraftEditor, RTE, createEditorState } from '../../Editor';
+import Validator from '../../Validator';
+import { DraftEditor } from '../../Editor';
 import { SingleUploadFile } from '../../ApolloUpload';
-import MakeFormSafe from './MakeFormSafe';
+// import MakeFormSafe from './MakeFormSafe';
+import editEventMutation from './editEventMutation.graphql';
 import s from './EditEvent.scss';
 
-const ReduxFormInputControl = ({ input, meta, ...props }) => <FormControl {...input} {...props} />;
-ReduxFormInputControl.propTypes = {
-  input: PropTypes.object.isRequired,
-  meta: PropTypes.object.isRequired,
-};
-
-const ReduxFormDateTimeControl = ({ input, meta, ...props }) => <DateTime {...input} {...props} />;
-ReduxFormDateTimeControl.propTypes = {
-  input: PropTypes.object.isRequired,
-  meta: PropTypes.object.isRequired,
-};
-
-const ReduxFormEditorControl = ({ input: { editorState, onChange, ...input }, meta, ...props }) => {
-  console.log(input, meta, ...props);
-  // return <FormControl {...input} {...props} />;
-  return <Editor editorState={editorState} onChange={onChange} />;
-};
-ReduxFormEditorControl.propTypes = {
-  input: PropTypes.object.isRequired,
-  meta: PropTypes.object.isRequired,
-};
-
 const withMoment = value => value && moment(value);
-const withSingleImage = value => _.isArray(value) && _.head(value);
-// const withEditorState = (value) => {
-//   let isValid = true;
-//   try {
-//     value = JSON.parse(value);
-//   } catch (e) {
-//     isValid = false;
-//   }
 
-//   return isValid ? DraftEditor.EditorState.createWithContent(DraftEditor.convertFromRaw(value)) : value;
-// };
+class ReduxFormInputField extends Component {
+  render() {
+    const { input, meta: { touched, error, warn }, ...props } = this.props;
+    return (<div>
+      <FormControl {...input} {...props} />
+      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
+    </div>);
+  }
+}
+ReduxFormInputField.propTypes = {
+  input: PropTypes.object.isRequired,
+  meta: PropTypes.object.isRequired,
+};
+
+class ReduxFormDateTimeField extends Component {
+  render() {
+    const { input, meta: { touched, error, warn }, ...props } = this.props;
+    return (<div>
+      <DateTime {...input} {...props} />
+      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
+    </div>);
+  }
+}
+ReduxFormDateTimeField.propTypes = {
+  input: PropTypes.object.isRequired,
+  meta: PropTypes.object.isRequired,
+};
+
+class ReduxFormEditorField extends DraftEditor {
+  render() {
+    const { meta: { touched, error, warn } } = this.props;
+    return (<div>
+      {super.render()}
+      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
+    </div>);
+  }
+}
+ReduxFormEditorField.propTypes = {
+  meta: PropTypes.object.isRequired,
+};
+
+class ReduxFormHiddenField extends Component {
+  componentWillMount() {
+    const { onFill, input } = this.props;
+    if (isFunction(onFill)) {
+      onFill(input.value);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { onFill, input } = this.props;
+    if (isFunction(onFill) && input.value !== prevProps.input.value) {
+      onFill(input.value);
+    }
+  }
+
+  render() {
+    return null;
+  }
+}
+ReduxFormHiddenField.propTypes = {
+  input: PropTypes.object.isRequired,
+  onFill: PropTypes.func,
+};
 
 class EditEventModal extends Component {
   constructor(props, ...args) {
     super(props, ...args);
 
     this.state = {
-      photo: _.isArray(props.initialValues.photos) && _.head(props.initialValues.photos),
-      showEndTime: !_.isUndefined(props.initialValues.end),
-      editorState: createEditorState(props.initialValues.message),
+      photo: isArray(props.initialValues.photos) && head(props.initialValues.photos),
+      privacy: props.initialValues.privacy,
+      showEndTime: !isUndefined(props.initialValues.end),
     };
 
     this.onUploadSuccess = this.onUploadSuccess.bind(this);
     this.onUploadClick = this.onUploadClick.bind(this);
     this.showEndTime = this.showEndTime.bind(this);
     this.hideEndTime = this.hideEndTime.bind(this);
+    this.onPrivacySelected = this.onPrivacySelected.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.onEditorChange = this.onEditorChange.bind(this);
   }
 
   onUploadSuccess({ uploadSingleFile }) {
     this.setState({
       photo: uploadSingleFile.file.url,
     });
+
     this.props.change('photos', [uploadSingleFile.file.url]);
   }
 
   onUploadClick() {
     this.uploadRef.click();
+  }
+
+  onSubmit({
+      _id,
+      privacy,
+      photos,
+      name,
+      location,
+      start,
+      end,
+      message,
+      invites,
+    }) {
+    this.props.saveEvent(_id, {
+      privacy,
+      photos,
+      name,
+      location,
+      start,
+      end,
+      message,
+      invites,
+    })
+    .then(() => this.props.onHide())
+    .catch(() => this.props.onHide());
+  }
+
+  onPrivacySelected(privacy) {
+    this.setState({
+      privacy,
+    });
+
+    this.props.change('privacy', privacy);
   }
 
   showEndTime(event) {
@@ -105,50 +175,8 @@ class EditEventModal extends Component {
     });
   }
 
-  onSubmit(data) {
-    const {
-      _id,
-      privacy,
-      photos,
-      name,
-      location,
-      start,
-      end,
-      message,
-      invites,
-    } = data;
-    console.log({
-      _id,
-      privacy,
-      photos,
-      name,
-      location,
-      start,
-      end,
-      message,
-      invites,
-    });
-    // this.props.saveEvent(data._id, {
-    //   _id,
-    //   privacy,
-    //   photos,
-    //   name,
-    //   location,
-    //   start,
-    //   end,
-    //   message,
-    //   invites,
-    // });
-  }
-
-  onEditorChange(event, editorState) {
-    this.props.change('message', JSON.stringify(editorState.toJS()));
-    this.setState({ editorState });
-    console.log(editorState, JSON.stringify(editorState.toJS()));
-  }
-
   render() {
-    const { handleSubmit, pristine, submitting, invalid } = this.props;
+    const { handleSubmit, pristine, submitting, invalid, form } = this.props;
     return (
       <Modal show={this.props.show} onHide={this.props.onHide} backdrop="static">
         <form name="EditEvent" noValidate onSubmit={handleSubmit(this.onSubmit)}>
@@ -186,8 +214,7 @@ class EditEventModal extends Component {
                         <Field
                           type="hidden"
                           name="photos"
-                          component={ReduxFormInputControl}
-                          format={withSingleImage}
+                          component={ReduxFormHiddenField}
                         />
                       </div> : null}
                   </div>
@@ -200,7 +227,8 @@ class EditEventModal extends Component {
                   <Field
                     type="text"
                     name="name"
-                    component={ReduxFormInputControl}
+                    component={ReduxFormInputField}
+                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
               </FormGroup>
@@ -211,7 +239,8 @@ class EditEventModal extends Component {
                   <Field
                     type="text"
                     name="location"
-                    component={ReduxFormInputControl}
+                    component={ReduxFormInputField}
+                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
               </FormGroup>
@@ -222,7 +251,7 @@ class EditEventModal extends Component {
                   <Field
                     type="text"
                     name="start"
-                    component={ReduxFormDateTimeControl}
+                    component={ReduxFormDateTimeField}
                     disableOnClickOutside
                     closeOnTab
                     inputProps={{
@@ -245,7 +274,7 @@ class EditEventModal extends Component {
                   <Field
                     type="text"
                     name="end"
-                    component={ReduxFormDateTimeControl}
+                    component={ReduxFormDateTimeField}
                     disableOnClickOutside
                     closeOnTab
                     inputProps={{
@@ -266,10 +295,9 @@ class EditEventModal extends Component {
                   <Field
                     type="textarea"
                     name="message"
-                    component={ReduxFormEditorControl}
+                    component={ReduxFormEditorField}
                     className={s.editor}
-                    onChange={this.onEditorChange}
-                    editorState={this.state.editorState}
+                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
               </FormGroup>
@@ -278,7 +306,12 @@ class EditEventModal extends Component {
             <Clearfix />
           </Modal.Body>
           <Modal.Footer>
-            <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} />
+            <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
+            <Field
+              type="hidden"
+              name="privacy"
+              component={ReduxFormHiddenField}
+            />
             <Button onClick={this.props.onHide}>Hủy bỏ</Button>
             <Button type="submit" bsStyle="primary" disabled={pristine || submitting || invalid}>Đăng bài</Button>
           </Modal.Footer>
@@ -309,37 +342,14 @@ export default reduxForm({
     'end',
     'location',
     'message',
+    'privacy',
   ],
   touchOnChange: true,
   touchOnBlur: true,
   enableReinitialize: true,
 })(compose(
   withStyles(s),
-  graphql(gql`mutation editEvent ($input: EditEventInput!) {
-    editEvent (input: $input) {
-      ...EventView
-    }
-  }
-  fragment EventView on Event {
-      _id
-      privacy
-      author {
-        _id
-        username
-        profile {
-          picture
-          firstName
-          lastName
-        }
-      }
-      photos
-      name
-      location
-      start
-      end
-      message
-    }
-  `, {
+  graphql(editEventMutation, {
     props: ({ mutate }) => ({
       saveEvent: (_id, data) => mutate({
         variables: {

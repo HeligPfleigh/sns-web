@@ -17,11 +17,11 @@ export default class Privacy extends Component {
    *
    * @param {*} args
    */
-  constructor(...args) {
-    super(...args);
+  constructor(props, ...args) {
+    super(props, ...args);
 
     this.state = {
-      privacySelected: PUBLIC,
+      privacySelected: props.value || PUBLIC,
     };
 
     this.onSelect = this.onSelect.bind(this);
@@ -102,6 +102,7 @@ Privacy.propTypes = {
   ]).isRequired,
   onSelect: PropTypes.func.isRequired,
   className: PropTypes.any,
+  value: PropTypes.string,
   PUBLIC: PropTypes.bool.isRequired,
   FRIEND: PropTypes.bool.isRequired,
   ONLY_ME: PropTypes.bool.isRequired,
@@ -110,6 +111,7 @@ Privacy.propTypes = {
 
 Privacy.defaultProps = {
   id: Math.random(),
+  value: PUBLIC,
   onSelect: () => undefined,
   PUBLIC: true,
   FRIEND: true,

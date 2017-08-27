@@ -4,17 +4,23 @@ import {
   Editor,
   EditorState,
   CompositeDecorator,
-  convertToRaw,
   convertFromRaw,
+  convertFromHTML,
+  ContentState,
+  convertToRaw,
 } from 'draft-js';
+import { stateToHTML } from 'draft-js-export-html';
 import classNames from 'classnames';
+import isUndefined from 'lodash/isUndefined';
+import isNull from 'lodash/isNull';
+import isObject from 'lodash/isObject';
+import isFunction from 'lodash/isFunction';
 
-import {
-  HANDLE_REGEX,
-  HASHTAG_REGEX,
-} from '../../constants';
-import HandleSpan from '../Common/Editor/HandleSpan';
-import HashtagSpan from '../Common/Editor/HashtagSpan';
+import HandleSpan from './HandleSpan';
+import HashtagSpan from './HashtagSpan';
+
+export const HANDLE_REGEX = /@[\w\d]+/g;
+export const HASHTAG_REGEX = /#[\w\d]+/g;
 
 function findWithRegex(regex, context, callback) {
   const text = context.getText();
@@ -43,25 +49,66 @@ const compositeDecorator = new CompositeDecorator([{
   component: HashtagSpan,
 }]);
 
-export function createEditorState(value = null) {
-  let editorState = EditorState.createEmpty(compositeDecorator);
-  if (value) {
-    if (value instanceof EditorState) {
-      editorState = value;
-    } else {
-      editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(value)));
-    }
-      // editorState = EditorState.moveFocusToEnd(editorState);
+export function createContentState(value) {
+  if (value instanceof EditorState) {
+    return value.getCurrentContent();
   }
 
-  return editorState;
+  if (value instanceof ContentState) {
+    return value;
+  }
+
+  if (isUndefined(value) || isNull(value)) {
+    return ContentState.createFromText('');
+  }
+
+  let jsonValue = null;
+  try {
+    jsonValue = JSON.parse(value);
+  } catch (e) {
+
+  }
+
+  try {
+    if (jsonValue) {
+      return convertFromRaw(jsonValue);
+    }
+    const blocksFromHTML = convertFromHTML(value);
+    return ContentState.createFromBlockArray(
+          blocksFromHTML.contentBlocks,
+          blocksFromHTML.entityMap,
+      );
+  } catch (e) {
+    return ContentState.createFromText('');
+  }
+}
+
+export function createEditorState(value) {
+  if (value instanceof EditorState) {
+    return value;
+  }
+
+  if (isUndefined(value) || isNull(value)) {
+    return EditorState.createEmpty(compositeDecorator);
+  }
+
+  try {
+    return EditorState.createWithContent(createContentState(value));
+  } catch (e) {
+    return EditorState.createEmpty(compositeDecorator);
+  }
+}
+
+export function DraftToHTML(value) {
+  return stateToHTML(createContentState(value));
 }
 
 export default class DraftEditor extends Component {
-  constructor(props) {
-    super(props);
+  constructor(props, ...args) {
+    super(props, ...args);
 
-    this.reset(props);
+    this.__init(props);
+
     this.onChange = this.onChange.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -74,7 +121,10 @@ export default class DraftEditor extends Component {
     this.setState({
       hasFocusEditor: true,
     });
-    this.props.onFocus.apply(this, ...args);
+
+    if (isFunction(this.callback.onFocus)) {
+      this.callback.onFocus.apply(this, ...args);
+    }
   }
 
   onBlur(...args) {
@@ -82,32 +132,49 @@ export default class DraftEditor extends Component {
       hasFocusEditor: false,
     });
 
-    this.props.onBlur.apply(this, ...args);
+    if (isFunction(this.callback.onBlur)) {
+      this.callback.onBlur.apply(this, ...args);
+    }
   }
 
   onClick(...args) {
     this.editor.focus();
-    this.props.onClick.apply(this, ...args);
+
+    if (isFunction(this.callback.onClick)) {
+      this.callback.onClick.apply(this, ...args);
+    }
   }
 
   onChange(editorState) {
-    this.setState({ editorState });
+    this.setState({
+      editorState,
+    });
 
-    this.props.onChange.call(this, editorState);
+    if (this.input.onChange) {
+      let currentValue = null;
+      if (editorState.getCurrentContent().hasText()) {
+        currentValue = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
+      }
+
+      this.input.onChange(currentValue);
+    }
+
+    if (isFunction(this.callback.onChange)) {
+      this.callback.onChange.call(this, editorState);
+    }
   }
 
   getCurrentContent() {
-    return JSON.stringify(convertToRaw(this.props.editorState.getCurrentContent()));
+    return JSON.stringify(this.state.editorState.toJS());
   }
 
-  reset(props) {
+  __init(props) {
+    this.input = isUndefined(props.input) || !isObject(props.input) ? {} : props.input;
+    this.callback = isUndefined(props.callback) || !isObject(props.callback) ? {} : props.callback;
     this.state = {
       hasFocusEditor: false,
+      editorState: createEditorState(this.input.value),
     };
-
-    if (!(this.props.editorState instanceof EditorState)) {
-      this.state.editorState = createEditorState(props.value);
-    }
   }
 
   inputRef(editor) {
@@ -115,16 +182,21 @@ export default class DraftEditor extends Component {
   }
 
   render() {
+    const { input: { onChange, editorState, ...input }, meta, className, ...props } = this.props;
     return (
-      <div className={classNames('form-control', this.props.className, { focus: this.state.hasFocusEditor })} onClick={this.onClick} style={{ height: 'auto' }}>
+      <div
+        className={classNames('form-control', className, { focus: this.state.hasFocusEditor })}
+        onClick={this.onClick}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}
+        style={{ height: 'auto' }}
+      >
         <Editor
           editorState={this.state.editorState}
           onChange={this.onChange}
-          placeholder={this.props.placeholder}
           ref={this.inputRef}
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          spellCheck={this.props.spellCheck}
+          {...input}
+          {...props}
         />
       </div>
     );
@@ -132,21 +204,24 @@ export default class DraftEditor extends Component {
 }
 
 DraftEditor.propTypes = {
-  onFocus: PropTypes.func.isRequired,
-  onBlur: PropTypes.func.isRequired,
-  onClick: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
-  spellCheck: PropTypes.bool,
-  placeholder: PropTypes.string,
-  className: PropTypes.string,
-  editorState: PropTypes.object.isRequired,
+  input: PropTypes.shape({
+    onChange: PropTypes.func,
+    editorState: PropTypes.instanceOf(EditorState),
+  }),
+  meta: PropTypes.object,
+  callback: PropTypes.shape({
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+    onClick: PropTypes.func,
+    onChange: PropTypes.func,
+  }),
+  className: PropTypes.any,
 };
 
 DraftEditor.defaultProps = {
-  onFocus: () => undefined,
-  onBlur: () => undefined,
-  onClick: () => undefined,
-  onChange: () => undefined,
-  editorState: {
+  spellCheck: false,
+  input: {
+    onChange: () => undefined,
+    editorState: createEditorState(null),
   },
 };
