@@ -28,4 +28,4 @@ const validate = (files, [width, height]) => {
   return Promise.all(list.map(file => validateImage(file, width, height)));
 };
 
-export default (attribute, message = 'The :attribute has invalid image dimensions.', width, height) => value => validate(value, [width, height]) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } has invalid image dimensions.', width, height) => value => validate(value, [width, height]) ? undefined : Message(message, { attribute });

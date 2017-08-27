@@ -7,4 +7,4 @@ const validate = (value, regex, ...flags) => {
   return new RegExp(regex, flags).test(String(value));
 };
 
-export default (attribute, message = 'The :attribute format is invalid.', regex, ...flags) => value => validate(value, regex, ...flags) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } format is invalid.', regex, ...flags) => value => validate(value, regex, ...flags) ? undefined : Message(message, { attribute });

@@ -30,4 +30,4 @@ const validate = (value, params) => {
   return parsedValue === parsedValue;
 };
 
-export default (attribute, message = 'The :attribute must be a decimal numeric.', params = ['*']) => value => validate(value, params) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be a decimal numeric.', params = ['*']) => value => validate(value, params) ? undefined : Message(message, { attribute });

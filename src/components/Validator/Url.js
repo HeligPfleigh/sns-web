@@ -10,4 +10,4 @@ const validate = (value, requireProtocol = true, allowUnderscores = true) => {
   return isUrl(value, options);
 };
 
-export default (attribute, message = 'The :attribute format is invalid.', ...options) => value => validate(value, ...options) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } format is invalid.', ...options) => value => validate(value, ...options) ? undefined : Message(message, { attribute });

@@ -9,4 +9,4 @@ const validate = (value, list) => {
   return list.filter(option => option === value).length > 0;
 };
 
-export default (attribute, message = 'The selected :attribute is invalid.', list) => value => (isArray(list) && validate(value, list)) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The selected ${ attribute } is invalid.', list) => value => (isArray(list) && validate(value, list)) ? undefined : Message(message, { attribute });

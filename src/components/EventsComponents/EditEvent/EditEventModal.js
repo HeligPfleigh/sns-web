@@ -7,14 +7,11 @@ import {
   Col,
   ControlLabel,
   FormGroup,
-  FormControl,
   Clearfix,
-  HelpBlock,
   ButtonToolbar,
  } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
-import ReactDateTime from 'react-datetime';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
 import isArray from 'lodash/isArray';
 import head from 'lodash/head';
@@ -25,97 +22,9 @@ import { connect } from 'react-redux';
 import history from '../../../core/history';
 import { Privacy } from '../../Dropdown';
 import Validator from '../../Validator';
-import { DraftEditor } from '../../Editor';
 import { SingleUploadFile } from '../../ApolloUpload';
-// import MakeFormSafe from './MakeFormSafe';
+import * as ReduxFormFields from './FormFields';
 import s from './EditEvent.scss';
-
-class ReduxFormInputField extends Component {
-  render() {
-    const { input, meta: { touched, error, warn }, ...props } = this.props;
-    return (<div>
-      <FormControl {...input} {...props} />
-      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
-    </div>);
-  }
-}
-ReduxFormInputField.propTypes = {
-  input: PropTypes.object.isRequired,
-  meta: PropTypes.object.isRequired,
-};
-
-class ReduxFormDateTimeField extends Component {
-  constructor(...args) {
-    super(...args);
-
-    this.onChange = this.onChange.bind(this);
-    this.componentRef = this.componentRef.bind(this);
-  }
-
-  onChange(dateSelected) {
-    const { input, closeOnSelect } = this.props;
-    input.onChange(dateSelected);
-
-    // Fix bug: When the attribute named closeOnSelect has defined, the datetime picker popup always hidden.
-    if (closeOnSelect) {
-      // this.datetimeRef.closeCalendar();
-    }
-  }
-
-  componentRef(datetimeRef) {
-    this.datetimeRef = datetimeRef;
-  }
-
-  render() {
-    const { input: { onChange, ...input }, meta: { touched, error, warn }, closeOnSelect, ...props } = this.props;
-    return (<div>
-      <ReactDateTime {...input} {...props} ref={this.componentRef} onChange={this.onChange} />
-      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
-    </div>);
-  }
-}
-ReduxFormDateTimeField.propTypes = {
-  input: PropTypes.object.isRequired,
-  meta: PropTypes.object.isRequired,
-  closeOnSelect: PropTypes.bool,
-};
-
-class ReduxFormEditorField extends DraftEditor {
-  render() {
-    const { meta: { touched, error, warn } } = this.props;
-    return (<div>
-      {super.render()}
-      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
-    </div>);
-  }
-}
-ReduxFormEditorField.propTypes = {
-  meta: PropTypes.object.isRequired,
-};
-
-class ReduxFormHiddenField extends Component {
-  componentWillMount() {
-    const { onFill, input } = this.props;
-    if (isFunction(onFill)) {
-      onFill(input.value);
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const { onFill, input } = this.props;
-    if (isFunction(onFill) && input.value !== prevProps.input.value) {
-      onFill(input.value);
-    }
-  }
-
-  render() {
-    return null;
-  }
-}
-ReduxFormHiddenField.propTypes = {
-  input: PropTypes.object.isRequired,
-  onFill: PropTypes.func,
-};
 
 class EditEventModal extends Component {
   constructor(props, ...args) {
@@ -125,6 +34,8 @@ class EditEventModal extends Component {
       photo: isArray(props.initialValues.photos) && head(props.initialValues.photos),
       privacy: props.initialValues.privacy,
       showEndTime: !isUndefined(props.initialValues.end),
+      formFields: {},
+      validationState: {},
     };
 
     this.onUploadSuccess = this.onUploadSuccess.bind(this);
@@ -134,6 +45,7 @@ class EditEventModal extends Component {
     this.onPrivacySelected = this.onPrivacySelected.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
+    this.validationState = this.validationState.bind(this);
   }
 
   onUploadSuccess({ uploadSingleFile }) {
@@ -203,6 +115,27 @@ class EditEventModal extends Component {
     });
   }
 
+  validationState(fieldName) {
+    return () => null;
+    // return () => {
+    //   try {
+    //     const fieldComponent = this.state.formFields[fieldName];
+    //     if (isUndefined(fieldComponent)) {
+    //       return false;
+    //     }
+
+    //     if (!isFunction(fieldComponent.getRenderedComponent)) {
+    //       return false;
+    //     }
+
+    //     const { props } = fieldComponent.getRenderedComponent();
+    //     return (props.meta.touched && ((props.meta.error && 'error') || (props.meta.warning && 'warning'))) || null;
+    //   } catch (e) {
+    //     return false;
+    //   }
+    // };
+  }
+
   render() {
     const {
       handleSubmit,
@@ -250,53 +183,65 @@ class EditEventModal extends Component {
                           className={s.imgResponsive}
                         />
                         <Field
-                          type="hidden"
+                          type="input"
                           name="photos"
-                          component={ReduxFormHiddenField}
+                          component={ReduxFormFields.HiddenField}
                         />
                       </div> : null}
                   </div>
                 </Col>
               </FormGroup>
 
-              <FormGroup>
+              <FormGroup validationState={this.state.validationState.name}>
                 <ControlLabel className="col-sm-3">Tên sự kiện</ControlLabel>
                 <Col sm={9}>
                   <Field
                     type="text"
                     name="name"
-                    component={ReduxFormInputField}
+                    component={ReduxFormFields.InputField}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
+                    ref={input => this.state.formFields.name = input}
+                    withRef
+                    onChange={this.validationState('name')}
                   />
                 </Col>
               </FormGroup>
 
-              <FormGroup>
+              <FormGroup validationState={this.state.validationState.location}>
                 <ControlLabel className="col-sm-3">Vị trí</ControlLabel>
                 <Col sm={9}>
                   <Field
                     type="text"
                     name="location"
-                    component={ReduxFormInputField}
+                    component={ReduxFormFields.InputField}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
+                    ref={input => this.state.formFields.location = input}
+                    withRef
+                    onChange={this.validationState('location')}
                   />
                 </Col>
               </FormGroup>
 
-              <FormGroup>
+              <FormGroup validationState={this.state.validationState.start}>
                 <ControlLabel className="col-sm-3">{ this.state.showEndTime ? 'Bắt đầu' : 'Ngày / Giờ' }</ControlLabel>
                 <Col sm={5}>
                   <Field
                     type="text"
                     name="start"
-                    component={ReduxFormDateTimeField}
+                    component={ReduxFormFields.DateTimeField}
                     disableOnClickOutside
                     closeOnTab
                     closeOnSelect
                     inputProps={{
                       readOnly: true,
                     }}
-                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
+                    validate={[
+                      Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                      (value, values) => Validator.Date.isBefore(null, `Thời gian bắt đầu phải trước ${Validator.Date.withMoment(values.end).format('DD/MM/YYYY HH:mm')}`, values.end)(value),
+                    ]}
+                    ref={input => this.state.formFields.start = input}
+                    withRef
+                    onChange={this.validationState('start')}
                   />
                 </Col>
                 {!this.state.showEndTime && (
@@ -304,40 +249,51 @@ class EditEventModal extends Component {
                   <a onClick={this.showEndTime}>+ Thời gian kết thúc</a>
                 </Col>
               )}
+                <Clearfix />
               </FormGroup>
 
               {this.state.showEndTime && (
-              <FormGroup>
+              <FormGroup validationState={this.state.validationState.end}>
                 <ControlLabel className="col-sm-3">Kết thúc</ControlLabel>
                 <Col sm={5}>
                   <Field
                     type="text"
                     name="end"
-                    component={ReduxFormDateTimeField}
+                    component={ReduxFormFields.DateTimeField}
                     disableOnClickOutside
                     closeOnTab
                     closeOnSelect
                     inputProps={{
                       readOnly: true,
                     }}
-                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
+                    validate={[
+                      Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                      (value, values) => Validator.Date.isAfter(null, `Thời gian kết thúc phải sau ${Validator.Date.withMoment(values.start).format('DD/MM/YYYY HH:mm')}`, values.start)(value),
+                    ]}
+                    ref={input => this.state.formFields.end = input}
+                    withRef
+                    onChange={this.validationState('end')}
                   />
                 </Col>
                 <Col sm={4} className={s.showEndTime}>
-                  <a onClick={this.hideEndTime}>Xóa</a>
+                  <a onClick={this.hideEndTime}>Ẩn</a>
                 </Col>
+                <Clearfix />
               </FormGroup>
-            )}
+              )}
 
-              <FormGroup>
+              <FormGroup validationState={this.state.validationState.message}>
                 <ControlLabel className="col-sm-3">Miêu tả</ControlLabel>
                 <Col sm={9}>
                   <Field
                     type="textarea"
                     name="message"
-                    component={ReduxFormEditorField}
+                    component={ReduxFormFields.EditorField}
                     className={s.editor}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
+                    ref={input => this.state.formFields.message = input}
+                    withRef
+                    onChange={this.validationState('message')}
                   />
                 </Col>
               </FormGroup>
@@ -351,9 +307,9 @@ class EditEventModal extends Component {
               <ButtonToolbar className="pull-right">
                 <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
                 <Field
-                  type="hidden"
+                  type="input"
                   name="privacy"
-                  component={ReduxFormHiddenField}
+                  component={ReduxFormFields.HiddenField}
                 />
                 <Button onClick={this.props.onHide} disabled={submitting}>Đóng cửa sổ</Button>
                 <Button type="submit" bsStyle="primary" disabled={!canUpdate || pristine || submitting || invalid}>Sửa</Button>

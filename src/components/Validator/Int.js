@@ -9,4 +9,4 @@ const validate = (value) => {
   return /^-?[0-9]+$/.test(String(value));
 };
 
-export default (attribute, message = 'The :attribute must be an integer.') => value => validate(value) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be an integer.') => value => validate(value) ? undefined : Message(message, { attribute });

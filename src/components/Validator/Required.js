@@ -19,4 +19,4 @@ const validate = (value, params = [false]) => {
   return String(value).trim().length > 0;
 };
 
-export default (attribute, message = 'The :attribute is required.', params = [false]) => value => validate(value, params) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } is required.', params = [false]) => value => validate(value, params) ? undefined : Message(message, { attribute });

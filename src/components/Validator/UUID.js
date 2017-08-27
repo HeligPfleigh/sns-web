@@ -13,4 +13,4 @@ const validate = (value, version = 'all') => {
   return isString(value) && pattern && pattern.test(value);
 };
 
-export default (attribute, message = 'The :attribute must be a UUID.', version = 'all') => value => validate(value, version) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be a UUID.', version = 'all') => value => validate(value, version) ? undefined : Message(message, { attribute });

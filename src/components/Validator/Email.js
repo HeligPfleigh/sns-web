@@ -10,4 +10,4 @@ const validate = (value) => {
   return isEmail(String(value));
 };
 
-export default (attribute, message = 'The :attribute must be a valid email address.', length) => value => validate(value, length) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be a valid email address.', length) => value => validate(value, length) ? undefined : Message(message, { attribute });

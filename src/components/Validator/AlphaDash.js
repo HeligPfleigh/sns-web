@@ -15,4 +15,4 @@ const validate = (value, locale = null) => {
   return (alphaDash[locale] || alphaDash.en).test(value);
 };
 
-export default (attribute, message = 'The :attribute may only contain letters, numbers, and dashes.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } may only contain letters, numbers, and dashes.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });

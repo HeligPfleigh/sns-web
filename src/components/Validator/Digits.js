@@ -15,4 +15,4 @@ const validate = (value, length) => {
   return /^[0-9]*$/.test(strVal) && strVal.length === Number(length);
 };
 
-export default (attribute, message = 'The :attribute must be :digits digits.', digits) => value => validate(value, digits) ? undefined : Message(message, { attribute, digits });
+export default (attribute, message = 'The ${ attribute } must be ${ digits } digits.', digits) => value => validate(value, digits) ? undefined : Message(message, { attribute, digits });

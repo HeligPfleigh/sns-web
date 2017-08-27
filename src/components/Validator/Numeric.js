@@ -10,4 +10,4 @@ const validate = (value) => {
   return isNumber(value);
 };
 
-export default (attribute, message = 'The :attribute must be a number.') => value => validate(value) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be a number.') => value => validate(value) ? undefined : Message(message, { attribute });

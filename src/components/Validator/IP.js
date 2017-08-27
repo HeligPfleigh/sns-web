@@ -10,4 +10,4 @@ const validate = (value, version = 4) => {
   return isIP(value, version);
 };
 
-export default (attribute, message = 'The :attribute must be a valid IP address.') => value => validate(value) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be a valid IP address.') => value => validate(value) ? undefined : Message(message, { attribute });

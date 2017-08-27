@@ -15,4 +15,4 @@ const validate = (value, locale = null) => {
   return (alpha[locale] || alpha.en).test(value);
 };
 
-export default (attribute, message = 'The :attribute may only contain letters.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } may only contain letters.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });

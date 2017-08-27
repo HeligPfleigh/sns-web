@@ -15,4 +15,4 @@ const validate = (value, locale = null) => {
   return (alphaNumeric[locale] || alphaNumeric.en).test(value);
 };
 
-export default (attribute, message = 'The :attribute may only contain letters and numbers.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } may only contain letters and numbers.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });

@@ -17,4 +17,4 @@ const validate = (str) => {
     (firstPaddingChar === len - 2 && str[len - 1] === '=');
 };
 
-export default (attribute, message = 'The :attribute must be base64 encoding string.') => value => validate(value) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } must be base64 encoding string.') => value => validate(value) ? undefined : Message(message, { attribute });
