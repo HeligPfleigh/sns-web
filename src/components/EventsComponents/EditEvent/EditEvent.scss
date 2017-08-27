@@ -54,7 +54,7 @@ a {
 }
 
 .showEndTime {
-  text-align: right !important;
+  text-align: right;
   line-height: 34px;
 }
 
@@ -62,8 +62,4 @@ a {
   padding: 8px;
   border: solid 1px #dedede;
   min-height: 200px;
-}
-
-.showEndTime {
-	text-align: right !important;
 }

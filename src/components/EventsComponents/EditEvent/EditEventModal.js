@@ -15,7 +15,7 @@ import {
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
-import DateTime from 'react-datetime';
+import ReactDateTime from 'react-datetime';
 import { reduxForm, Field } from 'redux-form';
 import isArray from 'lodash/isArray';
 import head from 'lodash/head';
@@ -47,10 +47,31 @@ ReduxFormInputField.propTypes = {
 };
 
 class ReduxFormDateTimeField extends Component {
+  constructor(...args) {
+    super(...args);
+
+    this.onChange = this.onChange.bind(this);
+    this.componentRef = this.componentRef.bind(this);
+  }
+
+  onChange(dateSelected) {
+    const { input, closeOnSelect } = this.props;
+    input.onChange(dateSelected);
+
+    // Fix bug: When the attribute named closeOnSelect has defined, the datetime picker popup always hidden.
+    if (closeOnSelect) {
+      this.datetimeRef.closeCalendar();
+    }
+  }
+
+  componentRef(datetimeRef) {
+    this.datetimeRef = datetimeRef;
+  }
+
   render() {
-    const { input, meta: { touched, error, warn }, ...props } = this.props;
+    const { input: { onChange, ...input }, meta: { touched, error, warn }, closeOnSelect, ...props } = this.props;
     return (<div>
-      <DateTime {...input} {...props} />
+      <ReactDateTime {...input} {...props} ref={this.componentRef} onChange={this.onChange} />
       {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
     </div>);
   }
@@ -58,6 +79,7 @@ class ReduxFormDateTimeField extends Component {
 ReduxFormDateTimeField.propTypes = {
   input: PropTypes.object.isRequired,
   meta: PropTypes.object.isRequired,
+  closeOnSelect: PropTypes.bool,
 };
 
 class ReduxFormEditorField extends DraftEditor {
@@ -260,10 +282,12 @@ class EditEventModal extends Component {
                     component={ReduxFormDateTimeField}
                     disableOnClickOutside
                     closeOnTab
+                    closeOnSelect
                     inputProps={{
                       readOnly: true,
                     }}
                     format={withMoment}
+                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
                 {!this.state.showEndTime && (
@@ -283,10 +307,12 @@ class EditEventModal extends Component {
                     component={ReduxFormDateTimeField}
                     disableOnClickOutside
                     closeOnTab
+                    closeOnSelect
                     inputProps={{
                       readOnly: true,
                     }}
                     format={withMoment}
+                    validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
                 <Col sm={4} className={s.showEndTime}>
