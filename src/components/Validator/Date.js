@@ -1,13 +1,15 @@
 import moment from 'moment';
 import Message from './Helper/Message';
 
-const toDate = (value, ...options) => value instanceof moment ? value : moment(value, ...options);
-const isValid = (value, ...options) => toDate(value, ...options).isValid();
-const isAfter = (value, date) => toDate(value).isAfter(toDate(date));
-const isBefore = (value, date) => toDate(value).isBefore(toDate(date));
-const isEqual = (value, date) => toDate(value).isEqual(toDate(date));
+const withMoment = (value, ...options) => value instanceof moment ? value : moment(value, ...options);
+const isValid = (value, ...options) => withMoment(value, ...options).isValid();
+const isAfter = (value, date) => withMoment(value).isAfter(withMoment(date));
+const isBefore = (value, date) => withMoment(value).isBefore(withMoment(date));
+const isEqual = (value, date) => withMoment(value).isEqual(withMoment(date));
 
 export default {
+  withMoment,
+  now: () => withMoment(),
   isValid: (attribute, message = 'The :attribute is not a valid date.', ...options) => value => isValid(value, ...options) ? undefined : Message(message, { attribute }),
   isAfter: (attribute, message = 'The :attribute must be a date after :date.', date) => value => isAfter(value, date) ? undefined : Message(message, { attribute, date }),
   isBefore: (attribute, message = 'The :attribute must be a date before :date.', date) => value => isBefore(value, date) ? undefined : Message(message, { attribute, date }),

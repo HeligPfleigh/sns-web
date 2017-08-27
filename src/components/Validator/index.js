@@ -6,7 +6,7 @@ import Ascii from './Ascii';
 import Base64 from './Base64';
 import * as Between from './Between';
 import Contains from './Contains';
-import * as Date from './Date';
+import Date from './Date';
 import Decimal from './Decimal';
 import Digits from './Digits';
 import Dimensions from './Dimensions';

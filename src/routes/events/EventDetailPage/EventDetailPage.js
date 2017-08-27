@@ -13,6 +13,7 @@ import joinEvent from './joinEvent.graphql';
 import canJoinEvent from './canJoinEvent.graphql';
 import cantJoinEvent from './cantJoinEvent.graphql';
 import deleteEvent from './deleteEvent.graphql';
+import editEventMutation from './editEventMutation.graphql';
 import fetchEventDetails from './fetchEventDetails.graphql';
 import {
   EventMenu,
@@ -96,6 +97,7 @@ class EventDetailPage extends Component {
                 canJoinEvent={this.props.canJoinEvent}
                 cantJoinEvent={this.props.cantJoinEvent}
                 deleteEvent={this.props.deleteEvent}
+                editEvent={this.props.editEvent}
                 interestEvent={this.props.interestEvent}
               />
             </Col>
@@ -124,6 +126,7 @@ EventDetailPage.propTypes = {
   canJoinEvent: PropTypes.func.isRequired,
   cantJoinEvent: PropTypes.func.isRequired,
   deleteEvent: PropTypes.func.isRequired,
+  editEvent: PropTypes.func.isRequired,
   interestEvent: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
@@ -157,6 +160,18 @@ export default compose(
       deleteEvent: eventId => mutate({
         variables: {
           eventId,
+        },
+      }),
+    }),
+  }),
+  graphql(editEventMutation, {
+    props: ({ mutate }) => ({
+      editEvent: (_id, data) => mutate({
+        variables: {
+          input: {
+            _id,
+            ...data,
+          },
         },
       }),
     }),

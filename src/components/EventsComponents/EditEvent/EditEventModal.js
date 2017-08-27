@@ -13,24 +13,22 @@ import {
   ButtonToolbar,
  } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { graphql, compose } from 'react-apollo';
-import moment from 'moment';
+import { compose } from 'react-apollo';
 import ReactDateTime from 'react-datetime';
-import { reduxForm, Field } from 'redux-form';
+import { reduxForm, Field, formValueSelector } from 'redux-form';
 import isArray from 'lodash/isArray';
 import head from 'lodash/head';
 import isUndefined from 'lodash/isUndefined';
 import isFunction from 'lodash/isFunction';
+import { connect } from 'react-redux';
 
+import history from '../../../core/history';
 import { Privacy } from '../../Dropdown';
 import Validator from '../../Validator';
 import { DraftEditor } from '../../Editor';
 import { SingleUploadFile } from '../../ApolloUpload';
 // import MakeFormSafe from './MakeFormSafe';
-import editEventMutation from './editEventMutation.graphql';
 import s from './EditEvent.scss';
-
-const withMoment = value => value && moment(value);
 
 class ReduxFormInputField extends Component {
   render() {
@@ -60,7 +58,7 @@ class ReduxFormDateTimeField extends Component {
 
     // Fix bug: When the attribute named closeOnSelect has defined, the datetime picker popup always hidden.
     if (closeOnSelect) {
-      this.datetimeRef.closeCalendar();
+      // this.datetimeRef.closeCalendar();
     }
   }
 
@@ -134,8 +132,8 @@ class EditEventModal extends Component {
     this.showEndTime = this.showEndTime.bind(this);
     this.hideEndTime = this.hideEndTime.bind(this);
     this.onPrivacySelected = this.onPrivacySelected.bind(this);
-    this.saveEvent = this.saveEvent.bind(this);
-    this.cancelEvent = this.cancelEvent.bind(this);
+    this.onUpdate = this.onUpdate.bind(this);
+    this.onDelete = this.onDelete.bind(this);
   }
 
   onUploadSuccess({ uploadSingleFile }) {
@@ -158,7 +156,7 @@ class EditEventModal extends Component {
     this.props.change('privacy', privacy);
   }
 
-  saveEvent({
+  onUpdate({
       _id,
       privacy,
       photos,
@@ -169,7 +167,7 @@ class EditEventModal extends Component {
       message,
       invites,
     }) {
-    return this.props.saveEvent(_id, {
+    return this.props.onUpdate(_id, {
       privacy,
       photos,
       name,
@@ -183,8 +181,10 @@ class EditEventModal extends Component {
     .catch(() => this.props.onHide());
   }
 
-  cancelEvent() {
-    console.log(this);
+  onDelete() {
+    this.props.onDelete(this.props.initialValues._id).then(() => {
+      history.push('/events');
+    });
   }
 
   showEndTime(event) {
@@ -204,10 +204,20 @@ class EditEventModal extends Component {
   }
 
   render() {
-    const { handleSubmit, pristine, submitting, invalid, form } = this.props;
+    const {
+      handleSubmit,
+      pristine,
+      submitting,
+      invalid,
+      form,
+      currentValues,
+      initialValues,
+      canUpdate,
+      canDelete,
+    } = this.props;
     return (
       <Modal show={this.props.show} onHide={this.props.onHide} backdrop="static">
-        <form name="EditEvent" noValidate onSubmit={handleSubmit(this.saveEvent)}>
+        <form name={form} noValidate onSubmit={handleSubmit(this.onUpdate)}>
           <Modal.Header closeButton={!submitting}>
             <Modal.Title>Tạo sự kiện</Modal.Title>
           </Modal.Header>
@@ -286,7 +296,6 @@ class EditEventModal extends Component {
                     inputProps={{
                       readOnly: true,
                     }}
-                    format={withMoment}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
@@ -311,7 +320,6 @@ class EditEventModal extends Component {
                     inputProps={{
                       readOnly: true,
                     }}
-                    format={withMoment}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
                   />
                 </Col>
@@ -339,7 +347,7 @@ class EditEventModal extends Component {
           </Modal.Body>
           <Modal.Footer>
             <ButtonToolbar>
-              <Button onClick={this.cancelEvent} className="btn-danger" disabled={submitting}>Hủy sự kiện</Button>
+              <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Hủy sự kiện</Button>
               <ButtonToolbar className="pull-right">
                 <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
                 <Field
@@ -348,7 +356,7 @@ class EditEventModal extends Component {
                   component={ReduxFormHiddenField}
                 />
                 <Button onClick={this.props.onHide} disabled={submitting}>Đóng cửa sổ</Button>
-                <Button type="submit" bsStyle="primary" disabled={pristine || submitting || invalid}>Đăng bài</Button>
+                <Button type="submit" bsStyle="primary" disabled={!canUpdate || pristine || submitting || invalid}>Sửa</Button>
               </ButtonToolbar>
             </ButtonToolbar>
           </Modal.Footer>
@@ -362,40 +370,45 @@ EditEventModal.propTypes = {
   onHide: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
   initialValues: PropTypes.object.isRequired,
-  saveEvent: PropTypes.func.isRequired,
+  canUpdate: PropTypes.bool.isRequired,
+  canDelete: PropTypes.bool.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 EditEventModal.defaultProps = {
   show: false,
+  canUpdate: false,
+  canDelete: false,
   onHide: () => undefined,
 };
 
-export default reduxForm({
+const fields = [
+  'name',
+  'photos',
+  'start',
+  'end',
+  'location',
+  'message',
+  'privacy',
+];
+
+const EditEventForm = reduxForm({
   form: 'EditEvent',
-  fields: [
-    'name',
-    'photos',
-    'start',
-    'end',
-    'location',
-    'message',
-    'privacy',
-  ],
+  fields,
   touchOnChange: true,
   touchOnBlur: true,
   enableReinitialize: true,
 })(compose(
   withStyles(s),
-  graphql(editEventMutation, {
-    props: ({ mutate }) => ({
-      saveEvent: (_id, data) => mutate({
-        variables: {
-          input: {
-            _id,
-            ...data,
-          },
-        },
-      }),
-    }),
-  }),
 )(EditEventModal));
+
+const mapStateToProps = state => ({
+  currentValues: formValueSelector('EditEvent')(state, ...fields),
+});
+
+const mapDispatchToProps = dispatch => ({
+
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditEventForm);
