@@ -10,6 +10,7 @@ import {
   FormControl,
   Clearfix,
   HelpBlock,
+  ButtonToolbar,
  } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
@@ -111,7 +112,8 @@ class EditEventModal extends Component {
     this.showEndTime = this.showEndTime.bind(this);
     this.hideEndTime = this.hideEndTime.bind(this);
     this.onPrivacySelected = this.onPrivacySelected.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+    this.saveEvent = this.saveEvent.bind(this);
+    this.cancelEvent = this.cancelEvent.bind(this);
   }
 
   onUploadSuccess({ uploadSingleFile }) {
@@ -126,7 +128,15 @@ class EditEventModal extends Component {
     this.uploadRef.click();
   }
 
-  onSubmit({
+  onPrivacySelected(privacy) {
+    this.setState({
+      privacy,
+    });
+
+    this.props.change('privacy', privacy);
+  }
+
+  saveEvent({
       _id,
       privacy,
       photos,
@@ -137,7 +147,7 @@ class EditEventModal extends Component {
       message,
       invites,
     }) {
-    this.props.saveEvent(_id, {
+    return this.props.saveEvent(_id, {
       privacy,
       photos,
       name,
@@ -151,12 +161,8 @@ class EditEventModal extends Component {
     .catch(() => this.props.onHide());
   }
 
-  onPrivacySelected(privacy) {
-    this.setState({
-      privacy,
-    });
-
-    this.props.change('privacy', privacy);
+  cancelEvent() {
+    console.log(this);
   }
 
   showEndTime(event) {
@@ -179,8 +185,8 @@ class EditEventModal extends Component {
     const { handleSubmit, pristine, submitting, invalid, form } = this.props;
     return (
       <Modal show={this.props.show} onHide={this.props.onHide} backdrop="static">
-        <form name="EditEvent" noValidate onSubmit={handleSubmit(this.onSubmit)}>
-          <Modal.Header closeButton>
+        <form name="EditEvent" noValidate onSubmit={handleSubmit(this.saveEvent)}>
+          <Modal.Header closeButton={!submitting}>
             <Modal.Title>Tạo sự kiện</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -306,14 +312,19 @@ class EditEventModal extends Component {
             <Clearfix />
           </Modal.Body>
           <Modal.Footer>
-            <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
-            <Field
-              type="hidden"
-              name="privacy"
-              component={ReduxFormHiddenField}
-            />
-            <Button onClick={this.props.onHide}>Hủy bỏ</Button>
-            <Button type="submit" bsStyle="primary" disabled={pristine || submitting || invalid}>Đăng bài</Button>
+            <ButtonToolbar>
+              <Button onClick={this.cancelEvent} className="btn-danger" disabled={submitting}>Hủy sự kiện</Button>
+              <ButtonToolbar className="pull-right">
+                <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
+                <Field
+                  type="hidden"
+                  name="privacy"
+                  component={ReduxFormHiddenField}
+                />
+                <Button onClick={this.props.onHide} disabled={submitting}>Đóng cửa sổ</Button>
+                <Button type="submit" bsStyle="primary" disabled={pristine || submitting || invalid}>Đăng bài</Button>
+              </ButtonToolbar>
+            </ButtonToolbar>
           </Modal.Footer>
         </form>
       </Modal>
