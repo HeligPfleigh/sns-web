@@ -1,0 +1,108 @@
+.containerTop30 {
+  margin-top: 30px;
+  .fee {
+    background-color: #fff;
+    padding: 25px 35px;
+    ul {
+      list-style: none;
+      padding: 0px;
+      li {
+        display: flow-root;
+        margin-bottom: 15px;
+        .pullLeft {
+          float: left;
+          min-width: 150px;
+        }
+        .pullRight {
+          display: inline-block;
+          i {
+            color:#FF6347;
+            font-size: 20px;
+            margin-left: 5px; 
+          }
+          span {
+            display: inline-block;
+            margin-right: 10px;
+          }
+          .saveUpdate {
+            background-color: #263E49;
+            border: 0px;
+            border-radius:4px;
+            padding: 5px 10px;
+            margin-right: 10px;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 400;
+            width: 100px;
+          }
+          .cancelUpdate {
+            border: 0px;
+            border-radius:4px;
+            padding: 5px 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 400;
+            width: 75px;
+          }
+          .edit {
+            color: #365899;
+            display: none;
+            margin-left: 10px; 
+          }          
+        }
+        &:hover {
+          .pullRight {
+            .edit {
+              color: #365899;
+              display: inline-block;
+              margin-left: 10px; 
+            }
+          }
+        }
+      }
+    }
+    .header {
+      margin-bottom: 40px;
+      display: flex;
+      i {
+        font-size: 25px;
+        margin-right: 10px; 
+      }
+      .mainPage {
+        font-weight: bold;
+      }
+      span {
+        padding-top: 3px; 
+      }
+    }
+  }
+  .buttonAccept {
+    background-color: #263E49;
+    border: 0px;
+    border-radius:4px;
+    padding: 10px 15px;
+    margin-right: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    width: 150px;
+  }
+  .buttonCancel {
+    border: 0px;
+    border-radius:4px;
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+    width: 150px;
+  }
+}
+
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}

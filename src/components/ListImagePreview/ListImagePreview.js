@@ -30,6 +30,7 @@ class ListImagePreview extends Component {
                 }}
                 className={`${s.deleteButton} fa fa-times`}
                 aria-hidden="true"
+                title="Xóa ảnh"
               ></i>
             </div>
           ))

@@ -441,6 +441,8 @@ Register.propTypes = {
 
 const RegisterForm = reduxForm({
   form: 'registerForm',
+  touchOnBlur: true,
+  touchOnChange: true,
   asyncValidate,
   asyncBlurFields: ['username', 'email', 'phoneNumber'],
 })(withStyles(s)(Register));
