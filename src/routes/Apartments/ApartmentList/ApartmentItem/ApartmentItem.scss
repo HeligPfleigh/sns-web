@@ -1,0 +1,36 @@
+.building{
+  background: #f0f9fd;
+  cursor: pointer;
+
+  .photo {
+    height: 200px;
+    width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    min-height: 200px;
+    text-align: center;
+    img{width: 100%}
+  }
+
+  .content {
+    padding: 0px 10px 5px;
+    p {
+      text-overflow: ellipsis;
+      color: #999999;
+    }
+  }
+
+  .title {
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+    display: block;
+    -webkit-margin-before: 1.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    &:before{
+      box-sizing: border-box;
+    }
+  }
+}

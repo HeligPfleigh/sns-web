@@ -1,0 +1,29 @@
+.containerTop30 {
+    margin-top: 30px;
+  }
+  
+.container {
+  background: #fff;
+  .contentMain {
+    background: #fff;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
+.header{
+  display: flex;
+  .homeIcon {
+    font-size: 36px;
+    margin-right: 10px;
+  }
+}
+
+.content{
+  
+}
+  

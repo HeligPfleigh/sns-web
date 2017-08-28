@@ -1,0 +1,42 @@
+import React, { PropTypes } from 'react';
+import {
+  Col,
+} from 'react-bootstrap';
+import { compose, graphql } from 'apollo-client';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './FeeTablePerMonth.scss';
+
+
+class FeeTablePerMonth extends React.Component {
+  render() {
+    const { fee } = this.props;
+    return (
+      <table style={{ width: '100%', textAlign: 'right', marginTop: 20 }}>
+        <thead className={s.styleHeaderBottom}>
+          <tr>
+            <th><h4>{`${fee.month}/${fee.year}`}</h4></th>
+            <th className={`${s.styleHeader} ${s.stylePayment}`}><h4>{`${fee.totals.toLocaleString()}₫`}</h4></th>
+            <th className={s.styleHeader}>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            fee.detail.map(item => (
+              <tr className={s.itemBody}>
+                <td className={`${s.styleBodyFeeType} ${s.styleTextBold}`}>{item.type.name}</td>
+                <td className={s.styleTextBold}>{`${item.total.toLocaleString()}₫`}</td>
+                <td>{item.status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
+              </tr>
+              ))
+          }
+        </tbody>
+      </table>
+    );
+  }
+}
+
+FeeTablePerMonth.propTypes = {
+  fee: PropTypes.object,
+};
+
+export default withStyles(s)(FeeTablePerMonth);

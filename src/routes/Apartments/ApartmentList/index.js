@@ -1,49 +1,52 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
+import gql from 'graphql-tag';
+import { Row, Col } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-// import history from '../../../core/history';
 import Loading from '../../../components/Loading';
-import BuildingList from '../BuildingList';
+import ApartmentItem from './ApartmentItem';
+import history from '../../../core/history';
 import s from './styles.scss';
 
-const BOMQuery = gql`query BOMQuery {
+
+const getApartments = gql`query getApartments {
   me {
-    _id
-    buildings {
-      _id
-      display
-      isAdmin
-      totalApartment
-      address {
-        basisPoint
-        country
-        province
-        district
-        ward
-        street
-      }
+    _id,
+    username,
+    profile {
+      picture,
+      firstName,
+      lastName
     }
-  }
+    apartments {
+      _id
+      number
+      isOwner
+      prefix
+      name
+      createdAt
+      updatedAt
+    }
+  },
 }`;
 
-class HomeManagement extends Component {
+class ApartmentList extends Component {
 
   componentWillReceiveProps = (nextProps) => {
     if (!nextProps.loading && nextProps.me) {
-      const { me: { buildings } } = nextProps;
-      if (buildings.length === 1) {
-        // history.push(`/management/${buildings[0]._id}`);
+      const { me: { apartments } } = nextProps;
+      if (apartments.length === 1) {
+        history.push(`/apartment/${apartments[0]._id}`);
       }
     }
   }
 
   render() {
-    const { loading, me } = this.props;
+    const { me: { apartments } } = this.props;
+    const { loading } = this.props;
 
-    // Show loading
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
@@ -51,17 +54,26 @@ class HomeManagement extends Component {
     return (
       <div className="container">
         <div className={s.containerTop30}>
-          <BuildingList buildings={me && me.buildings} />
+          <div className={s.apartments}>
+            <h4>Căn hộ đang sử dụng</h4>
+            <Row>
+              <Col md={12}>
+                { (apartments || []).map(apartment => <ApartmentItem
+                  key={Math.random()}
+                  apartment={apartment}
+                />) }
+              </Col>
+            </Row>
+          </div>
         </div>
       </div>
     );
   }
 }
-
-HomeManagement.propTypes = {
+ApartmentList.propTypes = {
+  apartments: PropTypes.array,
   loading: PropTypes.bool.isRequired,
   me: PropTypes.object,
-  // user: PropTypes.object.isRequired,
 };
 
 export default compose(
@@ -69,7 +81,7 @@ export default compose(
   connect(state => ({
     user: state.user,
   })),
-  graphql(BOMQuery, {
+  graphql(getApartments, {
     options: () => ({
       variables: {},
       fetchPolicy: 'network-only',
@@ -88,5 +100,4 @@ export default compose(
       };
     },
   }),
-)(HomeManagement);
-
+)(ApartmentList);
