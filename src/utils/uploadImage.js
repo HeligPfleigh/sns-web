@@ -9,7 +9,6 @@ function getCookie(name) {
 
 const uploadImage = async (file) => {
   const url = `${config.server.imageUpload}`;
-
   const token = getCookie('id_token');
   const formData = new FormData();
   formData.append('file', file);
