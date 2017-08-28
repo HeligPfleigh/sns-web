@@ -1,6 +1,0 @@
-query {
-  getFeeTypes {
-    code
-    name
-  }
-}
