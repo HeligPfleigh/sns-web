@@ -1,0 +1,27 @@
+query feesOfApartment ($apartmentId: String!, $month: Int, $year: Int){
+  feesOfApartment (apartmentId: $apartmentId, month: $month, year: $year){
+    edges {
+      month
+      year
+      apartment {
+        number
+        isOwner
+        prefix
+        name
+        createdAt
+        updatedAt
+      }
+      totals
+      detail {
+        type {
+          code
+          name
+        }
+        total
+        status
+        createdAt
+        updatedAt
+      }
+    }
+  }
+}

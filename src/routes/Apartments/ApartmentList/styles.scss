@@ -1,0 +1,19 @@
+@import "../../../theme/resources.scss";
+
+.apartments {
+  background: #ffffff;
+  h4 {
+    margin-left: 15px;
+    padding-top: 20px;
+    padding-bottom: 5px;
+  }
+}
+.containerTop30 {
+    margin-top: 30px;
+  }
+  
+  @media (max-width: 992px) {
+    .containerTop30 {
+      margin-top: 50px;
+    }
+  }

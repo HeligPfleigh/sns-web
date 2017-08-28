@@ -46,6 +46,15 @@ const homePageQuery = gql`query homePageQuery ($cursor: String) {
         lastName
       }
     }
+    apartments {
+      _id
+      number
+      isOwner
+      prefix
+      name
+      createdAt
+      updatedAt
+    }
   },
 }
 ${Feed.fragments.post}`;

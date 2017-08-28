@@ -28,6 +28,8 @@ export default {
     require('./feeDetails').default,
     require('./waiting').default,
     require('./BuildingManagement').default,
+    require('./Apartment').default,
+    require('./Apartments').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

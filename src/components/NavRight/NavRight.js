@@ -65,6 +65,9 @@ class NavRight extends Component {
               <MenuItem title="Chung cư của tôi" eventKey="1" onClick={() => this.navEventHandler('/management')}>
                 Chung cư của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
+              <MenuItem title="Căn hộ của tôi" eventKey="1" onClick={() => this.navEventHandler('/apartments')}>
+                Căn hộ của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
+              </MenuItem>
               <MenuItem title="Hàng xóm" eventKey="2">
                 Hàng xóm <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
               </MenuItem>

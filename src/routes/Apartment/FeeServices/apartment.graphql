@@ -1,0 +1,10 @@
+query apartment ($_id: String!){
+  apartment (_id: $_id){
+    number
+    isOwner
+    prefix
+    name
+    createdAt
+    updatedAt
+  }
+}
