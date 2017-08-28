@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import find from 'lodash/find';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import gql from 'graphql-tag';
-import { generate as idRandom } from 'shortid';
 import {
   Editor,
   EditorState,
@@ -14,25 +12,19 @@ import {
   Col,
   Clearfix,
   Button,
-  Dropdown,
-  MenuItem,
-  Glyphicon,
 } from 'react-bootstrap';
 import ListImagePreview from '../ListImagePreview';
 import uploadImage from '../../utils/uploadImage';
 import {
   HANDLE_REGEX,
   HASHTAG_REGEX,
-  PUBLIC,
-  FRIEND,
-  ONLY_ME,
-  ONLY_ADMIN_BUILDING,
 } from '../../constants';
 import s from './NewPost.scss';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 import { Feed } from '../Feed';
 import { MultipleUploadFile } from '../ApolloUpload';
+import { Privacy } from '../Dropdown';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -83,9 +75,7 @@ class NewPost extends Component {
     this.state = {
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: true,
-      privacy: PUBLIC,
       photos: [],
-      glyph: 'globe',
       error: '',
       inputUpload: null,
     };
@@ -123,15 +113,14 @@ class NewPost extends Component {
     const { friend } = this.props;
     const { photos } = this.state;
     if (friend) {
-      this.props.createNewPost(data, this.state.privacy, photos, friend);
+      this.props.createNewPost(data, this.privacy.getCurrentValue(), photos, friend);
     } else {
-      this.props.createNewPost(data, this.state.privacy, photos);
+      this.props.createNewPost(data, this.privacy.getCurrentValue(), photos);
     }
     this.setState(prevState => ({
       ...prevState,
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: true,
-      privacy: PUBLIC,
       photos: [],
     }));
   }
@@ -147,15 +136,6 @@ class NewPost extends Component {
     this.setState({
       photos,
       isSubmit: false,
-    });
-  }
-
-  onChangePrivacy = (eventKey, evt) => {
-    evt.preventDefault();
-    const f = find(this.props.privacy, o => (eventKey === o.name));
-    this.setState({
-      privacy: f.name,
-      glyph: f.glyph,
     });
   }
 
@@ -198,8 +178,8 @@ class NewPost extends Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { editorState, isSubmit, glyph, photos, error } = this.state;
-    const { displayPrivacy, privacy } = this.props;
+    const { editorState, isSubmit, photos, error } = this.state;
+    const { displayPrivacy } = this.props;
     return (
       <div className={s.newPostPanel}>
         <Col className={s.newPostEditor}>
@@ -244,22 +224,14 @@ class NewPost extends Component {
             </Button>
           </Col>
           <Col className="pull-right" style={{ marginRight: '15px' }}>
-            {displayPrivacy && <Dropdown id={idRandom()} className={s.privacyOptions}>
-              <Dropdown.Toggle>
-                <Glyphicon style={{ marginRight: '4px' }} glyph={glyph} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu onSelect={this.onChangePrivacy}>
-                {privacy.map(item => (
-                  <MenuItem key={item.name} eventKey={item.name}>
-                    <Glyphicon className={s.glyphicon} glyph={item.glyph} />
-                    {item.name === PUBLIC && 'Công khai'}
-                    {item.name === FRIEND && 'Bạn bè' }
-                    {item.name === ONLY_ME && 'Chỉ mình tôi' }
-                    {item.name === ONLY_ADMIN_BUILDING && 'Ban quản lý'}
-                  </MenuItem>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>}
+            {displayPrivacy && <Privacy
+              className={s.privacyOptions}
+              PUBLIC={this.props.PUBLIC}
+              FRIEND={this.props.FRIEND}
+              ONLY_ME={this.props.ONLY_ME}
+              ADMIN_BUILDING={this.props.ADMIN_BUILDING}
+              ref={privacy => this.privacy = privacy}
+            />}
             <Button title="Đăng bài" bsStyle="primary" onClick={this.onSubmit} disabled={isSubmit}>Đăng bài</Button>
           </Col>
 
@@ -278,26 +250,19 @@ NewPost.propTypes = {
   createNewPost: PropTypes.func.isRequired,
   friend: PropTypes.object,
   displayPrivacy: PropTypes.bool,
-  privacy: PropTypes.array,
+  PUBLIC: PropTypes.bool.isRequired,
+  FRIEND: PropTypes.bool.isRequired,
+  ONLY_ME: PropTypes.bool.isRequired,
+  ADMIN_BUILDING: PropTypes.bool.isRequired,
 };
 
 NewPost.defaultProps = {
   createNewPost: doNothing,
   displayPrivacy: true,
-  privacy: [
-    {
-      name: PUBLIC,
-      glyph: 'globe',
-    },
-    {
-      name: FRIEND,
-      glyph: 'user',
-    },
-    {
-      name: ONLY_ME,
-      glyph: 'lock',
-    },
-  ],
+  PUBLIC: true,
+  FRIEND: true,
+  ONLY_ME: true,
+  ADMIN_BUILDING: false,
 };
 
 NewPost.fragments = {};

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { FormGroup, FormControl, HelpBlock } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './InputWithValidation.scss';
 
@@ -24,16 +25,13 @@ class InputWithValidation extends Component {
     const { id, helpText } = this.props;
     return (
       <div>
-        <div className={this.state.showHelper ? s.wrapperError : s.wrapperNormal}>
-          <input
-            id={id}
-            value={this.state.value}
-            className={s.inputText}
-            type="text"
-            onChange={this.onChange}
-          />
-        </div>
-        {this.state.showHelper ? <div className={s.errorText}>{helpText}</div> : null}
+        <FormControl
+          type="text"
+          id={id}
+          value={this.state.value}
+          onChange={this.onChange}
+        />
+        {this.state.showHelper ? <HelpBlock>{helpText}</HelpBlock> : null}
       </div>
     );
   }

@@ -168,16 +168,6 @@ class User extends Component {
 
                   { isFriend && (<div className={s.parent}><NewPost
                     createNewPost={createNewPost} friend={resident}
-                    privacy={[
-                      {
-                        name: PUBLIC,
-                        glyph: 'globe',
-                      },
-                      {
-                        name: FRIEND,
-                        glyph: 'user',
-                      },
-                    ]}
                   /></div>) }
 
                   <InfiniteScroll

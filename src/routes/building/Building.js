@@ -26,16 +26,18 @@ import BuildingFeedTab from './BuildingFeedTab';
 import BuildingInformationTab from './BuildingInformationTab';
 import BuildingAnnouncementTab from './BuildingAnnouncementTab';
 import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
+import DocumentTab from './DocumentTab';
+import FAQTab from './FAQTab';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
 const MEMBERS_TAB = 'MEMBERS_TAB';
 const INFO_TAB = 'INFO_TAB';
-const DOCUMENTS_TAB = 'DOCUMENTS_TAB';
-const FAQ_TAB = 'FAQ_TAB';
 const BUILDING_MANAGEMENT_TAB = 'BUILDING_MANAGEMENT_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const USERS_AWAITING_APPROVAL_TAB = 'USERS_AWAITING_APPROVAL_TAB';
+const DOCUMENT_TAB = 'DOCUMENT_TAB';
+const FAQ_TAB = 'FAQ_TAB';
 
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int, $cursor: String) {
@@ -189,6 +191,7 @@ class Building extends Component {
   }
 
   handleSelect = (key) => {
+    console.log(key);
     if (key !== BUILDING_MANAGEMENT_TAB) {
       const { pathname } = history.location;
       history.push(`${pathname}?tab=${key}`);
@@ -252,7 +255,7 @@ class Building extends Component {
                   <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
                 </NavItem>
-                <NavItem title="Biểu mẫu" eventKey={DOCUMENTS_TAB}>
+                <NavItem title="Biểu mẫu" eventKey={DOCUMENT_TAB}>
                   <i className="fa fa-file-pdf-o" aria-hidden="true"></i>
                   Biểu mẫu
                 </NavItem>
@@ -314,6 +317,12 @@ class Building extends Component {
                     }}
                   />
                 </Tab.Pane>}
+                <Tab.Pane eventKey={DOCUMENT_TAB}>
+                  { building && <DocumentTab building={building} />}
+                </Tab.Pane>
+                <Tab.Pane eventKey={FAQ_TAB}>
+                  { building && <FAQTab building={building} />}
+                </Tab.Pane>
                 {/* Users awaiting approval */}
                 { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <ListUsersAwaitingApproval

@@ -41,6 +41,7 @@ class SingleUploadFile extends Component {
         onChange={this.onChange}
         className={this.props.className}
         ref={this.props.inputRef}
+        accept={this.props.accept}
       />
     );
   }
@@ -52,12 +53,14 @@ SingleUploadFile.propTypes = {
   singleUploadFile: PropTypes.func.isRequired,
   className: PropTypes.any,
   inputRef: PropTypes.func.isRequired,
+  accept: PropTypes.string.isRequired,
 };
 
 SingleUploadFile.defaultProps = {
   onSuccess: () => undefined,
   onError: () => undefined,
   inputRef: () => undefined,
+  accept: 'image/*',
 };
 
 export default compose(graphql(mutationSingleUploadFile, {

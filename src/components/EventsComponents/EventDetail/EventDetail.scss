@@ -2,9 +2,6 @@
 .eventDetailContent {
   background: #ffffff;
 }
-.button1 {
-
-}
 .divider {
   margin: 12px;
   margin-top: -1px;
@@ -12,14 +9,18 @@
 .titleLayout {
   display: flex;
   .left {
-    width: 120px;
     float: left;
     text-align: center;
-    h5 {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    .month {
       color: red;
+      text-transform: uppercase;
+      font-size: 20px;
     }
-    h4 {
-
+    .day {
+      text-transform: uppercase;
+      font-size: 40px;
     }
   }
   .right{
