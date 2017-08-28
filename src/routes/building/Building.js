@@ -26,12 +26,15 @@ import BuildingFeedTab from './BuildingFeedTab';
 import BuildingInformationTab from './BuildingInformationTab';
 import BuildingAnnouncementTab from './BuildingAnnouncementTab';
 import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
+import DocumentTab from './DocumentTab';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
 const INFO_TAB = 'INFO_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const USERS_AWAITING_APPROVAL_TAB = 'USERS_AWAITING_APPROVAL_TAB';
+const DOCUMENT_TAB = 'DOCUMENT_TAB';
+const FAQ_TAB = 'FAQ_TAB';
 
 const loadBuildingQuery = gql`
   query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int, $cursor: String) {
@@ -242,6 +245,14 @@ class Building extends Component {
                   <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
                 </NavItem>
+                <NavItem title="Biểu mẫu" eventKey={DOCUMENT_TAB}>
+                  <i className="fa fa-file" aria-hidden="true"></i>
+                  Biểu mẫu
+                </NavItem>
+                <NavItem title="Câu hỏi thường gặp" eventKey={FAQ_TAB}>
+                  <i className="fa fa-question" aria-hidden="true"></i>
+                  Câu hỏi thường gặp
+                </NavItem>
                 { building && building.isAdmin && <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
                   Thông báo
@@ -288,6 +299,9 @@ class Building extends Component {
                     }}
                   />
                 </Tab.Pane>}
+                <Tab.Pane eventKey={DOCUMENT_TAB}>
+                  { building && <DocumentTab building={building} />}
+                </Tab.Pane>
                 {/* Users awaiting approval */}
                 { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <ListUsersAwaitingApproval

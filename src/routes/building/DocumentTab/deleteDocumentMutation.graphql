@@ -1,0 +1,9 @@
+mutation deleteDocumentMutation ($input: DeleteDocumentInput!) {
+  deleteDocument(input: $input) {
+    ...DocumentView
+  }
+}
+
+fragment DocumentView on Document {
+  _id
+}

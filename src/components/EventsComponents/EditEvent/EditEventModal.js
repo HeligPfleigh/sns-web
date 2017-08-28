@@ -152,7 +152,7 @@ class EditEventModal extends Component {
       <Modal show={this.props.show} onHide={this.props.onHide} backdrop="static">
         <form name={form} noValidate onSubmit={handleSubmit(this.onUpdate)}>
           <Modal.Header closeButton={!submitting}>
-            <Modal.Title>Tạo sự kiện</Modal.Title>
+            <Modal.Title>Sửa sự kiện</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Col className="form-horizontal" xs={12}>

@@ -1,0 +1,17 @@
+mutation updateDocumentMutation ($input: UpdateDocumentInput!) {
+  updateDocument(input: $input) {
+    ...DocumentView
+  }
+}
+
+fragment DocumentView on Document {
+  _id
+  name
+  file
+  building {
+    _id
+    name
+    display
+    isAdmin
+  }
+}
