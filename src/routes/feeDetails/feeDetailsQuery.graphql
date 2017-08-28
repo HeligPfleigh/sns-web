@@ -11,6 +11,9 @@ query feeDetailsQuery($feeId: String!) {
       name
       number
     }
+    building {
+      _id
+    }
     total
     status
   }

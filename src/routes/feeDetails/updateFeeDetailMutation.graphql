@@ -1,0 +1,12 @@
+mutation updateFeeDetailMutation ($input: UpdateFeeDetailInput!) {
+  updateFeeDetail (input: $input) {
+    fee {
+      _id
+      total
+      status
+      building {
+        _id
+      }
+    }
+  }
+}

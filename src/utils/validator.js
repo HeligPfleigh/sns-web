@@ -20,6 +20,7 @@ export const maxLength = max => value => (
     ? `Cần phải ${max} ký tự trở xuống`
     : undefined
 );
+export const maxLength9 = maxLength(9);
 export const maxLength15 = maxLength(15);
 export const maxLength25 = maxLength(25);
 
@@ -30,6 +31,7 @@ export const minLength = min => value => (
     : undefined
 );
 export const minLength2 = minLength(2);
+export const minLength4 = minLength(4);
 export const minLength6 = minLength(6);
 
 export const strLength = (min = 5, max = 25) => value => (

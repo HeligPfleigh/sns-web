@@ -5,6 +5,7 @@ import me from './me';
 import chat from './chat';
 import runtime from './runtime';
 import alert from './alert';
+import fees from './fees';
 
 export default function createRootReducer({ apolloClient }) {
   return combineReducers({
@@ -15,5 +16,6 @@ export default function createRootReducer({ apolloClient }) {
     chat,
     runtime,
     alert,
+    fees,
   });
 }
