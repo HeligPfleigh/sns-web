@@ -9,7 +9,7 @@ import { loadFee as loadFeeDetail } from '../../reducers/fees';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
 import updateFeeDetailMutation from './updateFeeDetailMutation.graphql';
 import Loading from '../../components/Loading';
-import { PAID } from '../../constants';
+import { PAID, UNPAID } from '../../constants';
 import {
   required,
   minLength4,
@@ -226,8 +226,8 @@ class FeeDetails extends Component {
                               borderRadius: '4px',
                             }}
                           >
-                            <option value="PAID">Đã thanh toán</option>
-                            <option value="UNPAID">Chưa thanh toán</option>
+                            <option value={PAID}>Đã thanh toán</option>
+                            <option value={UNPAID}>Chưa thanh toán</option>
                           </Field>}
                           { !isStatusUpdate && (fee.status === PAID ? 'Đã thanh toán' : 'Chưa thanh toán') }
                         </span>
