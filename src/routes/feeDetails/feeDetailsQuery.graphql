@@ -1,0 +1,17 @@
+query feeDetailsQuery($feeId: String!) {
+  fee(_id: $feeId) {
+    _id
+    type {
+      code
+      name
+    }
+    from
+    to
+    apartment {
+      name
+      number
+    }
+    total
+    status
+  }
+}

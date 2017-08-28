@@ -64,7 +64,7 @@
     }
     .header {
       margin-bottom: 40px;
-      display: flex;
+      display: flow-root;
       i {
         font-size: 25px;
         margin-right: 10px; 
@@ -77,32 +77,20 @@
       }
     }
   }
-  .buttonAccept {
-    background-color: #263E49;
-    border: 0px;
-    border-radius:4px;
-    padding: 10px 15px;
-    margin-right: 20px;
-    text-align: center;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 400;
-    width: 150px;
-  }
-  .buttonCancel {
-    border: 0px;
-    border-radius:4px;
-    padding: 10px 15px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 400;
-    width: 150px;
-  }
 }
 
 
 @media (max-width: 992px) {
   .containerTop30 {
     margin-top: 50px;
+    .fee {
+      ul {
+        li {
+          .pullLeft {
+            float: none;
+          }
+        }
+      }
+    }
   }
 }
