@@ -1,14 +1,9 @@
 import React, { PropTypes } from 'react';
 import { compose } from 'react-apollo';
-import {
-  Col,
-  Button,
-} from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import DateTime from 'react-datetime';
 import PreviewUploadFile from '../PreviewUploadFile/PreviewUploadFile';
 import config from '../../../config';
-
 import s from './UploadFeeFile.scss';
 
 class UploadFeeFile extends React.Component {
@@ -101,11 +96,13 @@ class UploadFeeFile extends React.Component {
           <div className={s.title}>
             <i className="fa fa-money" aria-hidden="true"></i>
             <h4>Upload biểu phí</h4>
-            <a href="http://api-sns.mttjsc.com/images/template_fee.xlsx" className={s.downloadFile}><i className="fa fa-download" aria-hidden="true"> File Mẫu</i></a>
+            <a href="http://api-sns.mttjsc.com/images/template_fee.xlsx" className={s.downloadFile}>
+              <i className="fa fa-download" aria-hidden="true"> File Mẫu</i>
+            </a>
           </div>
           <ul className={s.list}>
             {
-              feeTypes.map(type => (<li>
+              (feeTypes || []).map(type => (<li>
                 <div className={s['box-text']}>{type.name}</div>
                 <div className={s['box-right']}>
                   <div className={s['box-full']}>

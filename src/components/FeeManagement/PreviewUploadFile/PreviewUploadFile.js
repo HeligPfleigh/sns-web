@@ -1,10 +1,9 @@
 import React, { PropTypes } from 'react';
 import {
-  Col,
   Button,
   Modal,
 } from 'react-bootstrap';
-import { graphql, compose } from 'react-apollo';
+import { compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './PreviewUploadFile.scss';
 import config from '../../../config';
@@ -81,19 +80,18 @@ class PreviewUpload extends React.Component {
                 <h5>Lỗi*:</h5>
                 <ul>
                   {
-                    Object.keys(data.error).map((key, idx) => (
-
-                      <li>
+                    Object.keys(data.error).map(key => (
+                      <li key={Math.random()}>
                         <p>{`Dòng ${key}`}</p>
                         <ul>
                           {data.error[key].errors.map(err => (
-                            <li>
+                            <li key={Math.random()}>
                               <p>{err}</p>
                             </li>
                               ))}
                         </ul>
                       </li>
-                      ))
+                    ))
                   }
                 </ul>
               </div>
@@ -138,13 +136,10 @@ class PreviewUpload extends React.Component {
 }
 
 PreviewUpload.propTypes = {
-  buildingId: PropTypes.string.isRequired,
   show: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
   type: PropTypes.object.isRequired,
-  feeFile: PropTypes.object,
   data: PropTypes.object,
-  onUploadComplete: PropTypes.func.isRequired,
 };
 
 export default compose(

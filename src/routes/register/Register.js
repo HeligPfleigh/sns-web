@@ -22,6 +22,7 @@ import {
   password,
   comparePassword,
   normalLength,
+  maxLength15,
   phoneNumber,
   hasWhiteSpace,
   hasSpecialChart,
@@ -152,7 +153,8 @@ class Register extends Component {
       password: passwordVal,
       building,
       apartments,
-      fullName,
+      firstName,
+      lastName,
       gender,
       dob,
       email: emailVal,
@@ -165,8 +167,6 @@ class Register extends Component {
       password: passwordVal,
     };
 
-    const firstName = fullName.trim().split(' ')[0];
-    const lastName = (fullName.trim().substring(firstName.length || 0, fullName.trim().length)).trim();
     const { initialValues } = this.props;
 
     const data = {
@@ -357,13 +357,26 @@ class Register extends Component {
               validate={[objRequired]}
             />
 
-            <Field
-              name="fullName"
-              component={InputField}
-              type="text"
-              placeholder="(*) Họ và tên"
-              validate={[required, normalLength]}
-            />
+            <div className="form-group">
+              <div className="col-sm-6">
+                <Field
+                  name="lastName"
+                  component={InputField}
+                  type="text"
+                  placeholder="(*) Họ của bạn?"
+                  validate={[required, maxLength15]}
+                />
+              </div>
+              <div className="col-sm-6">
+                <Field
+                  name="firstName"
+                  component={InputField}
+                  type="text"
+                  placeholder="(*) Tên của bạn?"
+                  validate={[required, maxLength15]}
+                />
+              </div>
+            </div>
 
             <div className="form-group">
               <div className="col-sm-6">
@@ -467,7 +480,8 @@ const RegisterPage = connect((state) => {
 
     initialValues = {
       username: username || '',
-      fullName: `${firstName} ${lastName}`,
+      firstName,
+      lastName,
       gender: gender || 'female',
       email: emailVal || '',
       phoneNumber: phone || '',
