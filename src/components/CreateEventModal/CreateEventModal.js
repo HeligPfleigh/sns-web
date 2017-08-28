@@ -432,4 +432,11 @@ CreateEventModal.mutation = {
 
 export default compose(
   withStyles(s),
+  graphql(CreateEventModal.mutation.createNewEvent, {
+    props: ({ mutate }) => ({
+      createNewEvent: input => mutate({
+        variables: { input },
+      }),
+    }),
+  }),
 )((CreateEventModal));
