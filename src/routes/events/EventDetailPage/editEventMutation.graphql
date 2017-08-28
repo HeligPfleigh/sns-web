@@ -1,0 +1,25 @@
+mutation editEvent ($input: EditEventInput!) {
+  editEvent (input: $input) {
+    ...EventView
+  }
+}
+
+fragment EventView on Event {
+  _id
+  privacy
+  author {
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
+  }
+  photos
+  name
+  location
+  start
+  end
+  message
+}

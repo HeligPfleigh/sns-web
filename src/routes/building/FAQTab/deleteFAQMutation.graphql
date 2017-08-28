@@ -1,0 +1,9 @@
+mutation deleteFAQMutation ($input: DeleteFAQInput!) {
+  deleteFAQ(input: $input) {
+    ...FAQView
+  }
+}
+
+fragment FAQView on FAQ {
+  _id
+}

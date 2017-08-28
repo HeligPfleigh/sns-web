@@ -1,0 +1,65 @@
+
+@global-import 'draft-js/dist/Draft.css';
+@global-import 'react-datetime/css/react-datetime.css';
+
+:global {
+  .rdt {
+    .rdtPicker {
+      box-shadow: none;
+      border: 1px solid #dedede;
+      margin-top: 0;
+    }
+  }
+}
+
+a {
+  cursor: pointer;
+}
+
+.btnUpload{
+  border-color: transparent;
+  color: #5c6f7c;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+  text-align: left;
+
+  &:hover, &:active, &:focus, &:disabled, &:active:focus {
+    text-decoration: none;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+.layoutForButtonUpload {
+  border: solid 1px #dedede;
+
+  .buttonToolbar {
+    padding: 10px;
+  }
+
+  .imgThumbnail {
+    border-top: solid 1px #dedede;
+
+    .imgResponsive {
+      padding: 5px;
+    }
+  }
+}
+
+.btnPrivacies {
+  margin-right: 25px;
+}
+
+.showEndTime {
+  text-align: right;
+  line-height: 34px;
+}
+
+.editor {
+  padding: 8px;
+  border: solid 1px #dedede;
+  min-height: 200px;
+}

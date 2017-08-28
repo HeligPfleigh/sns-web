@@ -1,0 +1,94 @@
+.list {
+  .noRecordsFound {
+    padding-top: 10px;
+  }
+
+  :global {
+    .panel-default {
+      border-radius: 0;
+      border: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .hidePanelBody {
+      .panel-default {
+        .panel-body {
+          display: none;
+        }
+      }
+    }
+
+    a {
+      color: #337ab7; 
+    }
+
+    .btn-toolbar {
+      right: 0;
+      top: 8px;
+    }
+
+    .panel-group {
+      .panel-heading {
+        padding: 0;
+
+        .panel-title {
+          font-size: 14px;
+          cursor: pointer;
+          font-weight: 500;
+        }        
+      }
+
+      .panel-body {
+        padding-left: 0;
+        padding-right: 0;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .panelHeaderTitle {
+    text-align: left;
+    position: relative;
+  }
+
+  .panelHeaderAddIcon {
+    position: absolute;
+    right: 0;
+    color: #3c763d;
+    cursor: pointer;
+
+    :global {
+      .fa {
+        font-size: 24px;
+      }
+    }
+  }
+}
+
+.btnUpload{
+  border-color: transparent;
+  color: #5c6f7c;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+  text-align: left;
+
+  &:hover, &:active, &:focus, &:disabled, &:active:focus {
+    text-decoration: none;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+.uploadFormControl {
+  margin-top: 10px;
+}
+
+.editor {
+  padding: 8px;
+  border: solid 1px #dedede;
+  min-height: 200px;
+}

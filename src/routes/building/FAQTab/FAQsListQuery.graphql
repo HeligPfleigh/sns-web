@@ -1,0 +1,25 @@
+query FAQsListQuery($building: String!, $limit: Int, $cursor: String) {
+  FAQs(building: $building, limit: $limit, cursor: $cursor) {
+    pageInfo {
+      endCursor
+      hasNextPage
+      total
+      limit
+    }
+    edges {
+      ...FAQView
+    }
+  }
+}
+
+fragment FAQView on FAQ {
+  _id
+  name
+  message
+  building {
+    _id
+    name
+    display
+    isAdmin
+  }
+}

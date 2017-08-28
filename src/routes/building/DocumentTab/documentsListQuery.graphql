@@ -1,0 +1,25 @@
+query documentsListQuery($building: String!, $limit: Int, $cursor: String) {
+  documents(building: $building, limit: $limit, cursor: $cursor) {
+    pageInfo {
+      endCursor
+      hasNextPage
+      total
+      limit
+    }
+    edges {
+      ...DocumentView
+    }
+  }
+}
+
+fragment DocumentView on Document {
+  _id
+  name
+  file
+  building {
+    _id
+    name
+    display
+    isAdmin
+  }
+}

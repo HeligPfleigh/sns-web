@@ -1,0 +1,17 @@
+mutation createFAQMutation ($input: CreateFAQInput!) {
+  createFAQ(input: $input) {
+    ...FAQView
+  }
+}
+
+fragment FAQView on FAQ {
+  _id
+  name
+  message
+  building {
+    _id
+    name
+    display
+    isAdmin
+  }
+}
