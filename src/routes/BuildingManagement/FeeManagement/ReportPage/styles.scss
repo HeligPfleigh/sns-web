@@ -1,0 +1,50 @@
+@global-import 'rc-table/dist/rc-table.min.css';
+@global-import 'react-select/dist/react-select.css';
+
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  background: #fff;
+  padding: 15px 8px;
+  margin: 0px;
+
+  a, a:hover, a:active {
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  ol {
+    padding: 8px 1px 0px;
+    background-color: #fff;
+  }
+
+  .panel-filter {
+    margin-bottom: 10px;
+
+    .label-filter {
+      padding: 8px 0px;
+    }
+
+    :global {
+      .rdt > input {
+        background:url(./images/icon-calender.png) no-repeat 94% 6px;
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+
+  .panel-filter {
+    .item-filter {
+      padding: 5px 0px;
+    }
+  }
+}

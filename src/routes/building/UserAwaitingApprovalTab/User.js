@@ -49,15 +49,13 @@ class User extends React.Component {
               <div className={s.moreInfo}>
                 <div>
                   <small>
-                    <i>Địa chỉ:
-                      Căn hộ { apartments.map(apartment => (
+                    <i>Căn hộ:
+                      { apartments.map(apartment => (
                         <i key={Math.random()}> {apartment.name} </i>
                       ))}
                     </i>
                   </small>
                 </div>
-                <div><small><i>Số điện thoại: { user.phone ? user.phone.number : 'None' }</i></small></div>
-                <div><small><i>Email: { user.emails ? user.emails.address : 'None' }</i></small></div>
                 { status === PENDING && <div><small><i>Trạng thái: Đang chờ phê duyệt</i></small></div> }
                 { status === ACCEPTED && <div style={{ color: '#337ab7' }}><small><i>Trạng thái: Đã đồng ý</i></small></div> }
                 { status === REJECTED && <div style={{ color: '#d9534f' }}><small><i>Trạng thái: Không đồng ý</i></small></div> }

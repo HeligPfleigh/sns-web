@@ -62,7 +62,7 @@ class NavRight extends Component {
               <i className="fa fa-bars" aria-hidden="true"></i>
             </CustomToggle>
             <Dropdown.Menu className={s.itemDropdownMenu}>
-              <MenuItem title="Chung cư của tôi" eventKey="1">
+              <MenuItem title="Chung cư của tôi" eventKey="1" onClick={() => this.navEventHandler('/management')}>
                 Chung cư của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
               <MenuItem title="Hàng xóm" eventKey="2">
@@ -74,7 +74,7 @@ class NavRight extends Component {
               <MenuItem title="Cửa hàng quanh tôi" eventKey="4">
                 Cửa hàng quanh tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
               </MenuItem>
-              <MenuItem title="Sự kiện sắp tới" eventKey="4" onClick={() => this.navEventHandler('/events')}>
+              <MenuItem title="Sự kiện sắp tới" eventKey="5" onClick={() => this.navEventHandler('/events')}>
                 Sự kiện sắp tới <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
               </MenuItem>
             </Dropdown.Menu>
