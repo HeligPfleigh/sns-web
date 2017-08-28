@@ -68,9 +68,9 @@ class InfoTab extends Component {
           variables: paramData,
         });
 
-        data.resident.profile.firstName = updateUserProfile.user.profile.firstName;
-        data.resident.profile.lastName = updateUserProfile.user.profile.lastName;
-        data.resident.profile.gender = updateUserProfile.user.profile.gender;
+        data.me.profile.firstName = updateUserProfile.user.profile.firstName;
+        data.me.profile.lastName = updateUserProfile.user.profile.lastName;
+        data.me.profile.gender = updateUserProfile.user.profile.gender;
 
         // Write our data back to the cache.
         store.writeQuery({

@@ -29,7 +29,11 @@ import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
+const MEMBERS_TAB = 'MEMBERS_TAB';
 const INFO_TAB = 'INFO_TAB';
+const DOCUMENTS_TAB = 'DOCUMENTS_TAB';
+const FAQ_TAB = 'FAQ_TAB';
+const BUILDING_MANAGEMENT_TAB = 'BUILDING_MANAGEMENT_TAB';
 const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const USERS_AWAITING_APPROVAL_TAB = 'USERS_AWAITING_APPROVAL_TAB';
 
@@ -185,8 +189,10 @@ class Building extends Component {
   }
 
   handleSelect = (key) => {
-    const { pathname } = history.location;
-    history.push(`${pathname}?tab=${key}`);
+    if (key !== BUILDING_MANAGEMENT_TAB) {
+      const { pathname } = history.location;
+      history.push(`${pathname}?tab=${key}`);
+    }
   }
 
   loadMoreFeeds = () => {
@@ -238,17 +244,37 @@ class Building extends Component {
                   <i className="fa fa-pencil" aria-hidden="true"></i>
                   Bài viết
                 </NavItem>
+                <NavItem title="Thành viên thuộc chung cư" eventKey={MEMBERS_TAB}>
+                  <i className="fa fa-address-book" aria-hidden="true"></i>
+                  Thành viên
+                </NavItem>
                 <NavItem title="Thông tin tòa nhà" eventKey={INFO_TAB}>
                   <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
                 </NavItem>
+                <NavItem title="Biểu mẫu" eventKey={DOCUMENTS_TAB}>
+                  <i className="fa fa-file-pdf-o" aria-hidden="true"></i>
+                  Biểu mẫu
+                </NavItem>
+                <NavItem title="Câu hỏi thơờng gặp" eventKey={FAQ_TAB}>
+                  <i className="fa fa-question-circle" aria-hidden="true"></i>
+                  Hỏi - đáp
+                </NavItem>
+                { building && building.isAdmin && <NavItem
+                  title="Truy cập trang quản lý của tòa nhà"
+                  eventKey={BUILDING_MANAGEMENT_TAB}
+                  onClick={() => history.push(`/management/${building._id}`)}
+                >
+                  <i className="fa fa-tachometer" aria-hidden="true"></i>
+                  Quản lý tòa nhà
+                </NavItem>}
                 { building && building.isAdmin && <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
-                  Thông báo
+                  Thông báo *
                 </NavItem>}
                 { building && building.isAdmin && <NavItem title="Danh sách đăng ký làm thành viên tòa nhà" eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <i className="fa fa-users" aria-hidden="true"></i>
-                  Yêu cầu
+                  Yêu cầu *
                 </NavItem> }
               </Nav>
             </Col>
@@ -291,12 +317,18 @@ class Building extends Component {
                 {/* Users awaiting approval */}
                 { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
                   <ListUsersAwaitingApproval
+                    data={building.requests}
                     loadMore={this.loadMoreUsersAwaitingApproval}
                     loading={loading}
                     building={building}
                     onAccept={this.onAccept}
                     onCancel={this.onCancel}
                     error={this.state.errorMessage}
+                    loadBuildingQuery={loadBuildingQuery}
+                    param={{
+                      buildingId: building._id,
+                      limit: 1000,
+                    }}
                   />
                 </Tab.Pane>) }
               </Tab.Content>
@@ -339,13 +371,9 @@ export default compose(
     options: props => ({
       variables: {
         buildingId: props.buildingId,
-        limit: 1000, // FIXME: paging,
       },
     }),
     props: ({ data }) => {
-      if (!data) {
-        return;
-      }
       const { fetchMore } = data;
       const loadMoreFeeds = throttle(() => fetchMore({
         query: loadMorePostOnBuildingQuery,
@@ -355,7 +383,7 @@ export default compose(
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return;
+            return null;
           }
           return update(previousResult, {
             building: {
@@ -380,7 +408,7 @@ export default compose(
         query: CommentList.fragments.loadCommentsQuery,
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return;
+            return null;
           }
           const index = previousResult.building.posts.edges.findIndex(item => item._id === postId);
           const updatedPost = update(previousResult.building.posts[index], {
@@ -407,7 +435,7 @@ export default compose(
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
-            return;
+            return null;
           }
           return update(previousResult, {
             building: {
@@ -721,7 +749,7 @@ export default compose(
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
             if (!mutationResult) {
-              return;
+              return null;
             }
             const r = mutationResult.data.acceptRequestForJoiningBuilding;
             return update(previousResult, {
@@ -755,7 +783,7 @@ export default compose(
         updateQueries: {
           loadBuildingQuery: (previousResult, { mutationResult }) => {
             if (!mutationResult) {
-              return;
+              return null;
             }
             const r = mutationResult.data.rejectRequestForJoiningBuilding;
             return update(previousResult, {

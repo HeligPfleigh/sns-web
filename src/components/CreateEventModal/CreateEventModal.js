@@ -35,8 +35,6 @@ const PRIVARY_TEXT = {
   FRIEND: 'Bạn bè',
 };
 
-moment.locale('vi');
-
 const CustomToggle = ({ onClick, children }) => (
   <Button onClick={onClick}>
     { children }

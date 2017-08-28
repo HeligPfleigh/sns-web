@@ -1,0 +1,25 @@
+.table{
+  border: 1px solid #cccccc;
+  width: 100%;
+  tr{
+    border-bottom: 1px solid #ccc;
+  }
+  th{
+    background-color: #fafafa;
+    font-style: bold;
+  }
+  th, td{
+    font-size: 14px;
+    color: #4c4c4c;
+    padding: 6px 10px;
+  }
+}
+.TableWrapper{
+  overflow: auto;
+  max-height: 350px;
+}
+.ErrorText{
+  h5{
+    color: red;
+  }
+}

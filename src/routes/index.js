@@ -25,6 +25,9 @@ export default {
     require('./userApprovalPage').default,
     require('./events').default,
     require('./buildingAnnouncementPage').default,
+    require('./feeDetails').default,
+    require('./waiting').default,
+    require('./BuildingManagement').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

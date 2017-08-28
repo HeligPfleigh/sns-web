@@ -35,7 +35,7 @@ class FriendOnlineItem extends Component {
     return (
       <li className={classNames('clearfix')}>
         <Link
-          title="T"
+          title={friend.profile && `${friend.profile.fullName}`}
           to={`/messages/${conversationIdToRedirect}`}
         >
           <div onClick={this.handleClickFriend}>
@@ -48,7 +48,7 @@ class FriendOnlineItem extends Component {
                 responsive
               />
             </span>
-            <div className={classNames(s.chatBody, 'clearfix')}>
+            <div className={s.chatBody}>
               <strong>{friend.profile.fullName}</strong>
               <span className="pull-right">{status}</span>
             </div>

@@ -3,6 +3,15 @@ $fa-font-path: "~font-awesome/fonts";
 @import "~font-awesome/scss/font-awesome";
 @import "./variables.scss";
 
+button, input[type=button], .btn {
+  outline: none !important;
+  text-decoration: none;
+  
+  &:hover, &:active, &:focus, &:disabled {
+    text-decoration: none;
+  }
+}
+
 .navbar-default {
 	border-bottom-color: transparent;
 }

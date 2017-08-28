@@ -1,0 +1,12 @@
+@import "../../../theme/resources.scss";
+.menuLeftClass{
+  .inforManager{
+    width: 100%;
+    background: #fff;
+    display: inline-flex;
+
+    .userInfo {
+      margin-left: 2px;
+    }
+  }
+}

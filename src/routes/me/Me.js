@@ -168,11 +168,6 @@ class Me extends Component {
                       deletePost={deletePost}
                       editPost={editPost}
                       sharingPost={sharingPost}
-                      queryData={profilePageQuery}
-                      paramData={{
-                        _id: resident._id,
-                        cursor: null,
-                      }}
                       updatePost={this.updatePostInList}
                     />
                   </InfiniteScroll>
@@ -185,7 +180,7 @@ class Me extends Component {
                       profile={profile}
                       queryData={profilePageQuery}
                       paramData={{
-                        _id: resident._id,
+                        _id: me._id,
                         cursor: null,
                       }}
                     />
@@ -426,30 +421,32 @@ export default compose(
         },
         update: (store, { data: { sharingPost } }) => {
           // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.user.id,
-              cursor: null,
-            },
-          });
-          data = update(data, {
-            resident: {
-              posts: {
-                edges: {
-                  $unshift: [sharingPost],
+          if (ownProps.user.id === (sharingPost.user && sharingPost.user._id)) {
+            let data = store.readQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.user.id,
+                cursor: null,
+              },
+            });
+            data = update(data, {
+              resident: {
+                posts: {
+                  edges: {
+                    $unshift: [sharingPost],
+                  },
                 },
               },
-            },
-          });
-          store.writeQuery({
-            query: profilePageQuery,
-            variables: {
-              _id: ownProps.user.id,
-              cursor: null,
-            },
-            data,
-          });
+            });
+            store.writeQuery({
+              query: profilePageQuery,
+              variables: {
+                _id: ownProps.user.id,
+                cursor: null,
+              },
+              data,
+            });
+          }
         },
       }),
     }),

@@ -8,8 +8,6 @@ const renderComponent = (props = {}) => shallow(
   <Feed
     key={props.item._id}
     data={props.item}
-    likePostEvent={props.likePostEvent}
-    unlikePostEvent={props.unlikePostEvent}
     userInfo={props.userInfo}
     loadMoreComments={props.loadMoreComments}
     createNewComment={props.createNewComment}
@@ -50,8 +48,6 @@ describe('<Feed />', () => {
         },
         _id: '59196acf13f21febf8a10503',
       },
-      likePostEvent: doNothing,
-      unlikePostEvent: doNothing,
       userInfo: {
         _id: '58f9c1bf2d4581000484b188',
         username: 'particle4dev',

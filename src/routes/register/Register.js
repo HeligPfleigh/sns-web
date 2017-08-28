@@ -13,6 +13,7 @@ import gql from 'graphql-tag';
 
 import createApolloClient from '../../core/createApolloClient';
 import history from '../../core/history';
+import { remove } from '../../actions/user';
 import { InputField, DateTimeField, SelectField } from '../../components/FormFields';
 import Modal from '../../components/Modal';
 import {
@@ -21,6 +22,7 @@ import {
   password,
   comparePassword,
   normalLength,
+  maxLength15,
   phoneNumber,
   hasWhiteSpace,
   hasSpecialChart,
@@ -132,10 +134,14 @@ class Register extends Component {
     this.getDataSelect(value);
   }
 
-  toLogin = () => {
+  toLogin = (evt) => {
+    // eslint-disable-next-line
+    evt && evt.preventDefault();
+
     this.setState({
       showModal: false,
     });
+    this.props.removeStateUser();
     history.push('/login');
   }
 
@@ -147,7 +153,8 @@ class Register extends Component {
       password: passwordVal,
       building,
       apartments,
-      fullName,
+      firstName,
+      lastName,
       gender,
       dob,
       email: emailVal,
@@ -160,8 +167,7 @@ class Register extends Component {
       password: passwordVal,
     };
 
-    const firstName = fullName.trim().split(' ')[0];
-    const lastName = (fullName.trim().substring(firstName.length || 0, fullName.trim().length)).trim();
+    const { initialValues } = this.props;
 
     const data = {
       ...account,
@@ -177,7 +183,9 @@ class Register extends Component {
         gender: gender || 'male',
         dob: dob && dob.isBefore(maxDate) ? dob.toDate() : maxDate.toDate(),
         address,
+        picture: (initialValues && initialValues.picture) || undefined,
       },
+      services: (initialValues && initialValues.services && JSON.stringify(initialValues.services)) || undefined,
       building: building._id,
       apartments: map(apartments, '_id'),
     };
@@ -349,13 +357,26 @@ class Register extends Component {
               validate={[objRequired]}
             />
 
-            <Field
-              name="fullName"
-              component={InputField}
-              type="text"
-              placeholder="(*) Họ và tên"
-              validate={[required, normalLength]}
-            />
+            <div className="form-group">
+              <div className="col-sm-6">
+                <Field
+                  name="lastName"
+                  component={InputField}
+                  type="text"
+                  placeholder="(*) Họ của bạn?"
+                  validate={[required, maxLength15]}
+                />
+              </div>
+              <div className="col-sm-6">
+                <Field
+                  name="firstName"
+                  component={InputField}
+                  type="text"
+                  placeholder="(*) Tên của bạn?"
+                  validate={[required, maxLength15]}
+                />
+              </div>
+            </div>
 
             <div className="form-group">
               <div className="col-sm-6">
@@ -399,7 +420,7 @@ class Register extends Component {
                   <strong>(*) Trường bắt buộc</strong>
                 </div>
                 <div className="pull-right">
-                  { pristine && <a className="btn-lg btn btn-danger" href="#" onClick={() => history.push('/login')}>Hủy đăng kí</a> }
+                  { pristine && <a className="btn-lg btn btn-danger" href="#" onClick={this.toLogin}>Hủy đăng kí</a> }
                   { !pristine && <button type="button" className="btn-lg btn btn-danger" disabled={pristine || submitting} onClick={reset}>
                     <i className="fa fa-refresh"></i> Nhập lại
                   </button> }
@@ -427,20 +448,54 @@ Register.propTypes = {
   error: PropTypes.string,
   firstPassword: PropTypes.string,
   apartments: PropTypes.any,
+  removeStateUser: PropTypes.func,
+  initialValues: PropTypes.any,
 };
 
 const RegisterForm = reduxForm({
   form: 'registerForm',
+  touchOnBlur: true,
+  touchOnChange: true,
   asyncValidate,
   asyncBlurFields: ['username', 'email', 'phoneNumber'],
 })(withStyles(s)(Register));
 
 const selector = formValueSelector('registerForm');
 const RegisterPage = connect((state) => {
+  const { user } = state;
+  let initialValues = {};
+  if (user) {
+    const {
+      username,
+      profile: {
+        firstName,
+        lastName,
+        gender,
+        picture,
+      },
+      email: emailVal,
+      phone,
+      services,
+    } = user;
+
+    initialValues = {
+      username: username || '',
+      firstName,
+      lastName,
+      gender: gender || 'female',
+      email: emailVal || '',
+      phoneNumber: phone || '',
+      picture,
+      services,
+    };
+  }
+
   const firstPassword = selector(state, 'firstPassword');
   const building = selector(state, 'building');
   const apartments = (building && building.apartments) || [];
-  return { firstPassword, apartments };
+  return { initialValues, firstPassword, apartments };
+}, {
+  removeStateUser: remove,
 })(RegisterForm);
 
 export default RegisterPage;

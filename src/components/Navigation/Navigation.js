@@ -145,7 +145,6 @@ class Navigation extends Component {
     if (!loading && pageInfo) {
       hasNextPage = pageInfo.hasNextPage;
     }
-
     const countChatNotification = getNotificationCount(chatNotification, current);
     const buildingId = !isEmpty(user) && user.building && user.building._id;
 

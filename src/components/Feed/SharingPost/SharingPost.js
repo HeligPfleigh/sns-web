@@ -18,7 +18,7 @@ class SharingPost extends Component {
     const { id, message, author, user, building, privacy, createdAt } = this.props;
     return (
       <div>
-        <Post >
+        <Post>
           <PostHeader
             avatar={
               <span>

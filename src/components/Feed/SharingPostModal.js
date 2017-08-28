@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   Row,
-  Col,
   Modal,
   Button,
   MenuItem,
   Dropdown,
   ButtonToolbar,
+  InputGroup,
 } from 'react-bootstrap';
 import {
   Editor,
@@ -78,7 +78,6 @@ class SharingPostModal extends Component {
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
       privacySelected: PUBLIC,
-      friend: {},
     };
   }
 
@@ -153,7 +152,7 @@ class SharingPostModal extends Component {
       editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
       privacySelected: PUBLIC,
-      friend: {},
+      friend: undefined,
     });
     closeModal();
   }
@@ -205,13 +204,6 @@ class SharingPostModal extends Component {
    */
   render() {
     const { shareType, friends, sharingFeed, show } = this.props;
-    const lblStyle = {
-      padding: '7.6px 0px',
-      border: '1px solid #CCCCCC',
-      borderLeft: 0,
-      textAlign: 'center',
-      backgroundColor: '#ECF0F7',
-    };
 
     return (
       <Modal show={show} onHide={this.closeModal}>
@@ -220,26 +212,29 @@ class SharingPostModal extends Component {
         </Modal.Header>
         <Modal.Body>
           { (shareType === SHARE_FRIEND) && <Row style={{ marginBottom: '10px' }}>
-            <Col md={1} style={lblStyle}>Bạn bè: </Col>
-            <Col md={11} style={{ padding: 0 }}>
+            <InputGroup>
+              <InputGroup.Addon style={{ borderRadius: 0 }}>
+                Bạn bè
+              </InputGroup.Addon>
               <UserSelect
                 style={{ borderRadius: 0 }}
                 name="user-select"
-                value={this.state.friend}
+                value={this.state.friend || undefined}
                 options={friends}
                 onChange={this.logChange}
                 clearable={!isEmpty(this.state.friend)}
                 valueKey="_id"
                 labelKey="fullName"
               />
-            </Col>
+            </InputGroup>
           </Row> }
           <div style={styles.editor} onClick={this.focus}>
             <Editor
               editorState={this.state.editorState}
               onChange={this.onChange}
+              // eslint-disable-next-line
               ref={editor => (this.editor = editor)}
-              placeholder="Nói gì đó về nó ..."
+              placeholder="Nói gì đó về nó..."
               spellCheck
             />
           </div>

@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS } from '../constants';
+import { LOGIN_SUCCESS, REMOVE_USER } from '../constants';
 
 export default function user(state = {}, action) {
   switch (action.type) {
@@ -7,6 +7,8 @@ export default function user(state = {}, action) {
         ...state,
         ...action.user,
       };
+    case REMOVE_USER:
+      return null;
     default:
       return state;
   }
