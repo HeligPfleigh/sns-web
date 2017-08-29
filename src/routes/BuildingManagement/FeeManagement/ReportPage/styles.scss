@@ -35,6 +35,16 @@
       }
     }
   }
+
+  :global {
+    .rc-table-row > td {
+      padding: 16px 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+    }
+  }
 }
 
 @media (max-width: 992px) {
@@ -42,9 +52,21 @@
     margin-top: 50px;
   }
 
-  .panel-filter {
-    .item-filter {
-      padding: 5px 0px;
+  .container {
+    .panel-filter {
+      .item-filter {
+        padding: 5px 0px;
+      }
+    }
+    :global {
+      .rc-table-row > td {
+        padding: 16px 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px;
+      }
     }
   }
+
 }

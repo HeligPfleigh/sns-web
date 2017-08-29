@@ -1,0 +1,62 @@
+#
+# Fees Report Queries
+#
+query feesReportPageQuery(
+  $buildingId: String!,
+  $page: Int,
+  $limit: Int,
+  $feeDate: String,
+  $feeType: Int,
+) {
+  getFeeTypes {
+    code,
+    name
+  },
+  feesReport(
+    page: $page,
+    limit: $limit,
+    feeDate: $feeDate,
+    feeType: $feeType,
+    buildingId: $buildingId,
+  ) {
+    pageInfo {
+      total
+      limit
+    }
+    edges {
+      _id
+      month
+      year
+      totals
+      status
+      type {
+        name
+      }
+      apartment {
+        number
+        name
+        owner {
+          username
+          profile {
+            fullName
+          }
+        }
+      }
+      building {
+        name
+        display
+        isAdmin
+        totalApartment
+      }
+      detail {
+        _id
+        type {
+          code
+          name
+        }
+        total
+        status
+      }
+    }
+  }
+}
