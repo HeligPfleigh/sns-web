@@ -67,8 +67,7 @@ class DocumentItem extends Component {
     const { data, canDelete, canUpdate } = this.props;
     return (<ListGroupItem>
       <div>
-        <i className="fa fa-caret-right" aria-hidden="true"></i> {data.name || data._id}
-        (<a onClick={this.onDownload(data.file)} rel="noreferrer"><i className="fa fa-download" aria-hidden="true"></i> Tải mẫu</a>)
+        <i className="fa fa-caret-right" aria-hidden="true"></i> {data.name || data._id} (<a onClick={this.onDownload(data.file)} rel="noreferrer"><i className="fa fa-download" aria-hidden="true"></i> Tải mẫu</a>)
       </div>
       {(canUpdate || canDelete) && (<ButtonToolbar className="pull-right">
         <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall" type="button"><i className="fa fa-edit" aria-hidden="true"></i> Sửa</Button>

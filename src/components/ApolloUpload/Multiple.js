@@ -52,7 +52,7 @@ MultipleUploadFile.propTypes = {
   onSuccess: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   multipleUploadFile: PropTypes.func.isRequired,
-  className: PropTypes.any,
+  className: PropTypes.string,
   inputRef: PropTypes.func.isRequired,
   accept: PropTypes.string.isRequired,
 };

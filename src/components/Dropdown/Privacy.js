@@ -101,7 +101,7 @@ Privacy.propTypes = {
     PropTypes.number,
   ]).isRequired,
   onSelect: PropTypes.func.isRequired,
-  className: PropTypes.any,
+  className: PropTypes.string,
   value: PropTypes.string,
   PUBLIC: PropTypes.bool.isRequired,
   FRIEND: PropTypes.bool.isRequired,

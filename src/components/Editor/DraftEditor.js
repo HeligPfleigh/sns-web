@@ -215,7 +215,7 @@ DraftEditor.propTypes = {
     onClick: PropTypes.func,
     onChange: PropTypes.func,
   }),
-  className: PropTypes.any,
+  className: PropTypes.string,
 };
 
 DraftEditor.defaultProps = {
