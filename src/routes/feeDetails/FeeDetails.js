@@ -132,8 +132,8 @@ class FeeDetails extends Component {
               <Col md={9} sm={12} xs={12} className={s.fee}>
                 <div className={s.header}>
                   <i className="fa fa-money" aria-hidden="true"></i>
-                  <span className={s.mainPage}>Quản lý chi phí/ </span>
-                  <span>Báo cáo/ </span>
+                  <span className={s.mainPage}>Quản lý chi phí / </span>
+                  <span>Báo cáo / </span>
                   <span>Phòng { fee.apartment && fee.apartment.number }</span>
                 </div>
                 <div>
@@ -147,19 +147,13 @@ class FeeDetails extends Component {
                       </div>
                     </li>
                     <li>
-                      <div className={s.pullLeft}>
-                        <label htmlFor="startDate">Ngày bắt đầu</label>
-                      </div>
-                      <div className={s.pullRight}>
+                      <div className={`${s.pullLeft} ${s.showMobile}`} style={{ minWidth: '300px' }}>
+                        <label htmlFor="startDate" style={{ minWidth: '115px' }}>Ngày bắt đầu</label>
                         <span>{ formatDate(fee.from) }</span>
                         <i className="fa fa-calendar" aria-hidden="true"></i>
                       </div>
-                    </li>
-                    <li>
-                      <div className={s.pullLeft}>
-                        <label htmlFor="endDate">Ngày kết thúc</label>
-                      </div>
                       <div className={s.pullRight}>
+                        <label htmlFor="endDate" style={{ minWidth: '115px' }}>Ngày kết thúc</label>
                         <span>{ formatDate(fee.to) }</span>
                         <i className="fa fa-calendar" aria-hidden="true"></i>
                       </div>
@@ -193,8 +187,7 @@ class FeeDetails extends Component {
                             label="Enter Text"
                             validate={[required, maxLength9, minLength4]}
                           /> : fee.total }
-                        </span>
-                        VND
+                        </span> VND
                         { isTotalUpdate &&
                           <div style={{ marginTop: '10px' }}>
                             <button type="submit" className={s.saveUpdate} disabled={submitting}> Thay đổi </button>
@@ -229,7 +222,10 @@ class FeeDetails extends Component {
                             <option value={PAID}>Đã thanh toán</option>
                             <option value={UNPAID}>Chưa thanh toán</option>
                           </Field>}
-                          { !isStatusUpdate && (fee.status === PAID ? 'Đã thanh toán' : 'Chưa thanh toán') }
+                          { !isStatusUpdate && (fee.status === PAID ?
+                            (<span style={{ color: '#46b8da', fontWeight: 'bold' }}>Đã thanh toán</span>) :
+                            (<span style={{ color: '#FF6347', fontWeight: 'bold' }}>Chưa thanh toán</span>)
+                          )}
                         </span>
                         { isStatusUpdate &&
                           <div style={{ marginTop: '10px' }}>

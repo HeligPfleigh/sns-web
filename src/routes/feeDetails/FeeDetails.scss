@@ -2,7 +2,7 @@
   margin-top: 30px;
   .fee {
     background-color: #fff;
-    padding: 25px 35px;
+    padding: 25px 25px;
     ul {
       list-style: none;
       padding: 0px;
@@ -11,19 +11,10 @@
         margin-bottom: 15px;
         .pullLeft {
           float: left;
-          min-width: 150px;
+          min-width: 115px;
         }
         .pullRight {
           display: inline-block;
-          i {
-            color:#FF6347;
-            font-size: 20px;
-            margin-left: 5px; 
-          }
-          span {
-            display: inline-block;
-            margin-right: 10px;
-          }
           .saveUpdate {
             background-color: #263E49;
             border: 0px;
@@ -50,6 +41,14 @@
             display: none;
             margin-left: 10px; 
           }          
+        }
+        i {
+          color:#FF6347;
+          font-size: 20px;
+          margin-left: 5px; 
+        }
+        span {
+          display: inline-block;
         }
         &:hover {
           .pullRight {
@@ -86,8 +85,8 @@
     .fee {
       ul {
         li {
-          .pullLeft {
-            float: none;
+          .showMobile{
+            margin-bottom: 15px;
           }
         }
       }

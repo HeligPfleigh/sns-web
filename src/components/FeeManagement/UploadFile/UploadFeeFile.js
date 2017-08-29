@@ -54,6 +54,7 @@ class UploadFeeFile extends React.Component {
   }
 
   validateFeeFile = async (file) => {
+    console.log(file);
     const url = `${config.server.documentUpload}?building=${this.props.buildingId}`;
     const token = this.getCookie('id_token');
     const formData = new FormData();
