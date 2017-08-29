@@ -68,7 +68,7 @@ export default compose(
       },
     }),
     props: ({ data }) => ({
-      data: data.feesOfApartment.edges,
+      data: data.feesOfApartment ? data.feesOfApartment.edges : [],
     }),
   }),
   graphql(apartment, {

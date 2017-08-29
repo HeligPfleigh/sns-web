@@ -92,7 +92,7 @@ export default {
         );
         return {
           title: 'Sổ tay chi tiêu',
-          component: <Layout><Expense buildingId={params.buildingId} /></Layout>,
+          component: <Layout><Expense apartmentId={params.apartmentId} /></Layout>,
         };
       },
     }, {
