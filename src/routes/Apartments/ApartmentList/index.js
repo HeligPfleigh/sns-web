@@ -44,8 +44,9 @@ class ApartmentList extends Component {
   }
 
   render() {
-    const { me: { apartments } } = this.props;
+    const { me } = this.props;
     const { loading } = this.props;
+
 
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
@@ -58,7 +59,7 @@ class ApartmentList extends Component {
             <h4>Căn hộ đang sử dụng</h4>
             <Row>
               <Col md={12}>
-                { (apartments || []).map(apartment => <ApartmentItem
+                { ((me && me.apartments) || []).map(apartment => <ApartmentItem
                   key={Math.random()}
                   apartment={apartment}
                 />) }
@@ -71,7 +72,6 @@ class ApartmentList extends Component {
   }
 }
 ApartmentList.propTypes = {
-  apartments: PropTypes.array,
   loading: PropTypes.bool.isRequired,
   me: PropTypes.object,
 };

@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import {
   Col,
 } from 'react-bootstrap';
+import classNames from 'classnames';
 import { compose, graphql } from 'apollo-client';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './FeeTablePerMonth.scss';
@@ -22,8 +23,11 @@ class FeeTablePerMonth extends React.Component {
         <tbody>
           {
             fee.detail.map(item => (
-              <tr className={s.itemBody}>
-                <td className={`${s.styleBodyFeeType} ${s.styleTextBold}`}>{item.type.name}</td>
+              <tr key={Math.random() * 10000} className={s.itemBody}>
+                <td className={`${s.styleBodyFeeType} ${s.styleTextBold}`}>
+                  <div className={s.circleIcon}><i className={classNames(item.type.icon)} /></div>
+                  {item.type.name}
+                </td>
                 <td className={s.styleTextBold}>{`${item.total.toLocaleString()}₫`}</td>
                 <td>{item.status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
               </tr>
