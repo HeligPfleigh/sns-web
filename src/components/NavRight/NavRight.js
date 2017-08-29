@@ -50,8 +50,8 @@ class NavRight extends Component {
                 </div>
               </MenuItem>
               <MenuItem header className={s.headerItem}>TÀI KHOẢN</MenuItem>
-              <MenuItem title="Cài đặt" onClick={() => this.navEventHandler('/settings')}>Cài đặt</MenuItem>
-              <MenuItem title="Trợ giúp" onClick={() => this.navEventHandler('/helps')}>Trợ giúp</MenuItem>
+              { /* <MenuItem title="Cài đặt" onClick={() => this.navEventHandler('/settings')}>Cài đặt</MenuItem> */ }
+              { /* <MenuItem title="Trợ giúp" onClick={() => this.navEventHandler('/helps')}>Trợ giúp</MenuItem> */ }
               <MenuItem title="Đăng xuất" href="/auth/logout">Đăng xuất</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
