@@ -20,6 +20,7 @@ import {
   REJECTED_JOIN_BUILDING,
   SHARING_POST,
   INTEREST_EVENT,
+  NEW_FEE_APARTMENT,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
@@ -54,10 +55,13 @@ const collectionNotifyMessages = {
   [ACCEPTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã được chấp nhận tham gia vào tòa nhà' : ' được chấp nhận tham gia vào tòa nhà'),
   [REJECTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã bị từ chối tham gia vào tòa nhà' : ' bị từ chối tham gia vào tòa nhà'),
   [INTEREST_EVENT]: () => ' vừa quan tâm sự kiện bạn tạo',
+  [NEW_FEE_APARTMENT]: () => '',
 };
 
-export const getNotifyContent = (currentUser, author, type, actors) => {
-  if (actors && actors.length > 0) {
+export const getNotifyContent = (currentUser, author, type, actors, data) => {
+  if (type === NEW_FEE_APARTMENT) {
+    return data.text;
+  } else if (actors && actors.length > 0) {
     const {
       _id: userId,
     } = author;
@@ -90,6 +94,7 @@ class NotificationItem extends Component {
         isRead,
         type,
         actors,
+        data,
       },
       updateIsRead,
       hidePopup,
@@ -111,6 +116,10 @@ class NotificationItem extends Component {
 
     if (EVENT_DELETED === type) {
       history.push('/events');
+    }
+
+    if (NEW_FEE_APARTMENT === type) {
+      history.push(`/apartment/${data.apartment}/service_fee`);
     }
 
     if ([ACCEPTED_JOIN_BUILDING, REJECTED_JOIN_BUILDING].indexOf(type) > -1) {
@@ -135,26 +144,27 @@ class NotificationItem extends Component {
         type,
         actors,
         createdAt,
+        data,
       },
       userInfo,
     } = this.props;
-
     const readStyle = isRead ? '' : s.readStyle;
     const fisrtContent = getActorsContent(userInfo, user, type, actors);
-    const lastContent = getNotifyContent(userInfo, user, type, actors);
+    const lastContent = getNotifyContent(userInfo, user, type, actors, data);
 
     return (
       <div className={`${s.boxNotificationItem} ${readStyle}`}>
         <a href="#" onClick={this.onClick}>
           <div>
             <span className={s.avarta}>
-              { actors && actors.length > 0 &&
-                <Image src={actors[0].profile.picture} circle />
+              { actors && actors.length > 0 ?
+                <Image src={actors[0].profile.picture} circle /> :
+                <Image src="/bg.jpg" circle />
               }
             </span>
             <span>
-              { actors && actors.length > 0 &&
-                <p><strong>{fisrtContent}</strong> {lastContent}</p>
+              { actors && actors.length > 0 ?
+                <p><strong>{fisrtContent}</strong> {lastContent}</p> : <p> {lastContent}</p>
               }
               <TimeAgoWraper time={createdAt} />
             </span>
