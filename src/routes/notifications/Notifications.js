@@ -46,6 +46,12 @@ const notificationFragment = gql`
         lastName
       }
     }
+    data {
+      text
+      month
+      year
+      apartment
+    }
     type
     seen
     subject {
