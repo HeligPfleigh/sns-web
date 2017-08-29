@@ -7,7 +7,6 @@ import MediaQuery from 'react-responsive';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
-import moment from 'moment';
 import DateTime from 'react-datetime';
 import Select from 'react-select';
 import {
@@ -25,7 +24,7 @@ import Loading from '../../../../components/Loading';
 import s from './styles.scss';
 import feesReportPageQuery from './queries/feesReportPageQuery.graphql';
 
-const limit = 150;
+const limit = 15;
 class ReportPage extends Component {
   constructor(props) {
     super(props);
@@ -34,7 +33,8 @@ class ReportPage extends Component {
       feeType: {},
       viewMode: 'months',
       isOpen: false,
-      dateValue: moment(),
+      dateValue: undefined,
+      currentPage: 1,
     };
   }
 
@@ -47,10 +47,19 @@ class ReportPage extends Component {
       this.setState({ feeType: {} });
       this.props.loadMoreRows({ buildingId, limit });
     }
+    this.setState({ currentPage: 1 });
+  }
+
+  changePage = (pageNum) => {
+    this.setState({ currentPage: pageNum });
+    this.handleFilter();
   }
 
   dateChange = (val) => {
-    this.setState({ dateValue: val });
+    this.setState({
+      dateValue: val,
+      currentPage: 1,
+    });
     const { viewMode } = this.state;
     if (viewMode === 'months') {
       this.setState({ isOpen: false });
@@ -64,15 +73,16 @@ class ReportPage extends Component {
   }
 
   handleFilter = () => {
-    const { feeType, dateValue } = this.state;
+    const { feeType, dateValue, currentPage: page } = this.state;
 
-    const month = dateValue.toDate().getMonth() + 1;
-    const year = dateValue.toDate().getFullYear();
-    const feeDate = `${month}-${year}`;
+    const options = { page };
 
-    const options = {
-      feeDate,
-    };
+    if (dateValue) {
+      const month = dateValue.toDate().getMonth() + 1;
+      const year = dateValue.toDate().getFullYear();
+      const feeDate = `${month}-${year}`;
+      options.feeDate = feeDate;
+    }
 
     if (!isEmpty(feeType)) {
       options.feeType = feeType.code;
@@ -88,15 +98,29 @@ class ReportPage extends Component {
       feeType,
       dateValue,
       isOpen,
+      currentPage,
     } = this.state;
     const { buildingId, user, feeTypes, feesReport } = this.props;
 
     let dataTable = [];
     let isTreeMode = true;
+    const pagination = {
+      totalPage: 1,
+      currentPage,
+    };
+
     if (!isEmpty(feesReport)) {
       dataTable = feesReport.edges || [];
       if (!isEmpty(dataTable)) {
         isTreeMode = !isEmpty(dataTable[0].detail);
+      }
+
+      // Calc total page
+      const countRecord = (feesReport.pageInfo && feesReport.pageInfo.total) || 1;
+      if (countRecord <= limit) {
+        pagination.totalPage = 1;
+      } else {
+        pagination.totalPage = Math.ceil(countRecord / limit);
       }
     }
 
@@ -150,6 +174,7 @@ class ReportPage extends Component {
                     locale="vi"
                     inputProps={{
                       readOnly: true,
+                      placeholder: 'DD-YYYY',
                     }}
                     viewMode="months"
                     dateFormat="MM-YYYY"
@@ -167,7 +192,12 @@ class ReportPage extends Component {
                 <Clearfix />
               </Col>
               <Col md={12}>
-                <FeeList treeMode={isTreeMode} dataSource={dataTable} />
+                <FeeList
+                  treeMode={isTreeMode}
+                  dataSource={dataTable}
+                  pagination={pagination}
+                  changePage={this.changePage}
+                />
               </Col>
             </Row>
           </Col>
