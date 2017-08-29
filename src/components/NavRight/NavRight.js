@@ -68,15 +68,17 @@ class NavRight extends Component {
               <MenuItem title="Căn hộ của tôi" eventKey="1" onClick={() => this.navEventHandler('/apartments')}>
                 Căn hộ của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
-              <MenuItem title="Hàng xóm" eventKey="2">
-                Hàng xóm <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
-              </MenuItem>
-              <MenuItem title="Nhóm trao đổi" eventKey="3">
-                Nhóm trao đổi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
-              </MenuItem>
-              <MenuItem title="Cửa hàng quanh tôi" eventKey="4">
-                Cửa hàng quanh tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
-              </MenuItem>
+              { /*
+                <MenuItem title="Hàng xóm" eventKey="2">
+                  Hàng xóm <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+                </MenuItem>
+                <MenuItem title="Nhóm trao đổi" eventKey="3">
+                  Nhóm trao đổi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+                </MenuItem>
+                <MenuItem title="Cửa hàng quanh tôi" eventKey="4">
+                  Cửa hàng quanh tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
+                </MenuItem>
+              */}
               <MenuItem title="Sự kiện sắp tới" eventKey="5" onClick={() => this.navEventHandler('/events')}>
                 Sự kiện sắp tới <i className="fa fa-chevron-right pull-right" aria-hidden="true"></i>
               </MenuItem>

@@ -18,24 +18,20 @@ import { Feed } from '../../components/Feed';
 import CommentList from '../../components/Comments/CommentList';
 import history from '../../core/history';
 import { PUBLIC } from '../../constants';
-import acceptRequestForJoiningBuildingMutation from './graphql/acceptRequestForJoiningBuildingMutation.graphql';
-import rejectRequestForJoiningBuildingMutation from './graphql/rejectRequestForJoiningBuildingMutation.graphql';
 import deletePostOnBuildingMutation from './graphql/deletePostOnBuildingMutation.graphql';
 import Sponsored from './Sponsored';
 import BuildingFeedTab from './BuildingFeedTab';
 import BuildingInformationTab from './BuildingInformationTab';
-import BuildingAnnouncementTab from './BuildingAnnouncementTab';
-import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
+// import BuildingAnnouncementTab from './BuildingAnnouncementTab';
 import DocumentTab from './DocumentTab';
 import FAQTab from './FAQTab';
 import s from './Building.scss';
 
 const POST_TAB = 'POST_TAB';
-const MEMBERS_TAB = 'MEMBERS_TAB';
+// const MEMBERS_TAB = 'MEMBERS_TAB';
+// const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
 const INFO_TAB = 'INFO_TAB';
 const BUILDING_MANAGEMENT_TAB = 'BUILDING_MANAGEMENT_TAB';
-const ANNOUNCEMENT_TAB = 'ANNOUNCEMENT_TAB';
-const USERS_AWAITING_APPROVAL_TAB = 'USERS_AWAITING_APPROVAL_TAB';
 const DOCUMENT_TAB = 'DOCUMENT_TAB';
 const FAQ_TAB = 'FAQ_TAB';
 
@@ -77,15 +73,6 @@ const loadBuildingQuery = gql`
         }
       }
       isAdmin
-      requests {
-        edges {
-          ...UsersAwaitingApproval
-        }
-        pageInfo {
-          endCursor
-          hasNextPage
-        }
-      }
     }
     me {
       _id
@@ -106,8 +93,7 @@ const loadBuildingQuery = gql`
       }
     }
   }
-${Feed.fragments.post}
-${Feed.fragments.requests}`;
+${Feed.fragments.post}`;
 
 const loadMorePostOnBuildingQuery = gql`
   query loadMorePostOnBuildingQuery ($buildingId: String!, $cursor: String, $limit: Int) {
@@ -124,22 +110,6 @@ const loadMorePostOnBuildingQuery = gql`
     }
   }
 ${Feed.fragments.post}`;
-
-const loadMoreUsersAwaitingApprovalBuildingQuery = gql`
-  query loadMoreUsersAwaitingApprovalBuildingQuery ($buildingId: String!, $cursor: String, $limit: Int) {
-    building (_id: $buildingId) {
-      requests (cursor: $cursor, limit: $limit) {
-        edges {
-          ...UsersAwaitingApproval
-        }
-        pageInfo {
-          endCursor
-          hasNextPage
-        }
-      }
-    }
-  }
-${Feed.fragments.requests}`;
 
 const createNewPostOnBuildingMutation = gql`mutation createNewPostOnBuilding ($message: String!, $photos: [String], $buildingId: String!, $privacy: PrivacyType) {
   createNewPostOnBuilding(message: $message, photos: $photos, buildingId: $buildingId, privacy: $privacy) {
@@ -158,40 +128,10 @@ class Building extends Component {
       activeTab: POST_TAB,
     };
 
-    this.onAccept = this.onAccept.bind(this);
-    this.onCancel = this.onCancel.bind(this);
-    this.loadMoreUsersAwaitingApproval = this.loadMoreUsersAwaitingApproval.bind(this);
     this.loadMoreFeeds = this.loadMoreFeeds.bind(this);
   }
 
-  onAccept(friend) {
-    return (event) => {
-      event.preventDefault();
-      const xhr = this.props.acceptRequestForJoiningBuilding(friend);
-      xhr.catch((error) => {
-        this.setState({
-          errorMessage: error.message,
-        });
-      });
-      return xhr;
-    };
-  }
-
-  onCancel(friend) {
-    return (event) => {
-      event.preventDefault();
-      const xhr = this.props.rejectRequestForJoiningBuilding(friend);
-      xhr.catch((error) => {
-        this.setState({
-          errorMessage: error.message,
-        });
-      });
-      return xhr;
-    };
-  }
-
   handleSelect = (key) => {
-    console.log(key);
     if (key !== BUILDING_MANAGEMENT_TAB) {
       const { pathname } = history.location;
       history.push(`${pathname}?tab=${key}`);
@@ -208,19 +148,9 @@ class Building extends Component {
     }
   }
 
-  loadMoreUsersAwaitingApproval = () => {
-    const {
-      loadMoreUsersAwaitingApproval,
-      query,
-    } = this.props;
-    if (query && (query.tab === USERS_AWAITING_APPROVAL_TAB)) {
-      loadMoreUsersAwaitingApproval();
-    }
-  }
-
   render() {
     const {
-      data: { building, me, loading },
+      data: { building, me },
       likePost,
       unlikePost,
       createNewComment,
@@ -247,10 +177,12 @@ class Building extends Component {
                   <i className="fa fa-pencil" aria-hidden="true"></i>
                   Bài viết
                 </NavItem>
-                <NavItem title="Thành viên thuộc chung cư" eventKey={MEMBERS_TAB}>
-                  <i className="fa fa-address-book" aria-hidden="true"></i>
-                  Thành viên
-                </NavItem>
+                { /*
+                  <NavItem title="Thành viên thuộc chung cư" eventKey={MEMBERS_TAB}>
+                    <i className="fa fa-address-book" aria-hidden="true"></i>
+                    Thành viên
+                  </NavItem>
+                */ }
                 <NavItem title="Thông tin tòa nhà" eventKey={INFO_TAB}>
                   <i className="fa fa-building" aria-hidden="true"></i>
                   Thông tin chung
@@ -271,14 +203,10 @@ class Building extends Component {
                   <i className="fa fa-tachometer" aria-hidden="true"></i>
                   Quản lý tòa nhà
                 </NavItem>}
-                { building && building.isAdmin && <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
+                { /* building && building.isAdmin && <NavItem title="Thông báo của tòa nhà" eventKey={ANNOUNCEMENT_TAB}>
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
                   Thông báo *
-                </NavItem>}
-                { building && building.isAdmin && <NavItem title="Danh sách đăng ký làm thành viên tòa nhà" eventKey={USERS_AWAITING_APPROVAL_TAB}>
-                  <i className="fa fa-users" aria-hidden="true"></i>
-                  Yêu cầu *
-                </NavItem> }
+                </NavItem> */ }
               </Nav>
             </Col>
             <Col sm={7}>
@@ -307,7 +235,13 @@ class Building extends Component {
                 <Tab.Pane eventKey={INFO_TAB}>
                   { building && <BuildingInformationTab building={building} />}
                 </Tab.Pane>
-                { building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
+                <Tab.Pane eventKey={DOCUMENT_TAB}>
+                  { building && <DocumentTab building={building} />}
+                </Tab.Pane>
+                <Tab.Pane eventKey={FAQ_TAB}>
+                  { building && <FAQTab building={building} />}
+                </Tab.Pane>
+                { /* building && building.isAdmin && <Tab.Pane eventKey={ANNOUNCEMENT_TAB}>
                   <BuildingAnnouncementTab
                     building={building}
                     loadBuildingQuery={loadBuildingQuery}
@@ -316,30 +250,7 @@ class Building extends Component {
                       limit: 1000,
                     }}
                   />
-                </Tab.Pane>}
-                <Tab.Pane eventKey={DOCUMENT_TAB}>
-                  { building && <DocumentTab building={building} />}
-                </Tab.Pane>
-                <Tab.Pane eventKey={FAQ_TAB}>
-                  { building && <FAQTab building={building} />}
-                </Tab.Pane>
-                {/* Users awaiting approval */}
-                { building && building.isAdmin && (<Tab.Pane eventKey={USERS_AWAITING_APPROVAL_TAB}>
-                  <ListUsersAwaitingApproval
-                    data={building.requests}
-                    loadMore={this.loadMoreUsersAwaitingApproval}
-                    loading={loading}
-                    building={building}
-                    onAccept={this.onAccept}
-                    onCancel={this.onCancel}
-                    error={this.state.errorMessage}
-                    loadBuildingQuery={loadBuildingQuery}
-                    param={{
-                      buildingId: building._id,
-                      limit: 1000,
-                    }}
-                  />
-                </Tab.Pane>) }
+                  </Tab.Pane> */ }
               </Tab.Content>
             </Col>
             <Col sm={3}>
@@ -362,7 +273,6 @@ Building.propTypes = {
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
   loadMoreFeeds: PropTypes.func.isRequired,
-  loadMoreUsersAwaitingApproval: PropTypes.func.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   createNewPostOnBuilding: PropTypes.func.isRequired,
@@ -370,8 +280,6 @@ Building.propTypes = {
   query: PropTypes.object.isRequired,
   editPost: PropTypes.func.isRequired,
   sharingPost: PropTypes.func.isRequired,
-  acceptRequestForJoiningBuilding: PropTypes.func.isRequired,
-  rejectRequestForJoiningBuilding: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -436,36 +344,11 @@ export default compose(
           });
         },
       });
-      const loadMoreUsersAwaitingApproval = throttle(() => fetchMore({
-        query: loadMoreUsersAwaitingApprovalBuildingQuery,
-        variables: {
-          buildingId: data.building._id,
-          cursor: data.building.requests.pageInfo.endCursor,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return null;
-          }
-          return update(previousResult, {
-            building: {
-              requests: {
-                edges: {
-                  $push: fetchMoreResult.building.requests.edges,
-                },
-                pageInfo: {
-                  $set: fetchMoreResult.building.requests.pageInfo,
-                },
-              },
-            },
-          });
-        },
-      }), 300);
 
       return {
         data,
         loadMoreFeeds,
         loadMoreComments,
-        loadMoreUsersAwaitingApproval,
       };
     },
   }),
@@ -732,74 +615,6 @@ export default compose(
                 posts: {
                   edges: {
                     $splice: [[index, 1, updatedPost]],
-                  },
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(acceptRequestForJoiningBuildingMutation, {
-    props: ({ ownProps, mutate }) => ({
-      acceptRequestForJoiningBuilding: data => mutate({
-        variables: {
-          buildingId: ownProps.buildingId,
-          userId: data._id,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          acceptRequestForJoiningBuilding: {
-            __typename: 'Friend',
-            _id: data._id,
-          },
-        },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            if (!mutationResult) {
-              return null;
-            }
-            const r = mutationResult.data.acceptRequestForJoiningBuilding;
-            return update(previousResult, {
-              building: {
-                requests: {
-                  edges: {
-                    $unset: [r._id],
-                  },
-                },
-              },
-            });
-          },
-        },
-      }),
-    }),
-  }),
-  graphql(rejectRequestForJoiningBuildingMutation, {
-    props: ({ ownProps, mutate }) => ({
-      rejectRequestForJoiningBuilding: data => mutate({
-        variables: {
-          buildingId: ownProps.buildingId,
-          userId: data._id,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          rejectRequestForJoiningBuilding: {
-            __typename: 'Friend',
-            _id: data._id,
-          },
-        },
-        updateQueries: {
-          loadBuildingQuery: (previousResult, { mutationResult }) => {
-            if (!mutationResult) {
-              return null;
-            }
-            const r = mutationResult.data.rejectRequestForJoiningBuilding;
-            return update(previousResult, {
-              building: {
-                requests: {
-                  edges: {
-                    $unset: [r._id],
                   },
                 },
               },

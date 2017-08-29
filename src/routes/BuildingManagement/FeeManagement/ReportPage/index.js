@@ -25,6 +25,7 @@ import Loading from '../../../../components/Loading';
 import s from './styles.scss';
 import feesReportPageQuery from './queries/feesReportPageQuery.graphql';
 
+const limit = 150;
 class ReportPage extends Component {
   constructor(props) {
     super(props);
@@ -44,7 +45,7 @@ class ReportPage extends Component {
     } else if (!val) {
       const { buildingId } = this.props;
       this.setState({ feeType: {} });
-      this.props.loadMoreRows({ buildingId });
+      this.props.loadMoreRows({ buildingId, limit });
     }
   }
 
@@ -78,7 +79,7 @@ class ReportPage extends Component {
     }
 
     const { buildingId } = this.props;
-    this.props.loadMoreRows({ buildingId, ...options });
+    this.props.loadMoreRows({ buildingId, limit, ...options });
   }
 
   render() {
@@ -193,6 +194,7 @@ export default compose(
     options: props => ({
       variables: {
         buildingId: props.buildingId,
+        limit,
       },
       fetchPolicy: 'network-only',
     }),

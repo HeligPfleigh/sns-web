@@ -1,25 +1,52 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { compose } from 'react-apollo';
+import { compose, graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
+import throttle from 'lodash/throttle';
+import update from 'immutability-helper';
+import { Feed } from '../../../../components/Feed';
 import Loading from '../../../../components/Loading';
 import Menu from '../../Menu/Menu';
 import s from './MemberManagement.scss';
+import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
+
+const loadUsersAwaitingApprovalQuery = gql`
+query loadUsersAwaitingApprovalQuery ($buildingId: String!, $cursor: String, $limit: Int) {
+  building (_id: $buildingId) {
+    _id
+    requests (cursor: $cursor, limit: $limit) {
+      edges {
+        ...UsersAwaitingApproval
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}
+${Feed.fragments.requests}`;
 
 class MemberManagement extends Component {
-  state= {
-    loading: false,
-  }
+
   render() {
-    const { loading } = this.state;
-    const { buildingId, user } = this.props;
+    const { data, loadMore, buildingId, user } = this.props;
+
+    let building = {};
+    if (data && data.building) {
+      building = data.building;
+    }
+
+    if (data && data.loading) {
+      return <Loading show={data.loading} full>Đang tải ...</Loading>;
+    }
 
     return (
       <Grid>
-        <Loading show={loading} full>Đang tải ...</Loading>
         <Row className={s.containerTop30}>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={3} smHidden xsHidden>
@@ -31,11 +58,13 @@ class MemberManagement extends Component {
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
-            <div className={s.container}>
-              <Col md={12} className={s.contentMain}>
-                <h1>Trang đăng kí thành viên tòa nhà</h1>
-              </Col>
-            </div>
+            { building &&
+              <ListUsersAwaitingApproval
+                data={building.requests || []}
+                loadMore={loadMore}
+                loading={data && data.loading}
+              />
+            }
           </Col>
         </Row>
       </Grid>
@@ -44,13 +73,56 @@ class MemberManagement extends Component {
 }
 
 MemberManagement.propTypes = {
+  data: PropTypes.object,
+  loadMore: PropTypes.func,
   user: PropTypes.object.isRequired,
   buildingId: PropTypes.string.isRequired,
 };
 
 export default compose(
+  withStyles(s),
   connect(state => ({
     user: state.user,
   })),
-  withStyles(s),
+  graphql(loadUsersAwaitingApprovalQuery, {
+    options: props => ({
+      variables: {
+        buildingId: props.buildingId,
+        limit: 4,
+      },
+    }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMore = throttle(() => fetchMore({
+        query: loadUsersAwaitingApprovalQuery,
+        variables: {
+          buildingId: data.building._id,
+          cursor: data.building.requests.pageInfo.endCursor,
+          limit: 4,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) {
+            return null;
+          }
+          return update(previousResult, {
+            building: {
+              requests: {
+                edges: {
+                  $push: fetchMoreResult.building.requests.edges,
+                },
+                pageInfo: {
+                  $set: fetchMoreResult.building.requests.pageInfo,
+                },
+              },
+            },
+          });
+        },
+      }), 300);
+
+      return {
+        data,
+        loadMore,
+      };
+    },
+  }),
 )(MemberManagement);

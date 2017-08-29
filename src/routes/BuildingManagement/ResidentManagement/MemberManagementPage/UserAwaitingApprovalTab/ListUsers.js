@@ -5,16 +5,13 @@ import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import { Panel } from 'react-bootstrap';
 import classNames from 'classnames';
+
 import User from './User';
-import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
-import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
-import { openAlertGlobal } from '../../../reducers/alert';
 import Errors from '../Errors';
-import {
-  ACCEPTED,
-  REJECTED,
-  MEMBER,
-} from '../../../constants';
+import { openAlertGlobal } from '../../../../../reducers/alert';
+import { ACCEPTED, REJECTED, MEMBER } from '../../../../../constants';
+import rejectingUserToBuildingMutation from './graphql/rejectingUserToBuildingMutation.graphql';
+import approvingUserToBuildingMutation from './graphql/approvingUserToBuildingMutation.graphql';
 import s from './UserAwaitingApproval.scss';
 
 class ListUsers extends React.Component {
@@ -79,25 +76,21 @@ class ListUsers extends React.Component {
   )
 
   renderListUsers = () => {
-    const {
-      data: {
-        edges,
-        pageInfo: {
-          hasNextPage,
-        },
-      },
-      loadMore,
-    } = this.props;
-    if (edges.length === 0) {
+    const { data, loadMore } = this.props;
+    const dataSource = (data && data.edges) || [];
+    const hasNextPage = (data && data.pageInfo && data.pageInfo.hasNextPage) || false;
+
+    if (dataSource.length === 0) {
       return this.renderNoRecordsFound();
     }
+
     return (
       <InfiniteScroll
         loadMore={loadMore}
-        hasMore={hasNextPage}
+        hasMore={hasNextPage || false}
         loader={this.renderLoadingIcon()}
       >
-        { edges.map(edge => (
+        { dataSource.map(edge => (
           <User
             edge={edge}
             onAccept={this.acceptUser}
