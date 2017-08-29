@@ -74,8 +74,14 @@ class FAQItem extends Component {
 
   render() {
     const { data, canDelete, canUpdate, show } = this.props;
-    return (<Panel header={<div onClick={this.onShow(data._id)}><i className="fa fa-caret-right" aria-hidden="true"></i> {data.name} </div>} eventKey={data._id} key={data._id} className={classNames({ hidePanelBody: !(show === data._id) })}>
-      <div className={classNames({ hide: !(show === data._id) })} >
+    const isClosed = !(show === data._id);
+    return (<Panel
+      header={<div onClick={this.onShow(data._id)}><i className="fa fa-caret-right" aria-hidden="true"></i> {data.name} </div>}
+      eventKey={data._id}
+      key={data._id}
+      className={classNames({ individual: true, hidePanelBody: isClosed })}
+    >
+      <div className={classNames({ hide: isClosed })} >
         <div dangerouslySetInnerHTML={{ __html: DraftToHTML(data.message) }} />
         {(canUpdate || canDelete) && (<ButtonToolbar className="pull-right">
           <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall" type="button"><i className="fa fa-edit" aria-hidden="true"></i> Sửa</Button>

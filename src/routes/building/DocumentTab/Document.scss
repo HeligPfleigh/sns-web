@@ -1,9 +1,27 @@
 .list {
+  margin-bottom: 0;
+
   .noRecordsFound {
     padding-top: 10px;
   }
 
   :global {
+
+    .panel-heading {
+      background-color: transparent;
+      font-weight: 100;
+      color: #6e7179;
+      border: none;
+      border-radius: 0;
+
+      .panel-title {
+        font-size: 24px;
+        border-bottom: 1px solid #e7eaec;
+        padding-bottom: 5px;
+        text-transform: capitalize;
+      }
+    }
+
     .list-group-item {
       border-radius: 0;
       border: none;

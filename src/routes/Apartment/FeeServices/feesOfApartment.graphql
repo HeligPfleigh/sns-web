@@ -16,6 +16,7 @@ query feesOfApartment ($apartmentId: String!, $month: Int, $year: Int){
         type {
           code
           name
+          icon
         }
         total
         status

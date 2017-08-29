@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Clearfix, ButtonToolbar, ButtonGroup, Button, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import history from '../../../core/history';
+import history from '../../../../../core/history';
 import {
   ACCEPTED,
   REJECTED,
   PENDING,
-} from '../../../constants';
+} from '../../../../../constants';
 import s from './UserAwaitingApproval.scss';
 
 class User extends React.Component {

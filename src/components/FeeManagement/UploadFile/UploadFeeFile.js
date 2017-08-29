@@ -103,7 +103,7 @@ class UploadFeeFile extends React.Component {
           </div>
           <ul className={s.list}>
             {
-              (feeTypes || []).map(type => (<li>
+              (feeTypes || []).map(type => (<li key={Math.random()}>
                 <div className={s['box-text']}>{type.name}</div>
                 <div className={s['box-right']}>
                   <div className={s['box-full']}>

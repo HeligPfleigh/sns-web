@@ -16,7 +16,6 @@ class Expense extends Component {
   render() {
     const { loading } = this.state;
     const { apartmentId, user } = this.props;
-
     return (
       <Grid>
         <Loading show={loading} full>Đang tải ...</Loading>

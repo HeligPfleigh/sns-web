@@ -16,6 +16,7 @@ class Services extends Component {
   render() {
     const { loading } = this.state;
     const { apartmentId, user } = this.props;
+    console.log(this.props);
 
     return (
       <Grid>

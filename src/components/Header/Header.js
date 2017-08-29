@@ -57,6 +57,12 @@ const NotifyFragment = gql`
     }
     type
     seen
+    data {
+      text
+      month
+      year
+      apartment
+    }
     subject {
       _id
       message

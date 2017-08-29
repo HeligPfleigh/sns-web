@@ -45,7 +45,7 @@ class MenuVertical extends Component {
                   >
                     <button className={s.childMenu}>
                       <i className="fa fa-caret-right" aria-hidden="true"></i>
-                      {child.text}
+                      <div style={{ fontSize: 12 }}>{child.text}</div>
                     </button>
                   </div>
                 ))

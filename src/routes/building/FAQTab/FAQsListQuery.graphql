@@ -1,7 +1,7 @@
-query FAQsListQuery($building: String!, $limit: Int, $cursor: String) {
-  FAQs(building: $building, limit: $limit, cursor: $cursor) {
+query FAQsListQuery($building: String!, $limit: Int, $page: Int) {
+  FAQs(building: $building, limit: $limit, page: $page) {
     pageInfo {
-      endCursor
+      page
       hasNextPage
       total
       limit

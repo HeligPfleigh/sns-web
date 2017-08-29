@@ -121,8 +121,8 @@ class CreateDocumentModal extends Component {
                     onClick={this.onUploadClick}
                     className={s.btnUpload}
                   >
-                    <i className="fa fa-camera" aria-hidden="true"></i>
-                    <strong>  Tải lên</strong>
+                    <i className="fa fa-upload" aria-hidden="true"></i>
+                    <strong> Tải lên</strong>
                     <SingleUploadFile
                       inputRef={input => this.uploadRef = input}
                       onSuccess={this.onUploadSuccess}

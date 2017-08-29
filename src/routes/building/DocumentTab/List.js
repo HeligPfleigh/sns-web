@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import throttle from 'lodash/throttle';
-import InfiniteScroll from 'react-infinite-scroller';
 import classNames from 'classnames';
-import { Alert, Panel, ListGroup, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Alert, Panel, ListGroup, Tooltip, OverlayTrigger, Col } from 'react-bootstrap';
 import isObject from 'lodash/isObject';
+
+import Pagination from '../../../components/Pagination';
 
 import documentsListQuery from './documentsListQuery.graphql';
 import createDocumentMutation from './createDocumentMutation.graphql';
@@ -21,7 +21,6 @@ import DeleteModal from './Delete';
 import s from './Document.scss';
 
 const tooltip = message => (<Tooltip id={Math.random()}>{message}</Tooltip>);
-
 class Documents extends Component {
 
   constructor(...args) {
@@ -104,15 +103,11 @@ class Documents extends Component {
       data: {
         documents: {
           edges,
-          pageInfo: {
-            hasNextPage,
-          },
         },
       },
       building: {
         isAdmin,
       },
-      loadMoreDocuments,
     } = this.props;
 
     if (edges.length === 0) {
@@ -120,25 +115,19 @@ class Documents extends Component {
     }
 
     return (
-      <InfiniteScroll
-        loadMore={loadMoreDocuments}
-        hasMore={hasNextPage}
-        loader={this.renderLoadingIcon()}
-      >
-        <ListGroup>
-          { edges.map(row => (
-            <Document
-              data={row}
-              onUpdate={this.onUpdate}
-              onDelete={this.onDelete}
-              onError={this.onError}
-              canUpdate={isAdmin}
-              canDelete={isAdmin}
-              key={Math.random()}
-            />
+      <ListGroup>
+        { edges.map(row => (
+          <Document
+            data={row}
+            onUpdate={this.onUpdate}
+            onDelete={this.onDelete}
+            onError={this.onError}
+            canUpdate={isAdmin}
+            canDelete={isAdmin}
+            key={Math.random()}
+          />
         ))}
-        </ListGroup>
-      </InfiniteScroll>
+      </ListGroup>
     );
   }
 
@@ -146,6 +135,9 @@ class Documents extends Component {
     const {
       data: {
         loading,
+        documents: {
+          pageInfo,
+        },
       },
       building: {
         isAdmin,
@@ -154,42 +146,46 @@ class Documents extends Component {
       updateDocument,
       createDocument,
       deleteDocument,
+      onChangePage,
      } = this.props;
     return (
-      <Panel header={<div className={s.panelHeaderTitle}>Danh sách các biểu mẫu của tòa nhà <OverlayTrigger overlay={tooltip('Thêm mới biểu mẫu')} placement="left"><span className={s.panelHeaderAddIcon}><i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteDocumentModal(false)}></i></span></OverlayTrigger></div>} className={s.list}>
-        {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
-          { this.state.errorMessage }
-        </Alert>)}
-        <CreateModal
-          onCreate={createDocument}
-          onError={this.onError}
-          canCreate={isAdmin}
-          show={!this.state.hideCreateInitialValues}
-          building={building}
-          onHide={this.onHideCreateleteDocumentModal}
-        />
-        <UpdateModal
-          onUpdate={updateDocument}
-          onDelete={deleteDocument}
-          onError={this.onError}
-          canUpdate={isAdmin}
-          canDelete={isAdmin}
-          initialValues={this.state.onUpdateInitialValues}
-          building={building}
-          onHide={this.onHideUpdateDocumentModal}
-        />
-        <DeleteModal
-          onUpdate={updateDocument}
-          onDelete={deleteDocument}
-          onError={this.onError}
-          canUpdate={isAdmin}
-          canDelete={isAdmin}
-          initialValues={this.state.onDeleteInitialValues}
-          building={building}
-          onHide={this.onHideDeleteDocumentModal}
-        />
-        { loading ? this.renderLoadingIcon() : this.renderDocuments() }
-      </Panel>
+      <Col>
+        <Panel header={<div className={s.panelHeaderTitle}>Danh sách các biểu mẫu của tòa nhà <OverlayTrigger overlay={tooltip('Thêm mới biểu mẫu')} placement="left"><span className={s.panelHeaderAddIcon}><i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteDocumentModal(false)}></i></span></OverlayTrigger></div>} className={s.list}>
+          {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
+            { this.state.errorMessage }
+          </Alert>)}
+          <CreateModal
+            onCreate={createDocument}
+            onError={this.onError}
+            canCreate={isAdmin}
+            show={!this.state.hideCreateInitialValues}
+            building={building}
+            onHide={this.onHideCreateleteDocumentModal}
+          />
+          <UpdateModal
+            onUpdate={updateDocument}
+            onDelete={deleteDocument}
+            onError={this.onError}
+            canUpdate={isAdmin}
+            canDelete={isAdmin}
+            initialValues={this.state.onUpdateInitialValues}
+            building={building}
+            onHide={this.onHideUpdateDocumentModal}
+          />
+          <DeleteModal
+            onUpdate={updateDocument}
+            onDelete={deleteDocument}
+            onError={this.onError}
+            canUpdate={isAdmin}
+            canDelete={isAdmin}
+            initialValues={this.state.onDeleteInitialValues}
+            building={building}
+            onHide={this.onHideDeleteDocumentModal}
+          />
+          { loading ? this.renderLoadingIcon() : this.renderDocuments() }
+        </Panel>
+        { !loading && <Pagination total={pageInfo.total} page={pageInfo.page} limit={pageInfo.limit} onChange={onChangePage} className="pull-right" /> }
+      </Col>
     );
   }
 }
@@ -203,7 +199,7 @@ Documents.propTypes = {
     documents: PropTypes.object,
     loading: PropTypes.bool.isRequired,
   }).isRequired,
-  loadMoreDocuments: PropTypes.func.isRequired,
+  onChangePage: PropTypes.func.isRequired,
   createDocument: PropTypes.func.isRequired,
   updateDocument: PropTypes.func.isRequired,
   deleteDocument: PropTypes.func.isRequired,
@@ -218,27 +214,20 @@ export default compose(
       },
     }),
     props: ({ ownProps, data }) => {
-      const loadMoreDocuments = throttle(() => data.fetchMore({
+      const onChangePage = page => data.fetchMore({
         query: documentsListQuery,
         variables: {
           building: ownProps.building._id,
-          cursor: data.documents.pageInfo.endCursor,
+          page,
         },
-        updateQuery: (previousResult, { fetchMoreResult }) => update(previousResult, {
-          documents: {
-            edges: {
-              $push: fetchMoreResult.documents.edges,
-            },
-            pageInfo: {
-              $set: fetchMoreResult.documents.pageInfo,
-            },
-          },
+        updateQuery: (previousResult, { fetchMoreResult }) => ({
+          ...fetchMoreResult,
         }),
-      }), 300);
+      });
 
       return {
         data,
-        loadMoreDocuments,
+        onChangePage,
       };
     },
   }),

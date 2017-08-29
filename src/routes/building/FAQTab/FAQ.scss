@@ -1,21 +1,52 @@
 .list {
+  box-shadow: none;
+
   .noRecordsFound {
     padding-top: 10px;
+    padding-bottom: 10px;
   }
 
   :global {
-    .panel-default {
-      border-radius: 0;
+
+    .panel-heading {
+      background-color: transparent;
+      font-weight: 100;
+      color: #6e7179;
       border: none;
-      padding-left: 0;
-      padding-right: 0;
+      border-radius: 0;
+
+      .panel-title {
+        font-size: 24px;
+        border-bottom: 1px solid #e7eaec;
+        padding-bottom: 5px;
+        text-transform: capitalize;
+      }
+    }
+
+    .individual {
+      padding-top: 0;
+      padding-bottom: 0;
+      border: none;
+      border-radius: 0;
+
+      .panel-heading {
+        padding-top: 0;
+        padding-bottom: 0;
+        
+        .panel-title {
+          border: none;
+        }
+      }
+
+      .panel-body {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
     }
 
     .hidePanelBody {
-      .panel-default {
-        .panel-body {
-          display: none;
-        }
+      .panel-body {
+        display: none;
       }
     }
 
@@ -28,9 +59,20 @@
       top: 8px;
     }
 
+    .panel-body {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
     .panel-group {
+      .panel-default {
+        box-shadow: none;
+      }
+
       .panel-heading {
         padding: 0;
+        background-color: transparent;
+        border: none;
 
         .panel-title {
           font-size: 14px;
@@ -40,9 +82,10 @@
       }
 
       .panel-body {
-        padding-left: 0;
-        padding-right: 0;
         font-size: 14px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 0 !important;
       }
     }
   }

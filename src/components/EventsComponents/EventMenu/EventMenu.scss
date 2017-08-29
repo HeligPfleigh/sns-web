@@ -1,5 +1,9 @@
 @import "../../../theme/resources.scss";
 .menuLeftClass{
+  .events-home {
+    cursor: pointer;
+  }
+
   .iconCalender {
     color: red;
     font-size: 30px;
@@ -28,6 +32,7 @@
     background-color: #283e4a;
     border-radius: 3px;
     margin-right: 30px;
+    margin-top: 15px;
   }
 }
 

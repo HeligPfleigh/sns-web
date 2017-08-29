@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose, graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import MediaQuery from 'react-responsive';
-import Table from 'rc-table';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import DateTime from 'react-datetime';
 import Select from 'react-select';
 import {
@@ -19,47 +18,48 @@ import {
   ControlLabel,
 } from 'react-bootstrap';
 
-import Loading from '../../../../components/Loading';
 import Menu from '../../Menu/Menu';
+import FeeList from './FeeList';
+import Loading from '../../../../components/Loading';
 import s from './styles.scss';
+import feesReportPageQuery from './queries/feesReportPageQuery.graphql';
 
-const columns = [{
-  title: 'Name', dataIndex: 'name', key: 'name', width: 100,
-}, {
-  title: 'Age', dataIndex: 'age', key: 'age', width: 100,
-}, {
-  title: 'Address', dataIndex: 'address', key: 'address', width: 200,
-}, {
-  title: 'Apeartions', dataIndex: '', key: 'operations', render: () => <a href="#">Delete</a>,
-}];
-
-const data = [
-  { name: 'Jack', age: 28, address: 'some where', key: '1' },
-  { name: 'Rose', age: 36, address: 'some where', key: '2' },
-];
-
-const getFeeTypes = gql`query {
-  getFeeTypes {
-    code
-    name
-  }
-}`;
-
+const limit = 15;
 class ReportPage extends Component {
-  state= {
-    loading: false,
-    feeType: {},
-    viewMode: 'months',
-    isOpen: false,
-    dateValue: new Date(),
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      feeType: {},
+      viewMode: 'months',
+      isOpen: false,
+      dateValue: undefined,
+      currentPage: 1,
+    };
   }
 
+  // filter
   changeFeeType = (val) => {
-    this.setState({ feeType: val });
+    if (val && !isEqual(val, this.state.feeType)) {
+      this.setState({ feeType: val });
+    } else if (!val) {
+      const { buildingId } = this.props;
+      this.setState({ feeType: {} });
+      this.props.loadMoreRows({ buildingId, limit });
+    }
+    this.setState({ currentPage: 1 });
+  }
+
+  changePage = (pageNum) => {
+    this.setState({ currentPage: pageNum });
+    this.handleFilter();
   }
 
   dateChange = (val) => {
-    this.setState({ dateValue: val });
+    this.setState({
+      dateValue: val,
+      currentPage: 1,
+    });
     const { viewMode } = this.state;
     if (viewMode === 'months') {
       this.setState({ isOpen: false });
@@ -72,9 +72,57 @@ class ReportPage extends Component {
     });
   }
 
+  handleFilter = () => {
+    const { feeType, dateValue, currentPage: page } = this.state;
+
+    const options = { page };
+
+    if (dateValue) {
+      const month = dateValue.toDate().getMonth() + 1;
+      const year = dateValue.toDate().getFullYear();
+      const feeDate = `${month}-${year}`;
+      options.feeDate = feeDate;
+    }
+
+    if (!isEmpty(feeType)) {
+      options.feeType = feeType.code;
+    }
+
+    const { buildingId } = this.props;
+    this.props.loadMoreRows({ buildingId, limit, ...options });
+  }
+
   render() {
-    const { loading, feeType, dateValue, isOpen } = this.state;
-    const { buildingId, user, feeTypes } = this.props;
+    const {
+      loading,
+      feeType,
+      dateValue,
+      isOpen,
+      currentPage,
+    } = this.state;
+    const { buildingId, user, feeTypes, feesReport } = this.props;
+
+    let dataTable = [];
+    let isTreeMode = true;
+    const pagination = {
+      totalPage: 1,
+      currentPage,
+    };
+
+    if (!isEmpty(feesReport)) {
+      dataTable = feesReport.edges || [];
+      if (!isEmpty(dataTable)) {
+        isTreeMode = !isEmpty(dataTable[0].detail);
+      }
+
+      // Calc total page
+      const countRecord = (feesReport.pageInfo && feesReport.pageInfo.total) || 1;
+      if (countRecord <= limit) {
+        pagination.totalPage = 1;
+      } else {
+        pagination.totalPage = Math.ceil(countRecord / limit);
+      }
+    }
 
     return (
       <Grid>
@@ -126,6 +174,7 @@ class ReportPage extends Component {
                     locale="vi"
                     inputProps={{
                       readOnly: true,
+                      placeholder: 'DD-YYYY',
                     }}
                     viewMode="months"
                     dateFormat="MM-YYYY"
@@ -138,12 +187,17 @@ class ReportPage extends Component {
                   />
                 </Col>
                 <Col sm={1} className={s['item-filter']} >
-                  <Button bsStyle="primary" onClick={() => console.log('DKM')} >Xem</Button>
+                  <Button bsStyle="primary" onClick={this.handleFilter} >Xem</Button>
                 </Col>
                 <Clearfix />
               </Col>
               <Col md={12}>
-                <Table columns={columns} data={data} />
+                <FeeList
+                  treeMode={isTreeMode}
+                  dataSource={dataTable}
+                  pagination={pagination}
+                  changePage={this.changePage}
+                />
               </Col>
             </Row>
           </Col>
@@ -155,6 +209,8 @@ class ReportPage extends Component {
 
 ReportPage.propTypes = {
   feeTypes: PropTypes.array,
+  feesReport: PropTypes.object,
+  loadMoreRows: PropTypes.func,
   user: PropTypes.object.isRequired,
   buildingId: PropTypes.string.isRequired,
 };
@@ -164,12 +220,33 @@ export default compose(
   connect(state => ({
     user: state.user,
   })),
-  graphql(getFeeTypes, {
-    options: () => ({
+  graphql(feesReportPageQuery, {
+    options: props => ({
+      variables: {
+        buildingId: props.buildingId,
+        limit,
+      },
       fetchPolicy: 'network-only',
     }),
-    props: ({ data: result }) => ({
-      feeTypes: result.getFeeTypes,
-    }),
+    props: ({ data }) => {
+      const {
+        fetchMore,
+        feesReport,
+        getFeeTypes: feeTypes,
+      } = data;
+
+      const loadMoreRows = (variables) => {
+        fetchMore({
+          variables,
+          fetchPolicy: 'network-only',
+          updateQuery: (_, { fetchMoreResult }) => fetchMoreResult,
+        });
+      };
+      return {
+        feeTypes,
+        feesReport,
+        loadMoreRows,
+      };
+    },
   }),
 )(ReportPage);

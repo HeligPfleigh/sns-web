@@ -16,31 +16,31 @@ const menus = [{
   text: 'Phí dịch vụ',
   key: 'service_fee',
   url: '/service_fee',
-}, {
-  icon: 'fa fa-bar-chart',
-  text: 'Biểu đồ phí',
-  key: 'fee_chart',
-  url: '/fee_chart',
-}, {
-  icon: 'fa fa-commenting',
-  text: 'Góp ý',
-  key: 'feedbacks',
-  url: '/feedbacks',
-}, {
-  icon: 'fa fa-book',
-  text: 'Sổ tay chi tiêu',
-  key: 'expense',
-  url: '/expense',
-}, {
-  icon: 'fa fa-database',
-  text: 'Dịch vụ',
-  key: 'services',
-  url: '/services',
-}, {
-  icon: 'fa fa-cog',
-  text: 'Tiện ích',
-  key: 'utility',
-  url: '/utility',
+// }, {
+//   icon: 'fa fa-bar-chart',
+//   text: 'Biểu đồ phí',
+//   key: 'fee_chart',
+//   url: '/fee_chart',
+// }, {
+//   icon: 'fa fa-commenting',
+//   text: 'Góp ý',
+//   key: 'feedbacks',
+//   url: '/feedbacks',
+// }, {
+//   icon: 'fa fa-book',
+//   text: 'Sổ tay chi tiêu',
+//   key: 'expense',
+//   url: '/expense',
+// }, {
+//   icon: 'fa fa-database',
+//   text: 'Dịch vụ',
+//   key: 'services',
+//   url: '/services',
+// }, {
+//   icon: 'fa fa-cog',
+//   text: 'Tiện ích',
+//   key: 'utility',
+//   url: '/utility',
 }];
 
 class Menu extends Component {

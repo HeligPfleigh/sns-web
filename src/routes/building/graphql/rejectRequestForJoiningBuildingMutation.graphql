@@ -1,5 +1,0 @@
-mutation rejectRequestForJoiningBuilding ($buildingId: String!, $userId: String!) {
-  rejectRequestForJoiningBuilding(buildingId: $buildingId, userId: $userId) {
-    _id
-  }
-}
