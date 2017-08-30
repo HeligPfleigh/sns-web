@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import throttle from 'lodash/throttle';
-import InfiniteScroll from 'react-infinite-scroller';
 import classNames from 'classnames';
-import { Alert, Panel, Tooltip, OverlayTrigger, PanelGroup } from 'react-bootstrap';
+import { Alert, Panel, Tooltip, OverlayTrigger, PanelGroup, Col } from 'react-bootstrap';
 import isObject from 'lodash/isObject';
+
+import Pagination from '../../../components/Pagination';
 
 import FAQsListQuery from './FAQsListQuery.graphql';
 import createFAQMutation from './createFAQMutation.graphql';
@@ -21,7 +21,6 @@ import DeleteModal from './Delete';
 import s from './FAQ.scss';
 
 const tooltip = message => (<Tooltip id={Math.random()}>{message}</Tooltip>);
-
 class FAQs extends Component {
 
   constructor(...args) {
@@ -112,15 +111,11 @@ class FAQs extends Component {
       data: {
         FAQs: {
           edges,
-          pageInfo: {
-            hasNextPage,
-          },
         },
       },
       building: {
         isAdmin,
       },
-      loadMoreFAQs,
     } = this.props;
 
     if (edges.length === 0) {
@@ -128,28 +123,21 @@ class FAQs extends Component {
     }
 
     return (
-      <InfiniteScroll
-        loadMore={loadMoreFAQs}
-        hasMore={hasNextPage}
-        loader={this.renderLoadingIcon()}
-      >
-        <PanelGroup accordion>
-          { edges.map(row => (
-            <FAQ
-              data={row}
-              onUpdate={this.onUpdate}
-              onDelete={this.onDelete}
-              onError={this.onError}
-              onShow={this.onShow}
-              canUpdate={isAdmin}
-              canDelete={isAdmin}
-              key={Math.random()}
-              show={this.state.showFAQ}
-            />
+      <PanelGroup accordion>
+        { edges.map(row => (
+          <FAQ
+            data={row}
+            onUpdate={this.onUpdate}
+            onDelete={this.onDelete}
+            onError={this.onError}
+            onShow={this.onShow}
+            canUpdate={isAdmin}
+            canDelete={isAdmin}
+            key={Math.random()}
+            show={this.state.showFAQ}
+          />
         ))}
-        </PanelGroup>
-
-      </InfiniteScroll>
+      </PanelGroup>
     );
   }
 
@@ -157,6 +145,7 @@ class FAQs extends Component {
     const {
       data: {
         loading,
+        FAQs,
       },
       building: {
         isAdmin,
@@ -165,42 +154,58 @@ class FAQs extends Component {
       updateFAQ,
       createFAQ,
       deleteFAQ,
+      onChangePage,
      } = this.props;
     return (
-      <Panel header={<div className={s.panelHeaderTitle}>Các câu hỏi thường gặp <OverlayTrigger overlay={tooltip('Thêm mới FAQ')} placement="left"><span className={s.panelHeaderAddIcon}><i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteFAQModal(false)}></i></span></OverlayTrigger></div>} className={s.list}>
-        {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
-          { this.state.errorMessage }
-        </Alert>)}
-        <CreateModal
-          onCreate={createFAQ}
-          onError={this.onError}
-          canCreate={isAdmin}
-          show={!this.state.hideCreateInitialValues}
-          building={building}
-          onHide={this.onHideCreateleteFAQModal}
-        />
-        <UpdateModal
-          onUpdate={updateFAQ}
-          onDelete={deleteFAQ}
-          onError={this.onError}
-          canUpdate={isAdmin}
-          canDelete={isAdmin}
-          initialValues={this.state.onUpdateInitialValues}
-          building={building}
-          onHide={this.onHideUpdateFAQModal}
-        />
-        <DeleteModal
-          onUpdate={updateFAQ}
-          onDelete={deleteFAQ}
-          onError={this.onError}
-          canUpdate={isAdmin}
-          canDelete={isAdmin}
-          initialValues={this.state.onDeleteInitialValues}
-          building={building}
-          onHide={this.onHideDeleteFAQModal}
-        />
-        { loading ? this.renderLoadingIcon() : this.renderFAQs() }
-      </Panel>
+      <Col>
+        <Panel
+          header={
+            <div className={s.panelHeaderTitle}>
+            Các câu hỏi thường gặp
+            <OverlayTrigger overlay={tooltip('Thêm mới FAQ')} placement="left">
+              <span className={s.panelHeaderAddIcon}>
+                <i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteFAQModal(false)}></i>
+              </span>
+            </OverlayTrigger>
+            </div>
+        }
+          className={s.list}
+        >
+          {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
+            { this.state.errorMessage }
+          </Alert>)}
+          <CreateModal
+            onCreate={createFAQ}
+            onError={this.onError}
+            canCreate={isAdmin}
+            show={!this.state.hideCreateInitialValues}
+            building={building}
+            onHide={this.onHideCreateleteFAQModal}
+          />
+          <UpdateModal
+            onUpdate={updateFAQ}
+            onDelete={deleteFAQ}
+            onError={this.onError}
+            canUpdate={isAdmin}
+            canDelete={isAdmin}
+            initialValues={this.state.onUpdateInitialValues}
+            building={building}
+            onHide={this.onHideUpdateFAQModal}
+          />
+          <DeleteModal
+            onUpdate={updateFAQ}
+            onDelete={deleteFAQ}
+            onError={this.onError}
+            canUpdate={isAdmin}
+            canDelete={isAdmin}
+            initialValues={this.state.onDeleteInitialValues}
+            building={building}
+            onHide={this.onHideDeleteFAQModal}
+          />
+          { loading ? this.renderLoadingIcon() : this.renderFAQs() }
+        </Panel>
+        { !loading && FAQs && <Pagination total={FAQs.pageInfo.total} page={FAQs.pageInfo.page} limit={FAQs.pageInfo.limit} onChange={onChangePage} className="pull-right" /> }
+      </Col>
     );
   }
 }
@@ -214,7 +219,7 @@ FAQs.propTypes = {
     FAQs: PropTypes.object,
     loading: PropTypes.bool.isRequired,
   }).isRequired,
-  loadMoreFAQs: PropTypes.func.isRequired,
+  onChangePage: PropTypes.func.isRequired,
   createFAQ: PropTypes.func.isRequired,
   updateFAQ: PropTypes.func.isRequired,
   deleteFAQ: PropTypes.func.isRequired,
@@ -229,27 +234,20 @@ export default compose(
       },
     }),
     props: ({ ownProps, data }) => {
-      const loadMoreFAQs = throttle(() => data.fetchMore({
+      const onChangePage = page => data.fetchMore({
         query: FAQsListQuery,
         variables: {
           building: ownProps.building._id,
-          cursor: data.FAQs.pageInfo.endCursor,
+          page,
         },
-        updateQuery: (previousResult, { fetchMoreResult }) => update(previousResult, {
-          FAQs: {
-            edges: {
-              $push: fetchMoreResult.FAQs.edges,
-            },
-            pageInfo: {
-              $set: fetchMoreResult.FAQs.pageInfo,
-            },
-          },
+        updateQuery: (previousResult, { fetchMoreResult }) => ({
+          ...fetchMoreResult,
         }),
-      }), 300);
+      });
 
       return {
         data,
-        loadMoreFAQs,
+        onChangePage,
       };
     },
   }),
@@ -325,16 +323,13 @@ export default compose(
           },
         },
         updateQueries: {
-          FAQsListQuery: (previousResult, { mutationResult }) => {
-            const FAQ = mutationResult.data.deleteFAQ;
-            return update(previousResult, {
-              FAQs: {
-                edges: {
-                  $unset: [FAQ._id],
-                },
+          FAQsListQuery: (previousResult, { mutationResult }) => update(previousResult, {
+            FAQs: {
+              edges: {
+                $unset: [mutationResult.data.deleteFAQ._id],
               },
-            });
-          },
+            },
+          }),
         },
       }),
     }),
