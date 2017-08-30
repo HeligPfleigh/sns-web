@@ -4,6 +4,7 @@ import Table from 'rc-table';
 import includes from 'lodash/includes';
 import { Pagination, Clearfix } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import history from '../../../../core/history';
 import s from './styles.scss';
 
 class FeeList extends Component {
@@ -30,8 +31,8 @@ class FeeList extends Component {
     />
   );
 
-  handleClick = (index) => {
-    console.log(index);
+  handleClick = (data) => {
+    history.push(`/fee/${data._id}`);
   }
 
   handlePageSelect = (pageNum) => {
@@ -66,39 +67,43 @@ class FeeList extends Component {
     }];
   }
 
-  viewFeeDetail = (o, row, index) => (
-    <a href="#" onClick={() => this.handleClick(index)}>{'Chi tiết >>'}</a>
+  viewFeeDetail = data => (
+    <a
+      href="#"
+      onClick={(evt) => {
+        evt.preventDefault();
+        this.handleClick(data);
+      }}
+    >{'Chi tiết >>'}</a>
   );
 
-  renderAction = (o, row, index) => {
-    if (includes(this.state.expandedRowKeys, o._id)) {
-      return (<a
-        href="#" onClick={(evt) => {
-          evt.preventDefault();
-          this.handleClick(index);
-        }}
-      >
+  doNothing = (evt) => {
+    evt.preventDefault();
+  }
+
+  renderAction = (data) => {
+    if (includes(this.state.expandedRowKeys, data._id)) {
+      return (
+        <a href="#" onClick={this.doNothing}>
+          Xem thêm
+          <i
+            aria-hidden="true"
+            className="fa fa-caret-down"
+            style={{ marginLeft: '3px' }}
+          ></i>
+        </a>
+      );
+    }
+    return (
+      <a href="#" onClick={this.doNothing} >
         Xem thêm
         <i
           aria-hidden="true"
-          className="fa fa-caret-down"
+          className="fa fa-caret-right"
           style={{ marginLeft: '3px' }}
         ></i>
-      </a>);
-    }
-    return (<a
-      href="#" onClick={(evt) => {
-        evt.preventDefault();
-        this.handleClick(index);
-      }}
-    >
-      Xem thêm
-      <i
-        aria-hidden="true"
-        className="fa fa-caret-right"
-        style={{ marginLeft: '3px' }}
-      ></i>
-    </a>);
+      </a>
+    );
   }
 
   render() {
