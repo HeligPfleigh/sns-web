@@ -102,7 +102,7 @@ class FAQs extends Component {
 
   renderNoRecordsFound = () => (
     <div className={classNames(s.noRecordsFound, 'text-center')}>
-      Hiện tại chưa có FAQ
+      Hiện tại chưa có dữ liệu
     </div>
   )
 
