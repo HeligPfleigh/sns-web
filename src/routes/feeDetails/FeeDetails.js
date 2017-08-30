@@ -5,11 +5,11 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, FormControl } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
+import MediaQuery from 'react-responsive';
 import { loadFee as loadFeeDetail } from '../../reducers/fees';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
 import updateFeeDetailMutation from './updateFeeDetailMutation.graphql';
 import Loading from '../../components/Loading';
-import MediaQuery from 'react-responsive';
 import Menu from '../BuildingManagement/Menu/Menu';
 import { PAID, UNPAID } from '../../constants';
 import {
