@@ -9,6 +9,8 @@ import { loadFee as loadFeeDetail } from '../../reducers/fees';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
 import updateFeeDetailMutation from './updateFeeDetailMutation.graphql';
 import Loading from '../../components/Loading';
+import MediaQuery from 'react-responsive';
+import Menu from '../BuildingManagement/Menu/Menu';
 import { PAID, UNPAID } from '../../constants';
 import {
   required,
@@ -62,8 +64,8 @@ class FeeDetails extends Component {
     };
   }
 
-  componentDidMount() {
-    const { data: { fee } } = this.props;
+  componentWillReceiveProps(nextProps) {
+    const { data: { fee } } = nextProps;
     this.props.load({
       total: fee && fee.total,
       status: fee && fee.status,
@@ -116,6 +118,7 @@ class FeeDetails extends Component {
         fee,
       },
       handleSubmit,
+      user,
     } = this.props;
     const { submitting } = this.state;
     if (loading) {
@@ -126,9 +129,15 @@ class FeeDetails extends Component {
       <form onSubmit={handleSubmit(this.submit)}>
         <Grid>
           <Row className={s.containerTop30}>
-            <Col md={3}>
-              { !fee && <h3>Not found page</h3> }
-            </Col>
+            <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+              <Col md={3} smHidden xsHidden>
+                <Menu
+                  user={user}
+                  parentPath={`/management/${fee.building._id}`}
+                  pageKey="fee_management>fee_dashboard"
+                />
+              </Col>
+            </MediaQuery>
             { !loading && fee &&
               <Col md={9} sm={12} xs={12} className={s.fee}>
                 <div className={s.header}>
@@ -260,6 +269,7 @@ FeeDetails.propTypes = {
   load: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   updateFeeDetail: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 const FeeDetailsForm = reduxForm({
@@ -317,4 +327,7 @@ export default compose(
     }),
     { load: loadFeeDetail },
   ),
+  connect(state => ({
+    user: state.user,
+  })),
 )(FeeDetailsForm);
