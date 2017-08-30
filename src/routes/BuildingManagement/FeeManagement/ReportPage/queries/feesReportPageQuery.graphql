@@ -55,10 +55,10 @@ query feesReportPageQuery(
           name
         }
         apartment {
-          _id
+          id: _id
         }
         building {
-          _id
+          id: _id
         }
         total
         status
