@@ -212,7 +212,7 @@ class Building extends Component {
             <Col sm={7}>
               <Tab.Content animation>
                 <Tab.Pane eventKey={POST_TAB}>
-                  {building && <BuildingFeedTab
+                  {building && building.posts && <BuildingFeedTab
                     loadMoreFeeds={this.loadMoreFeeds}
                     createNewPostOnBuilding={createNewPostOnBuilding}
                     building={building}
