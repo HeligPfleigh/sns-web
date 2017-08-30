@@ -135,9 +135,7 @@ class Documents extends Component {
     const {
       data: {
         loading,
-        documents: {
-          pageInfo,
-        },
+        documents,
       },
       building: {
         isAdmin,
@@ -184,7 +182,13 @@ class Documents extends Component {
           />
           { loading ? this.renderLoadingIcon() : this.renderDocuments() }
         </Panel>
-        { !loading && <Pagination total={pageInfo.total} page={pageInfo.page} limit={pageInfo.limit} onChange={onChangePage} className="pull-right" /> }
+        { !loading && documents && <Pagination
+          total={documents.pageInfo.total}
+          page={documents.pageInfo.page}
+          limit={documents.pageInfo.limit}
+          onChange={onChangePage}
+          className="pull-right"
+        /> }
       </Col>
     );
   }
