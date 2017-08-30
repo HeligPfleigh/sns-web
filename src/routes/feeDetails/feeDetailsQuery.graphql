@@ -8,6 +8,7 @@ query feeDetailsQuery($feeId: String!) {
     from
     to
     apartment {
+      _id
       name
       number
     }

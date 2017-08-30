@@ -1,0 +1,5 @@
+mutation reminderToPayFee ($input: ReminderToPayFeeInput!) {
+  reminderToPayFee (input: $input) {
+    _id
+  }
+}

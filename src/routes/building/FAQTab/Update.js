@@ -70,8 +70,22 @@ class UpdateFAQModal extends Component {
     this.props.onHide({});
   }
 
-  onDelete() {
-    this.props.onDelete(this.props.initialValues._id);
+  onDelete(event) {
+    event.preventDefault();
+    const { _id, building } = this.props.initialValues;
+    this.props.onDelete({
+      _id,
+      building: building._id,
+    })
+    .then(() => {
+      this.resetForm();
+      this.onHide();
+    })
+    .catch(() => {
+      this.resetForm();
+      this.props.onError('Có lỗi xảy ra trong quá trình xóa FAQ');
+      this.onHide();
+    });
   }
 
   render() {
@@ -81,7 +95,6 @@ class UpdateFAQModal extends Component {
       submitting,
       invalid,
       form,
-      currentValues,
       canUpdate,
       canDelete,
     } = this.props;

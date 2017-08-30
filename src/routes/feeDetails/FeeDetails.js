@@ -17,6 +17,7 @@ import {
   minLength4,
   maxLength9,
 } from '../../utils/validator';
+import reminderToPayFeeMutation from './ReminderToPayFeeMutation';
 import s from './FeeDetails.scss';
 
 
@@ -61,7 +62,10 @@ class FeeDetails extends Component {
       isTotalUpdate: false,
       isStatusUpdate: false,
       submitting: false,
+      hasReminded: false,
     };
+
+    this.onReminderToPayFee = this.onReminderToPayFee.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -70,6 +74,23 @@ class FeeDetails extends Component {
       total: fee && fee.total,
       status: fee && fee.status,
     });
+  }
+
+  onReminderToPayFee(_id, apartment, building) {
+    return (event) => {
+      event.preventDefault();
+      if (this.state.hasReminded) {
+        return;
+      }
+
+      this.props.reminderToPayFeeMutation({
+        _id,
+        apartment,
+        building,
+      }).then(() => {
+        this.setState({ hasReminded: true });
+      });
+    };
   }
 
   openFeeUpdate = () => {
@@ -248,6 +269,14 @@ class FeeDetails extends Component {
                         }
                       </div>
                     </li>
+                    <li>
+                      <div className={s.pullLeft}>&nbsp;</div>
+                      <div className={s.pullRight}>
+                        {!isStatusUpdate && (fee.status === UNPAID) &&
+                          <button disabled={submitting || this.state.hasReminded} type="button" onClick={this.onReminderToPayFee(fee._id, fee.apartment._id, fee.building._id)} className="btn btn-warning">Nhắc nhở đóng phí</button>
+                        }
+                      </div>
+                    </li>
                   </ul>
                 </div>
               </Col>
@@ -269,6 +298,7 @@ FeeDetails.propTypes = {
   load: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   updateFeeDetail: PropTypes.func.isRequired,
+  reminderToPayFeeMutation: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -286,6 +316,7 @@ export default compose(
       },
     }),
   }),
+  reminderToPayFeeMutation,
   graphql(updateFeeDetailMutation, {
     props: ({ ownProps, mutate }) => ({
       updateFeeDetail: (_id, total, status, building) => mutate({

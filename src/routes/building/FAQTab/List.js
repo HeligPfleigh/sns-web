@@ -323,13 +323,16 @@ export default compose(
           },
         },
         updateQueries: {
-          FAQsListQuery: (previousResult, { mutationResult }) => update(previousResult, {
-            FAQs: {
-              edges: {
-                $unset: [mutationResult.data.deleteFAQ._id],
+          FAQsListQuery: (previousResult, { mutationResult }) => {
+            const faq = mutationResult.data.deleteFAQ;
+            return update(previousResult, {
+              FAQs: {
+                edges: {
+                  $unset: [faq._id],
+                },
               },
-            },
-          }),
+            });
+          },
         },
       }),
     }),
