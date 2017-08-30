@@ -63,9 +63,10 @@ class FeeDetails extends Component {
   }
 
   componentDidMount() {
+    const { data: { fee } } = this.props;
     this.props.load({
-      total: this.props.data.fee.total,
-      status: this.props.data.fee.status,
+      total: fee && fee.total,
+      status: fee && fee.status,
     });
   }
 
