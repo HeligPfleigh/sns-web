@@ -544,11 +544,12 @@ export default compose(
   }),
   graphql(Feed.mutation.sharingPost, {
     props: ({ mutate }) => ({
-      sharingPost: (postId, privacy, message, userId) => mutate({
+      sharingPost: (postId, privacy, message, friendId, userId) => mutate({
         variables: {
           _id: postId,
           privacy: privacy || PUBLIC,
           message,
+          friendId,
           userId,
         },
       }),

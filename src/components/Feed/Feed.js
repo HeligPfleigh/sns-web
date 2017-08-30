@@ -177,10 +177,22 @@ class Feed extends Component {
             <span>
               {sharing && author._id !== sharing.author._id &&
                 <span>
-                  đã chia sẻ bài viết của &nbsp;
-                  <Link to={`/user/${sharing.author._id}`}>
-                    <strong>{`${sharing.author.profile.firstName} ${sharing.author.profile.lastName}`}</strong>
-                  </Link>
+                  { author._id !== user._id &&
+                    <span>
+                      đã chia sẻ bài viết với &nbsp;
+                      <Link to={`/user/${user._id}`}>
+                        <strong>{`${user.profile.firstName} ${user.profile.lastName}`}</strong>
+                      </Link>
+                    </span>
+                  }
+                  { author._id === user._id &&
+                    <span>
+                      đã chia sẻ bài viết của &nbsp;
+                      <Link to={`/user/${sharing.author._id}`}>
+                        <strong>{`${sharing.author.profile.firstName} ${sharing.author.profile.lastName}`}</strong>
+                      </Link>
+                    </span>
+                  }
                 </span>
               }
               { sharing && (author._id === sharing.author._id) &&
@@ -635,8 +647,8 @@ Feed.mutation = {
     }
   }
   `,
-  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!, $message: String!, $userId: String) {
-    sharingPost(_id: $_id, privacy: $privacy, message: $message, userId: $userId) {
+  sharingPost: gql`mutation sharingPost ($_id: String!, $privacy: String!, $message: String!, $friendId: String, $userId: String) {
+    sharingPost(_id: $_id, privacy: $privacy, message: $message, friendId: $friendId, userId: $userId) {
       ...PostView
     }
   }
