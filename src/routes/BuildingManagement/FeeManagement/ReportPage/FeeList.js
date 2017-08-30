@@ -5,6 +5,8 @@ import includes from 'lodash/includes';
 import { Pagination, Clearfix } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import history from '../../../../core/history';
+import { PAID, UNPAID } from '../../../../constants';
+import { convertStatus } from '../../../../utils/fee.util';
 import s from './styles.scss';
 
 class FeeList extends Component {
@@ -48,7 +50,7 @@ class FeeList extends Component {
       }, {
         title: 'Thành tiền', dataIndex: 'total', key: 'total', width: '26.7%',
       }, {
-        title: 'Trạng thái', dataIndex: 'status', key: 'status', width: '15.7%',
+        title: 'Trạng thái', dataIndex: 'status', key: 'status', render: this.statusColumn, width: '15.7%',
       }, {
         title: '', dataIndex: '', key: 'x', render: this.viewFeeDetail,
       }];
@@ -61,11 +63,14 @@ class FeeList extends Component {
     }, {
       title: 'Thành tiền', dataIndex: 'totals', key: 'totals', width: '25%',
     }, {
-      title: 'Trạng thái', dataIndex: 'status', key: 'status', width: '15%',
+      title: 'Trạng thái', dataIndex: 'status', key: 'status', render: this.statusColumn, width: '15%',
     }, {
       title: '', dataIndex: '', key: 'x', render: this.renderAction,
     }];
   }
+
+  // Functional generator status column
+  statusColumn = (data, row) => convertStatus(row.status);
 
   viewFeeDetail = data => (
     <a
