@@ -65,16 +65,16 @@ class DeleteFAQModal extends Component {
     return (
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static">
         <Modal.Header closeButton={!this.state.submitting}>
-          <Modal.Title>Xóa FAQ</Modal.Title>
+          <Modal.Title>Xóa câu hỏi thường gặp</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Col>Bạn có chắc muốn xóa FAQ này không?</Col>
+          <Col>Bạn có chắc muốn xóa bản ghi này không?</Col>
         </Modal.Body>
         <Modal.Footer>
           <ButtonToolbar>
             <ButtonToolbar className="pull-right">
               <Button onClick={this.onHide} disabled={this.state.submitting}>Đóng cửa sổ</Button>
-              <Button type="submit" bsStyle="primary" disabled={!canDelete || this.state.submitting} onClick={this.onDelete}>Xóa FAQ</Button>
+              <Button type="submit" bsStyle="primary" disabled={!canDelete || this.state.submitting} onClick={this.onDelete}>Xóa</Button>
             </ButtonToolbar>
           </ButtonToolbar>
         </Modal.Footer>

@@ -51,7 +51,9 @@
     }
 
     a {
-      color: #337ab7; 
+      &:hover, &:active, &:focus {
+        text-decoration: none;
+      }
     }
 
     .btn-toolbar {

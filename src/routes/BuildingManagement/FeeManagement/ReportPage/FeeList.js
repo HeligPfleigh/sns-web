@@ -92,7 +92,7 @@ class FeeList extends Component {
   );
 
   reminderToPayFee(data) {
-    if (data.status === PAID) {
+    if (data && data.status === PAID) {
       return null;
     }
 
@@ -112,8 +112,8 @@ class FeeList extends Component {
 
       this.props.reminderToPayFeeMutation({
         _id: data._id,
-        building: data.building._id,
-        apartment: data.apartment._id,
+        building: data.building.id,
+        apartment: data.apartment.id,
       }).then(() => {
         const { reminders } = this.state;
         reminders.push(data._id);
