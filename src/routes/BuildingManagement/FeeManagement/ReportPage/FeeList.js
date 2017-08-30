@@ -4,8 +4,13 @@ import Table from 'rc-table';
 import includes from 'lodash/includes';
 import { Pagination, Clearfix } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { compose } from 'react-apollo';
+import classNames from 'classnames';
+
+import reminderToPayFeeMutation from '../../../feeDetails/ReminderToPayFeeMutation';
+
 import history from '../../../../core/history';
-import { PAID, UNPAID } from '../../../../constants';
+import { PAID } from '../../../../constants';
 import { convertStatus } from '../../../../utils/fee.util';
 import s from './styles.scss';
 
@@ -14,7 +19,11 @@ class FeeList extends Component {
     super(props);
     this.state = {
       expandedRowKeys: [],
+      reminders: [],
     };
+
+    this.reminderToPayFee = this.reminderToPayFee.bind(this);
+    this.onReminderToPayFee = this.onReminderToPayFee.bind(this);
   }
 
   // table functional
@@ -44,7 +53,7 @@ class FeeList extends Component {
   configCols = (isSubTable) => {
     if (isSubTable) {
       return [{
-        title: 'Số phòng', dataIndex: '', key: 'a', width: '20.1%',
+        title: 'Số phòng', dataIndex: '', key: 'a', width: '20.1%', render: this.reminderToPayFee,
       }, {
         title: 'Loại phí', dataIndex: 'type.name', key: 'type.name', width: '21.7%',
       }, {
@@ -81,6 +90,37 @@ class FeeList extends Component {
       }}
     >{'Chi tiết >>'}</a>
   );
+
+  reminderToPayFee(data) {
+    if (data.status === PAID) {
+      return null;
+    }
+
+    const isDisabled = this.state.reminders.includes(data._id);
+    return (<a
+      onClick={this.onReminderToPayFee(data, isDisabled)}
+    ><i title="Nhắc nhở việc đóng phí" aria-hidden="true" className={classNames('fa fa-bell', { disabledReminderToPayFee: isDisabled })}></i>
+    </a>);
+  }
+
+  onReminderToPayFee(data, isDisabled) {
+    return (event) => {
+      event.preventDefault();
+      if (isDisabled) {
+        return;
+      }
+
+      this.props.reminderToPayFeeMutation({
+        _id: data._id,
+        building: data.building._id,
+        apartment: data.apartment._id,
+      }).then(() => {
+        const { reminders } = this.state;
+        reminders.push(data._id);
+        this.setState({ reminders });
+      });
+    };
+  }
 
   doNothing = (evt) => {
     evt.preventDefault();
@@ -164,6 +204,10 @@ FeeList.propTypes = {
   pagination: PropTypes.object.isRequired,
   changePage: PropTypes.func.isRequired,
   dataSource: PropTypes.array.isRequired,
+  reminderToPayFeeMutation: PropTypes.func.isRequired,
 };
 
-export default withStyles(s)(FeeList);
+export default compose(
+  withStyles(s),
+  reminderToPayFeeMutation,
+)(FeeList);

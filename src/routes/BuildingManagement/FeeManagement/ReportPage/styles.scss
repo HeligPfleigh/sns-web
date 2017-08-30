@@ -44,6 +44,11 @@
       text-overflow: ellipsis;
       max-width: 250px;
     }
+
+    .disabledReminderToPayFee::before {
+      cursor: not-allowed;
+      color: #5cb85c;
+    }
   }
 }
 
