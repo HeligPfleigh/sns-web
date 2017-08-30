@@ -105,10 +105,12 @@ class SharingPostModal extends Component {
   onSubmit = (evt) => {
     const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     const { friend } = this.state;
+    const author = this.props.sharingFeed.author;
     this.props.clickModal(evt, {
       message,
       privacyPost: this.privacy.getCurrentValue(),
-      userId: friend && friend._id,
+      friendId: friend && friend._id,
+      userId: author && author._id,
     });
 
     // reset editor
