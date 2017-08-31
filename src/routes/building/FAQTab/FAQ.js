@@ -6,7 +6,7 @@ import isUndefined from 'lodash/isUndefined';
 import isNull from 'lodash/isNull';
 import classNames from 'classnames';
 
-import { Panel, ButtonToolbar, Button, Clearfix } from 'react-bootstrap';
+import { ButtonToolbar, Button } from 'react-bootstrap';
 import { DraftToHTML } from '../../../components/Editor';
 import s from './FAQ.scss';
 
@@ -17,7 +17,6 @@ class FAQItem extends Component {
     this.onDownload = this.onDownload.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
-    this.onShow = this.onShow.bind(this);
   }
 
   onUpdate(event) {
@@ -28,13 +27,6 @@ class FAQItem extends Component {
   onDelete(event) {
     event.preventDefault();
     this.props.onDelete(this.props.data);
-  }
-
-  onShow(_id) {
-    return (event) => {
-      event.preventDefault();
-      this.props.onShow(_id);
-    };
   }
 
   onDownload(url) {
@@ -73,23 +65,16 @@ class FAQItem extends Component {
   }
 
   render() {
-    const { data, canDelete, canUpdate, show } = this.props;
-    const isClosed = !(show === data._id);
-    return (<Panel
-      header={<div onClick={this.onShow(data._id)}><i className="fa fa-caret-right" aria-hidden="true"></i> {data.name} </div>}
-      eventKey={data._id}
-      key={data._id}
-      className={classNames({ individual: true, hidePanelBody: isClosed })}
-    >
-      <div className={classNames({ hide: isClosed })} >
+    const { data, canDelete, canUpdate, selected } = this.props;
+    return (
+      <div className={classNames({ hide: !selected })} >
         <div dangerouslySetInnerHTML={{ __html: DraftToHTML(data.message) }} />
         {(canUpdate || canDelete) && (<ButtonToolbar className="pull-right">
           <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall" type="button"><i className="fa fa-edit" aria-hidden="true"></i> Sửa</Button>
           <Button bsStyle="danger" onClick={this.onDelete} bsSize="xsmall" type="button"><i className="fa fa-trash" aria-hidden="true"></i> Xóa</Button>
         </ButtonToolbar>)}
       </div>
-      <Clearfix />
-    </Panel>);
+    );
   }
 }
 
@@ -104,14 +89,12 @@ FAQItem.propTypes = {
   canUpdate: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   onError: PropTypes.func.isRequired,
-  onShow: PropTypes.func.isRequired,
-  show: PropTypes.string.isRequired,
+  selected: PropTypes.bool.isRequired,
 };
 
 FAQItem.defaultProps = {
   canDelete: false,
   canUpdate: false,
-  show: '',
 };
 
 export default compose(

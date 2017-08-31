@@ -82,7 +82,7 @@ class CreateFAQModal extends Component {
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static">
         <form name={form} noValidate onSubmit={handleSubmit(this.onCreate)}>
           <Modal.Header closeButton={!submitting}>
-            <Modal.Title>Tạo FAQ</Modal.Title>
+            <Modal.Title>Tạo mới câu hỏi thường gặp</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Col className="form-horizontal" xs={12}>

@@ -1,7 +1,13 @@
 import React, { PropTypes } from 'react';
 import { compose } from 'react-apollo';
-import { Col } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import {
+  Col,
+  FormGroup,
+  InputGroup,
+  FormControl,
+ } from 'react-bootstrap';
+
 import PreviewUploadFile from '../PreviewUploadFile/PreviewUploadFile';
 import config from '../../../config';
 import s from './UploadFeeFile.scss';
@@ -16,22 +22,13 @@ class UploadFeeFile extends React.Component {
       feeFiles: [],
       fileShowModal: {},
       resultForPreview: {},
-      uploadCompletes: {},
+      fileSelected: {},
     };
   }
 
   onModalClose = () => {
     this.setState({
       showPreviewModal: false,
-    });
-  }
-
-  onUploadComplete = (type) => {
-    const uploadCompletes = this.state.uploadCompletes;
-    uploadCompletes[type.toString()] = true;
-    this.setState({
-      showPreviewModal: false,
-      uploadCompletes,
     });
   }
 
@@ -46,6 +43,21 @@ class UploadFeeFile extends React.Component {
     }
   }
 
+  onFileSelected = feeType => (event) => {
+    event.preventDefault();
+    const { fileSelected } = this.state;
+    fileSelected[feeType] = event.target.checked;
+    this.setState({ fileSelected });
+  }
+
+  hasFileSelected = feeType => this.state.fileSelected.hasOwnProperty(feeType) && this.state.fileSelected[feeType] === true;
+
+  onUploadCancel = (feeType) => {
+    const { fileSelected } = this.state;
+    fileSelected[feeType] = false;
+    this.setState({ fileSelected });
+  }
+
   getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -54,7 +66,6 @@ class UploadFeeFile extends React.Component {
   }
 
   validateFeeFile = async (file) => {
-    console.log(file);
     const url = `${config.server.documentUpload}?building=${this.props.buildingId}`;
     const token = this.getCookie('id_token');
     const formData = new FormData();
@@ -81,7 +92,7 @@ class UploadFeeFile extends React.Component {
 
   render() {
     const { feeTypes, buildingId } = this.props;
-    const { showPreviewModal, fileShowModal, typeFeeModal, resultForPreview, uploadCompletes } = this.state;
+    const { showPreviewModal, fileShowModal, typeFeeModal, resultForPreview } = this.state;
     return (
       <div className={s.container}>
         <PreviewUploadFile
@@ -91,38 +102,40 @@ class UploadFeeFile extends React.Component {
           feeFile={fileShowModal}
           data={resultForPreview}
           buildingId={buildingId}
-          onUploadComplete={this.onUploadComplete}
+          onCancel={this.onUploadCancel}
         />
-        <Col md={12} className={s.contentMain}>
-          <div className={s.title}>
+        <Col xs={12} className={s.contentMain}>
+          <Col xs={12} className={s.title}>
             <i className="fa fa-money" aria-hidden="true"></i>
-            <h4>Upload biểu phí</h4>
+            <h4>Biểu phí</h4>
             <a href="http://api-sns.mttjsc.com/images/template_fee.xlsx" className={s.downloadFile}>
-              <i className="fa fa-download" aria-hidden="true"> File Mẫu</i>
+              <i className="fa fa-download" aria-hidden="true"> Tập tin mẫu</i>
             </a>
-          </div>
-          <ul className={s.list}>
+          </Col>
+          <Col xs={12} className={s.list}>
             {
-              (feeTypes || []).map(type => (<li key={Math.random()}>
-                <div className={s['box-text']}>{type.name}</div>
-                <div className={s['box-right']}>
-                  <div className={s['box-full']}>
-                    <div className={s['box-input']}>
-                      <input
+              (feeTypes || []).map(type => (<Col xs={12} key={Math.random()} className={s.file}>
+                <Col xs={3}>{type.name}</Col>
+                <Col xs={9}>
+                  <FormGroup>
+                    <InputGroup>
+                      <FormControl
                         type="file"
+                        disabled={!this.hasFileSelected(type.code)}
                         onChange={(input) => {
                           this.onFilePicked(type, input);
                         }}
+                        className="form-control"
                       />
-                    </div>
-                    <label className={s['checkbox-inline']}>
-                      <input type="checkbox" checked={uploadCompletes[type.code.toString()]} disabled></input>
-                    </label>
-                  </div>
-                </div>
-              </li>))
+                      <InputGroup.Addon>
+                        <input type="checkbox" onChange={this.onFileSelected(type.code)} className={s.inputCheckbox} checked={this.hasFileSelected(type.code)} />
+                      </InputGroup.Addon>
+                    </InputGroup>
+                  </FormGroup>
+                </Col>
+              </Col>))
             }
-          </ul>
+          </Col>
         </Col>
       </div>
     );

@@ -102,7 +102,7 @@ class UpdateFAQModal extends Component {
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static">
         <form name={form} noValidate onSubmit={handleSubmit(this.onUpdate)}>
           <Modal.Header closeButton={!submitting}>
-            <Modal.Title>Sửa FAQ</Modal.Title>
+            <Modal.Title>Sửa câu hỏi thường gặp</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Col className="form-horizontal" xs={12}>
@@ -137,7 +137,7 @@ class UpdateFAQModal extends Component {
           </Modal.Body>
           <Modal.Footer>
             <ButtonToolbar>
-              <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Xóa FAQ</Button>
+              <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Xóa</Button>
               <ButtonToolbar className="pull-right">
                 <Button onClick={this.onHide} disabled={submitting}>Đóng cửa sổ</Button>
                 <Button type="submit" bsStyle="primary" disabled={!canUpdate || pristine || submitting || invalid}>Sửa</Button>
