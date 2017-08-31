@@ -1,5 +1,4 @@
 import FeeServices from './FeeServices/FeeServices';
 
-export {
-  FeeServices
-};
+// eslint-disable-next-line
+export { FeeServices };

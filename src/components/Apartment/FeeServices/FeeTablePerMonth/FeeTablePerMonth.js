@@ -1,12 +1,7 @@
 import React, { PropTypes } from 'react';
-import {
-  Col,
-} from 'react-bootstrap';
 import classNames from 'classnames';
-import { compose, graphql } from 'apollo-client';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './FeeTablePerMonth.scss';
-
 
 class FeeTablePerMonth extends React.Component {
   render() {
@@ -22,7 +17,7 @@ class FeeTablePerMonth extends React.Component {
         </thead>
         <tbody>
           {
-            fee.detail.map(item => (
+            (fee.detail || []).map(item => (
               <tr key={Math.random() * 10000} className={s.itemBody}>
                 <td className={`${s.styleBodyFeeType} ${s.styleTextBold}`}>
                   <div className={s.circleIcon}><i className={classNames(item.type.icon)} /></div>
