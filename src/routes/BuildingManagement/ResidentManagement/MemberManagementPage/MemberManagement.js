@@ -48,7 +48,7 @@ class MemberManagement extends Component {
 
     return (
       <Grid>
-        <Row className={s.containerTop30}>
+        <Row className={classNames(s.containerTop30)}>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={3} smHidden xsHidden>
               <Menu
@@ -59,7 +59,7 @@ class MemberManagement extends Component {
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
-            <Row className={s.container}>
+            <Row className={classNames(s.container)}>
               <Col md={12} className={classNames(s['panel-title'])}>
                 <ol className={classNames('breadcrumb')}>
                   <li className={classNames(s['breadcrumb-item'])}>
