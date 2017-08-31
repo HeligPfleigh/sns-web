@@ -1,25 +1,87 @@
-.table{
-  border: 1px solid #cccccc;
-  width: 100%;
-  tr{
-    border-bottom: 1px solid #ccc;
+.previewFees {
+  :global {
+    .modal-content {
+      border-radius: 0;
+
+      .modal-header {
+        border-bottom: 0;
+
+        .modal-title {
+          text-align: center;
+          text-transform: capitalize;
+        }
+      }
+
+      .modal-body {
+        table {
+          margin-bottom: 0;
+          
+          thead {
+            th {
+              border-bottom: 1px solid #ddd;
+              padding-top: 10px;
+              padding-bottom: 10px;
+              text-transform: capitalize;
+              background-color: #f9f9f9;
+
+              &:first-child {
+              }
+
+              &:last-child {
+              }
+            }
+          }
+
+          tbody {
+            tr {
+              td {
+                padding-top: 10px;
+                padding-bottom: 10px;
+
+                &:first-child {
+                }
+
+                &:last-child {
+                }
+              }
+
+              &:last-child {
+                td {
+                  
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .modal-footer {
+        border-top: none;
+        
+        .btn-toolbar {
+          display: inline-block;
+          text-align: center;
+          padding-top: 20px;
+          padding-bottom: 20px;
+        }
+      }
+    }
   }
-  th{
-    background-color: #fafafa;
-    font-style: bold;
+
+  .note {
+    text-align: center;
+    font-style: italic;
   }
-  th, td{
-    font-size: 14px;
-    color: #4c4c4c;
-    padding: 6px 10px;
+
+  .TableWrapper{
+    overflow-y: overlay;
+    max-height: 350px;
+    border: 1px solid #ddd;
   }
-}
-.TableWrapper{
-  overflow: auto;
-  max-height: 350px;
-}
-.ErrorText{
-  h5{
-    color: red;
+  
+  .ErrorText {
+    h5 {
+      color: red;
+    }
   }
 }

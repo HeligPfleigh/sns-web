@@ -5,9 +5,9 @@ import { compose } from 'react-apollo';
 import isUndefined from 'lodash/isUndefined';
 import isNull from 'lodash/isNull';
 import classNames from 'classnames';
-
 import { ListGroupItem, ButtonToolbar, Button, Clearfix } from 'react-bootstrap';
 
+import config from '../../../config';
 import s from './Document.scss';
 
 class DocumentItem extends Component {
@@ -71,7 +71,7 @@ class DocumentItem extends Component {
         <i className="fa fa-caret-right" aria-hidden="true"></i> {data.name}
       </div>
       {(canUpdate || canDelete) && (<ButtonToolbar className="pull-right">
-        <a className={classNames('btn btn-default btn-xs', s.btnDownload)} onClick={this.onDownload(data.file)} title={data.name}>(<i className="fa fa-download" aria-hidden="true"></i> Tải xuống)</a>
+        <a className={classNames('btn btn-default btn-xs', s.btnDownload)} onClick={this.onDownload(data.file)} title={data.file}>(<i className="fa fa-download" aria-hidden="true"></i> Tải xuống)</a>
         <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall" type="button"><i className="fa fa-edit" aria-hidden="true"></i> Sửa</Button>
         <Button bsStyle="danger" onClick={this.onDelete} bsSize="xsmall" type="button"><i className="fa fa-trash" aria-hidden="true"></i> Xóa</Button>
       </ButtonToolbar>)}

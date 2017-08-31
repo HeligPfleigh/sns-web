@@ -167,12 +167,13 @@ class FAQs extends Component {
         <Panel
           header={
             <div className={s.panelHeaderTitle}>
-            Các câu hỏi thường gặp
-            <OverlayTrigger overlay={tooltip('Thêm mới câu hỏi thường gặp')} placement="left">
+              <i className="fa fa-question-circle" aria-hidden="true"></i> Câu hỏi thường gặp
+            {isAdmin && <OverlayTrigger overlay={tooltip('Thêm mới câu hỏi thường gặp')} placement="left">
               <span className={s.panelHeaderAddIcon}>
                 <i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteFAQModal(false)}></i>
               </span>
             </OverlayTrigger>
+            }
             </div>
         }
           className={s.list}

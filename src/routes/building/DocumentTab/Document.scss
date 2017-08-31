@@ -1,5 +1,7 @@
 .list {
   margin-bottom: 0;
+  border-radius: 0;
+  border: none;
 
   .noRecordsFound {
     padding-top: 0;
@@ -13,6 +15,13 @@
     border: none;
     color: #337ab7;
     font-weight: 500;
+
+    &:hover, &:active, &:focus, &:disabled, &:active:focus {
+      text-decoration: none;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
   }
 
   .titleEllipsis {

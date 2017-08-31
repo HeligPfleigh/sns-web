@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
 import FeedList from '../../../components/Feed';
 import NewPost from '../../../components/NewPost';
-import { PUBLIC, ONLY_ADMIN_BUILDING } from '../../../constants';
 import s from './BuildingFeedTab.scss';
 
 class BuildingFeedTab extends Component {
