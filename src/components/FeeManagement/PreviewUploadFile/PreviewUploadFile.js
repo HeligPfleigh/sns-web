@@ -2,12 +2,14 @@ import React, { PropTypes } from 'react';
 import {
   Button,
   Modal,
+  Table,
+  Col,
+  ButtonToolbar,
 } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classNames from 'classnames';
 import s from './PreviewUploadFile.scss';
 import config from '../../../config';
-
 
 class PreviewUpload extends React.Component {
 
@@ -97,12 +99,13 @@ class PreviewUpload extends React.Component {
       </ul>
     </div>);
 
-    const renderPreview = () => (<table style={{ width: '100%' }} className={s.table}>
+    const renderPreview = () => (<Table>
       <thead>
         <tr>
           <th key="aparment">Căn hộ</th>
           <th key="freeType">Loại phí</th>
           <th key="amount">Số tiền</th>
+          <th key="datetime">Thời gian</th>
           <th key="status">Đã thanh toán</th>
         </tr>
       </thead>
@@ -115,13 +118,14 @@ class PreviewUpload extends React.Component {
                 <td key={`aparment${i}`}>{item.apartment_number}</td>
                 <td key={`freeType${i}`}>{type.name}</td>
                 <td key={`amount${i}`}>{`${item.total}`}</td>
-                <th key={`status${i}`}>{item.paid ? 'Đã nộp' : 'Chưa nộp'}</th>
+                <td key={`datetime${i}`}>{`${item.time.month}/${item.time.year}`}</td>
+                <td key={`status${i}`}>{item.paid ? <span className="text-success">Đã nộp</span> : <span className="text-danger">Chưa nộp</span>}</td>
               </tr>
             );
           })
         }
       </tbody>
-    </table>);
+    </Table>);
 
     return (<div className={s.TableWrapper}>{ data.error ? renderError() : renderPreview() }</div>);
   }
@@ -133,16 +137,21 @@ class PreviewUpload extends React.Component {
     const showMessage = error || success;
 
     return (
-      <Modal show={show} onHide={closeModal} backdrop="static">
+      <Modal show={show} onHide={closeModal} backdrop="static" className={s.previewFees}>
         <Modal.Header>
-          <Modal.Title>{`Bạn đang upload file phí ${type.name}`}</Modal.Title>
+          <Modal.Title>{`Bạn đang tải tập lên tập tin ${type.name}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {showMessage ? this.renderMessage() : this.renderPrevieFees()}
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.onCancel}>{ showMessage ? 'Đóng cửa sổ' : 'Hủy bỏ' }</Button>
-          {!showMessage && <Button bsStyle="primary" onClick={this.uploadAndSave} disabled={disableUploadButton}>Đồng ý</Button>}
+          <div className="text-center">
+            <ButtonToolbar>
+              <Button onClick={this.onCancel}>{ showMessage ? 'Đóng cửa sổ' : 'Hủy bỏ' }</Button>
+              {!showMessage && <Button bsStyle="primary" onClick={this.uploadAndSave} disabled={disableUploadButton}>Đồng ý</Button>}
+            </ButtonToolbar>
+          </div>
+          <Col className={s.note}>(*Ghi chú: Nếu tập tin tải lên không đúng, bạn có thể hủy và chọn lại.)</Col>
         </Modal.Footer>
       </Modal>
     );
