@@ -18,7 +18,7 @@ class Announcement extends Component {
     loading: false,
   }
 
-  submit = (evt, values) => {
+  submit = (values) => {
     const { message, description } = values;
     this.props.createNewBuildingAnnouncement(message, description)
     .then(() => {
