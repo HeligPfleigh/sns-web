@@ -139,7 +139,7 @@ class FeeDetails extends Component {
               <Col md={3} smHidden xsHidden>
                 <Menu
                   user={user}
-                  parentPath={`/management/${fee.building._id}`}
+                  parentPath={`/management/${fee.building.id}`}
                   pageKey="fee_management>fee_dashboard"
                 />
               </Col>
@@ -258,7 +258,7 @@ class FeeDetails extends Component {
                       <div className={s.pullLeft}>&nbsp;</div>
                       <div className={s.pullRight}>
                         {!isStatusUpdate && (fee.status === UNPAID) &&
-                          <button disabled={submitting || this.state.hasReminded} type="button" onClick={this.onReminderToPayFee(fee._id, fee.apartment._id, fee.building._id)} className="btn btn-warning">Nhắc nhở đóng phí</button>
+                          <button disabled={submitting || this.state.hasReminded} type="button" onClick={this.onReminderToPayFee(fee._id, fee.apartment.id, fee.building.id)} className="btn btn-warning">Nhắc nhở đóng phí</button>
                         }
                       </div>
                     </li>
