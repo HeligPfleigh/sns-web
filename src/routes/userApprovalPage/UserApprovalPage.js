@@ -1,22 +1,26 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
+import MediaQuery from 'react-responsive';
 import { graphql, compose } from 'react-apollo';
 import { Grid, Row, Col } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
+import s from './UserApprovalPage.scss';
+import { PENDING } from '../../constants';
+import Loading from '../../components/Loading';
+import Menu from '../BuildingManagement/Menu/Menu';
+import { openAlertGlobal } from '../../reducers/alert';
 import userApprovalPageQuery from './userApprovalPageQuery.graphql';
 import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
 import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
-import {
-  PENDING,
-} from '../../constants';
-import { openAlertGlobal } from '../../reducers/alert';
-import s from './UserApprovalPage.scss';
 
 function generateFullname({ firstName, lastName }) {
   return `${lastName} ${firstName}`;
 }
 
+// eslint-disable-next-line
 function getAddress({
   basisPoint,
   province,
@@ -70,7 +74,14 @@ class UserApprovalPage extends Component {
   }
 
   render() {
-    const { data: { loading, requestsToJoinBuilding } } = this.props;
+    const {
+      userMenu,
+      data: {
+        loading,
+        requestsToJoinBuilding,
+      },
+    } = this.props;
+
     let user = null;
     let building = null;
     let requestInformation = null;
@@ -79,11 +90,23 @@ class UserApprovalPage extends Component {
       building = requestsToJoinBuilding.building;
       requestInformation = requestsToJoinBuilding.requestInformation;
     }
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
     return (
-      <div>
-        <Grid>
-          <Row>
-            <Col md={8} sm={12} xs={12} className={s.profile}>
+      <Grid>
+        <Row className={classNames(s.containerTop30)}>
+          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+            <Col md={3} smHidden xsHidden>
+              <Menu
+                user={userMenu}
+                parentPath={`/management/${building && building._id}`}
+                pageKey="resident_management>approve_member"
+              />
+            </Col>
+          </MediaQuery>
+          <Col md={9} sm={12} xs={12}>
+            <Row className={classNames(s.container)}>
               <div className={s.backBuildingRequestTab} onClick={this.backBuildingRequestTab}>
                 <i className="fa fa-chevron-left" aria-hidden="true"></i>
                 <h4>Quay lại trang</h4>
@@ -174,15 +197,16 @@ class UserApprovalPage extends Component {
                     Từ chối
                   </button>
                 </div>}
-            </Col>
-          </Row>
-        </Grid>
-      </div>
+            </Row>
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }
 
 UserApprovalPage.propTypes = {
+  userMenu: PropTypes.object,
   data: PropTypes.shape({}).isRequired,
   approvingUserToBuilding: PropTypes.func.isRequired,
   rejectingUserToBuilding: PropTypes.func.isRequired,
@@ -191,6 +215,11 @@ UserApprovalPage.propTypes = {
 
 export default compose(
   withStyles(s),
+  connect(state => ({
+    userMenu: state.user,
+  }), {
+    openAlertGlobalAction: openAlertGlobal,
+  }),
   graphql(userApprovalPageQuery, {
     options: props => ({
       variables: {
@@ -220,7 +249,4 @@ export default compose(
       }),
     }),
   }),
-)(connect(
-  null,
-  { openAlertGlobalAction: openAlertGlobal },
-)(UserApprovalPage));
+)(UserApprovalPage);
