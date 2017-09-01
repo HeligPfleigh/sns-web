@@ -76,12 +76,11 @@ class BuildingAnnouncementTab extends Component {
     }));
   }
 
-  editAnnouncement = (id, message, type) => {
+  editAnnouncement = (id, message) => {
     this.setState(() => ({
       showEditAnnouncement: true,
       idEditAnnouncement: id,
       announcementMessage: message,
-      announcementType: type,
     }));
   }
   render() {

@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
+import { FormControl, FormGroup } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import {
   required,
   minLength2,
 } from '../../../utils/validator';
-import {
-  TYPE1,
-  TYPE2,
-} from '../../../constants';
 import s from './NewAnnouncementForm.scss';
 
 const renderTextField = ({ input, placeholder, type, meta: { touched, error, warning } }) => (
@@ -31,26 +27,23 @@ renderTextField.propTypes = {
   meta: PropTypes.object,
 };
 
-const renderSelectField = ({ input, placeholder, options, type, meta: { touched, error, warning } }) => (
+const renderTextAreaField = ({ input, placeholder, componentClass, meta: { touched, error, warning } }) => (
   <div>
     <FormControl
-      componentClass="select"
       {...input}
       placeholder={placeholder}
-      type={type}
-    >
-      {options && options.map(option => <option key={Math.random()} value={option.value}>{option.label}</option>)}
-    </FormControl>
+      componentClass={componentClass}
+      style={{ minHeight: '200px' }}
+    />
     {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
   </div>
 );
 
-renderSelectField.propTypes = {
+renderTextAreaField.propTypes = {
   placeholder: PropTypes.string,
   input: PropTypes.any,
-  type: PropTypes.string,
+  componentClass: PropTypes.string,
   meta: PropTypes.object,
-  options: PropTypes.arrayOf(PropTypes.object),
 };
 
 class NewAnnouncementForm extends Component {
@@ -58,32 +51,16 @@ class NewAnnouncementForm extends Component {
   render() {
     const {
       handleSubmit,
+      submitting,
+      reset,
     } = this.props;
-    const types = [
-      {
-        label: 'Loại #1',
-        value: TYPE1,
-      },
-      {
-        label: 'Loại #2',
-        value: TYPE2,
-      },
-    ];
     return (
       <div>
         <form onSubmit={handleSubmit}>
           <FormGroup>
-            <ControlLabel>Kiểu thông báo</ControlLabel>
-            <Field
-              name="type"
-              type="select"
-              component={renderSelectField}
-              placeholder="Loại thông báo"
-              options={types}
-            />
-          </FormGroup>
-          <FormGroup>
-            <ControlLabel>Tiêu đề</ControlLabel>
+            <div >
+              <label>Tiêu đề</label>
+            </div>
             <Field
               name="message"
               type="text"
@@ -92,9 +69,30 @@ class NewAnnouncementForm extends Component {
               validate={[required, minLength2]}
             />
           </FormGroup>
-          <button type="submit" className="btn btn-primary">
-            Cập nhật
-          </button>
+          <FormGroup>
+            <div>
+              <label>Nội dung</label>
+            </div>
+            <Field
+              name="description"
+              componentClass="textarea"
+              component={renderTextAreaField}
+              placeholder="Nội dung"
+              validate={[required, minLength2]}
+            />
+          </FormGroup>
+          <div>
+            <div>
+              <div className="pull-right">
+                <button type="button" onClick={reset} className="btn btn-default" style={{ marginRight: '5px' }}>
+                  Hủy
+                </button>
+                <button type="submit" disabled={submitting} className="btn btn-primary" >
+                  Gửi
+                </button>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
     );
@@ -103,6 +101,8 @@ class NewAnnouncementForm extends Component {
 
 NewAnnouncementForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  reset: PropTypes.func.isRequired,
 };
 
 const NewAnnouncementReduxForm = reduxForm({

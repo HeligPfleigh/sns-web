@@ -3,7 +3,7 @@ mutation updateBuildingAnnouncement($input: UpdateBuildingAnnouncementInput!) {
     announcement {
       _id
       message
-      type
+      description
     }
   }
 }

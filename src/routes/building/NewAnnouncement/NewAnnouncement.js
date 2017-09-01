@@ -7,9 +7,6 @@ import { reset } from 'redux-form';
 import { generate as idRandom } from 'shortid';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import NewAnnouncementForm from './NewAnnouncementForm';
-import {
-  TYPE1,
-} from '../../../constants';
 import { openAlertGlobal } from '../../../reducers/alert';
 import createNewBuildingAnnouncementMutation from './createNewBuildingAnnouncementMutation.graphql';
 import s from './NewAnnouncement.scss';
@@ -18,10 +15,10 @@ class NewAnnouncement extends Component {
 
   submit = (values) => {
     const {
-      type = TYPE1,
       message,
+      description,
     } = values;
-    this.props.createNewBuildingAnnouncement(type, message)
+    this.props.createNewBuildingAnnouncement(message, description)
     .then(({ data }) => {
       this.props.resetForm();
       this.props.openAlertGlobalAction({
@@ -54,13 +51,13 @@ export default compose(
   withStyles(s),
   graphql(createNewBuildingAnnouncementMutation, {
     props: ({ ownProps, mutate }) => ({
-      createNewBuildingAnnouncement: (type, message) => mutate({
+      createNewBuildingAnnouncement: (message, description) => mutate({
         variables: {
           input: {
             buildingId: ownProps.buildingId,
             announcementInput: {
-              type,
               message,
+              description,
             },
           },
         },
@@ -72,7 +69,7 @@ export default compose(
               __typename: 'BuildingAnnouncement',
               _id: idRandom(),
               message,
-              type,
+              description,
               date: (new Date()).toISOString(),
             },
           },

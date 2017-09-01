@@ -3,7 +3,7 @@ mutation createNewBuildingAnnouncement ($input: CreateNewBuildingAnnouncementInp
     announcement {
       _id
       message
-      type
+      description
       date
     }
   }

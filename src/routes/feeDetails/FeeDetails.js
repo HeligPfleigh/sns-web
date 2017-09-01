@@ -39,7 +39,6 @@ renderField.propTypes = {
   type: PropTypes.string,
   meta: PropTypes.object,
 };
-
 class FeeDetails extends Component {
   constructor(props) {
     super(props);
@@ -165,12 +164,12 @@ class FeeDetails extends Component {
                     <li>
                       <div className={`${s.pullLeft} ${s.showMobile}`} style={{ minWidth: '300px' }}>
                         <label htmlFor="startDate" style={{ minWidth: '115px' }}>Ngày bắt đầu</label>
-                        <span>{ fee.from && moment(fee.from).format('DD/MM/YYYY') }</span>
+                        <span>{moment(fee.from).format('DD/MM/YYYY')}</span>
                         <i className="fa fa-calendar" aria-hidden="true"></i>
                       </div>
                       <div className={s.pullRight}>
                         <label htmlFor="endDate" style={{ minWidth: '115px' }}>Ngày kết thúc</label>
-                        <span>{ fee.to && moment(fee.to).format('DD/MM/YYYY') }</span>
+                        <span>{moment(fee.to).format('DD/MM/YYYY')}</span>
                         <i className="fa fa-calendar" aria-hidden="true"></i>
                       </div>
                     </li>
