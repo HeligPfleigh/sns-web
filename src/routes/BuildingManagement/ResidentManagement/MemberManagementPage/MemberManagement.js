@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose, graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import classNames from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
@@ -47,7 +48,7 @@ class MemberManagement extends Component {
 
     return (
       <Grid>
-        <Row className={s.containerTop30}>
+        <Row className={classNames(s.containerTop30)}>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={3} smHidden xsHidden>
               <Menu
@@ -58,13 +59,28 @@ class MemberManagement extends Component {
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
-            { building &&
-              <ListUsersAwaitingApproval
-                data={building.requests || []}
-                loadMore={loadMore}
-                loading={data && data.loading}
-              />
-            }
+            <Row className={classNames(s.container)}>
+              <Col md={12} className={classNames(s['panel-title'])}>
+                <ol className={classNames('breadcrumb')}>
+                  <li className={classNames(s['breadcrumb-item'])}>
+                    <a href="#">
+                      <i className="fa fa-address-book" aria-hidden="true"></i>
+                      Quản lý cư dân
+                    </a>
+                  </li>
+                  <li className="active">Phê duyệt</li>
+                </ol>
+              </Col>
+              <Col md={12}>
+                { building &&
+                  <ListUsersAwaitingApproval
+                    data={building.requests || []}
+                    loadMore={loadMore}
+                    loading={data && data.loading}
+                  />
+                }
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Grid>

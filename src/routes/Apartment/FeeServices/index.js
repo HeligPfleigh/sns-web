@@ -1,29 +1,36 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { compose, graphql } from 'react-apollo';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
-import Loading from '../../../components/Loading';
-import Menu from '../Menu/Menu';
-import feesOfApartment from './feesOfApartment.graphql';
-import apartment from './apartment.graphql';
-import FeeServices from '../../../components/Apartment/FeeServices/FeeServices';
-import s from './styles.scss';
+import { compose, graphql } from 'react-apollo';
+import { Grid, Row, Col } from 'react-bootstrap';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
-const currentDate = new Date();
+import s from './styles.scss';
+import Menu from '../Menu/Menu';
+import Loading from '../../../components/Loading';
+import feesOfApartment from './feesOfApartment.graphql';
+import feeServiceQueries from './feeServiceQueries.graphql';
+import FeeServices from '../../../components/Apartment/FeeServices/FeeServices';
 
 class FeeServicesPage extends Component {
-  state= {
-    loading: false,
-  }
   render() {
-    const { loading } = this.state;
-    const { apartmentId, user, data, apartment } = this.props;
+    const {
+      user,
+      data,
+      feeTypes,
+      apartment,
+      apartmentId,
+      loadMoreRows,
+    } = this.props;
+
+    // Show loading
+    if (data && data.loading) {
+      return <Loading show={data.loading} full>Đang tải ...</Loading>;
+    }
+
     return (
       <Grid>
-        <Loading show={loading} full>Đang tải ...</Loading>
         <Row className={s.containerTop30}>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={3} smHidden xsHidden>
@@ -37,8 +44,10 @@ class FeeServicesPage extends Component {
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
             <FeeServices
-              apartment={apartment}
               fees={data}
+              apartment={apartment}
+              feeTypes={feeTypes || []}
+              loadMoreRows={loadMoreRows}
             />
           </Col>
         </Row>
@@ -48,36 +57,50 @@ class FeeServicesPage extends Component {
 }
 
 FeeServicesPage.propTypes = {
+  data: PropTypes.array,
+  feeTypes: PropTypes.array,
+  apartment: PropTypes.object,
   user: PropTypes.object.isRequired,
   apartmentId: PropTypes.string.isRequired,
-  data: PropTypes.array,
-  apartment: PropTypes.object,
+  loadMoreRows: PropTypes.func,
 };
 
 export default compose(
+  withStyles(s),
   connect(state => ({
     user: state.user,
   })),
-  withStyles(s),
   graphql(feesOfApartment, {
     options: ownProps => ({
       variables: {
         apartmentId: ownProps.apartmentId,
-        month: currentDate.getMonth() + 1,
-        year: currentDate.getFullYear(),
       },
+      fetchPolicy: 'network-only',
     }),
-    props: ({ data }) => ({
-      data: data.feesOfApartment ? data.feesOfApartment.edges : [],
-    }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+
+      const loadMoreRows = (variables) => {
+        fetchMore({
+          variables,
+          fetchPolicy: 'network-only',
+          updateQuery: (_, { fetchMoreResult }) => fetchMoreResult,
+        });
+      };
+      return {
+        loadMoreRows,
+        data: data.feesOfApartment || [],
+      };
+    },
   }),
-  graphql(apartment, {
+  graphql(feeServiceQueries, {
     options: ownProps => ({
       variables: {
         _id: ownProps.apartmentId,
       },
     }),
     props: ({ data }) => ({
+      feeTypes: data.getFeeTypes,
       apartment: data.apartment,
     }),
   }),

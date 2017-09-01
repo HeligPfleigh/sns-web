@@ -5,8 +5,8 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, FormControl } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-import moment from 'moment';
 import MediaQuery from 'react-responsive';
+import moment from 'moment';
 import { loadFee as loadFeeDetail } from '../../reducers/fees';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
 import updateFeeDetailMutation from './updateFeeDetailMutation.graphql';
@@ -138,7 +138,7 @@ class FeeDetails extends Component {
               <Col md={3} smHidden xsHidden>
                 <Menu
                   user={user}
-                  parentPath={`/management/${fee.building._id}`}
+                  parentPath={`/management/${fee.building.id}`}
                   pageKey="fee_management>fee_dashboard"
                 />
               </Col>
@@ -181,14 +181,14 @@ class FeeDetails extends Component {
                         <span>{ fee.type && fee.type.name }</span>
                       </div>
                     </li>
-                    <li>
+                    { /* <li>
                       <div className={s.pullLeft}>
                         <label htmlFor="">Tổng số</label>
                       </div>
                       <div className={s.pullRight}>
                         <span>50 khối</span>
                       </div>
-                    </li>
+                    </li> */ }
                     <li>
                       <div className={s.pullLeft}>
                         <label htmlFor="total">Tổng số tiền</label>
@@ -257,7 +257,7 @@ class FeeDetails extends Component {
                       <div className={s.pullLeft}>&nbsp;</div>
                       <div className={s.pullRight}>
                         {!isStatusUpdate && (fee.status === UNPAID) &&
-                          <button disabled={submitting || this.state.hasReminded} type="button" onClick={this.onReminderToPayFee(fee._id, fee.apartment._id, fee.building._id)} className="btn btn-warning">Nhắc nhở đóng phí</button>
+                          <button disabled={submitting || this.state.hasReminded} type="button" onClick={this.onReminderToPayFee(fee._id, fee.apartment.id, fee.building.id)} className="btn btn-warning">Nhắc nhở đóng phí</button>
                         }
                       </div>
                     </li>
@@ -309,7 +309,7 @@ export default compose(
             feeId: _id,
             total,
             status,
-            buildingId: building._id,
+            buildingId: building.id,
           },
         },
         update: (store, { data: { updateFeeDetail } }) => {

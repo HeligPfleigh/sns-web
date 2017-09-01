@@ -1,5 +1,11 @@
 @import "../../theme/resources.scss";
 
+:global {
+  .Select-menu-outer {
+    z-index: 9999 !important;
+  }
+}
+
 a {
   cursor: pointer;
   text-decoration: none;

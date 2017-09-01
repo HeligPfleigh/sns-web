@@ -1,6 +1,13 @@
 .container {
   background: #fff;
+  min-height: 405px;
 
+  :global {
+    .input-group-addon {
+      background-color: transparent;
+      border: none;
+    }
+  }
 
   .contentMain {
     background: #fff;
@@ -32,18 +39,18 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-ul.list {
+.list {
   margin:0px;
   padding:0px;
   }
-ul.list li {
+.list .file {
   width:100%;
   float:left;
   list-style:none;
   padding-top:10px;
   padding-bottom:10px;
   }
-ul.list li .box-text {
+.list .file .box-text {
   float:left;
   width:125px;
   line-height:33px;
@@ -51,10 +58,10 @@ ul.list li .box-text {
   text-align:left;
   color:#4c4c4c;
   }
-ul.list li .box-right {
+.list .file .box-right {
   margin-left:125px;
   }
-ul.list li .box-input {
+.list .file .box-input {
   width:245px;
   float:left;
   border:1px solid #e1e9ee;
@@ -63,7 +70,7 @@ ul.list li .box-input {
   padding:4px 5px;
 
   }
-ul.list li .input-text {
+.list .file .input-text {
   width:245px;
   float:left;
   border:1px solid #e1e9ee;
@@ -72,17 +79,16 @@ ul.list li .input-text {
   line-height:32px;
   background:url(./images/icon-calender.png) no-repeat 217px 5px;
 }
-ul.list li.button .box-input {
+.list .file.button .box-input {
   border:0px;
   height: auto;
   text-align:right;
 
   }
-ul.list li .box-input.over {
+.list .file .box-input.over {
     overflow:hidden;
 }
-ul.list li .box-input input[type='file'] { }
-  .box-full {
+.box-full {
   width:100%;
   float:left;
 }
@@ -98,8 +104,8 @@ ul.list li .box-input input[type='file'] { }
   margin-top: 0;
   margin-left: 10px;
 }
-ul.list li  .checkbox-inline { margin-top:8px;}
-ul.list li .buttons {
+.list .file  .checkbox-inline { margin-top:8px;}
+.list .file .buttons {
   background-color:#0084bf;
   border:0px;
   padding:6px 15px;
@@ -112,7 +118,7 @@ ul.list li .buttons {
   border-radius: 4px;
   margin-left:5px;
 }
-ul.list li .buttons-huy {
+.list .file .buttons-huy {
   background-color:#f6f7f9;
   border:1px solid #d7d9dd;
   padding:5px 15px;
@@ -123,4 +129,11 @@ ul.list li .buttons-huy {
   cursor:pointer;
   display:inline-block;
   border-radius: 4px;
+}
+.btnToolbar {
+  margin-top: 10px;
+  margin-left: 0;
+}
+.inputCheckbox {
+  cursor: pointer;
 }

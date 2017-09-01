@@ -4,7 +4,7 @@ import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classNames from 'classnames';
-import { Alert, Panel, Tooltip, OverlayTrigger, PanelGroup, Col } from 'react-bootstrap';
+import { Alert, Panel, Tooltip, OverlayTrigger, Accordion, Col } from 'react-bootstrap';
 import isObject from 'lodash/isObject';
 
 import Pagination from '../../../components/Pagination';
@@ -38,7 +38,7 @@ class FAQs extends Component {
     this.onDelete = this.onDelete.bind(this);
     this.onCreate = this.onCreate.bind(this);
     this.onError = this.onError.bind(this);
-    this.onShow = this.onShow.bind(this);
+    this.onFAQSelected = this.onFAQSelected.bind(this);
     this.onHideUpdateFAQModal = this.onHideUpdateFAQModal.bind(this);
     this.onHideDeleteFAQModal = this.onHideDeleteFAQModal.bind(this);
     this.onHideCreateleteFAQModal = this.onHideCreateleteFAQModal.bind(this);
@@ -62,9 +62,9 @@ class FAQs extends Component {
     });
   }
 
-  onShow(showFAQ) {
+  onFAQSelected(FAQSelected) {
     this.setState({
-      showFAQ,
+      FAQSelected,
     });
   }
 
@@ -102,7 +102,7 @@ class FAQs extends Component {
 
   renderNoRecordsFound = () => (
     <div className={classNames(s.noRecordsFound, 'text-center')}>
-      Hiện tại chưa có FAQ
+      Hiện tại chưa có dữ liệu
     </div>
   )
 
@@ -123,21 +123,27 @@ class FAQs extends Component {
     }
 
     return (
-      <PanelGroup accordion>
+      <Accordion>
         { edges.map(row => (
-          <FAQ
-            data={row}
-            onUpdate={this.onUpdate}
-            onDelete={this.onDelete}
-            onError={this.onError}
-            onShow={this.onShow}
-            canUpdate={isAdmin}
-            canDelete={isAdmin}
-            key={Math.random()}
-            show={this.state.showFAQ}
-          />
+          <Panel
+            header={<div><i className="fa fa-caret-right" aria-hidden="true"></i> {row.name} </div>}
+            eventKey={row._id}
+            key={row._id}
+            className={classNames({ individual: true })}
+            onSelect={this.onFAQSelected}
+          >
+            <FAQ
+              data={row}
+              onUpdate={this.onUpdate}
+              onDelete={this.onDelete}
+              onError={this.onError}
+              canUpdate={isAdmin}
+              canDelete={isAdmin}
+              selected={row._id === this.state.FAQSelected}
+            />
+          </Panel>
         ))}
-      </PanelGroup>
+      </Accordion>
     );
   }
 
@@ -161,12 +167,13 @@ class FAQs extends Component {
         <Panel
           header={
             <div className={s.panelHeaderTitle}>
-            Các câu hỏi thường gặp
-            <OverlayTrigger overlay={tooltip('Thêm mới FAQ')} placement="left">
+              <i className="fa fa-question-circle" aria-hidden="true"></i> Câu hỏi thường gặp
+            {isAdmin && <OverlayTrigger overlay={tooltip('Thêm mới câu hỏi thường gặp')} placement="left">
               <span className={s.panelHeaderAddIcon}>
                 <i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteFAQModal(false)}></i>
               </span>
             </OverlayTrigger>
+            }
             </div>
         }
           className={s.list}

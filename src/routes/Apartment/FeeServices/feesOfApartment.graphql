@@ -1,28 +1,27 @@
-query feesOfApartment ($apartmentId: String!, $month: Int, $year: Int){
-  feesOfApartment (apartmentId: $apartmentId, month: $month, year: $year){
-    edges {
-      month
-      year
-      apartment {
-        number
-        isOwner
-        prefix
+query feesOfApartment (
+  $feeType: Int,
+  $feeDate: String,
+  $apartmentId: String!,
+){
+  feesOfApartment (
+    feeDate: $feeDate,
+    feeType: $feeType,
+    apartmentId: $apartmentId,
+  ){
+    month
+    year
+    totals
+    status
+    detail {
+      type {
+        code
         name
-        createdAt
-        updatedAt
+        icon
       }
-      totals
-      detail {
-        type {
-          code
-          name
-          icon
-        }
-        total
-        status
-        createdAt
-        updatedAt
-      }
+      total
+      status
+      createdAt
+      updatedAt
     }
   }
 }

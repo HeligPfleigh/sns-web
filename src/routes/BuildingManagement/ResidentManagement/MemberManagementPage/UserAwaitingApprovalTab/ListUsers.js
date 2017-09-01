@@ -105,14 +105,14 @@ class ListUsers extends React.Component {
   render() {
     const { loading } = this.props;
     return (
-      <Panel header="Danh sách thành viên của tòa nhà" className={s.usersAwaitingApproval}>
+      <div className={s.usersAwaitingApproval}>
         <Errors
           open
           message={this.state.errorMessage}
           autoHideDuration={4000}
         />
         { loading ? this.renderLoadingIcon() : this.renderListUsers() }
-      </Panel>
+      </div>
     );
   }
 }

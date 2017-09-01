@@ -51,8 +51,12 @@ class ReportPage extends Component {
   }
 
   changePage = (pageNum) => {
-    this.setState({ currentPage: pageNum });
-    this.handleFilter();
+    this.setState(prevState => ({
+      ...prevState,
+      currentPage: pageNum,
+    }), () => {
+      this.handleFilter();
+    });
   }
 
   dateChange = (val) => {

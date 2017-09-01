@@ -14,7 +14,7 @@ class BuildingAnnouncementItem extends Component {
       data,
     } = this.props;
     if (onEdit) {
-      onEdit(data._id, data.message, data.type);
+      onEdit(data._id, data.message);
     }
   }
 

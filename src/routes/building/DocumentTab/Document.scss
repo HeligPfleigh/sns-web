@@ -1,8 +1,35 @@
 .list {
   margin-bottom: 0;
+  border-radius: 0;
+  border: none;
 
   .noRecordsFound {
     padding-top: 0;
+  }
+
+  .documentItem {
+    display: block;
+  }
+
+  .btnDownload {
+    border: none;
+    color: #337ab7;
+    font-weight: 500;
+
+    &:hover, &:active, &:focus, &:disabled, &:active:focus {
+      text-decoration: none;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+
+  .titleEllipsis {
+    width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
   }
 
   :global {
@@ -27,10 +54,6 @@
       border: none;
       padding-left: 0;
       padding-right: 0;
-    }
-
-    a {
-      color: #337ab7; 
     }
 
     .btn-toolbar {

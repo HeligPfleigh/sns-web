@@ -26,6 +26,25 @@ class FeeList extends Component {
     this.onReminderToPayFee = this.onReminderToPayFee.bind(this);
   }
 
+  onReminderToPayFee(data, isDisabled) {
+    return (event) => {
+      event.preventDefault();
+      if (isDisabled) {
+        return;
+      }
+
+      this.props.reminderToPayFeeMutation({
+        _id: data._id,
+        building: data.building.id,
+        apartment: data.apartment.id,
+      }).then(() => {
+        const { reminders } = this.state;
+        reminders.push(data._id);
+        this.setState({ reminders });
+      });
+    };
+  }
+
   // table functional
   onExpandedRowsChange = (rows) => {
     this.setState({
@@ -50,7 +69,7 @@ class FeeList extends Component {
     this.props.changePage(pageNum);
   }
 
-  configCols = (isSubTable) => {
+  configCols = (isSubTable, isFinded) => {
     if (isSubTable) {
       return [{
         title: 'Số phòng', dataIndex: '', key: 'a', width: '20.1%', render: this.reminderToPayFee,
@@ -65,17 +84,22 @@ class FeeList extends Component {
       }];
     }
 
-    return [{
+    const typeName = isFinded ? 'type.name' : '';
+    const emptyCol = [{ title: '', dataIndex: '', key: 'tt', width: '4%', render: this.reminderToPayFee }];
+
+    const cols = [{
       title: 'Số phòng', dataIndex: 'apartment.name', key: 'apartment.name', width: '20%',
     }, {
-      title: 'Loại phí', dataIndex: '', key: 'a', width: '20%',
+      title: 'Loại phí', dataIndex: typeName, key: typeName, width: '20%',
     }, {
       title: 'Thành tiền', dataIndex: 'totals', key: 'totals', width: '25%',
     }, {
       title: 'Trạng thái', dataIndex: 'status', key: 'status', render: this.statusColumn, width: '15%',
     }, {
-      title: '', dataIndex: '', key: 'x', render: this.renderAction,
+      title: '', dataIndex: '', key: 'x', render: isFinded ? this.viewFeeDetail : this.renderAction,
     }];
+
+    return isFinded ? [...emptyCol, ...cols] : cols;
   }
 
   // Functional generator status column
@@ -92,7 +116,7 @@ class FeeList extends Component {
   );
 
   reminderToPayFee(data) {
-    if (data.status === PAID) {
+    if (data && data.status === PAID) {
       return null;
     }
 
@@ -101,25 +125,6 @@ class FeeList extends Component {
       onClick={this.onReminderToPayFee(data, isDisabled)}
     ><i title="Nhắc nhở việc đóng phí" aria-hidden="true" className={classNames('fa fa-bell', { disabledReminderToPayFee: isDisabled })}></i>
     </a>);
-  }
-
-  onReminderToPayFee(data, isDisabled) {
-    return (event) => {
-      event.preventDefault();
-      if (isDisabled) {
-        return;
-      }
-
-      this.props.reminderToPayFeeMutation({
-        _id: data._id,
-        building: data.building._id,
-        apartment: data.apartment._id,
-      }).then(() => {
-        const { reminders } = this.state;
-        reminders.push(data._id);
-        this.setState({ reminders });
-      });
-    };
   }
 
   doNothing = (evt) => {
@@ -175,7 +180,7 @@ class FeeList extends Component {
             rowKey="_id"
             emptyText="Dữ liệu tìm kiếm không tồn tại"
             data={dataSource || []}
-            columns={this.configCols(false)}
+            columns={this.configCols(false, true)}
           />
         }
         { (pagination.totalPage > 1) &&

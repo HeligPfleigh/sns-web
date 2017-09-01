@@ -68,8 +68,8 @@ const loadBuildingQuery = gql`
         edges {
           _id
           message
+          description
           date
-          type
         }
       }
       isAdmin

@@ -1,20 +1,32 @@
+@global-import 'react-select/dist/react-select.css';
+
 .containerTop30 {
-    margin-top: 30px;
-  }
-  
+  margin-top: 30px;
+}
+
 .container {
   background: #fff;
-  .contentMain {
-    background: #fff;
-    padding: 20px;
+  padding: 20px;
+
+  .panel-filter {
+    padding: 10px 0px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e6e9ec;
+
+    .label-filter {
+      padding: 8px 0px;
+    }
+
+    :global {
+      .rdt > input {
+        border-radius: 4px;
+        cursor: pointer;
+        background:url(./images/icon-calender.png) no-repeat 94% 6px;
+      }
+    }
   }
 }
 
-@media (max-width: 992px) {
-  .containerTop30 {
-    margin-top: 50px;
-  }
-}
 .header{
   display: flex;
   .homeIcon {
@@ -23,6 +35,41 @@
   }
 }
 
-.content{
-  
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+
+  .container {
+    .panel-filter {
+      padding-left: 0px;
+      padding-right: 0px;
+
+      .item-filter {
+        padding: 0px 15px;
+      }
+
+      :global {
+        .rdt > input {
+          background:url(./images/icon-calender.png) no-repeat 96% 6px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    .panel-filter {
+      .item-filter {
+        padding: 5px 0px;
+      }
+
+      :global {
+        .rdt > input {
+          background:url(./images/icon-calender.png) no-repeat 98% 6px;
+        }
+      }
+    }
+  }
 }

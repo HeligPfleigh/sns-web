@@ -70,6 +70,7 @@ export default compose(
         userId: ownProps.user.id,
         limit: 3,
       },
+      fetchPolicy: 'network-only',
     }),
   }),
 )(BuildingAnnouncement);

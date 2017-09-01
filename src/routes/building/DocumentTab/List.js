@@ -148,7 +148,15 @@ class Documents extends Component {
      } = this.props;
     return (
       <Col>
-        <Panel header={<div className={s.panelHeaderTitle}>Danh sách các biểu mẫu của tòa nhà <OverlayTrigger overlay={tooltip('Thêm mới biểu mẫu')} placement="left"><span className={s.panelHeaderAddIcon}><i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteDocumentModal(false)}></i></span></OverlayTrigger></div>} className={s.list}>
+        <Panel
+          header={
+            <div className={s.panelHeaderTitle}><i className="fa fa-file-pdf-o" aria-hidden="true"></i> Biểu mẫu
+            {isAdmin && <OverlayTrigger overlay={tooltip('Thêm mới biểu mẫu')} placement="left">
+              <span className={s.panelHeaderAddIcon}><i className="fa fa-plus" aria-hidden="true" onClick={() => this.onHideCreateleteDocumentModal(false)}></i></span>
+            </OverlayTrigger>}
+            </div>
+            } className={s.list}
+        >
           {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
             { this.state.errorMessage }
           </Alert>)}
