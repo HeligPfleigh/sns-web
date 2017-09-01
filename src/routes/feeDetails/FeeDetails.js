@@ -5,6 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, FormControl } from 'react-bootstrap';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import MediaQuery from 'react-responsive';
 import { loadFee as loadFeeDetail } from '../../reducers/fees';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
@@ -38,23 +39,6 @@ renderField.propTypes = {
   type: PropTypes.string,
   meta: PropTypes.object,
 };
-
-function formatDate(datetring) {
-  const date = new Date(datetring);
-  let day = date.getDate();
-  let month = date.getMonth();
-  const year = date.getFullYear();
-
-  if (day < 10) {
-    day = `0${day}`;
-  }
-  if (month < 10) {
-    month = `0${month + 1}`;
-  }
-
-  return `${day}/${month}/${year}`;
-}
-
 class FeeDetails extends Component {
   constructor(props) {
     super(props);
@@ -180,12 +164,12 @@ class FeeDetails extends Component {
                     <li>
                       <div className={`${s.pullLeft} ${s.showMobile}`} style={{ minWidth: '300px' }}>
                         <label htmlFor="startDate" style={{ minWidth: '115px' }}>Ngày bắt đầu</label>
-                        <span>{ formatDate(fee.from) }</span>
+                        <span>{moment(fee.from).format('DD/MM/YYYY')}</span>
                         <i className="fa fa-calendar" aria-hidden="true"></i>
                       </div>
                       <div className={s.pullRight}>
                         <label htmlFor="endDate" style={{ minWidth: '115px' }}>Ngày kết thúc</label>
-                        <span>{ formatDate(fee.to) }</span>
+                        <span>{moment(fee.to).format('DD/MM/YYYY')}</span>
                         <i className="fa fa-calendar" aria-hidden="true"></i>
                       </div>
                     </li>

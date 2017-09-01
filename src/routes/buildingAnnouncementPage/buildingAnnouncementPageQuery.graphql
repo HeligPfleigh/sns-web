@@ -11,8 +11,8 @@ query buildingAnnouncementPageQuery ($buildingId: String!) {
       edges {
         _id
         message
+        description
         date
-        type
       }
     }
   }

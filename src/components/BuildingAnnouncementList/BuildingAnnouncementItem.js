@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button } from 'react-bootstrap';
 import moment from 'moment';
-import {
-  TYPE1,
-} from '../../constants';
 import s from './BuildingAnnouncementItem.scss';
 
 class BuildingAnnouncementItem extends Component {
@@ -44,12 +41,12 @@ class BuildingAnnouncementItem extends Component {
       <li>
         <div className={s.buildingAnnouncementItem}>
           <div className={s.buildingAnnouncementIcon}>
-            <i className="fa fa-bullhorn fa-2x" aria-hidden="true"></i>
+            <i className="fa fa-bell-o" aria-hidden="true"></i>
           </div>
           <div className={s.buildingAnnouncementInfo}>
             <strong>{message}</strong>
             <br />
-            <small>{moment(date).format('HH:mm DD/MM/YYYY')}</small>
+            <small>{moment(date).format('HH:mm  DD/MM/YYYY')}</small>
           </div>
           { displayAction && <div className={s.buildingAnnouncementButtons}>
             <Button

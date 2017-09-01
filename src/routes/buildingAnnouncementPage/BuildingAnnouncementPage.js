@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import { Grid, Row, Col } from 'react-bootstrap';
+import MediaQuery from 'react-responsive';
+import FriendSuggestions from '../FriendSuggestions';
+import ChatSideBar from '../ChatSideBar';
 import buildingAnnouncementPageQuery from './buildingAnnouncementPageQuery.graphql';
 import {
   BuildingAnnouncementItem,
@@ -18,11 +21,14 @@ class BuildingAnnouncementPage extends Component {
       },
     } = this.props;
     return (
-      <div className={s.containerTop30}>
-        <Grid>
-          {loading && <div> Đang tải dữ liệu...</div>}
-          <Row>
-            <Col md={8} sm={12} xs={12} style={{ listStyle: 'none' }}>
+      <Grid>
+        {loading && <div> Đang tải dữ liệu...</div>}
+        <Row>
+          <Col md={8} sm={12} xs={12} className={s.container}>
+            <div className={s.header}>
+              <h3>Các thông báo</h3>
+            </div>
+            <ul className={s.buildingAnnouncementList}>
               {
                 !loading && building && building.announcements && building.announcements.edges.map(a => (
                   <BuildingAnnouncementItem
@@ -32,10 +38,16 @@ class BuildingAnnouncementPage extends Component {
                   />
                 ))
               }
+            </ul>
+          </Col>
+          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+            <Col md={4} smHidden xsHidden>
+              <ChatSideBar />
+              <FriendSuggestions />
             </Col>
-          </Row>
-        </Grid>
-      </div>
+          </MediaQuery>
+        </Row>
+      </Grid>
     );
   }
 }

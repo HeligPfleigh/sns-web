@@ -1,9 +1,19 @@
-.containerTop30 {
-  margin-top: 30px;
+.container {
+  margin-top: 10px;
+  background-color: #fff; 
+}
+
+.header {
+  margin-bottom: 20px; 
+}
+
+.buildingAnnouncementList {
+  list-style: none;
+  padding: 0;
 }
 
 @media (max-width: 992px) {
-  .containerTop30 {
+  .container {
     margin-top: 50px;
   }
 }

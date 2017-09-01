@@ -9,7 +9,7 @@ const BuildingAnnouncementList = ({ children, buildingId }) => {
     <div className={s.buildingAnnouncementList}>
       <ul>{children}</ul>
       <div className={s.buildingAnnouncementListFooter}>
-        <Link to={`/building-announcement/${buildingId}`} style={{ textDecoration: 'none', color: '#337ab7' }}>
+        <Link to={`/building/${buildingId}/announcements`} style={{ textDecoration: 'none', color: '#337ab7' }}>
           Xem thêm
         </Link>
       </div>

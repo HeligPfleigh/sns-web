@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { checkAuth } from '../../utils/role';
 
 export default {
-  path: '/building-announcement/:buildingId',
+  path: '/building/:buildingId/announcements',
 
   async action(context) {
     const redirect = checkAuth(context.store);
