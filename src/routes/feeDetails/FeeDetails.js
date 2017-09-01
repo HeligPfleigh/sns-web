@@ -310,7 +310,7 @@ export default compose(
             feeId: _id,
             total,
             status,
-            buildingId: building._id,
+            buildingId: building.id,
           },
         },
         update: (store, { data: { updateFeeDetail } }) => {
