@@ -65,6 +65,7 @@ export default compose(
           variables: {
             _id: ownProps.user.id,
             cursor: null,
+            limit: 4,
           },
         }],
       }),
