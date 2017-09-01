@@ -106,7 +106,6 @@ class FAQs extends Component {
       ...prevState,
       currentPage: pageNum,
     }), () => {
-      console.log(this.state.currentPage);
       this.props.onChangePage(this.state.currentPage);
     });
   }
@@ -184,6 +183,10 @@ class FAQs extends Component {
       currentPage: this.state.currentPage,
     };
 
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     // Calc total page
     const limit = (FAQList.pageInfo && FAQList.pageInfo.limit) || 15;
     const countRecord = (FAQList.pageInfo && FAQList.pageInfo.total) || 1;
@@ -191,10 +194,6 @@ class FAQs extends Component {
       pagination.totalPage = 1;
     } else {
       pagination.totalPage = Math.ceil(countRecord / limit);
-    }
-
-    if (loading) {
-      return <Loading show={loading} full>Đang tải ...</Loading>;
     }
 
     return (
@@ -291,13 +290,12 @@ export default compose(
         building: props.building._id,
       },
     }),
-    props: ({ ownProps, data }) => {
+    props: ({ data }) => {
       const onChangePage = page => data.fetchMore({
         query: FAQsListQuery,
         variables: {
           page,
-          limit: 15,
-          building: ownProps.building._id,
+          ...data.variables,
         },
         updateQuery: (_, { fetchMoreResult }) => fetchMoreResult,
       });
