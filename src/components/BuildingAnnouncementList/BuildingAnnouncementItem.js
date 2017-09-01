@@ -35,7 +35,6 @@ class BuildingAnnouncementItem extends Component {
   render() {
     const {
       data: {
-        type,
         date,
       },
       message,
@@ -45,7 +44,7 @@ class BuildingAnnouncementItem extends Component {
       <li>
         <div className={s.buildingAnnouncementItem}>
           <div className={s.buildingAnnouncementIcon}>
-            <i className="fa fa-bullhorn fa-2x" style={{ backgroundColor: `${type === TYPE1 ? '#006400' : '#FF8C00'}` }} aria-hidden="true"></i>
+            <i className="fa fa-bullhorn fa-2x" aria-hidden="true"></i>
           </div>
           <div className={s.buildingAnnouncementInfo}>
             <strong>{message}</strong>

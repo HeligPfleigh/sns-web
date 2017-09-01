@@ -13,8 +13,8 @@ query buildingAnnouncementsQuery ($userId: String!, $skip: Int, $limit: Int) {
         edges {
           _id
           message
+          description
           date
-          type
         }
       }
     }

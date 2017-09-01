@@ -1,0 +1,42 @@
+@import "../../../../theme/resources.scss";
+
+.displayForm {
+  display: flex;
+}
+
+.displayFormLeft {
+  min-width: 15%;
+}
+
+.displayFormRight {
+  min-width: 80%;
+}
+
+.newAnnouncementControl {
+  padding: 10px 0;
+  display: flex;
+}
+
+button.addPhoto, button.addPhoto:hover, button.addPhoto:active {
+  padding-left: 0px;
+  color: $text-color;
+  text-decoration: none;
+  border: none;
+  background-color: transparent;
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+
+  .displayForm {
+    display: block;
+  }
+
+  .newAnnouncementControl {
+    padding: 10px 0;
+    display: block;
+    margin-bottom: 45px;
+  }  
+}
