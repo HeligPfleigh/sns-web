@@ -75,19 +75,19 @@ class Login extends Component {
         try {
           const user = await fetchAPI('/auth/login', { username, password });
           this.props.loginSuccess(user);
-          // if (isEmpty(user.buildings)) {
-          //   if (user.id) {
-          //     this.props.removeStateUser();
-          //     history.push('/waiting');
-          //   } else {
-          //     history.push('/register');
-          //   }
-          // } else if (user.isActive === 0) {
-          //   this.props.removeStateUser();
-          //   history.push('/waiting');
-          // } else {
-          history.push('/');
-          // }
+          if (isEmpty(user.buildings)) {
+            if (user.id) {
+              this.props.removeStateUser();
+              history.push('/waiting');
+            } else {
+              history.push('/register');
+            }
+          } else if (user.isActive === 0) {
+            this.props.removeStateUser();
+            history.push('/waiting');
+          } else {
+            history.push('/');
+          }
         } catch (error) {
           throw new Error(error);
         }
