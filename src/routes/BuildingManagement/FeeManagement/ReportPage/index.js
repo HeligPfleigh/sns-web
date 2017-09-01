@@ -24,7 +24,7 @@ import Loading from '../../../../components/Loading';
 import s from './styles.scss';
 import feesReportPageQuery from './queries/feesReportPageQuery.graphql';
 
-const limit = 15;
+const limit = 10;
 class ReportPage extends Component {
   constructor(props) {
     super(props);

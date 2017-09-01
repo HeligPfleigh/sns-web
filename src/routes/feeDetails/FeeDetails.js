@@ -149,7 +149,7 @@ class FeeDetails extends Component {
                   <i className="fa fa-money" aria-hidden="true"></i>
                   <span className={s.mainPage}>Quản lý chi phí / </span>
                   <span>Báo cáo / </span>
-                  <span>Phòng { fee.apartment && fee.apartment.number }</span>
+                  <span>Phòng { fee.apartment && fee.apartment.name }</span>
                 </div>
                 <div>
                   <ul>
@@ -158,7 +158,7 @@ class FeeDetails extends Component {
                         <label htmlFor="apartment">Số phòng</label>
                       </div>
                       <div className={s.pullRight}>
-                        <span>{ fee.apartment && fee.apartment.number }</span>
+                        <span>{ fee.apartment && fee.apartment.name }</span>
                       </div>
                     </li>
                     <li>

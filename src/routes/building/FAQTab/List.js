@@ -4,11 +4,17 @@ import update from 'immutability-helper';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classNames from 'classnames';
-import { Alert, Panel, Tooltip, OverlayTrigger, Accordion, Col } from 'react-bootstrap';
 import isObject from 'lodash/isObject';
+import {
+  Alert,
+  Panel,
+  Tooltip,
+  Accordion,
+  Pagination,
+  OverlayTrigger,
+  Col } from 'react-bootstrap';
 
-import Pagination from '../../../components/Pagination';
-
+import Loading from '../../../components/Loading';
 import FAQsListQuery from './FAQsListQuery.graphql';
 import createFAQMutation from './createFAQMutation.graphql';
 import updateFAQMutation from './updateFAQMutation.graphql';
@@ -27,6 +33,7 @@ class FAQs extends Component {
     super(...args);
 
     this.state = {
+      currentPage: 1,
       errorMessage: null,
       onUpdateInitialValues: {},
       onDeleteInitialValues: {},
@@ -94,6 +101,16 @@ class FAQs extends Component {
     });
   }
 
+  handlePageSelect = (pageNum) => {
+    this.setState(prevState => ({
+      ...prevState,
+      currentPage: pageNum,
+    }), () => {
+      console.log(this.state.currentPage);
+      this.props.onChangePage(this.state.currentPage);
+    });
+  }
+
   renderLoadingIcon = () => (
     <div className={classNames(s.noRecordsFound, 'text-center')}>
       <i className="fa fa-spinner fa-spin" aria-hidden="true"></i> Đang tải dữ liệu ...
@@ -151,7 +168,7 @@ class FAQs extends Component {
     const {
       data: {
         loading,
-        FAQs,
+        FAQs: FAQList,
       },
       building: {
         isAdmin,
@@ -160,8 +177,26 @@ class FAQs extends Component {
       updateFAQ,
       createFAQ,
       deleteFAQ,
-      onChangePage,
-     } = this.props;
+    } = this.props;
+
+    const pagination = {
+      totalPage: 1,
+      currentPage: this.state.currentPage,
+    };
+
+    // Calc total page
+    const limit = (FAQList.pageInfo && FAQList.pageInfo.limit) || 15;
+    const countRecord = (FAQList.pageInfo && FAQList.pageInfo.total) || 1;
+    if (countRecord <= limit) {
+      pagination.totalPage = 1;
+    } else {
+      pagination.totalPage = Math.ceil(countRecord / limit);
+    }
+
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     return (
       <Col>
         <Panel
@@ -211,7 +246,22 @@ class FAQs extends Component {
           />
           { loading ? this.renderLoadingIcon() : this.renderFAQs() }
         </Panel>
-        { !loading && FAQs && <Pagination total={FAQs.pageInfo.total} page={FAQs.pageInfo.page} limit={FAQs.pageInfo.limit} onChange={onChangePage} className="pull-right" /> }
+        { !loading && FAQList &&
+          (pagination.totalPage > 1) &&
+          <div className="pull-right">
+            <Pagination
+              maxButtons={5}
+              prev={pagination.totalPage > 5}
+              next={pagination.totalPage > 5}
+              first={pagination.totalPage > 5}
+              last={pagination.totalPage > 5}
+              ellipsis={pagination.totalPage > 5}
+              items={pagination.totalPage}
+              activePage={pagination.currentPage}
+              onSelect={this.handlePageSelect}
+            />
+          </div>
+        }
       </Col>
     );
   }
@@ -237,6 +287,7 @@ export default compose(
   graphql(FAQsListQuery, {
     options: props => ({
       variables: {
+        limit: 15,
         building: props.building._id,
       },
     }),
@@ -244,12 +295,11 @@ export default compose(
       const onChangePage = page => data.fetchMore({
         query: FAQsListQuery,
         variables: {
-          building: ownProps.building._id,
           page,
+          limit: 15,
+          building: ownProps.building._id,
         },
-        updateQuery: (previousResult, { fetchMoreResult }) => ({
-          ...fetchMoreResult,
-        }),
+        updateQuery: (_, { fetchMoreResult }) => fetchMoreResult,
       });
 
       return {
