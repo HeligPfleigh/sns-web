@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Button } from 'react-bootstrap';
 import moment from 'moment';
+import Link from '../Link';
 import s from './BuildingAnnouncementItem.scss';
 
 class BuildingAnnouncementItem extends Component {
@@ -32,6 +33,7 @@ class BuildingAnnouncementItem extends Component {
   render() {
     const {
       data: {
+        _id,
         date,
       },
       message,
@@ -40,14 +42,16 @@ class BuildingAnnouncementItem extends Component {
     return (
       <li>
         <div className={s.buildingAnnouncementItem}>
-          <div className={s.buildingAnnouncementIcon}>
-            <i className="fa fa-bell-o" aria-hidden="true"></i>
-          </div>
-          <div className={s.buildingAnnouncementInfo}>
-            <strong>{message}</strong>
-            <br />
-            <small>{moment(date).format('HH:mm  DD/MM/YYYY')}</small>
-          </div>
+          <Link to={`/announcement/${_id}`} style={{ textDecoration: 'none' }}>
+            <div className={s.buildingAnnouncementIcon}>
+              <i className="fa fa-bell-o" aria-hidden="true"></i>
+            </div>
+            <div className={s.buildingAnnouncementInfo}>
+              <strong>{message}</strong>
+              <br />
+              <small>{moment(date).format('HH:mm  DD/MM/YYYY')}</small>
+            </div>
+          </Link>
           { displayAction && <div className={s.buildingAnnouncementButtons}>
             <Button
               bsStyle="primary"

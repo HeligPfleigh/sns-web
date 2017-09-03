@@ -1,0 +1,8 @@
+query announcementQuery($announcementId: String!) {
+  announcement(_id: $announcementId) {
+    _id
+    message
+    description
+    date
+  }
+}
