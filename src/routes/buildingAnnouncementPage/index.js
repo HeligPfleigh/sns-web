@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { checkAuth } from '../../utils/role';
 
 export default {
-  path: '/building/:buildingId/announcements',
+  path: '/announcements',
 
   async action(context) {
     const redirect = checkAuth(context.store);
@@ -11,7 +11,7 @@ export default {
     const BuildingAnnouncementPage = await require.ensure([], require => require('./BuildingAnnouncementPage').default, 'buildingannouncementpage');
     return {
       title: 'SNS - Thông báo của tòa nhà',
-      component: <Layout><BuildingAnnouncementPage buildingId={context.params.buildingId} /></Layout>,
+      component: <Layout><BuildingAnnouncementPage /></Layout>,
     };
   },
 };

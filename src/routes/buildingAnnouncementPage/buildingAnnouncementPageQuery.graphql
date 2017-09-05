@@ -1,7 +1,24 @@
-query buildingAnnouncementPageQuery ($buildingId: String!) {
-  building (_id : $buildingId) {
+query buildingAnnouncementPageQuery ($userId: String!, $cursor: String, $limit: Int, $skip: Int) {
+  resident(_id: $userId) {
     _id
-    announcements (skip: 0, limit: 1000) {
+    building {
+      _id
+    }
+    announcements (cursor: $cursor, limit: $limit) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        _id
+        message
+        description
+        date
+      }
+    }
+    otherAnnouncements: announcements (skip: $skip, limit: $limit) {
       pageInfo {
         skip
         hasNextPage

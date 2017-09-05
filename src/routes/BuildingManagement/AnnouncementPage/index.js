@@ -10,7 +10,7 @@ import Loading from '../../../components/Loading';
 import Menu from '../Menu/Menu';
 import NewAnnouncementForm from './NewAnnouncementForm';
 import { openAlertGlobal } from '../../../reducers/alert';
-import createNewBuildingAnnouncementMutation from './createNewBuildingAnnouncementMutation.graphql';
+import createNewAnnouncementMutation from './createNewAnnouncementMutation.graphql';
 import s from './styles.scss';
 
 class Announcement extends Component {
@@ -20,7 +20,7 @@ class Announcement extends Component {
 
   submit = (values) => {
     const { message, description } = values;
-    this.props.createNewBuildingAnnouncement(message, description)
+    this.props.createNewAnnouncement(message, description)
     .then(() => {
       this.props.resetForm();
       this.props.openAlertGlobalAction({
@@ -71,7 +71,7 @@ class Announcement extends Component {
 
 Announcement.propTypes = {
   user: PropTypes.object.isRequired,
-  createNewBuildingAnnouncement: PropTypes.func.isRequired,
+  createNewAnnouncement: PropTypes.func.isRequired,
   buildingId: PropTypes.string.isRequired,
   openAlertGlobalAction: PropTypes.func,
   resetForm: PropTypes.func,
@@ -82,16 +82,14 @@ export default compose(
     user: state.user,
   })),
   withStyles(s),
-  graphql(createNewBuildingAnnouncementMutation, {
+  graphql(createNewAnnouncementMutation, {
     props: ({ ownProps, mutate }) => ({
-      createNewBuildingAnnouncement: (message, description) => mutate({
+      createNewAnnouncement: (message, description) => mutate({
         variables: {
           input: {
+            message,
+            description,
             buildingId: ownProps.buildingId,
-            announcementInput: {
-              message,
-              description,
-            },
           },
         },
       }),
