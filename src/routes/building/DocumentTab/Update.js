@@ -13,6 +13,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import Validator from '../../../components/Validator';
 import { SingleUploadFile } from '../../../components/ApolloUpload';
@@ -140,7 +141,7 @@ class UpdateDocumentModal extends Component {
                 <Col sm={9}>
                   <Button
                     onClick={this.onUploadClick}
-                    className={s.btnUpload}
+                    className={classNames('btn-upload', s.btnUpload)}
                   >
                     <i className="fa fa-upload" aria-hidden="true"></i>
                     <strong> Tải lên</strong>

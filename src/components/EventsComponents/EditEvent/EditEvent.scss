@@ -17,20 +17,11 @@ a {
 }
 
 .btnUpload{
-  border-color: transparent;
   color: #5c6f7c;
-  background: transparent;
   padding-left: 0;
   padding-right: 0;
   width: 100%;
   text-align: left;
-
-  &:hover, &:active, &:focus, &:disabled, &:active:focus {
-    text-decoration: none;
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
 }
 
 .layoutForButtonUpload {

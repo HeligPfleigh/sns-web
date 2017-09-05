@@ -74,14 +74,54 @@
   }
 
   .TableWrapper{
-    overflow-y: overlay;
+    overflow-y: scroll;
     max-height: 350px;
     border: 1px solid #ddd;
   }
   
   .ErrorText {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+
+    .panel-body {
+      border-bottom: 0;
+    }
+
+    :global {
+      .modal-content {
+        border-radius: 0;
+        border: none;
+      }
+
+      ul {
+        padding: 0;
+        padding-bottom: 5px;
+        padding-top: 5px;
+        margin: 0;
+      }
+
+      .list-group-item {
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        margin-bottom: 0;
+        margin-top: 0;
+
+        .list-group-item {
+          padding-bottom: 1px;
+          padding-top: 1px;
+          padding-left: 15px;
+          padding-right: 15px;
+          font-style: italic;
+        }
+      }
+    }
+
     h5 {
       color: red;
+      text-transform: capitalize;
     }
   }
 }

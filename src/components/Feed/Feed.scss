@@ -123,12 +123,6 @@ a {
       color: #FF8C00;
       border-radius: 15px;
       outline: none !important;
-
-      &:hover, &:active, &:focus, &:disabled {
-        border-color: #fff;
-        color: #fff;
-        background-color: #FF8C00;
-      }
     }
   }
 }

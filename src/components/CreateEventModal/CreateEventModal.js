@@ -262,7 +262,7 @@ class CreateEventModal extends Component {
                       onClick={() => {
                         document.getElementById('fileInEvent').click();
                       }}
-                      className={s.btnUpload}
+                      className={classNames('btn-upload', s.btnUpload)}
                     >
                       <i className="fa fa-camera" aria-hidden="true"></i>
                       <strong>  Đăng hình</strong>

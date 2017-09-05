@@ -58,6 +58,10 @@ FeeUploadPage.propTypes = {
   buildingId: PropTypes.string.isRequired,
 };
 
+FeeUploadPage.defaultProps = {
+  feeTypes: [],
+};
+
 export default compose(
   withStyles(s),
   connect(state => ({

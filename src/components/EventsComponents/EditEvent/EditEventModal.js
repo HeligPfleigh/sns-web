@@ -18,6 +18,7 @@ import head from 'lodash/head';
 import isUndefined from 'lodash/isUndefined';
 import isFunction from 'lodash/isFunction';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import history from '../../../core/history';
 import { Privacy } from '../../Dropdown';
@@ -164,7 +165,7 @@ class EditEventModal extends Component {
                     <div className={s.buttonToolbar}>
                       <Button
                         onClick={this.onUploadClick}
-                        className={s.btnUpload}
+                        className={classNames('btn-upload', s.btnUpload)}
                       >
                         <i className="fa fa-camera" aria-hidden="true"></i>
                         <strong>  Đăng hình</strong>

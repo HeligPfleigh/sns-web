@@ -225,11 +225,11 @@ export default compose(
         building: props.building._id,
       },
     }),
-    props: ({ ownProps, data }) => {
+    props: ({ data }) => {
       const onChangePage = page => data.fetchMore({
         query: documentsListQuery,
         variables: {
-          building: ownProps.building._id,
+          ...data.variables,
           page,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => ({

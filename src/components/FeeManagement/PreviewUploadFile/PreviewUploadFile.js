@@ -5,6 +5,9 @@ import {
   Table,
   Col,
   ButtonToolbar,
+  Panel,
+  ListGroup,
+  ListGroupItem,
 } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classNames from 'classnames';
@@ -12,7 +15,6 @@ import s from './PreviewUploadFile.scss';
 import config from '../../../config';
 
 class PreviewUpload extends React.Component {
-
 
   constructor(...args) {
     super(...args);
@@ -25,6 +27,11 @@ class PreviewUpload extends React.Component {
   }
 
   onCancel = () => {
+    this.setState({
+      success: false,
+      error: false,
+      message: null,
+    });
     this.props.onCancel(this.props.type.code);
     this.props.closeModal();
   }
@@ -38,7 +45,7 @@ class PreviewUpload extends React.Component {
 
   uploadAndSave = async () => {
     const { type, buildingId, feeFile } = this.props;
-    const url = `${config.server.documentUpload}?building=${buildingId}&type=${type.code}`;
+    const url = `${config.server.documentUpload}?building=${buildingId}&type=${type.code}&import`;
     const token = this.getCookie('id_token');
     const formData = new FormData();
     formData.append('file', feeFile);
@@ -54,7 +61,6 @@ class PreviewUpload extends React.Component {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-
       this.setState({
         message: 'Bạn đã cập nhật thành công.',
         success: true,
@@ -75,29 +81,21 @@ class PreviewUpload extends React.Component {
     return <p className={classNames('text-center', { 'text-success': success, 'text-danger': error })}>{message}</p>;
   }
 
-  renderPrevieFees() {
-    const { type, data } = this.props;
+  renderPrevieFees(hasError) {
+    const { data } = this.props;
     let increment = 0;
 
-    const renderError = () => (<div className={s.ErrorText}>
-      <h5>Lỗi*:</h5>
-      <ul>
-        {
-              Object.keys(data.error).map(key => (
-                <li key={Math.random()}>
-                  <p>{`Dòng ${key}`}</p>
-                  <ul>
-                    {data.error[key].errors.map(err => (
-                      <li key={Math.random()}>
-                        <p>{err}</p>
-                      </li>
-                        ))}
-                  </ul>
-                </li>
-              ))
-            }
-      </ul>
-    </div>);
+    const renderError = () => (<Panel className={s.ErrorText}>
+      <h5>{data.message}</h5>
+      {data.validationErrors && (<ListGroup>
+          {Object.keys(data.validationErrors).map(key => (<ListGroupItem key={Math.random()}>
+            <div><i className="fa fa-circle-o" aria-hidden="true"></i> {`Dòng ${key}`}</div>
+            <ListGroup>
+              {data.validationErrors[key].map(err => (<ListGroupItem key={Math.random()}><i className="fa fa-caret-right" aria-hidden="true"></i> {err}</ListGroupItem>))}
+            </ListGroup>
+          </ListGroupItem>))}
+        </ListGroup>)}
+    </Panel>);
 
     const renderPreview = () => (<Table>
       <thead>
@@ -116,7 +114,7 @@ class PreviewUpload extends React.Component {
             return (
               <tr key={`k${i}`}>
                 <td key={`aparment${i}`}>{item.apartment_number}</td>
-                <td key={`freeType${i}`}>{type.name}</td>
+                <td key={`freeType${i}`}>{item.fee}</td>
                 <td key={`amount${i}`}>{`${item.total}`}</td>
                 <td key={`datetime${i}`}>{`${item.time.month}/${item.time.year}`}</td>
                 <td key={`status${i}`}>{item.paid ? <span className="text-success">Đã nộp</span> : <span className="text-danger">Chưa nộp</span>}</td>
@@ -127,28 +125,27 @@ class PreviewUpload extends React.Component {
       </tbody>
     </Table>);
 
-    return (<div className={s.TableWrapper}>{ data.error ? renderError() : renderPreview() }</div>);
+    return (<div className={s.TableWrapper}>{ hasError ? renderError() : renderPreview() }</div>);
   }
 
   render() {
     const { show, closeModal, type, data } = this.props;
-    const disableUploadButton = !!data.error;
+    const hasError = !!data.error;
     const { error, success } = this.state;
     const showMessage = error || success;
-
     return (
       <Modal show={show} onHide={closeModal} backdrop="static" className={s.previewFees}>
         <Modal.Header>
           <Modal.Title>{`Bạn đang tải tập lên tập tin ${type.name}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {showMessage ? this.renderMessage() : this.renderPrevieFees()}
+          {showMessage ? this.renderMessage() : this.renderPrevieFees(hasError)}
         </Modal.Body>
         <Modal.Footer>
           <div className="text-center">
             <ButtonToolbar>
-              <Button onClick={this.onCancel}>{ showMessage ? 'Đóng cửa sổ' : 'Hủy bỏ' }</Button>
-              {!showMessage && <Button bsStyle="primary" onClick={this.uploadAndSave} disabled={disableUploadButton}>Đồng ý</Button>}
+              <Button type="button" onClick={this.onCancel}>{ showMessage ? 'Đóng cửa sổ' : 'Hủy bỏ' }</Button>
+              {!showMessage && <Button type="button" bsStyle="primary" onClick={this.uploadAndSave} disabled={hasError}>Đồng ý</Button>}
             </ButtonToolbar>
           </div>
           <Col className={s.note}>(*Ghi chú: Nếu tập tin tải lên không đúng, bạn có thể hủy và chọn lại.)</Col>

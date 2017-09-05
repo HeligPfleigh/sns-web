@@ -39,7 +39,7 @@ class UploadFeeFile extends React.Component {
         typeFeeModal: type,
         fileShowModal: input.target.files[0],
       });
-      this.validateFeeFile(input.target.files[0]);
+      this.validateFeeFile(input.target.files[0], type);
     }
   }
 
@@ -65,8 +65,8 @@ class UploadFeeFile extends React.Component {
     return null;
   }
 
-  validateFeeFile = async (file) => {
-    const url = `${config.server.documentUpload}?building=${this.props.buildingId}`;
+  validateFeeFile = async (file, type) => {
+    const url = `${config.server.documentUpload}?building=${this.props.buildingId}&type=${type.code}`;
     const token = this.getCookie('id_token');
     const formData = new FormData();
     formData.append('file', file);
