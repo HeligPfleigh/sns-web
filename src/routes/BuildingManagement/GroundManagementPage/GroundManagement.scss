@@ -4,9 +4,31 @@
 
 .container {
   background: #fff;
+
   .contentMain {
     background: #fff;
     padding: 20px;
+  }
+
+  a, a:hover, a:active {
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  .panel-title {
+    border-bottom: 1px solid #ccc;
+    ol {
+      padding: 20px 1px 0px;
+      background-color: #fff;
+
+      .breadcrumbItem {
+        i {
+          padding-right: 5px;
+        }
+      }
+    }
   }
 }
 

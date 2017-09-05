@@ -5,6 +5,7 @@ import { compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
+import classNames from 'classnames';
 import Loading from '../../../components/Loading';
 import Menu from '../Menu/Menu';
 import s from './GroundManagement.scss';
@@ -29,7 +30,11 @@ class GroundManagement extends Component {
           <Col md={9} sm={12} xs={12}>
             <div className={s.container}>
               <Col md={12} className={s.contentMain}>
-                <h1>Trang quản lý mặt bằng</h1>
+                <ol className="breadcrumb">
+                  <li className={s.breadcrumbItem}>
+                    <i className="fa fa-building" aria-hidden="true"></i> Danh sách cư dân theo các căn hộ
+                  </li>
+                </ol>
               </Col>
             </div>
           </Col>
