@@ -1,17 +1,17 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-import { Panel } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import User from './User';
 import Errors from '../Errors';
 import { openAlertGlobal } from '../../../../../reducers/alert';
-import { ACCEPTED, REJECTED, MEMBER } from '../../../../../constants';
-import rejectingUserToBuildingMutation from './graphql/rejectingUserToBuildingMutation.graphql';
-import approvingUserToBuildingMutation from './graphql/approvingUserToBuildingMutation.graphql';
+import { ACCEPTED, MEMBER } from '../../../../../constants';
+import rejectingUserToBuildingMutation from '../graphql/rejectingUserToBuildingMutation.graphql';
+import approvingUserToBuildingMutation from '../graphql/approvingUserToBuildingMutation.graphql';
 import s from './UserAwaitingApproval.scss';
 
 class ListUsers extends React.Component {
@@ -43,13 +43,12 @@ class ListUsers extends React.Component {
     });
   }
 
-  rejectUser = (evt, requestsToJoinBuildingId) => {
-    evt.preventDefault();
+  rejectUser = (requestsToJoinBuildingId, message) => {
     const {
       rejectingUserToBuilding,
       openAlertGlobalAction,
     } = this.props;
-    rejectingUserToBuilding(requestsToJoinBuildingId)
+    rejectingUserToBuilding(requestsToJoinBuildingId, message)
     .then(() => {
       openAlertGlobalAction({
         message: 'Bạn đã hủy yêu cầu của user thành công',
@@ -167,22 +166,11 @@ export default compose(
   }),
   graphql(rejectingUserToBuildingMutation, {
     props: ({ mutate }) => ({
-      rejectingUserToBuilding: id => mutate({
+      rejectingUserToBuilding: (id, message) => mutate({
         variables: {
           input: {
             requestsToJoinBuildingId: id,
-          },
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          rejectingUserToBuilding: {
-            __typename: 'RejectingUserToBuildingPayload',
-            request: {
-              __typename: 'RequestsToJoinBuilding',
-              _id: id,
-              type: MEMBER,
-              status: REJECTED,
-            },
+            message,
           },
         },
       }),
