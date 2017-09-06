@@ -36,7 +36,7 @@ const DOCUMENT_TAB = 'DOCUMENT_TAB';
 const FAQ_TAB = 'FAQ_TAB';
 
 const loadBuildingQuery = gql`
-  query loadBuildingQuery ($buildingId: String!, $skip: Int, $limit: Int, $cursor: String) {
+  query loadBuildingQuery ($buildingId: String!, $cursor: String) {
     building (_id: $buildingId) {
       _id
       name
@@ -56,20 +56,6 @@ const loadBuildingQuery = gql`
         pageInfo {
           endCursor
           hasNextPage
-        }
-      }
-      announcements (skip: $skip, limit: $limit) {
-        pageInfo {
-          skip
-          hasNextPage
-          total
-          limit
-        }
-        edges {
-          _id
-          message
-          description
-          date
         }
       }
       isAdmin
