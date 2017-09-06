@@ -9,10 +9,13 @@ import {
   ListGroup,
   ListGroupItem,
 } from 'react-bootstrap';
+import moment from 'moment';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import classNames from 'classnames';
 import s from './PreviewUploadFile.scss';
 import config from '../../../config';
+
+moment.locale('vi');
 
 class PreviewUpload extends React.Component {
 
@@ -45,7 +48,7 @@ class PreviewUpload extends React.Component {
 
   uploadAndSave = async () => {
     const { type, buildingId, feeFile } = this.props;
-    const url = `${config.server.documentUpload}?building=${buildingId}&type=${type.code}&import`;
+    const url = `${config.server.documentUpload}?building=${buildingId}&type=${type.code}&import=true`;
     const token = this.getCookie('id_token');
     const formData = new FormData();
     formData.append('file', feeFile);
@@ -104,6 +107,7 @@ class PreviewUpload extends React.Component {
           <th key="freeType">Loại phí</th>
           <th key="amount">Số tiền</th>
           <th key="datetime">Thời gian</th>
+          <th key="deadline">Hạn nộp</th>
           <th key="status">Đã thanh toán</th>
         </tr>
       </thead>
@@ -117,6 +121,7 @@ class PreviewUpload extends React.Component {
                 <td key={`freeType${i}`}>{item.fee}</td>
                 <td key={`amount${i}`}>{`${item.total}`}</td>
                 <td key={`datetime${i}`}>{`${item.time.month}/${item.time.year}`}</td>
+                <td key={`deadline${i}`}>{moment(item.deadline).format('DD/MM/YYYY')}</td>
                 <td key={`status${i}`}>{item.paid ? <span className="text-success">Đã nộp</span> : <span className="text-danger">Chưa nộp</span>}</td>
               </tr>
             );
