@@ -19,7 +19,7 @@ class BuildingAnnouncement extends Component {
     }
     return (
       <div>
-        {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
+        {loading && <h3 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h3>}
         {!loading && announcements && announcements.edges.length > 0 &&
           <BuildingAnnouncementList>
             <BuildingAnnouncementHeader />

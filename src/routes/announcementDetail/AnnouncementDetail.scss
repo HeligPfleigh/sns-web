@@ -10,22 +10,17 @@
 
 .announcementTitle {
   margin-bottom: 10px;
-  span {
-    font-size: 18px;
-    font-weight: bold;
-  }
 }
 
-.otherAnnouncementsHeader {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.otherAnnouncementsList {
+.announcementList {
   list-style: none;
   padding: 0;
 }
 
+span {
+  font-size: 18px;
+  font-weight: bold;
+}
 
 @media (max-width: 992px) {
   .container {

@@ -29,7 +29,7 @@ class BuildingAnnouncementPage extends Component {
     }
     return (
       <Grid>
-        {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
+        {loading && <h3>Đang tải dữ liệu...</h3>}
         <Row>
           <Col md={8} sm={12} xs={12} className={s.container}>
             <div className={s.announcements}>
