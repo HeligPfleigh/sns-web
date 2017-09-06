@@ -22,7 +22,6 @@ export default {
     require('./user').default,
     require('./me').default,
     require('./search').default,
-    require('./userApprovalPage').default,
     require('./events').default,
     require('./buildingAnnouncementPage').default,
     require('./feeDetails').default,

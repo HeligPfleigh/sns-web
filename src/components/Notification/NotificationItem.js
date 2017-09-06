@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image } from 'react-bootstrap';
+import { Image, Clearfix } from 'react-bootstrap';
 // import { convertFromRaw } from 'draft-js';
 // import { stateToHTML } from 'draft-js-export-html';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -170,6 +170,7 @@ class NotificationItem extends Component {
             </span>
           </div>
         </a>
+        <Clearfix />
       </div>
     );
   }

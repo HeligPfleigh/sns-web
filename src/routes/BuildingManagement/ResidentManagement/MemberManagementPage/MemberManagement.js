@@ -13,7 +13,7 @@ import { Feed } from '../../../../components/Feed';
 import Loading from '../../../../components/Loading';
 import Menu from '../../Menu/Menu';
 import s from './MemberManagement.scss';
-import { ListUsersAwaitingApproval } from './UserAwaitingApprovalTab';
+import { ListUsersAwaitingApproval } from './UserListAwaitingApproval';
 
 const loadUsersAwaitingApprovalQuery = gql`
 query loadUsersAwaitingApprovalQuery ($buildingId: String!, $cursor: String, $limit: Int) {
