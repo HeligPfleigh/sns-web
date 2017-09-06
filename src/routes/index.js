@@ -30,6 +30,7 @@ export default {
     require('./BuildingManagement').default,
     require('./Apartment').default,
     require('./Apartments').default,
+    require('./announcementDetail').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

@@ -1,0 +1,29 @@
+.container {
+  margin-top: 10px;
+  background-color: #fff; 
+}
+
+.announcement {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.announcementTitle {
+  margin-bottom: 10px;
+}
+
+.announcementList {
+  list-style: none;
+  padding: 0;
+}
+
+span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@media (max-width: 992px) {
+  .container {
+    margin-top: 50px;
+  }
+}
