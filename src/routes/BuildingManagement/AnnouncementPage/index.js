@@ -9,28 +9,11 @@ import MediaQuery from 'react-responsive';
 import Loading from '../../../components/Loading';
 import Menu from '../Menu/Menu';
 import NewAnnouncementForm from './NewAnnouncementForm';
-import { openAlertGlobal } from '../../../reducers/alert';
-import createNewAnnouncementMutation from './createNewAnnouncementMutation.graphql';
 import s from './styles.scss';
 
 class Announcement extends Component {
   state= {
     loading: false,
-  }
-
-  submit = (values) => {
-    const { message, description } = values;
-    this.props.createNewAnnouncement(message, description)
-    .then(() => {
-      this.props.resetForm();
-      this.props.openAlertGlobalAction({
-        message: 'Bạn đã đăng thông báo thành công',
-        open: true,
-        autoHideDuration: 0,
-      });
-    }).catch((error) => {
-      console.log('there was an error sending the query', error);
-    });
   }
 
   render() {
@@ -58,7 +41,7 @@ class Announcement extends Component {
                   <span className={s.headerTitle}>Thông báo khác</span>
                 </div>
                 <NewAnnouncementForm
-                  onSubmit={this.submit}
+                  buildingId={buildingId}
                 />
               </Col>
             </div>
@@ -71,10 +54,7 @@ class Announcement extends Component {
 
 Announcement.propTypes = {
   user: PropTypes.object.isRequired,
-  createNewAnnouncement: PropTypes.func.isRequired,
   buildingId: PropTypes.string.isRequired,
-  openAlertGlobalAction: PropTypes.func,
-  resetForm: PropTypes.func,
 };
 
 export default compose(
@@ -82,23 +62,4 @@ export default compose(
     user: state.user,
   })),
   withStyles(s),
-  graphql(createNewAnnouncementMutation, {
-    props: ({ ownProps, mutate }) => ({
-      createNewAnnouncement: (message, description) => mutate({
-        variables: {
-          input: {
-            message,
-            description,
-            buildingId: ownProps.buildingId,
-          },
-        },
-      }),
-    }),
-  }),
-)(connect(
-  null,
-  dispatch => ({
-    openAlertGlobalAction: data => dispatch(openAlertGlobal(data)),
-    resetForm: () => dispatch(reset('newAnnouncementForm')),
-  }),
-)(Announcement));
+)(Announcement);
