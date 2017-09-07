@@ -1,12 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { graphql, compose } from 'react-apollo';
+import { generate as idRandom } from 'shortid';
+import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { FormControl, FormGroup } from 'react-bootstrap';
-import { Field, reduxForm } from 'redux-form';
+import { FormControl, FormGroup, Dropdown, MenuItem, Button } from 'react-bootstrap';
+import Select from 'react-select';
+import { Field, reduxForm, reset } from 'redux-form';
+import { openAlertGlobal } from '../../../../reducers/alert';
+import createNewAnnouncementMutation from '../createNewAnnouncementMutation.graphql';
 import {
   required,
   minLength2,
 } from '../../../../utils/validator';
+import {
+  PUBLIC,
+  PRIVATE,
+} from '../../../../constants';
+import apartmentsQuery from './apartmentsQuery.graphql';
 import s from './NewAnnouncementForm.scss';
 
 const renderTextField = ({ input, placeholder, type, meta: { touched, error, warning } }) => (
@@ -46,17 +57,125 @@ renderTextAreaField.propTypes = {
   meta: PropTypes.object,
 };
 
+const doNothing = () => {};
+
+const selectApartmentsField = ({
+  input,
+  multi,
+  valueKey,
+  labelKey,
+  dataSource,
+  placeholder,
+  onInputChange,
+  meta: { touched, error, warning },
+}) => (
+  <div className={s.displayFormRight}>
+    <Select
+      {...input}
+      multi={multi}
+      valueKey={valueKey}
+      labelKey={labelKey}
+      options={dataSource}
+      placeholder={placeholder}
+      onBlur={() => {
+        input.onBlur(input.value);
+      }}
+      onChange={(value) => {
+        input.onChange(value);
+      }}
+      onInputChange={onInputChange || doNothing}
+    />
+    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
+  </div>
+);
+
+selectApartmentsField.propTypes = {
+  input: PropTypes.object.isRequired,
+  multi: PropTypes.bool,
+  valueKey: PropTypes.string,
+  labelKey: PropTypes.string,
+  dataSource: PropTypes.any.isRequired,
+  placeholder: PropTypes.string,
+  meta: PropTypes.object,
+  onInputChange: PropTypes.func,
+};
+
+const PRIVARY_TEXT = {
+  PUBLIC: 'Công khai',
+  PRIVATE: 'Riêng tư',
+};
+
+const CustomToggle = ({ onClick, children }) => (
+  <Button onClick={onClick}>
+    { children }
+  </Button>
+);
+
+CustomToggle.propTypes = {
+  onClick: PropTypes.func,
+  children: PropTypes.node,
+};
+
 class NewAnnouncementForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      privacy: PUBLIC,
+      displaySelectApartments: false,
+    };
+  }
+
+  onSelectPrivary = (eventKey, event) => {
+    event.preventDefault();
+    if (eventKey === PRIVATE) {
+      this.setState({
+        privacy: eventKey,
+        displaySelectApartments: true,
+      });
+    } else {
+      this.setState({
+        privacy: eventKey,
+      });
+    }
+  }
+
+  submit = (values) => {
+    const { privacy } = this.state;
+    let apartments = [];
+    const { message, description } = values;
+    if (values.apartments) {
+      apartments = values.apartments.map(i => i._id);
+    }
+    this.props.createNewAnnouncement(message, description, apartments, privacy)
+    .then(() => {
+      this.props.resetForm();
+      this.props.openAlertGlobalAction({
+        message: 'Bạn đã đăng thông báo thành công',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
+  }
 
   render() {
     const {
+      data: {
+        building,
+      },
       handleSubmit,
       submitting,
       reset,
     } = this.props;
+    const { privacy, displaySelectApartments } = this.state;
+    let apartments = null;
+    if (building) {
+      apartments = building.apartments;
+    }
     return (
       <div>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(this.submit)}>
           <FormGroup className={s.displayForm}>
             <div className={s.displayFormLeft}>
               <label>Tiêu đề</label>
@@ -81,6 +200,23 @@ class NewAnnouncementForm extends Component {
               validate={[required, minLength2]}
             />
           </FormGroup>
+          {apartments && displaySelectApartments &&
+            <FormGroup className={s.displayForm}>
+              <div className={s.displayFormLeft}>
+                <label>Các căn hộ</label>
+              </div>
+              <Field
+                name="apartments"
+                multi
+                valueKey="_id"
+                labelKey="name"
+                dataSource={apartments}
+                component={selectApartmentsField}
+                placeholder="Chọn các căn hộ cần gửi thông báo"
+                validate={[required]}
+              />
+            </FormGroup>
+          }
           <div className={s.newAnnouncementControl}>
             <div className={s.displayFormLeft}></div>
             <div className={s.displayFormRight}>
@@ -91,6 +227,21 @@ class NewAnnouncementForm extends Component {
                 </button>
               </div>
               <div className="pull-right">
+                <Dropdown
+                  className={s.setPrivaryBtn}
+                  style={{ marginRight: '5px' }}
+                  id={idRandom()}
+                >
+                  <CustomToggle bsRole="toggle">
+                    <span title={PRIVARY_TEXT[privacy]}>
+                      {PRIVARY_TEXT[privacy]} <i className="fa fa-caret-down" aria-hidden="true"></i>
+                    </span>
+                  </CustomToggle>
+                  <Dropdown.Menu onSelect={this.onSelectPrivary}>
+                    <MenuItem eventKey={PUBLIC}>Công khai</MenuItem>
+                    <MenuItem eventKey={PRIVATE}>Riêng tư</MenuItem>
+                  </Dropdown.Menu>
+                </Dropdown>
                 <button type="button" onClick={reset} className="btn btn-default" style={{ marginRight: '5px' }}>
                   Hủy
                 </button>
@@ -107,9 +258,13 @@ class NewAnnouncementForm extends Component {
 }
 
 NewAnnouncementForm.propTypes = {
+  data: PropTypes.shape({}).isRequired,
   handleSubmit: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
   reset: PropTypes.func.isRequired,
+  createNewAnnouncement: PropTypes.func.isRequired,
+  openAlertGlobalAction: PropTypes.func,
+  resetForm: PropTypes.func,
 };
 
 const NewAnnouncementReduxForm = reduxForm({
@@ -117,4 +272,35 @@ const NewAnnouncementReduxForm = reduxForm({
   form: 'newAnnouncementForm',
 })(NewAnnouncementForm);
 
-export default withStyles(s)(NewAnnouncementReduxForm);
+export default compose(
+  withStyles(s),
+  graphql(apartmentsQuery, {
+    options: ownProps => ({
+      variables: {
+        buildingId: ownProps.buildingId,
+      },
+      fetchPolicy: 'network-only',
+    }),
+  }),
+  graphql(createNewAnnouncementMutation, {
+    props: ({ ownProps, mutate }) => ({
+      createNewAnnouncement: (message, description, apartments, privacy) => mutate({
+        variables: {
+          input: {
+            message,
+            description,
+            apartments,
+            privacy,
+            buildingId: ownProps.buildingId,
+          },
+        },
+      }),
+    }),
+  }),
+)(connect(
+  null,
+  dispatch => ({
+    openAlertGlobalAction: data => dispatch(openAlertGlobal(data)),
+    resetForm: () => dispatch(reset('newAnnouncementForm')),
+  }),
+)(NewAnnouncementReduxForm));
