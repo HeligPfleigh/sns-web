@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-// import history from '../../../core/history';
+import history from '../../../core/history';
 import Loading from '../../../components/Loading';
-import BuildingList from '../BuildingList';
+import BuildingList from '../../../components/BuildingList';
 import s from './styles.scss';
 
 const BOMQuery = gql`query BOMQuery {
@@ -40,6 +40,10 @@ class HomeManagement extends Component {
     }
   }
 
+  onRedirect = (id) => {
+    history.push(`/management/${id}`);
+  }
+
   render() {
     const { loading, me } = this.props;
 
@@ -51,7 +55,7 @@ class HomeManagement extends Component {
     return (
       <div className="container">
         <div className={s.containerTop30}>
-          <BuildingList buildings={me && me.buildings} />
+          <BuildingList buildings={me && me.buildings} onRedirect={this.onRedirect} />
         </div>
       </div>
     );
