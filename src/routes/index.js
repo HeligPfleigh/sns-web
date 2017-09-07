@@ -22,7 +22,6 @@ export default {
     require('./user').default,
     require('./me').default,
     require('./search').default,
-    require('./userApprovalPage').default,
     require('./events').default,
     require('./buildingAnnouncementPage').default,
     require('./feeDetails').default,
@@ -30,6 +29,7 @@ export default {
     require('./BuildingManagement').default,
     require('./Apartment').default,
     require('./Apartments').default,
+    require('./announcementDetail').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

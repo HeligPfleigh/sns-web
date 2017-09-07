@@ -1,13 +1,27 @@
 .container {
   margin-top: 10px;
+  padding-top: 15px; 
   background-color: #fff; 
 }
 
-.header {
-  margin-bottom: 20px; 
+.announcements {
+  background-color: #ffdb9e;
+  padding: 10px 15px;
+  margin-bottom: 30px; 
 }
 
-.buildingAnnouncementList {
+.otherAnnouncements {
+  padding: 10px 15px;
+}
+
+.header {
+  margin-bottom: 20px;
+  h3 {
+    margin-top: 0px; 
+  }
+}
+
+.announcementList {
   list-style: none;
   padding: 0;
 }

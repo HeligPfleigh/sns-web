@@ -1,0 +1,16 @@
+mutation createNewAnnouncementMutation ($input: CreateNewAnnouncementInput!) {
+  createNewAnnouncement(input: $input) {
+    _id
+    message
+    description
+    privacy
+    date
+    building {
+      _id
+    }
+    apartments {
+      _id
+      name
+    }
+  }
+}

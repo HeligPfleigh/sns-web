@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Image, Row } from 'react-bootstrap';
+import { Image, Col } from 'react-bootstrap';
 import Gallery from './Gallery';
 import s from './PostPhotos.scss';
 
@@ -14,7 +14,7 @@ class PostPhotos extends Component {
       thumbnail: image,
     }));
     return (
-      <Row>
+      <Col>
         {
           images.length > 1 ? <Gallery
             images={imagesToView}
@@ -27,7 +27,7 @@ class PostPhotos extends Component {
             responsive
           />
         }
-      </Row>
+      </Col>
     );
   }
 }

@@ -13,18 +13,18 @@ import s from './BuildingAnnouncement.scss';
 class BuildingAnnouncement extends Component {
   render() {
     const { data: { loading, resident } } = this.props;
-    let building = null;
+    let announcements = null;
     if (resident) {
-      building = resident.building;
+      announcements = resident.announcements;
     }
     return (
       <div>
-        {loading && <h1 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h1>}
-        {!loading && building && building.announcements && building.announcements.edges.length > 0 &&
-          <BuildingAnnouncementList buildingId={building._id}>
+        {loading && <h3 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h3>}
+        {!loading && announcements && announcements.edges.length > 0 &&
+          <BuildingAnnouncementList>
             <BuildingAnnouncementHeader />
             {
-              building.announcements && building.announcements.edges.map((a) => {
+              announcements.edges.map((a) => {
                 let newMessage = null;
                 const oldMessageLength = a.message.length;
                 if (oldMessageLength > 21) {
@@ -69,6 +69,7 @@ export default compose(
       variables: {
         userId: ownProps.user.id,
         limit: 3,
+        cursor: null,
       },
       fetchPolicy: 'network-only',
     }),

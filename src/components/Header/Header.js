@@ -62,6 +62,7 @@ const NotifyFragment = gql`
       month
       year
       apartment
+      announcement
     }
     subject {
       _id
@@ -161,7 +162,7 @@ class Header extends Component {
         <Grid>
           <Row>
             <Col md={6} sm={6} xs={6}>
-              <Button title="Trang chủ" onClick={this.gotoHomePage} bsStyle="danger">HX</Button>
+              <Button title="Trang chủ" onClick={this.gotoHomePage} bsStyle="danger" className='pull-left marginTop'>HX</Button>
               <MediaQuery query="(min-width: 992px)">
                 <SearchBox />
               </MediaQuery>

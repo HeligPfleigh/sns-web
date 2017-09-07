@@ -21,12 +21,14 @@ class Message extends Component {
     const picture = user && user.profile && user.profile.picture;
     const isOwner = user === members[0];
     return (
-      <span>
+      <div>
+        <div>
         {
           isShowDate === true && <div className={s.dateView}>
             <span>{ moment(messageValues && messageValues.timestamp).format('HH:mm DD/MM/YYYY') }</span>
           </div>
         }
+        </div>
         <div className={classnames(s.root, { [s.rootOwner]: isOwner })} >
           <div className={s.chatUser}>
             <Link to={`/user/${user.id}`}>
@@ -37,7 +39,7 @@ class Message extends Component {
             <div dangerouslySetInnerHTML={{ __html: messageValues && messageValues.message }} />
           </div>
         </div>
-      </span>
+      </div>
     );
   }
 }

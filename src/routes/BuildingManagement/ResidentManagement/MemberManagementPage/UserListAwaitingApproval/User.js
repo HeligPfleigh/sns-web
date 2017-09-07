@@ -1,54 +1,78 @@
-import React, { PropTypes } from 'react';
-import { Row, Col, Clearfix, ButtonToolbar, ButtonGroup, Button, Image } from 'react-bootstrap';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import {
+  Row,
+  Col,
+  Alert,
+  Image,
+  Button,
+  Clearfix,
+  ButtonToolbar,
+} from 'react-bootstrap';
+
 import history from '../../../../../core/history';
 import {
   ACCEPTED,
   REJECTED,
   PENDING,
 } from '../../../../../constants';
+import RejectModal from '../RejectModal';
 import s from './UserAwaitingApproval.scss';
 
 class User extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      errorMessage: null,
+      showModal: false,
+    };
+  }
+
+  onToggleModal = () => {
+    this.setState({
+      showModal: !this.state.showModal,
+    });
+  }
 
   approveUser = (evt) => {
     const requestsToJoinBuildingId = this.props.edge._id;
     this.props.onAccept(evt, requestsToJoinBuildingId);
   }
 
-  rejectUser = (evt) => {
-    const requestsToJoinBuildingId = this.props.edge._id;
-    this.props.onCancel(evt, requestsToJoinBuildingId);
-  }
-
   useDetail = (evt) => {
     evt.preventDefault();
     const requestsToJoinBuildingId = this.props.edge._id;
-    history.push(`/user-approval/${requestsToJoinBuildingId}`);
+    history.push(`/management/user-approval/${requestsToJoinBuildingId}`);
   }
 
   render() {
     const {
       edge: {
+        _id,
         user,
         status,
         requestInformation: {
           apartments,
         },
       },
+      onCancel,
     } = this.props;
     return (
       <div className={s.item}>
         { user && status &&
           <Row>
-            <Col xs={4} md={3}>
+            <Col xs={3} md={2}>
               <Image
-                width={150}
+                circle
                 thumbnail responsive
                 src={user.profile.picture || '/avatar-default.jpg'}
+                className={s.avarta}
               />
             </Col>
-            <Col xs={8} md={9}>
+            <Col xs={9} md={10}>
               <label className={s.fullName}>{`${user.profile.firstName} ${user.profile.lastName}`}</label>
               <div className={s.moreInfo}>
                 <div>
@@ -66,24 +90,33 @@ class User extends React.Component {
               </div>
 
               <ButtonToolbar>
-                <Button title="Xem thông tin của thành viên" bsStyle="info" bsSize="xsmall" onClick={this.useDetail}>
+                <Button title="Xem thông tin của thành viên" bsStyle="primary" onClick={this.useDetail}>
                   <i className="fa fa-info-circle" /> Xem thông tin
                 </Button>
                 { status === PENDING &&
-                  <ButtonGroup>
-                    <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" bsSize="xsmall" onClick={this.approveUser}>
+                  <span>
+                    <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" onClick={this.approveUser}>
                       <i className="fa fa-check" /> Đồng ý
                     </Button>
-                    <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="danger" bsSize="xsmall" onClick={this.rejectUser}>
+                    <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="default" onClick={this.onToggleModal}>
                       <i className="fa fa-remove" /> Từ chối
                     </Button>
-                  </ButtonGroup>
+                  </span>
                 }
               </ButtonToolbar>
             </Col>
             <Clearfix />
           </Row>
         }
+        {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
+          { this.state.errorMessage }
+        </Alert>)}
+        { this.state.showModal && <RejectModal
+          requestsToJoinBuildingId={_id}
+          onReject={onCancel}
+          show={this.state.showModal}
+          onHide={this.onToggleModal}
+        /> }
       </div>
     );
   }

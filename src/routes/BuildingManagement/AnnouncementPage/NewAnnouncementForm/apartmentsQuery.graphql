@@ -1,0 +1,9 @@
+query apartmentsQuery ($buildingId: String!) {
+  building (_id: $buildingId) {
+    _id
+    apartments {
+      _id
+      name
+    }
+  }
+}

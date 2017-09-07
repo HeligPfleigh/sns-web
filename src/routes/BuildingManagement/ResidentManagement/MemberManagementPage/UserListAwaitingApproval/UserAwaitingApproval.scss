@@ -6,6 +6,11 @@
     padding-top: 15px;
     border-bottom: 1px solid #ccc;
 
+    .avarta {
+      width: 130px !important;
+      height: 110px !important;
+    }
+
     .moreInfo {
       padding-top: 10px;
       padding-bottom: 10px;
@@ -23,6 +28,26 @@
 
   .noRecordsFound {
     padding-top: 10px;
+  }
+
+  :global .btn {
+    font-weight: 500;
+    margin-left: 5px !important;
+    border-radius: 4px;
+  }
+  :global .btn-primary {
+    color: #fff;
+    background: #283e4a;
+    &:hover {
+        background: #3E5B6B;
+    }
+  }
+  :global .btn-default {
+    color: #fff;
+    background: #bbb;
+    &:hover {
+        background: #ccc;
+    }
   }
 }
 .userDetailAwaitingApproval {

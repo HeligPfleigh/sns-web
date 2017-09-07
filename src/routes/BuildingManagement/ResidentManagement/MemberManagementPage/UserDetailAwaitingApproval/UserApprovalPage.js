@@ -4,17 +4,18 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import { graphql, compose } from 'react-apollo';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Alert, Grid, Row, Col } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
 import s from './UserApprovalPage.scss';
-import { PENDING } from '../../constants';
-import Loading from '../../components/Loading';
-import Menu from '../BuildingManagement/Menu/Menu';
-import { openAlertGlobal } from '../../reducers/alert';
-import userApprovalPageQuery from './userApprovalPageQuery.graphql';
-import rejectingUserToBuildingMutation from './rejectingUserToBuildingMutation.graphql';
-import approvingUserToBuildingMutation from './approvingUserToBuildingMutation.graphql';
+import { PENDING } from '../../../../../constants';
+import Loading from '../../../../../components/Loading';
+import Menu from '../../../Menu/Menu';
+import RejectModal from '../RejectModal';
+import { openAlertGlobal } from '../../../../../reducers/alert';
+import userApprovalPageQuery from '../graphql/UserDetailApprovalQuery.graphql';
+import rejectingUserToBuildingMutation from '../graphql/rejectingUserToBuildingMutation.graphql';
+import approvingUserToBuildingMutation from '../graphql/approvingUserToBuildingMutation.graphql';
 
 function generateFullname({ firstName, lastName }) {
   return `${lastName} ${firstName}`;
@@ -32,6 +33,21 @@ function getAddress({
 }
 
 class UserApprovalPage extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      errorMessage: null,
+      showModal: false,
+    };
+  }
+
+  onToggleModal = () => {
+    this.setState({
+      showModal: !this.state.showModal,
+    });
+  }
 
   backBuildingRequestTab = () => history.back()
 
@@ -54,14 +70,12 @@ class UserApprovalPage extends Component {
     });
   }
 
-  rejectUser = (evt) => {
-    evt.preventDefault();
+  rejectUser = (requestsToJoinBuildingId, message) => {
     const {
-      data: { requestsToJoinBuilding },
       rejectingUserToBuilding,
       openAlertGlobalAction,
     } = this.props;
-    rejectingUserToBuilding(requestsToJoinBuilding._id)
+    rejectingUserToBuilding(requestsToJoinBuildingId, message)
     .then(() => {
       openAlertGlobalAction({
         message: 'Bạn đã hủy yêu cầu của user thành công',
@@ -82,6 +96,10 @@ class UserApprovalPage extends Component {
       },
     } = this.props;
 
+    if (loading) {
+      return <Loading show={loading} full>Đang tải ...</Loading>;
+    }
+
     let user = null;
     let building = null;
     let requestInformation = null;
@@ -90,9 +108,7 @@ class UserApprovalPage extends Component {
       building = requestsToJoinBuilding.building;
       requestInformation = requestsToJoinBuilding.requestInformation;
     }
-    if (loading) {
-      return <Loading show={loading} full>Đang tải ...</Loading>;
-    }
+
     return (
       <Grid>
         <Row className={classNames(s.containerTop30)}>
@@ -107,7 +123,7 @@ class UserApprovalPage extends Component {
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>
             <Row className={classNames(s.container)}>
-              <div className={s.backBuildingRequestTab} onClick={this.backBuildingRequestTab}>
+              <div onClick={this.backBuildingRequestTab}>
                 <i className="fa fa-chevron-left" aria-hidden="true"></i>
                 <h4>Quay lại trang</h4>
               </div>
@@ -191,7 +207,7 @@ class UserApprovalPage extends Component {
                     Đồng ý
                   </button>
                   <button
-                    onClick={this.rejectUser}
+                    onClick={this.onToggleModal}
                     className={s.buttonCancel}
                   >
                     Từ chối
@@ -200,6 +216,26 @@ class UserApprovalPage extends Component {
             </Row>
           </Col>
         </Row>
+        {
+          this.state.errorMessage && (
+            <Alert
+              bsStyle="danger"
+              onDismiss={() => this.setState({ errorMessage: false })}
+            >
+              { this.state.errorMessage }
+            </Alert>
+          )
+        }
+        {
+          this.state.showModal && (
+            <RejectModal
+              onReject={this.rejectUser}
+              show={this.state.showModal}
+              onHide={this.onToggleModal}
+              requestsToJoinBuildingId={requestsToJoinBuilding._id}
+            />
+          )
+        }
       </Grid>
     );
   }
@@ -240,10 +276,11 @@ export default compose(
   }),
   graphql(rejectingUserToBuildingMutation, {
     props: ({ mutate }) => ({
-      rejectingUserToBuilding: id => mutate({
+      rejectingUserToBuilding: (id, message) => mutate({
         variables: {
           input: {
             requestsToJoinBuildingId: id,
+            message,
           },
         },
       }),

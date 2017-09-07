@@ -47,7 +47,6 @@ class ApartmentList extends Component {
     const { me } = this.props;
     const { loading } = this.props;
 
-
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
