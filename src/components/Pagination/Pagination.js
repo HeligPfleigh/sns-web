@@ -25,7 +25,8 @@ export default class Pagination extends Component {
 
   render() {
     const { className, display, total, page, next, prev, first, last, ellipsis, boundaryLinks, limit } = this.props;
-    const maxButtons = Math.min(display, Math.ceil(total / limit));
+    const items = Math.ceil(total / limit);
+    const maxButtons = Math.min(display, items);
     if (maxButtons <= 1) {
       return null;
     }
@@ -38,7 +39,7 @@ export default class Pagination extends Component {
       first={first}
       last={last}
       ellipsis={ellipsis}
-      items={total}
+      items={items}
       activePage={page}
       onSelect={this.onChange}
     />);
