@@ -21,6 +21,7 @@ import {
   SHARING_POST,
   INTEREST_EVENT,
   NEW_FEE_APARTMENT,
+  NEW_ANNOUNCEMENT,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
@@ -56,6 +57,7 @@ const collectionNotifyMessages = {
   [REJECTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã bị từ chối tham gia vào tòa nhà' : ' bị từ chối tham gia vào tòa nhà'),
   [INTEREST_EVENT]: () => ' vừa quan tâm sự kiện bạn tạo',
   [NEW_FEE_APARTMENT]: () => '',
+  [NEW_ANNOUNCEMENT]: () => '',
 };
 
 export const getNotifyContent = (currentUser, author, type, actors, data) => {
@@ -78,6 +80,8 @@ export const getNotifyContent = (currentUser, author, type, actors, data) => {
     }
 
     return notifyContent;
+  } else if (type === NEW_ANNOUNCEMENT) {
+    return 'Bạn vừa nhận được thông báo mới từ tòa nhà';
   }
 
   return '';
@@ -120,6 +124,10 @@ class NotificationItem extends Component {
 
     if (NEW_FEE_APARTMENT === type) {
       history.push(`/apartment/${data.apartment}/service_fee`);
+    }
+
+    if (NEW_ANNOUNCEMENT === type) {
+      history.push(`/announcement/${data.announcement}`);
     }
 
     if ([ACCEPTED_JOIN_BUILDING, REJECTED_JOIN_BUILDING].indexOf(type) > -1) {
