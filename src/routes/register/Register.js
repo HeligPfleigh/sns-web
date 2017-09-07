@@ -253,7 +253,6 @@ class Register extends Component {
       padding: '6px',
       backgroundColor: saved ? '#2BB74B' : '#E53935',
     };
-
     return (
       <div>
         <Modal

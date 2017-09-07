@@ -1,0 +1,25 @@
+query announcementQuery($announcementId: String!, $userId: String!, $limit: Int) {
+  announcement(_id: $announcementId) {
+    _id
+    message
+    description
+    date
+  }
+  resident(_id: $userId) {
+    _id
+    announcements (cursor: $announcementId, limit: $limit) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        _id
+        message
+        description
+        date
+      }
+    }
+  }
+}

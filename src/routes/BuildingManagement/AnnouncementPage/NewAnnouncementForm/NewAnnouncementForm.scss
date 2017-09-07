@@ -1,4 +1,5 @@
 @import "../../../../theme/resources.scss";
+@global-import 'react-select/dist/react-select.css';
 
 .displayForm {
   display: flex;
@@ -23,6 +24,11 @@ button.addPhoto, button.addPhoto:hover, button.addPhoto:active {
   text-decoration: none;
   border: none;
   background-color: transparent;
+}
+
+.setPrivaryBtn{
+  border-bottom-right-radius: 2;
+  border-top-right-radius: 2;
 }
 
 @media (max-width: 992px) {

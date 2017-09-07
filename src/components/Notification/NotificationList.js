@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { generate as idRandom } from 'shortid';
+import { Clearfix } from 'react-bootstrap';
 import NotificationItem from './NotificationItem';
 import s from './NotificationList.scss';
 
@@ -30,6 +31,7 @@ class NotificationList extends Component {
             hidePopup={hidePopup}
           />
         ))}
+        <Clearfix />
       </span>
     );
   }

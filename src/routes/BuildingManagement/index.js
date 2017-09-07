@@ -3,7 +3,9 @@ import Layout from '../../components/Layout';
 import { checkAuth } from '../../utils/role';
 
 export default {
+
   path: '/management',
+
   children: [
     {
       path: '/',
@@ -48,6 +50,20 @@ export default {
         return {
           title: 'SNS - Ban quản lý tòa nhà',
           component: <Layout><MemberManagement buildingId={params.buildingId} /></Layout>,
+        };
+      },
+    }, {
+      path: '/user-approval/:id',
+      async action(context) {
+        const redirect = checkAuth(context.store);
+        if (redirect) return redirect;
+        const UserApprovalPage = await require.ensure(
+          [], require => require('./ResidentManagement/MemberManagementPage/UserDetailAwaitingApproval').default,
+          'UserApprovalPage',
+        );
+        return {
+          title: 'SNS - Phê duyệt user',
+          component: <Layout><UserApprovalPage requestId={context.params.id} /></Layout>,
         };
       },
     }, {
