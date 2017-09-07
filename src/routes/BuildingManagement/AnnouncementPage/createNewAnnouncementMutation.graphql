@@ -8,5 +8,9 @@ mutation createNewAnnouncementMutation ($input: CreateNewAnnouncementInput!) {
     building {
       _id
     }
+    apartments {
+      _id
+      name
+    }
   }
 }
