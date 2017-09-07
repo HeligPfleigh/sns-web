@@ -51,6 +51,7 @@ const notificationFragment = gql`
       month
       year
       apartment
+      announcement
     }
     type
     seen

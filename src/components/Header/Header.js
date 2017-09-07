@@ -62,6 +62,7 @@ const NotifyFragment = gql`
       month
       year
       apartment
+      announcement
     }
     subject {
       _id
