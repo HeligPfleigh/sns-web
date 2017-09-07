@@ -104,6 +104,7 @@ const headerQuery = gql`query headerQuery($cursor: String) {
   me {
      _id
     username
+    isAdmin
     profile {
       picture
       firstName
