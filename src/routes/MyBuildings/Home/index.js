@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import gql from 'graphql-tag';
+import filter from 'lodash/filter';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import history from '../../../core/history';
@@ -29,7 +30,7 @@ const BOMQuery = gql`query BOMQuery {
   }
 }`;
 
-class HomeManagement extends Component {
+class HomePage extends Component {
 
   componentWillReceiveProps = (nextProps) => {
     if (!nextProps.loading && nextProps.me) {
@@ -41,7 +42,7 @@ class HomeManagement extends Component {
   }
 
   onRedirect = (id) => {
-    history.push(`/management/${id}`);
+    history.push(`/my-buildings/${id}`);
   }
 
   render() {
@@ -52,17 +53,19 @@ class HomeManagement extends Component {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
 
+    const dataSource = filter((me && me.buildings) || [], { isAdmin: true });
+
     return (
       <div className="container">
         <div className={s.containerTop30}>
-          <BuildingList buildings={me && me.buildings} onRedirect={this.onRedirect} />
+          <BuildingList buildings={dataSource} onRedirect={this.onRedirect} />
         </div>
       </div>
     );
   }
 }
 
-HomeManagement.propTypes = {
+HomePage.propTypes = {
   loading: PropTypes.bool.isRequired,
   me: PropTypes.object,
   // user: PropTypes.object.isRequired,
@@ -92,5 +95,5 @@ export default compose(
       };
     },
   }),
-)(HomeManagement);
+)(HomePage);
 
