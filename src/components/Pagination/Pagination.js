@@ -20,7 +20,7 @@ export default class Pagination extends Component {
 
   onChange(page, event) {
     event.preventDefault();
-    this.props.onChange(page - 1);
+    this.props.onChange(page);
   }
 
   render() {
@@ -39,7 +39,7 @@ export default class Pagination extends Component {
       last={last}
       ellipsis={ellipsis}
       items={total}
-      activePage={page + 1}
+      activePage={page}
       onSelect={this.onChange}
     />);
   }
