@@ -4,13 +4,12 @@ import isEmpty from 'lodash/isEmpty';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Col, Image } from 'react-bootstrap';
 import s from './BuildingItem.scss';
-import history from '../../../../core/history';
 
 class BuildingItem extends Component {
 
   onRedirect = () => {
     const { building: { _id } } = this.props;
-    history.push(`/management/${_id}`);
+    this.props.onRedirect(_id);
   }
 
   render() {
@@ -51,6 +50,7 @@ class BuildingItem extends Component {
 
 BuildingItem.propTypes = {
   building: PropTypes.object.isRequired,
+  onRedirect: PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(BuildingItem);

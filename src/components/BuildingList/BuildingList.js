@@ -9,7 +9,7 @@ import s from './BuildingList.scss';
 class BuildingList extends Component {
 
   render() {
-    const { buildings } = this.props;
+    const { buildings, onRedirect } = this.props;
 
     return (
       <div className={s.buildings}>
@@ -19,6 +19,7 @@ class BuildingList extends Component {
             { (buildings || []).map(building => <BuildingItem
               key={Math.random()}
               building={building}
+              onRedirect={onRedirect}
             />) }
           </Col>
         </Row>
@@ -27,7 +28,8 @@ class BuildingList extends Component {
   }
 }
 BuildingList.propTypes = {
-  buildings: PropTypes.array,
+  buildings: PropTypes.array.isRequired,
+  onRedirect: PropTypes.func.isRequired,
 };
 
 export default withStyles(s)(BuildingList);
