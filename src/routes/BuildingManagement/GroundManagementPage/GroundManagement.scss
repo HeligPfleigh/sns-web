@@ -3,12 +3,8 @@
 }
 
 .container {
-  background: #fff;
-
-  .contentMain {
-    background: #fff;
-    padding: 20px;
-  }
+  background-color: #fff;
+  padding: 15px 8px;
 
   a, a:hover, a:active {
     cursor: pointer;
@@ -17,19 +13,89 @@
     text-decoration-line: none;
   }
 
-  .panel-title {
-    border-bottom: 1px solid #ccc;
-    ol {
-      padding: 20px 1px 0px;
-      background-color: #fff;
+  ol {
+    padding: 8px 1px;
+    background-color: #fff;
 
-      .breadcrumbItem {
-        i {
-          padding-right: 5px;
+    .breadcrumbItem {
+      i {
+        padding-right: 5px;
+      }
+    }
+  }
+
+  .stats {
+    margin: 0;
+    line-height: 34px;
+
+    :global {
+      .pull-left {
+        font-style: italic;
+        font-size: 13px;
+        color: #d43f3a;
+      }
+
+      .pull-right {
+        text-align: right;
+        
+        .fa-file-excel-o:before {
+          font-size: 24px;
+          line-height: 34px;
+          color: #1b926c;
+          cursor: pointer;
         }
       }
     }
   }
+
+  .filter {
+    padding-bottom: 20px;
+
+    .label {
+      text-align: right;
+      line-height: 34px;
+    }
+
+    .apartment {
+
+    }
+
+    .resident {
+
+    }
+
+    .button {
+
+    }
+  }
+
+  .datatable {
+    border: 2px solid #52b9e9;
+    margin-bottom: 0;
+
+    th, td {
+      font-size: 14px;
+      padding: 12px 6px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #52b9e9;	
+      font-weight: 700;
+      color: #fff;
+      border: 0;
+    }
+
+    td {
+      color: #4c4c4c;
+      font-weight: 400;
+
+      a { 
+        color: #0551ff;
+      }
+    }
+  }
+
 }
 
 @media (max-width: 992px) {

@@ -1,0 +1,29 @@
+query ResidentsInApartmentBuilding($building: String!, $filters: SearchByResidentsInApartmentBuilding, $page: Int, $limit: Int) {
+  residentsInApartmentBuilding(building: $building, filters: $filters, page: $page, limit: $limit) {
+    pageInfo {
+      page
+      total
+      limit
+    }
+    stats {
+      numberOfApartments
+      numberOfResidents
+    }
+    edges {
+      _id
+      name
+      number
+      building
+      residents {
+        _id
+        username
+        chatId
+        totalFriends
+        totalNotification
+        isFriend
+        createdAt
+        updatedAt
+      }
+    }
+  }
+}
