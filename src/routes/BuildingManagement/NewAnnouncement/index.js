@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { compose } from 'react-apollo';
 import { connect } from 'react-redux';
-import { reset } from 'redux-form';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
@@ -29,7 +28,7 @@ class Announcement extends Component {
               { user && <Menu
                 user={user}
                 parentPath={`/management/${buildingId}`}
-                pageKey="noti_other"
+                pageKey="announcements_management>create_announcement"
               /> }
             </Col>
           </MediaQuery>
@@ -38,7 +37,7 @@ class Announcement extends Component {
               <Col md={12} className={s.contentMain}>
                 <div className={s.header}>
                   <i className="fa fa-bullhorn" aria-hidden="true"></i>
-                  <span className={s.headerTitle}>Thông báo khác</span>
+                  <span className={s.headerTitle}>Tạo thông báo mới</span>
                 </div>
                 <NewAnnouncementForm
                   buildingId={buildingId}
