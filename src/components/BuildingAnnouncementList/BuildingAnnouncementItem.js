@@ -54,13 +54,19 @@ class BuildingAnnouncementItem extends Component {
           </Link>
           { displayAction && <div className={s.buildingAnnouncementButtons}>
             <Button
-              bsStyle="primary"
+              bsStyle="default"
               onClick={this.edit}
-              style={{ marginRight: '5px' }}
+              style={{ border: 'none' }}
             >
-              Edit
+              <i className="fa fa-pencil" aria-hidden="true"></i>
             </Button>
-            <Button bsStyle="primary" onClick={this.delete} >Delete</Button>
+            <Button
+              bsStyle="default"
+              onClick={this.delete}
+              style={{ border: 'none' }}
+            >
+              <i className="fa fa-times" aria-hidden="true"></i>
+            </Button>
           </div>
           }
         </div>

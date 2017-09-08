@@ -6,8 +6,9 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { FormControl, FormGroup, Dropdown, MenuItem, Button } from 'react-bootstrap';
 import Select from 'react-select';
-import { Field, reduxForm, reset } from 'redux-form';
+import { Field, reduxForm, reset as resetReduxForm } from 'redux-form';
 import { openAlertGlobal } from '../../../../reducers/alert';
+import apartmentsQuery from '../apartmentsQuery.graphql';
 import createNewAnnouncementMutation from '../createNewAnnouncementMutation.graphql';
 import {
   required,
@@ -17,7 +18,6 @@ import {
   PUBLIC,
   PRIVATE,
 } from '../../../../constants';
-import apartmentsQuery from './apartmentsQuery.graphql';
 import s from './NewAnnouncementForm.scss';
 
 const renderTextField = ({ input, placeholder, type, meta: { touched, error, warning } }) => (
@@ -301,6 +301,6 @@ export default compose(
   null,
   dispatch => ({
     openAlertGlobalAction: data => dispatch(openAlertGlobal(data)),
-    resetForm: () => dispatch(reset('newAnnouncementForm')),
+    resetForm: () => dispatch(resetReduxForm('newAnnouncementForm')),
   }),
 )(NewAnnouncementReduxForm));

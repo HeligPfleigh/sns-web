@@ -1,0 +1,34 @@
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  background: #fff;
+  .contentMain {
+    background: #fff;
+    padding: 20px;
+  }
+}
+
+.header {
+  font-size: 18px;
+  font-weight: bold;
+  color: #283e4a;
+  margin-bottom: 20px;
+}
+
+.headerTitle {
+  margin-left: 10px;
+}
+
+.announcementList {
+  list-style: none;
+  padding: 0;
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
+  
