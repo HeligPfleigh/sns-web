@@ -129,19 +129,36 @@ export default {
         };
       },
     }, {
-      path: '/:buildingId/noti_other',
+      path: '/:buildingId/create_announcement',
       async action({ store, params }) {
         const redirect = checkAuth(store);
         if (redirect) return redirect;
-        const BuldingAnnouncementPage = await require.ensure(
+        const Announcement = await require.ensure(
           [],
-          require => require('./AnnouncementPage/index').default,
-          'BuldingAnnouncementPage',
+          require => require('./NewAnnouncement/index').default,
+          'Announcement',
         );
         return {
           title: 'SNS - Ban quản lý tòa nhà',
           component: <Layout>
-            <BuldingAnnouncementPage buildingId={params.buildingId} />
+            <Announcement buildingId={params.buildingId} />
+          </Layout>,
+        };
+      },
+    }, {
+      path: '/:buildingId/announcements_management',
+      async action({ store, params }) {
+        const redirect = checkAuth(store);
+        if (redirect) return redirect;
+        const AnnouncementsManagement = await require.ensure(
+          [],
+          require => require('./AnnouncementsManagement/index').default,
+          'AnnouncementsManagement',
+        );
+        return {
+          title: 'SNS - Ban quản lý tòa nhà',
+          component: <Layout>
+            <AnnouncementsManagement buildingId={params.buildingId} />
           </Layout>,
         };
       },
