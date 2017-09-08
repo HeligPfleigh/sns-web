@@ -25,11 +25,12 @@ class Announcement extends Component {
         <Row className={s.containerTop30}>
           <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
             <Col md={3} smHidden xsHidden>
-              <Menu
+              { user && <Menu
                 user={user}
                 parentPath={`/management/${buildingId}`}
                 pageKey="announcements_management>create_announcement"
               />
+              }
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>

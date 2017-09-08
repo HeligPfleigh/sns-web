@@ -1,4 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
+import isBoolean from 'lodash/isBoolean';
 
 export default role => (route) => {
   const newRoute = {
@@ -55,4 +56,17 @@ export const checkAuth = (store) => {
     };
   }
   return false;
+};
+
+export const checkAuthAdmin = (store) => {
+  const normalCheck = checkAuth(store);
+  if (isBoolean(normalCheck) && !normalCheck) {
+    const state = store.getState();
+    if (state.user.isAdmin === false) {
+      return {
+        redirect: '/permission-error',
+      };
+    }
+  }
+  return normalCheck;
 };

@@ -1,17 +1,19 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import { checkAuth } from '../../utils/role';
+import { checkAuthAdmin } from '../../utils/role';
 
 export default {
 
   path: '/management',
 
+  async action({ store }) {
+    const redirect = checkAuthAdmin(store);
+    if (redirect) return redirect;
+  },
   children: [
     {
       path: '/',
-      async action({ store }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action() {
         const HomeManagement = await require.ensure(
           [],
           require => require('./HomeManagement/index').default,
@@ -24,9 +26,7 @@ export default {
       },
     }, {
       path: '/:buildingId',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const GroundManagement = await require.ensure(
           [],
           require => require('./GroundManagementPage/GroundManagement').default,
@@ -39,9 +39,7 @@ export default {
       },
     }, {
       path: '/:buildingId/approve_member',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const MemberManagement = await require.ensure(
           [],
           require => require('./ResidentManagement/MemberManagementPage/MemberManagement').default,
@@ -55,8 +53,6 @@ export default {
     }, {
       path: '/user-approval/:id',
       async action(context) {
-        const redirect = checkAuth(context.store);
-        if (redirect) return redirect;
         const UserApprovalPage = await require.ensure(
           [], require => require('./ResidentManagement/MemberManagementPage/UserDetailAwaitingApproval').default,
           'UserApprovalPage',
@@ -68,9 +64,7 @@ export default {
       },
     }, {
       path: '/:buildingId/change_info',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const ChangeInfoPage = await require.ensure(
           [],
           require => require('./ResidentManagement/ChangeInfoPage/index').default,
@@ -83,9 +77,7 @@ export default {
       },
     }, {
       path: '/:buildingId/fee_dashboard',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const ReportPage = await require.ensure(
           [],
           require => require('./FeeManagement/ReportPage/index').default,
@@ -98,9 +90,7 @@ export default {
       },
     }, {
       path: '/:buildingId/fee_upload',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const UploadPage = await require.ensure(
           [],
           require => require('./FeeManagement/UploadPage/index').default,
@@ -113,9 +103,7 @@ export default {
       },
     }, {
       path: '/:buildingId/fee_notications',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const AnnouncementPage = await require.ensure(
           [],
           require => require('./FeeManagement/AnnouncementPage/index').default,
@@ -130,9 +118,7 @@ export default {
       },
     }, {
       path: '/:buildingId/create_announcement',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const Announcement = await require.ensure(
           [],
           require => require('./NewAnnouncement/index').default,
@@ -147,9 +133,7 @@ export default {
       },
     }, {
       path: '/:buildingId/announcements_management',
-      async action({ store, params }) {
-        const redirect = checkAuth(store);
-        if (redirect) return redirect;
+      async action({ params }) {
         const AnnouncementsManagement = await require.ensure(
           [],
           require => require('./AnnouncementsManagement/index').default,
