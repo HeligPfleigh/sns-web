@@ -26,7 +26,7 @@ class BuildingAnnouncementItem extends Component {
       data,
     } = this.props;
     if (onDelete) {
-      onDelete(data._id, data.message);
+      onDelete(data._id);
     }
   }
 
