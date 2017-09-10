@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose, graphql } from 'react-apollo';
 import { connect } from 'react-redux';
+import update from 'immutability-helper';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Pagination } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
@@ -11,6 +12,8 @@ import announcementsQuery from './announcementsQuery.graphql';
 import {
   BuildingAnnouncementItem,
 } from '../../../components/BuildingAnnouncementList';
+import DeleteAnnouncementModal from './DeleteAnnouncementModal';
+import deleteAnnouncementMutation from './deleteAnnouncementMutation.graphql';
 import s from './style.scss';
 
 const limit = 4;
@@ -21,7 +24,35 @@ class AnnouncementsManagement extends Component {
     this.state = {
       loading: false,
       currentPage: 1,
+      idDeleteAnnouncement: null,
+      showDeleteAnnouncement: false,
     };
+  }
+
+  onClickModal = (evt) => {
+    evt.preventDefault();
+    const { idDeleteAnnouncement } = this.state;
+    if (idDeleteAnnouncement) {
+      this.props.deleteAnnouncement(idDeleteAnnouncement);
+    }
+    this.closeModal();
+  }
+
+  closeModal = () => {
+    const { idDeleteAnnouncement } = this.state;
+    if (idDeleteAnnouncement) {
+      this.setState(() => ({
+        showDeleteAnnouncement: false,
+        idDeleteAnnouncement: null,
+      }));
+    }
+  }
+
+  deleteAnnouncementEvent = (id) => {
+    this.setState({
+      idDeleteAnnouncement: id,
+      showDeleteAnnouncement: true,
+    });
   }
 
   handlePageSelect = (pageNum) => {
@@ -91,6 +122,7 @@ class AnnouncementsManagement extends Component {
                         data={a}
                         message={a.message}
                         displayAction
+                        onDelete={this.deleteAnnouncementEvent}
                       />
                     ))
                   }
@@ -112,6 +144,11 @@ class AnnouncementsManagement extends Component {
             </div>
           </Col>
         </Row>
+        <DeleteAnnouncementModal
+          show={this.state.showDeleteAnnouncement}
+          closeModal={this.closeModal}
+          clickModal={this.onClickModal}
+        />
       </Grid>
     );
   }
@@ -122,6 +159,7 @@ AnnouncementsManagement.propTypes = {
   loadMoreRows: PropTypes.func,
   user: PropTypes.object.isRequired,
   buildingId: PropTypes.string.isRequired,
+  deleteAnnouncement: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -156,5 +194,53 @@ export default compose(
         loadMoreRows,
       };
     },
+  }),
+  graphql(deleteAnnouncementMutation, {
+    props: ({ ownProps, mutate }) => ({
+      deleteAnnouncement: idDeleteAnnouncement => mutate({
+        variables: {
+          _id: idDeleteAnnouncement,
+          buildingId: ownProps.buildingId,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deleteAnnouncement: {
+            __typename: 'Announcement',
+            _id: idDeleteAnnouncement,
+            buildingId: ownProps.buildingId,
+          },
+        },
+        update: (store, { data: { deleteAnnouncement } }) => {
+          // Read the data from our cache for this query.
+          let data = store.readQuery({
+            query: announcementsQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+              skip: 0,
+              limit: 4,
+            },
+          });
+          data = update(data, {
+            building: {
+              announcements: {
+                edges: {
+                  $unset: [deleteAnnouncement._id],
+                },
+              },
+            },
+          });
+          // Write our data back to the cache.
+          store.writeQuery({
+            query: announcementsQuery,
+            variables: {
+              buildingId: ownProps.buildingId,
+              skip: 0,
+              limit: 4,
+            },
+            data,
+          });
+        },
+      }),
+    }),
   }),
 )(AnnouncementsManagement);
