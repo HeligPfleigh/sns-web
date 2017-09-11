@@ -1,0 +1,33 @@
+query MyBuildingQueries(
+  $building: String!,
+  $limit: Int
+) {
+  apartmentsOfUserByBuilding(buildingId: $building) {
+    _id
+    name
+  }
+  FAQs(building: $building, limit: $limit) {
+    edges {
+      ...FAQView
+    }
+  }
+  documents(building: $building, limit: $limit) {
+    edges {
+      ...DocumentView
+    }
+  }
+}
+
+fragment FAQView on FAQ {
+  _id
+  name
+  message
+  updatedAt
+}
+
+fragment DocumentView on Document {
+  _id
+  name
+  file
+  updatedAt
+}
