@@ -1,0 +1,27 @@
+query feesOfApartment (
+  $feeType: Int,
+  $feeDate: String,
+  $apartmentId: String!,
+){
+  feesOfApartment (
+    feeDate: $feeDate,
+    feeType: $feeType,
+    apartmentId: $apartmentId,
+  ){
+    month
+    year
+    totals
+    status
+    detail {
+      type {
+        code
+        name
+        icon
+      }
+      total
+      status
+      createdAt
+      updatedAt
+    }
+  }
+}
