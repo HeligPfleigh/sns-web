@@ -14,15 +14,15 @@ query ResidentsInApartmentBuilding($building: String!, $filters: SearchByResiden
       name
       number
       building
+      owner
       residents {
         _id
         username
-        chatId
-        totalFriends
-        totalNotification
-        isFriend
-        createdAt
-        updatedAt
+        profile {
+          fullName
+          picture
+          gender
+        }
       }
     }
   }

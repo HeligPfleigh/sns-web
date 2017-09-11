@@ -1,3 +1,6 @@
+@global-import 'rc-table/dist/rc-table.min.css';
+@global-import 'react-select/dist/react-select.css';
+
 .containerTop30 {
   margin-top: 30px;
 }
@@ -76,7 +79,7 @@
     th, td {
       font-size: 14px;
       padding: 12px 6px;
-      text-align: center;
+      text-align: left;
     }
 
     th {
@@ -84,6 +87,71 @@
       font-weight: 700;
       color: #fff;
       border: 0;
+    }
+
+    :global {
+      .rc-table {
+        font-size: inherit;
+        width: 100%;
+      }
+      
+      .rc-table-placeholder {
+        text-align: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+
+      .rc-table-row-expand-icon-cell {
+        text-align: center;
+      }
+
+      th, td {
+        &.rc-table-expand-icon-th, &.rc-table-row-expand-icon-cell {
+          width: 5%;
+        }
+
+        &.actions {
+          width: 10%;
+        }
+
+        &.apartmentName {
+          width: 25%;
+        }
+
+        &.residentName {
+          width: 40%;
+        }
+
+        &.residentRole {
+          width: 20%;
+        }
+      }
+      
+      .rc-table-expanded-row {
+
+        >td {
+          &:first-child {
+            width: 5%;
+          }
+
+          &:last-child {
+            width: 95%;
+          }
+        }
+
+        .rc-table-placeholder {
+          background: transparent;
+          border: none;
+        }
+
+        .rc-table {
+
+          td {
+            border: none;
+          }
+        }
+      }
+      
     }
 
     td {
