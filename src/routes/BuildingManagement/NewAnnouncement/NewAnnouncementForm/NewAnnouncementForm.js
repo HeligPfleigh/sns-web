@@ -4,8 +4,7 @@ import { graphql, compose } from 'react-apollo';
 import { generate as idRandom } from 'shortid';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { FormControl, FormGroup, Dropdown, MenuItem, Button } from 'react-bootstrap';
-import Select from 'react-select';
+import { FormGroup, Dropdown, MenuItem, Button } from 'react-bootstrap';
 import { Field, reduxForm, reset as resetReduxForm } from 'redux-form';
 import { openAlertGlobal } from '../../../../reducers/alert';
 import apartmentsQuery from '../apartmentsQuery.graphql';
@@ -18,87 +17,8 @@ import {
   PUBLIC,
   PRIVATE,
 } from '../../../../constants';
+import { TextField, TextAreaField, SelectApartmentsField } from '../../../../components/FormFields';
 import s from './NewAnnouncementForm.scss';
-
-const renderTextField = ({ input, placeholder, type, meta: { touched, error, warning } }) => (
-  <div className={s.displayFormRight}>
-    <FormControl
-      {...input}
-      placeholder={placeholder}
-      type={type}
-    />
-    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-  </div>
-);
-
-renderTextField.propTypes = {
-  placeholder: PropTypes.string,
-  input: PropTypes.any,
-  type: PropTypes.string,
-  meta: PropTypes.object,
-};
-
-const renderTextAreaField = ({ input, placeholder, componentClass, meta: { touched, error, warning } }) => (
-  <div className={s.displayFormRight}>
-    <FormControl
-      {...input}
-      placeholder={placeholder}
-      componentClass={componentClass}
-      style={{ minHeight: '200px' }}
-    />
-    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-  </div>
-);
-
-renderTextAreaField.propTypes = {
-  placeholder: PropTypes.string,
-  input: PropTypes.any,
-  componentClass: PropTypes.string,
-  meta: PropTypes.object,
-};
-
-const doNothing = () => {};
-
-const selectApartmentsField = ({
-  input,
-  multi,
-  valueKey,
-  labelKey,
-  dataSource,
-  placeholder,
-  onInputChange,
-  meta: { touched, error, warning },
-}) => (
-  <div className={s.displayFormRight}>
-    <Select
-      {...input}
-      multi={multi}
-      valueKey={valueKey}
-      labelKey={labelKey}
-      options={dataSource}
-      placeholder={placeholder}
-      onBlur={() => {
-        input.onBlur(input.value);
-      }}
-      onChange={(value) => {
-        input.onChange(value);
-      }}
-      onInputChange={onInputChange || doNothing}
-    />
-    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-  </div>
-);
-
-selectApartmentsField.propTypes = {
-  input: PropTypes.object.isRequired,
-  multi: PropTypes.bool,
-  valueKey: PropTypes.string,
-  labelKey: PropTypes.string,
-  dataSource: PropTypes.any.isRequired,
-  placeholder: PropTypes.string,
-  meta: PropTypes.object,
-  onInputChange: PropTypes.func,
-};
 
 const PRIVARY_TEXT = {
   PUBLIC: 'Công khai',
@@ -135,6 +55,7 @@ class NewAnnouncementForm extends Component {
     } else {
       this.setState({
         privacy: eventKey,
+        displaySelectApartments: false,
       });
     }
   }
@@ -183,7 +104,7 @@ class NewAnnouncementForm extends Component {
             <Field
               name="message"
               type="text"
-              component={renderTextField}
+              component={TextField}
               placeholder="Tiêu đề"
               validate={[required, minLength2]}
             />
@@ -195,7 +116,7 @@ class NewAnnouncementForm extends Component {
             <Field
               name="description"
               componentClass="textarea"
-              component={renderTextAreaField}
+              component={TextAreaField}
               placeholder="Nội dung"
               validate={[required, minLength2]}
             />
@@ -211,7 +132,7 @@ class NewAnnouncementForm extends Component {
                 valueKey="_id"
                 labelKey="name"
                 dataSource={apartments}
-                component={selectApartmentsField}
+                component={SelectApartmentsField}
                 placeholder="Chọn các căn hộ cần gửi thông báo"
                 validate={[required]}
               />
