@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import gql from 'graphql-tag';
-import filter from 'lodash/filter';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import history from '../../../core/history';
@@ -53,12 +52,16 @@ class HomePage extends Component {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
 
-    const dataSource = filter((me && me.buildings) || [], { isAdmin: true });
+    const dataSource = (me && me.buildings) || [];
 
     return (
       <div className="container">
         <div className={s.containerTop30}>
-          <BuildingList buildings={dataSource} onRedirect={this.onRedirect} />
+          <BuildingList
+            title="Danh sách chung cư"
+            buildings={dataSource}
+            onRedirect={this.onRedirect}
+          />
         </div>
       </div>
     );

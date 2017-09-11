@@ -1,0 +1,91 @@
+/* start css services */
+.boxServices {
+  a:hover {
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  .titleTab {
+    width: 100%;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    margin: 0px;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    color: #4c4c4c;
+    line-height: 46px;
+
+    &:before {
+      content: "";
+      border-bottom: 2px solid #ccc;
+      position: absolute;
+      top: 22px;
+      width: 100%;
+      left: 0px;
+    }
+
+    span {
+      display: inline-block;
+      background-color: #fff;
+      padding: 0px 3px;
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  .boxItemService {
+    margin-bottom: 15px;
+
+    .itemService {
+      width: 100%;
+      float: left;
+      margin: 15px 0;
+      position: relative;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+
+      .boxTextItemService {
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(40, 62, 74, 0.5);
+
+        h2 {
+          width: 100%;
+          bottom: 40px;
+          font-size: 14px;
+          color: #fff;
+          font-weight: 700;
+          text-align: center;
+          position: absolute;
+        }
+      }
+
+      &:hover .boxTextItemService {
+        background: rgba(40, 62, 74, 0);
+        transition: .4s ease-in-out all;
+        h2 {
+          bottom: 35%;
+
+          span {
+            padding: 3px 5px;
+            transition: .2s ease-in-out all;
+            background: rgba(40, 62, 74, 0.7);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* end css services */

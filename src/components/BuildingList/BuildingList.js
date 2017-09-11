@@ -9,11 +9,11 @@ import s from './BuildingList.scss';
 class BuildingList extends Component {
 
   render() {
-    const { buildings, onRedirect } = this.props;
+    const { title, buildings, onRedirect } = this.props;
 
     return (
       <div className={s.buildings}>
-        <h4>Danh sách chung cư đang quản lý</h4>
+        <h4>{title}</h4>
         <Row>
           <Col md={12}>
             { (buildings || []).map(building => <BuildingItem
@@ -28,6 +28,7 @@ class BuildingList extends Component {
   }
 }
 BuildingList.propTypes = {
+  title: PropTypes.string.isRequired,
   buildings: PropTypes.array.isRequired,
   onRedirect: PropTypes.func.isRequired,
 };
