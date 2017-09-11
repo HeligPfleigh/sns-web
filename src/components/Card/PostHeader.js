@@ -8,7 +8,7 @@ import {
 import s from './PostHeader.scss';
 
 const PostHeader = ({ avatar, title, sharingPostTitle, subtitle, menuRight }) => (
-  <div>
+  <div className={s.PostHeader}>
     <Col className={s.postHeaderLeft}>
       <div className={s.avarta}>
         { avatar }
