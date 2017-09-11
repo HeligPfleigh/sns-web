@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup } from 'react-bootstrap';
+import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup, ButtonGroup, Alert } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import isString from 'lodash/isString';
 import forEach from 'lodash/forEach';
 import isObject from 'lodash/isObject';
+import isUndefined from 'lodash/isUndefined';
+import isNull from 'lodash/isNull';
+import update from 'immutability-helper';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
 import Table from 'rc-table';
 import Loading from '../../../components/Loading';
@@ -15,7 +18,10 @@ import Pagination from '../../../components/Pagination';
 import Validator from '../../../components/Validator';
 import history from '../../../core/history';
 import InputField from './InputField';
-import ResidentsInApartmentBuilding from './ResidentsInApartmentBuilding.graphql';
+import ResidentsInApartmentBuildingQuery from './ResidentsInApartmentBuildingQuery.graphql';
+import DeleteResidentInApartmentBuildingMutation from './DeleteResidentInApartmentBuildingMutation.graphql';
+import ExportResidentsInApartmentBuildingMutation from './ExportResidentsInApartmentBuildingMutation.graphql';
+import DeleteResidentModal from './DeleteResident';
 import Menu from '../Menu/Menu';
 import s from './GroundManagement.scss';
 
@@ -24,7 +30,8 @@ class GroundManagement extends Component {
     super(...args);
 
     this.state = {
-      expandedRowKeys: [],
+      deleteResidentValues: {},
+      errorMessage: null,
     };
 
     this.hasSubmitFiltering = false;
@@ -54,10 +61,64 @@ class GroundManagement extends Component {
     return this.onChangePage(1);
   }
 
-  onExpandedRowsChange = (expandedRowKeys) => {
+  onDeleteResident = ({ resident, apartment, building }) => this.props.onDeleteResident({
+    resident,
+    apartment,
+    building,
+  })
+
+  onHideDeleteResidentModal = () => {
     this.setState({
-      expandedRowKeys,
+      deleteResidentValues: {},
     });
+  }
+
+  onErrorWhenDeleteResident = (errorMessage) => {
+    this.setState({
+      errorMessage,
+    });
+  }
+
+  onExportToExcel = (building) => {
+    const downloadId = `download-${Math.random()}`;
+    return async (event) => {
+      event.preventDefault();
+
+      const downloadWindow = window.open('about:blank', downloadId, [
+        'toolbar=yes',
+        'scrollbars=yes',
+        'location=yes',
+        'menubar=yes',
+        'resizable=yes',
+        'fullscreen=yes',
+        'status=yes',
+        `width=${window.outerWidth}`,
+        `height=${window.outerHeight}`,
+        'left=0',
+        'top=0',
+      ].join(','));
+
+      try {
+        const r = await this.props.onExportToExcel({
+          building,
+          filters: this.hasFilterSubmitted ? this.getAllFilterInputs() : {},
+        });
+
+        const { data: { exportResidentsInApartmentBuilding: { file } } } = r;
+        if (isUndefined(file) || isNull(file)) {
+          this.onErrorWhenDeleteResident('Không thể tạo được đường dẫn để tạo tập tin.');
+          return;
+        }
+
+        setTimeout(() => {
+          downloadWindow.location.replace(file);
+          downloadWindow.close();
+        }, 300);
+      } catch (e) {
+        downloadWindow.close();
+        this.onErrorWhenDeleteResident('Có lỗi trong quá trình tải tập tin.');
+      }
+    };
   }
 
   getAllFilterInputs() {
@@ -68,15 +129,36 @@ class GroundManagement extends Component {
     };
   }
 
-  viewResident = data => (
-    <a
-      href="#"
-      onClick={(evt) => {
-        evt.preventDefault();
-        history.push(`/user/${data._id}?tab=MY_INFO`);
-      }}
-    >{'Thông tin cư dân >>'}</a>
-  );
+  viewActions = rows => rows.expanded ? this.viewApartment(rows) : this.viewResident(rows)
+
+  viewResident = data => (<Col className="text-center">
+    <ButtonGroup>
+      <Button
+        type="button"
+        onClick={(evt) => {
+          evt.preventDefault();
+          history.push(`/user/${data._id}?tab=MY_INFO`);
+        }}
+        title="Xem thông tin của cư dân"
+        className="btn btn-sm btn-info"
+      ><i className="fa fa-info-circle" /></Button>
+      <Button
+        type="button"
+        onClick={(evt) => {
+          evt.preventDefault();
+          this.setState({
+            deleteResidentValues: {
+              resident: data._id,
+              apartment: data.apartment,
+              building: data.building,
+            },
+          });
+        }}
+        title="Loại bỏ cư dân này ra khỏi căn hộ này"
+        className="btn btn-sm btn-danger"
+      >Xóa</Button>
+    </ButtonGroup>
+  </Col>);
 
   viewApartment = () => (
     <a
@@ -87,29 +169,15 @@ class GroundManagement extends Component {
     >{'Thông tin căn hộ >>'}</a>
     );
 
-  tableColumns = (expanded) => {
-    if (expanded) {
-      return [{
-        title: 'Căn hộ', dataIndex: '', key: 'apartmentName', className: 'apartmentName',
-      }, {
-        title: 'Cư dân', dataIndex: 'residentName', key: 'residentName', className: 'residentName',
-      }, {
-        title: 'Vai trò', dataIndex: 'residentRole', key: 'residentRole', className: 'residentRole',
-      }, {
-        title: `${' '}`, dataIndex: '', key: 'actions', className: 'actions', render: this.viewResident,
-      }];
-    }
-
-    return [{
-      title: 'Căn hộ', dataIndex: 'apartmentName', key: 'apartmentName', className: 'apartmentName',
-    }, {
-      title: 'Cư dân', dataIndex: 'numberOfResidents', key: 'numberOfResidents', className: 'residentName',
-    }, {
-      title: 'Vai trò', dataIndex: '', key: 'residentRole', className: 'residentRole',
-    }, {
-      title: `${' '}`, dataIndex: '', key: 'actions', className: 'actions', render: this.viewApartment,
-    }];
-  }
+  tableColumns = () => [{
+    title: 'Căn hộ', dataIndex: 'apartmentName', key: 'apartmentName', className: 'apartmentName',
+  }, {
+    title: 'Cư dân', dataIndex: 'residentName', key: 'residentName', className: 'residentName',
+  }, {
+    title: 'Vai trò', dataIndex: 'residentRole', key: 'residentRole', className: 'residentRole',
+  }, {
+    title: `${' '}`, dataIndex: '', key: 'actions', className: 'actions', render: this.viewActions,
+  }];
 
   datatable() {
     const {
@@ -118,59 +186,45 @@ class GroundManagement extends Component {
       },
     } = this.props;
 
-    const { expandedRowKeys } = this.state;
-
     const data = [];
-    const defaultExpandedRowKeys = [];
     if (isObject(residentsInApartmentBuilding) && Array.isArray(residentsInApartmentBuilding.edges)) {
       residentsInApartmentBuilding.edges.forEach((rows) => {
-        const residents = [];
+        const children = [];
         if (Array.isArray(rows.residents)) {
           rows.residents.forEach((resident) => {
-            residents.push({
+            children.push({
               _id: resident._id,
+              apartment: rows._id,
+              building: rows.building,
+              rowKey: `${rows._id}-${resident._id}`,
               residentName: (isObject(resident.profile) && resident.profile.fullName) || resident.name,
               residentRole: resident._id === rows.owner ? 'Chủ hộ' : 'Người thuê nhà',
+              expanded: false,
             });
-
-            if (defaultExpandedRowKeys.length === 0 && this.hasFilterSubmitted) {
-              defaultExpandedRowKeys.push(rows._id);
-            }
           });
         }
 
         data.push({
           _id: rows._id,
+          rowKey: rows._id,
           apartmentName: rows.name,
-          numberOfResidents: `Có tổng số ${residents.length} cư dân`,
-          residents,
+          residentName: `Có tổng số ${children.length} cư dân`,
+          expanded: true,
+          children,
         });
       });
     }
+
     return (<Table
-      rowKey="_id"
+      rowKey="rowKey"
       data={data}
       expandIconAsCell
       expandRowByClick
-      columns={this.tableColumns(false)}
+      columns={this.tableColumns()}
       emptyText="Hiện tại không có dữ liệu."
-      expandedRowKeys={expandedRowKeys}
-      expandedRowRender={this.expandedRowRender}
-      onExpandedRowsChange={this.onExpandedRowsChange}
       className={s.datatable}
-      defaultExpandedRowKeys={defaultExpandedRowKeys}
     />);
   }
-
-  expandedRowRender = record => (
-    <Table
-      rowKey="_id"
-      showHeader={false}
-      columns={this.tableColumns(true)}
-      emptyText="Hiện tại không có dữ liệu."
-      data={record.residents}
-    />
-    )
 
   render() {
     const {
@@ -258,75 +312,22 @@ class GroundManagement extends Component {
                         <i className="fa fa-bar-chart" aria-hidden="true"></i> Tòa nhà hiện có {residentsInApartmentBuilding.stats.numberOfApartments} căn hộ và {residentsInApartmentBuilding.stats.numberOfResidents} cư dân.
                       </Col>
                       <Col className="pull-right" xs={4}>
-                        <i className="fa fa-file-excel-o" aria-hidden="true" title="Tải xuống với định dạng excel"></i>
+                        <a onClick={this.onExportToExcel(buildingId)} title="Tải xuống với định dạng excel"><i className="fa fa-file-excel-o" aria-hidden="true"></i></a>
                       </Col>
                     </Row>
                   </Col>
 
                   <Col xs={12}>
+                    <DeleteResidentModal
+                      onDelete={this.onDeleteResident}
+                      onError={this.onErrorWhenDeleteResident}
+                      initialValues={this.state.deleteResidentValues}
+                      onHide={this.onHideDeleteResidentModal}
+                    />
+                    {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: null })}>
+                      { this.state.errorMessage }
+                    </Alert>)}
                     {this.datatable()}
-                    {/* <Table className={s.datatable} responsive hover condensed striped>
-                      <thead>
-                        <tr>
-                          <th>Căn hộ</th>
-                          <th>Diện tích</th>
-                          <th>Số phòng ngủ</th>
-                          <th>Hướng cửa</th>
-                          <th>Tình trạng</th>
-                          <th>&nbsp; </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>304</td>
-                          <td>117.8m2</td>
-                          <td>3</td>
-                          <td>TB</td>
-                          <td>Trống</td>
-                          <td><a href="#">Chi tiết>></a></td>
-                        </tr>
-                        <tr>
-                          <td>304</td>
-                          <td>117.8m2</td>
-                          <td>3</td>
-                          <td>TB</td>
-                          <td>Trống</td>
-                          <td><a href="#">Chi tiết>></a></td>
-                        </tr>
-                        <tr>
-                          <td>304</td>
-                          <td>117.8m2</td>
-                          <td>3</td>
-                          <td>TB</td>
-                          <td>Trống</td>
-                          <td><a href="#">Chi tiết>></a></td>
-                        </tr>
-                        <tr>
-                          <td>304</td>
-                          <td>117.8m2</td>
-                          <td>3</td>
-                          <td>TB</td>
-                          <td>Trống</td>
-                          <td><a href="#">Chi tiết>></a></td>
-                        </tr>
-                        <tr>
-                          <td>304</td>
-                          <td>117.8m2</td>
-                          <td>3</td>
-                          <td>TB</td>
-                          <td>Trống</td>
-                          <td><a href="#">Chi tiết>></a></td>
-                        </tr>
-                        <tr>
-                          <td>304</td>
-                          <td>117.8m2</td>
-                          <td>3</td>
-                          <td>TB</td>
-                          <td>Trống</td>
-                          <td><a href="#">Chi tiết>></a></td>
-                        </tr>
-                      </tbody>
-                    </Table> */}
                   </Col>
                   <Col xs={12} className="pull-right">
                     <Pagination
@@ -361,6 +362,8 @@ GroundManagement.propTypes = {
   }).isRequired,
   currentValues: PropTypes.object,
   fields: PropTypes.array,
+  onDeleteResident: PropTypes.func.isRequired,
+  onExportToExcel: PropTypes.func.isRequired,
 };
 
 GroundManagement.defaultProps = {
@@ -391,7 +394,7 @@ const GroundManagementForm = reduxForm({
   enableReinitialize: true,
 })(compose(
   withStyles(s),
-  graphql(ResidentsInApartmentBuilding, {
+  graphql(ResidentsInApartmentBuildingQuery, {
     options: props => ({
       variables: {
         building: props.buildingId,
@@ -400,7 +403,7 @@ const GroundManagementForm = reduxForm({
     }),
     props: ({ data }) => {
       const onChangePage = ({ page, filters }) => data.fetchMore({
-        query: ResidentsInApartmentBuilding,
+        query: ResidentsInApartmentBuildingQuery,
         variables: {
           ...data.variables,
           filters,
@@ -416,6 +419,51 @@ const GroundManagementForm = reduxForm({
         onChangePage,
       };
     },
+  }),
+  graphql(DeleteResidentInApartmentBuildingMutation, {
+    props: ({ mutate }) => ({
+      onDeleteResident: input => mutate({
+        variables: {
+          input,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deleteResidentInApartmentBuilding: {
+            __typename: 'User',
+            _id: input.resident,
+          },
+        },
+        updateQueries: {
+          ResidentsInApartmentBuildingQuery: (previousResult) => {
+            const { residentsInApartmentBuilding } = previousResult;
+            const apartmentPos = residentsInApartmentBuilding.edges.findIndex(item => item._id === input.apartment);
+            const { residents } = residentsInApartmentBuilding.edges[apartmentPos];
+            let residentIndex;
+            if (Array.isArray(residents) && residents.length > 0) {
+              residentIndex = residents.findIndex(item => item._id === input.resident);
+            }
+            return update(previousResult, {
+              residentsInApartmentBuilding: {
+                edges: {
+                  [apartmentPos]: {
+                    residents: {
+                      $splice: [[residentIndex, 1]],
+                    },
+                  },
+                },
+              },
+            });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(ExportResidentsInApartmentBuildingMutation, {
+    props: ({ mutate }) => ({
+      onExportToExcel: variables => mutate({
+        variables,
+      }),
+    }),
   }),
 )(GroundManagement));
 

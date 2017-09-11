@@ -73,8 +73,11 @@
   }
 
   .datatable {
-    border: 2px solid #52b9e9;
     margin-bottom: 0;
+
+    table {
+      border: 2px solid #52b9e9;
+    }
 
     th, td {
       font-size: 14px;
@@ -124,31 +127,6 @@
 
         &.residentRole {
           width: 20%;
-        }
-      }
-      
-      .rc-table-expanded-row {
-
-        >td {
-          &:first-child {
-            width: 5%;
-          }
-
-          &:last-child {
-            width: 95%;
-          }
-        }
-
-        .rc-table-placeholder {
-          background: transparent;
-          border: none;
-        }
-
-        .rc-table {
-
-          td {
-            border: none;
-          }
         }
       }
       
