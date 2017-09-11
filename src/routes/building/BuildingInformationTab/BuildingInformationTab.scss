@@ -23,4 +23,13 @@ ul>li>a {
   .textMuted {
     color: #99abb4;
   }
+  .textName {
+    span {
+      color: #99abb4;
+      min-width: 300px;
+    }
+    a {
+      margin-left: 30px;
+    }
+  }
 }

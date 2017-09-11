@@ -1,0 +1,12 @@
+query getBOMList ($buildingId: String!){
+  getBOMList (buildingId: $buildingId){
+    _id
+    profile {
+      fullName
+      picture
+      firstName
+      lastName
+      gender
+    }
+  }
+}
