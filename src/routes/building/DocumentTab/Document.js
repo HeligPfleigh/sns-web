@@ -7,7 +7,7 @@ import isNull from 'lodash/isNull';
 import classNames from 'classnames';
 import { ListGroupItem, ButtonToolbar, Button, Clearfix } from 'react-bootstrap';
 
-import config from '../../../config';
+import DownloadFile from '../../../components/Common/DownloadFile';
 import s from './Document.scss';
 
 class DocumentItem extends Component {
@@ -30,8 +30,6 @@ class DocumentItem extends Component {
   }
 
   onDownload(url) {
-    const downloadId = `download-${Math.random()}`;
-    let timeoutId;
     return (event) => {
       event.preventDefault();
 
@@ -40,27 +38,7 @@ class DocumentItem extends Component {
         return;
       }
 
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      const downloadWindow = window.open('about:blank', downloadId, [
-        'toolbar=yes',
-        'scrollbars=yes',
-        'location=yes',
-        'menubar=yes',
-        'resizable=yes',
-        'fullscreen=yes',
-        'status=yes',
-        `width=${window.outerWidth}`,
-        `height=${window.outerHeight}`,
-        'left=0',
-        'top=0',
-      ].join(','));
-
-      timeoutId = setTimeout(() => {
-        downloadWindow.location.replace(url);
-      }, 300);
+      DownloadFile(url);
     };
   }
 
