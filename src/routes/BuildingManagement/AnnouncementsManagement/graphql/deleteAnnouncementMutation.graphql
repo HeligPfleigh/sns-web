@@ -1,0 +1,5 @@
+mutation deleteAnnouncementMutation ($_id: String!, $buildingId: String!) {
+    deleteAnnouncement (_id: $_id, buildingId: $buildingId) {
+        _id
+    }
+}

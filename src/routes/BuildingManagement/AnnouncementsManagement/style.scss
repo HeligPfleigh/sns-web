@@ -1,0 +1,54 @@
+@global-import 'react-select/dist/react-select.css';
+
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  background: #fff;
+  .contentMain {
+    background: #fff;
+    padding: 20px;
+  }
+}
+
+.header {
+  font-size: 18px;
+  font-weight: bold;
+  color: #283e4a;
+  margin-bottom: 20px;
+}
+
+.headerTitle {
+  margin-left: 10px;
+}
+
+.announcementList {
+  list-style: none;
+  padding: 0;
+}
+
+.displayForm {
+  display: flex;
+}
+
+.displayFormLeft {
+  min-width: 15%;
+}
+
+.newAnnouncementControl {
+  padding: 10px 0;
+  display: flex;
+}
+
+.setPrivaryBtn{
+  border-bottom-right-radius: 2;
+  border-top-right-radius: 2;
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
+  

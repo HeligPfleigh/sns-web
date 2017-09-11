@@ -24,27 +24,14 @@
     }
   }
   .buildingAnnouncementButtons {
-    display: none;
+    display: block;
     float: right;
     margin-top: 8px;
   }
-  &:hover {
-    .buildingAnnouncementButtons {
-      display: block;
-      float: right;
-      margin-top: 8px;
-    }
-  };
   @media (max-width: 992px) {
     .buildingAnnouncementButtons {
       text-align: left;
       float: none;
     }
-    &:hover {
-      .buildingAnnouncementButtons {
-        text-align: left;
-        float: none;
-      }
-    };
   }
 }

@@ -1,0 +1,43 @@
+query MyBuildingQueries(
+  $userId: String!,
+  $annouceLimit: Int,
+  $building: String!,
+  $limit: Int
+) {
+  resident(_id: $userId) {
+    _id
+    announcements(limit: $annouceLimit) {
+      edges {
+        _id
+        message
+        description
+        date
+      }
+    }
+  }
+
+  FAQs(building: $building, limit: $limit) {
+    edges {
+      ...FAQView
+    }
+  }
+  documents(building: $building, limit: $limit) {
+    edges {
+      ...DocumentView
+    }
+  }
+}
+
+fragment FAQView on FAQ {
+  _id
+  name
+  message
+  updatedAt
+}
+
+fragment DocumentView on Document {
+  _id
+  name
+  file
+  updatedAt
+}

@@ -7,7 +7,7 @@ import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import moment from 'moment';
-import { loadFee as loadFeeDetail } from '../../reducers/fees';
+import { loadFee } from '../../reducers/fees';
 import feeDetailsQuery from './feeDetailsQuery.graphql';
 import updateFeeDetailMutation from './updateFeeDetailMutation.graphql';
 import Loading from '../../components/Loading';
@@ -340,7 +340,7 @@ export default compose(
     state => ({
       initialValues: state.fees.feeDetail,
     }),
-    { load: loadFeeDetail },
+    { load: loadFee },
   ),
   connect(state => ({
     user: state.user,

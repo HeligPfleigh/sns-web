@@ -45,9 +45,18 @@ const menus = [{
   }],
 }, {
   icon: 'fa fa-bullhorn',
-  text: 'Thông báo khác',
-  key: 'noti_other',
-  url: '/noti_other',
+  text: 'Quản lý thông báo',
+  key: 'announcements_management',
+  url: '/announcements_management',
+  children: [{
+    text: 'Các thông báo',
+    key: 'announcements',
+    url: '/announcements_management',
+  }, {
+    text: 'Tạo thông báo',
+    key: 'create_announcement',
+    url: '/create_announcement',
+  }],
 }];
 
 class Menu extends Component {

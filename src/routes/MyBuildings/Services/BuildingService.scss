@@ -1,0 +1,47 @@
+@global-import 'react-select/dist/react-select.css';
+
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  background: #fff;
+  padding: 15px;
+
+  .apartmentTitle {
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  :global {
+    .rdt {
+      width: 85%;
+      float: left;
+      padding-right: 3px;
+    }
+    .rdt > input {
+      border-radius: 4px;
+      cursor: pointer;
+      background:url(/images/icon-calender.png) no-repeat 94% 6px;
+    }
+  }
+
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
+
+.header {
+  display: flex;
+  .homeIcon {
+    font-size: 36px;
+    margin-right: 10px;
+  }
+}
+
+.content{
+
+}
