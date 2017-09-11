@@ -1,0 +1,13 @@
+mutation editAnnouncementMutation ($input: EditAnnouncementInput!) {
+  editAnnouncement(input: $input) {
+    _id
+    message
+    description
+    privacy
+    apartments {
+      _id
+      name
+    }
+    date
+  }
+}
