@@ -14,6 +14,7 @@ import update from 'immutability-helper';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
 import Table from 'rc-table';
 import Loading from '../../../components/Loading';
+import DownloadFile from '../../../components/Common/DownloadFile';
 import Pagination from '../../../components/Pagination';
 import Validator from '../../../components/Validator';
 import history from '../../../core/history';
@@ -79,46 +80,25 @@ class GroundManagement extends Component {
     });
   }
 
-  onExportToExcel = (building) => {
-    const downloadId = `download-${Math.random()}`;
-    return async (event) => {
-      event.preventDefault();
+  onExportToExcel = building => async (event) => {
+    event.preventDefault();
 
-      const downloadWindow = window.open('about:blank', downloadId, [
-        'toolbar=yes',
-        'scrollbars=yes',
-        'location=yes',
-        'menubar=yes',
-        'resizable=yes',
-        'fullscreen=yes',
-        'status=yes',
-        `width=${window.outerWidth}`,
-        `height=${window.outerHeight}`,
-        'left=0',
-        'top=0',
-      ].join(','));
+    try {
+      const r = await this.props.onExportToExcel({
+        building,
+        filters: this.hasFilterSubmitted ? this.getAllFilterInputs() : {},
+      });
 
-      try {
-        const r = await this.props.onExportToExcel({
-          building,
-          filters: this.hasFilterSubmitted ? this.getAllFilterInputs() : {},
-        });
-
-        const { data: { exportResidentsInApartmentBuilding: { file } } } = r;
-        if (isUndefined(file) || isNull(file)) {
-          this.onErrorWhenDeleteResident('Không thể tạo được đường dẫn để tạo tập tin.');
-          return;
-        }
-
-        setTimeout(() => {
-          downloadWindow.location.replace(file);
-          downloadWindow.close();
-        }, 300);
-      } catch (e) {
-        downloadWindow.close();
-        this.onErrorWhenDeleteResident('Có lỗi trong quá trình tải tập tin.');
+      const { data: { exportResidentsInApartmentBuilding: { file } } } = r;
+      if (isUndefined(file) || isNull(file)) {
+        this.onErrorWhenDeleteResident('Không thể tạo được đường dẫn để tạo tập tin.');
+        return;
       }
-    };
+
+      DownloadFile(file);
+    } catch (e) {
+      this.onErrorWhenDeleteResident('Có lỗi trong quá trình tải tập tin.');
+    }
   }
 
   getAllFilterInputs() {
