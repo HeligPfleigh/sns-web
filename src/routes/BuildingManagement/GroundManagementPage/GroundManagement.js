@@ -3,14 +3,17 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Grid, Row, Col, Table, Clearfix, ControlLabel, Button, FormGroup } from 'react-bootstrap';
+import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import isString from 'lodash/isString';
 import forEach from 'lodash/forEach';
+import isObject from 'lodash/isObject';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
+import Table from 'rc-table';
 import Loading from '../../../components/Loading';
 import Pagination from '../../../components/Pagination';
 import Validator from '../../../components/Validator';
+import history from '../../../core/history';
 import InputField from './InputField';
 import ResidentsInApartmentBuilding from './ResidentsInApartmentBuilding.graphql';
 import Menu from '../Menu/Menu';
@@ -19,6 +22,10 @@ import s from './GroundManagement.scss';
 class GroundManagement extends Component {
   constructor(...args) {
     super(...args);
+
+    this.state = {
+      expandedRowKeys: [],
+    };
 
     this.hasSubmitFiltering = false;
   }
@@ -47,6 +54,12 @@ class GroundManagement extends Component {
     return this.onChangePage(1);
   }
 
+  onExpandedRowsChange = (expandedRowKeys) => {
+    this.setState({
+      expandedRowKeys,
+    });
+  }
+
   getAllFilterInputs() {
     const { currentValues } = this.props;
     return {
@@ -54,6 +67,110 @@ class GroundManagement extends Component {
       resident: isString(currentValues.filterByResident) ? String(currentValues.filterByResident).trim() : '',
     };
   }
+
+  viewResident = data => (
+    <a
+      href="#"
+      onClick={(evt) => {
+        evt.preventDefault();
+        history.push(`/user/${data._id}?tab=MY_INFO`);
+      }}
+    >{'Thông tin cư dân >>'}</a>
+  );
+
+  viewApartment = () => (
+    <a
+      href="#"
+      onClick={(evt) => {
+        evt.preventDefault();
+      }}
+    >{'Thông tin căn hộ >>'}</a>
+    );
+
+  tableColumns = (expanded) => {
+    if (expanded) {
+      return [{
+        title: 'Căn hộ', dataIndex: '', key: 'apartmentName', className: 'apartmentName',
+      }, {
+        title: 'Cư dân', dataIndex: 'residentName', key: 'residentName', className: 'residentName',
+      }, {
+        title: 'Vai trò', dataIndex: 'residentRole', key: 'residentRole', className: 'residentRole',
+      }, {
+        title: `${' '}`, dataIndex: '', key: 'actions', className: 'actions', render: this.viewResident,
+      }];
+    }
+
+    return [{
+      title: 'Căn hộ', dataIndex: 'apartmentName', key: 'apartmentName', className: 'apartmentName',
+    }, {
+      title: 'Cư dân', dataIndex: 'numberOfResidents', key: 'numberOfResidents', className: 'residentName',
+    }, {
+      title: 'Vai trò', dataIndex: '', key: 'residentRole', className: 'residentRole',
+    }, {
+      title: `${' '}`, dataIndex: '', key: 'actions', className: 'actions', render: this.viewApartment,
+    }];
+  }
+
+  datatable() {
+    const {
+      data: {
+        residentsInApartmentBuilding,
+      },
+    } = this.props;
+
+    const { expandedRowKeys } = this.state;
+
+    const data = [];
+    const defaultExpandedRowKeys = [];
+    if (isObject(residentsInApartmentBuilding) && Array.isArray(residentsInApartmentBuilding.edges)) {
+      residentsInApartmentBuilding.edges.forEach((rows) => {
+        const residents = [];
+        if (Array.isArray(rows.residents)) {
+          rows.residents.forEach((resident) => {
+            residents.push({
+              _id: resident._id,
+              residentName: (isObject(resident.profile) && resident.profile.fullName) || resident.name,
+              residentRole: resident._id === rows.owner ? 'Chủ hộ' : 'Người thuê nhà',
+            });
+
+            if (defaultExpandedRowKeys.length === 0 && this.hasFilterSubmitted) {
+              defaultExpandedRowKeys.push(rows._id);
+            }
+          });
+        }
+
+        data.push({
+          _id: rows._id,
+          apartmentName: rows.name,
+          numberOfResidents: `Có tổng số ${residents.length} cư dân`,
+          residents,
+        });
+      });
+    }
+    return (<Table
+      rowKey="_id"
+      data={data}
+      expandIconAsCell
+      expandRowByClick
+      columns={this.tableColumns(false)}
+      emptyText="Hiện tại không có dữ liệu."
+      expandedRowKeys={expandedRowKeys}
+      expandedRowRender={this.expandedRowRender}
+      onExpandedRowsChange={this.onExpandedRowsChange}
+      className={s.datatable}
+      defaultExpandedRowKeys={defaultExpandedRowKeys}
+    />);
+  }
+
+  expandedRowRender = record => (
+    <Table
+      rowKey="_id"
+      showHeader={false}
+      columns={this.tableColumns(true)}
+      emptyText="Hiện tại không có dữ liệu."
+      data={record.residents}
+    />
+    )
 
   render() {
     const {
@@ -75,7 +192,7 @@ class GroundManagement extends Component {
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
-    console.log(pristine, submitting, invalid);
+
     return (
       <Grid>
         <Row className={s.containerTop30}>
@@ -147,7 +264,8 @@ class GroundManagement extends Component {
                   </Col>
 
                   <Col xs={12}>
-                    <Table className={s.datatable} responsive hover condensed striped>
+                    {this.datatable()}
+                    {/* <Table className={s.datatable} responsive hover condensed striped>
                       <thead>
                         <tr>
                           <th>Căn hộ</th>
@@ -208,7 +326,7 @@ class GroundManagement extends Component {
                           <td><a href="#">Chi tiết>></a></td>
                         </tr>
                       </tbody>
-                    </Table>
+                    </Table> */}
                   </Col>
                   <Col xs={12} className="pull-right">
                     <Pagination
