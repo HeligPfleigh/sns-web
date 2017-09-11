@@ -5,6 +5,7 @@ query MyBuildingQueries(
   $limit: Int
 ) {
   resident(_id: $userId) {
+    _id
     announcements(limit: $annouceLimit) {
       edges {
         _id
