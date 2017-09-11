@@ -6,14 +6,17 @@ import update from 'immutability-helper';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Pagination } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
+import { initialize as initializeState } from 'redux-form';
 import Loading from '../../../components/Loading';
 import Menu from '../Menu/Menu';
-import announcementsQuery from './announcementsQuery.graphql';
+import announcementsQuery from './graphql/announcementsQuery.graphql';
 import {
   BuildingAnnouncementItem,
 } from '../../../components/BuildingAnnouncementList';
 import DeleteAnnouncementModal from './DeleteAnnouncementModal';
-import deleteAnnouncementMutation from './deleteAnnouncementMutation.graphql';
+import EditAnnouncementModal from './EditAnnouncementModal';
+import deleteAnnouncementMutation from './graphql/deleteAnnouncementMutation.graphql';
+import editAnnouncementMutation from './graphql/editAnnouncementMutation.graphql';
 import s from './style.scss';
 
 const limit = 4;
@@ -25,25 +28,47 @@ class AnnouncementsManagement extends Component {
       loading: false,
       currentPage: 1,
       idDeleteAnnouncement: null,
+      idEditAnnouncement: null,
       showDeleteAnnouncement: false,
+      showEditAnnouncement: false,
     };
   }
 
-  onClickModal = (evt) => {
-    evt.preventDefault();
+  onClickDeleteModal = () => {
     const { idDeleteAnnouncement } = this.state;
     if (idDeleteAnnouncement) {
       this.props.deleteAnnouncement(idDeleteAnnouncement);
+      this.closeModal();
     }
-    this.closeModal();
+  }
+
+  onClickEditModal = ({ message, description, privacy, apartments, date }) => {
+    const { idEditAnnouncement } = this.state;
+    if (idEditAnnouncement) {
+      this.props.editAnnouncement(
+        idEditAnnouncement,
+        message,
+        description,
+        privacy,
+        apartments,
+        date,
+      );
+      this.closeModal();
+    }
   }
 
   closeModal = () => {
-    const { idDeleteAnnouncement } = this.state;
+    const { idDeleteAnnouncement, idEditAnnouncement } = this.state;
     if (idDeleteAnnouncement) {
       this.setState(() => ({
         showDeleteAnnouncement: false,
         idDeleteAnnouncement: null,
+      }));
+    }
+    if (idEditAnnouncement) {
+      this.setState(() => ({
+        showEditAnnouncement: false,
+        idEditAnnouncement: null,
       }));
     }
   }
@@ -53,6 +78,23 @@ class AnnouncementsManagement extends Component {
       idDeleteAnnouncement: id,
       showDeleteAnnouncement: true,
     });
+  }
+
+  editAnnouncementEvent = (data) => {
+    this.setState({
+      idEditAnnouncement: data._id,
+      showEditAnnouncement: true,
+    });
+    this.props.initializeState(
+      'editAnnouncementForm',
+      {
+        message: data.message,
+        description: data.description,
+        apartments: data.apartments,
+        privacy: data.privacy,
+        date: data.date,
+      },
+    );
   }
 
   handlePageSelect = (pageNum) => {
@@ -72,7 +114,12 @@ class AnnouncementsManagement extends Component {
   }
 
   render() {
-    const { loading, currentPage } = this.state;
+    const {
+      loading,
+      currentPage,
+      showDeleteAnnouncement,
+      showEditAnnouncement,
+    } = this.state;
     const {
       buildingId,
       user,
@@ -123,6 +170,7 @@ class AnnouncementsManagement extends Component {
                         message={a.message}
                         displayAction
                         onDelete={this.deleteAnnouncementEvent}
+                        onEdit={this.editAnnouncementEvent}
                       />
                     ))
                   }
@@ -145,9 +193,15 @@ class AnnouncementsManagement extends Component {
           </Col>
         </Row>
         <DeleteAnnouncementModal
-          show={this.state.showDeleteAnnouncement}
+          show={showDeleteAnnouncement}
           closeModal={this.closeModal}
-          clickModal={this.onClickModal}
+          clickModal={this.onClickDeleteModal}
+        />
+        <EditAnnouncementModal
+          show={showEditAnnouncement}
+          closeModal={this.closeModal}
+          clickModal={this.onClickEditModal}
+          buildingId={buildingId}
         />
       </Grid>
     );
@@ -160,12 +214,16 @@ AnnouncementsManagement.propTypes = {
   user: PropTypes.object.isRequired,
   buildingId: PropTypes.string.isRequired,
   deleteAnnouncement: PropTypes.func.isRequired,
+  editAnnouncement: PropTypes.func.isRequired,
+  initializeState: PropTypes.func.isRequired,
 };
 
 export default compose(
   connect(state => ({
     user: state.user,
-  })),
+  }), {
+    initializeState,
+  }),
   withStyles(s),
   graphql(announcementsQuery, {
     options: ownProps => ({
@@ -239,6 +297,21 @@ export default compose(
             },
             data,
           });
+        },
+      }),
+    }),
+  }),
+  graphql(editAnnouncementMutation, {
+    props: ({ mutate }) => ({
+      editAnnouncement: (idEditAnnouncement, message, description, privacy, apartments, date) => mutate({
+        variables: {
+          input: {
+            _id: idEditAnnouncement,
+            message,
+            description,
+            privacy,
+            apartments,
+          },
         },
       }),
     }),
