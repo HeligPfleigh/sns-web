@@ -33,8 +33,21 @@ export default {
           'MyBuildings-Dashboard',
         );
         return {
-          title: 'SNS - Ban quản lý tòa nhà',
+          title: 'SNS - Trang tin tổng hợp của tòa nhà',
           component: <Layout><Dashboard buildingId={params.buildingId} /></Layout>,
+        };
+      },
+    }, {
+      path: '/:buildingId/services',
+      async action({ params, query }) {
+        const BuildingService = await require.ensure(
+          [],
+          require => require('./Services/BuildingService').default,
+          'MyBuildings-Services',
+        );
+        return {
+          title: 'SNS - Trang tin tổng hợp phí dịch vụ theo tháng',
+          component: <Layout><BuildingService query={query} buildingId={params.buildingId} /></Layout>,
         };
       },
     },
