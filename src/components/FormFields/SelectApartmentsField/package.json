@@ -1,0 +1,7 @@
+{
+    "name": "SelectApartmentsField",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./SelectApartmentsField.js"
+  }
+  

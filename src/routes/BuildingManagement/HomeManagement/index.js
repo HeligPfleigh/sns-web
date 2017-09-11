@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import gql from 'graphql-tag';
+import filter from 'lodash/filter';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-// import history from '../../../core/history';
+import history from '../../../core/history';
 import Loading from '../../../components/Loading';
-import BuildingList from '../BuildingList';
+import BuildingList from '../../../components/BuildingList';
 import s from './styles.scss';
 
 const BOMQuery = gql`query BOMQuery {
@@ -40,6 +41,10 @@ class HomeManagement extends Component {
     }
   }
 
+  onRedirect = (id) => {
+    history.push(`/management/${id}`);
+  }
+
   render() {
     const { loading, me } = this.props;
 
@@ -48,10 +53,16 @@ class HomeManagement extends Component {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
 
+    const dataSource = filter((me && me.buildings) || [], { isAdmin: true });
+
     return (
       <div className="container">
         <div className={s.containerTop30}>
-          <BuildingList buildings={me && me.buildings} />
+          <BuildingList
+            title="Danh sách chung cư đang quản lý"
+            buildings={dataSource}
+            onRedirect={this.onRedirect}
+          />
         </div>
       </div>
     );

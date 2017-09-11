@@ -1,0 +1,105 @@
+/* start css documents */
+
+.boxContent {
+  width: 100%;
+  float: left;
+  margin-bottom: 30px;
+  padding: 20px 15px;
+  min-height: 240px;
+  background-color: #f7f6f6;
+
+  a:hover {
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4c4c4c;
+    float: left;
+    width: 100%;
+    text-align: left;
+    margin: 0px;
+  }
+
+  .title .link {
+    float: right;
+    color: #0084bf;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .bgOrange {
+    background-color: #ffdc9e;
+  }
+
+  .bgGray {
+    background-color: #f7f6f6;
+  }
+
+  .listItem {
+    width: 100%;
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 20px;
+
+    li {
+      width: 100%;
+      float: left;
+      list-style: none;
+      padding-top: 5px;
+      padding-bottom: 5px;
+
+      &:hover {
+        background-color: #EBEBEB;
+      }
+
+      h3 {
+        display: block;
+        color: #4c4c4c;
+        font-size: 13px;
+        font-weight: bold;
+        margin: 0px;
+        margin-top: 5px;
+      }
+
+      i {
+        font-size: 20px;
+        color: #cf9632;
+        float: left;
+        margin-right: 10px;
+      }
+
+      .time {
+        display: block;
+        color: #737373;
+        font-size: 11px;
+        margin: 0px;
+      }
+    }
+
+    li.red i {
+      color: #ff0000;
+    }
+  }
+
+  .listItem.thongBao i {
+    width: 37px;
+    height: 37px;
+    float: left;
+    background-color: #dfd9d9;
+    text-align: center;
+    line-height: 37px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+  }
+}
+
+.boxContent.bgOrange {
+  background-color: #ffdc9e;
+}
+
+/* end css documents */

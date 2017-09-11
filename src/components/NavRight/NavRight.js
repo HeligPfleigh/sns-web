@@ -11,6 +11,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image, Dropdown, MenuItem } from 'react-bootstrap';
+// import classNames from 'classnames';
 import history from '../../core/history';
 import Link from '../Link';
 import CustomToggle from '../Common/DropdownMenu/CustomToggle';
@@ -26,7 +27,7 @@ class NavRight extends Component {
   };
 
   render() {
-    const { user: { profile } } = this.props;
+    const { user: { isAdmin, profile } } = this.props;
     return (
       <div className={s.navRight}>
         <div className={s.userDropdown}>
@@ -62,11 +63,21 @@ class NavRight extends Component {
               <i className="fa fa-bars" aria-hidden="true"></i>
             </CustomToggle>
             <Dropdown.Menu className={s.itemDropdownMenu}>
-              <MenuItem title="Chung cư của tôi" eventKey="1" onClick={() => this.navEventHandler('/management')}>
-                Chung cư của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
+              { isAdmin && <MenuItem title="Trang Quản Lý" eventKey="1" onClick={() => this.navEventHandler('/management')}>
+                <span>Quản lý</span>
+                <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
+              </MenuItem> }
+              <MenuItem title="Trang thông báo dành cho bạn" eventKey="1" onClick={() => this.navEventHandler('/announcements')}>
+                <span>Thông báo</span>
+                <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
+              </MenuItem>
+              <MenuItem title="Chung cư của tôi" eventKey="1" onClick={() => this.navEventHandler('/my-buildings')}>
+                <span>Chung cư</span>
+                <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
               <MenuItem title="Căn hộ của tôi" eventKey="1" onClick={() => this.navEventHandler('/apartments')}>
-                Căn hộ của tôi <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
+                <span>Căn hộ</span>
+                <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
               { /*
                 <MenuItem title="Hàng xóm" eventKey="2">

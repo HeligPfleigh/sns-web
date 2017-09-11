@@ -1,0 +1,28 @@
+
+a:hover {
+  text-decoration: none;
+  text-decoration-line: none;
+}
+
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  width: 100%;
+  margin: auto;
+  padding: 0px;
+
+  .mainContent {
+    width: 100%;
+    float: left;
+    background-color:#fff;
+    padding: 30px 15px;
+  }
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
