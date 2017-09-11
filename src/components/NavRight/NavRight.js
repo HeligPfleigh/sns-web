@@ -11,7 +11,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Image, Dropdown, MenuItem } from 'react-bootstrap';
-import classNames from 'classnames';
+// import classNames from 'classnames';
 import history from '../../core/history';
 import Link from '../Link';
 import CustomToggle from '../Common/DropdownMenu/CustomToggle';
@@ -67,7 +67,7 @@ class NavRight extends Component {
                 <span>Quản lý</span>
                 <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem> }
-              <MenuItem title="Trang thông báo dành cho bạn" eventKey="1" onClick={() => {}}>
+              <MenuItem title="Trang thông báo dành cho bạn" eventKey="1" onClick={() => this.navEventHandler('/announcements')}>
                 <span>Thông báo</span>
                 <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
