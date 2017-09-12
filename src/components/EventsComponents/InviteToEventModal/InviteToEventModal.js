@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button, Image } from 'react-bootstrap';
+import { Row, Col, Modal, ButtonGroup, Button, Image, Clearfix } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import classNames from 'classnames';
 import s from './InviteToEventModal.scss';
 
 class InviteToEventModal extends Component {
-  constructor(props) {
-    super(props);
-    const { invites } = props;
-    const friendSelected = [];
-    invites.forEach((friend) => {
-      friendSelected.push(friend._id);
-    });
+  constructor(props, ...args) {
+    super(props, ...args);
+
+    const { invites, friends } = props;
+
     this.state = {
-      friendSelected,
+      friendSelected: props.invites.map(friend => friend._id),
+      selectedAllFrends: !(invites.length === friends.length),
     };
   }
 
@@ -30,18 +30,28 @@ class InviteToEventModal extends Component {
     }
   }
 
-  onFriendSelect = (friendId) => {
-    const { friendSelected } = this.state;
+  onFriendClick = friendId => (event) => {
+    event.preventDefault();
+
+    let { friendSelected } = this.state;
     if (friendSelected.includes(friendId)) {
-      this.setState({
-        friendSelected: friendSelected.filter(friend => friend !== friendId),
-      });
+      friendSelected = friendSelected.filter(friend => friend !== friendId);
     } else {
       friendSelected.push(friendId);
-      this.setState({
-        friendSelected,
-      });
     }
+
+    this.setState({
+      friendSelected,
+    });
+  }
+
+  onSelectAllFriends = selectedAllFrends => (event) => {
+    event.preventDefault();
+
+    this.setState({
+      friendSelected: selectedAllFrends ? this.props.friends.map(friend => friend._id) : [],
+      selectedAllFrends,
+    });
   }
 
   sendInvite = async () => {
@@ -57,54 +67,31 @@ class InviteToEventModal extends Component {
         <Modal.Header closeButton>
           <Modal.Title>Mời</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <div className={s.ListFriendForInvite}>
-            <div className={s.ListFriendWrapper}>
-              {
-                friends.map(friend => (
-                  <table
-                    key={Math.random()}
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => {
-                      this.onFriendSelect(friend._id);
-                    }}
-                    cols={3}
-                    className={s.ItemFriend}
-                  >
-                    <tbody>
-                      <tr>
-                        <td>
-                          <Image
-                            src={friend.profile.picture}
-                          />
-                        </td>
-                        <td className={s.ItemFriendMiddle}>
-                          <div>
-                            <span>{`${friend.profile.firstName} ${friend.profile.lastName}`}</span>
-                          </div>
-                        </td>
-                        <td>
-                          {
-                            friendSelected.includes(friend._id) ? <i className="fa fa-check-circle-o" aria-hidden="true"></i> : <i className="fa fa-circle-o" aria-hidden="true"></i>
-                          }
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  ))
-              }
-            </div>
-          </div>
+        <Modal.Body className={s.list}>
+          { friends.map((friend) => {
+            const hasSelected = friendSelected.includes(friend._id);
+            return (
+              <Row className={classNames(s.friend, { active: hasSelected })} onClick={this.onFriendClick(friend._id)} key={friend._id}>
+                <Col xs={2}>
+                  <Image src={friend.profile.picture} thumbnail responsive />
+                </Col>
+                <Col xs={9} className={s.fullName}>
+                  {`${friend.profile.firstName} ${friend.profile.lastName}`}
+                </Col>
+                <Col xs={1} className={s.iconCheck}>
+                  {hasSelected ? <i className="fa fa-check-circle-o" aria-hidden="true"></i> : <i className="fa fa-circle-o" aria-hidden="true"></i>}
+                </Col>
+              </Row>);
+          },
+          )}
+          <Clearfix />
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            onClick={this.sendInvite}
-            bsStyle="primary"
-          >
-            Gửi lời mời
-          </Button>
+          <ButtonGroup className="pull-left">
+            <Button type="button" onClick={this.onSelectAllFriends(true)}>Chọn tất cả</Button>
+            <Button type="button" onClick={this.onSelectAllFriends(false)}>Bỏ chọn</Button>
+          </ButtonGroup>
+          <Button onClick={this.sendInvite} bsStyle="primary">Gửi lời mời</Button>
         </Modal.Footer>
       </Modal>
     );

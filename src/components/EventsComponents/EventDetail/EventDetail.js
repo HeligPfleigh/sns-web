@@ -119,8 +119,8 @@ class EventDetail extends Component {
     const now = Validator.Date.now();
     return event.isAuthor &&
       (
-        (Validator.Date.isValid(event.start) && (Validator.Date.withMoment(event.start) > now)) ||
-        (Validator.Date.isValid(event.end) && (Validator.Date.withMoment(event.end) < now))
+        (Validator.Date.isValid(event.start) && (Validator.Date.withMoment(event.start) > now))
+        // || (Validator.Date.isValid(event.end) && (Validator.Date.withMoment(event.end) < now))
       );
   }
 

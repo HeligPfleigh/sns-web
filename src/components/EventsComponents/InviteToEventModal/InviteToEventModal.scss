@@ -1,27 +1,43 @@
-@import "../../../theme/resources.scss";
-.ListFriendForInvite {
-  overflow: auto;
-  .ListFriendWrapper{
-    max-height: 360px;
-    display: block;
-    direction: ltr;
-    .ItemFriend {
-      margin: 8px;
-      img{
-        width: 56px;
-        height: 56px;
-        border: 0;
-        margin-right: 10px;
-      }
-      .ItemFriendMiddle {
-        width: 100%;
-      }
-      i {
-        font-size: 20px;
-      }
-      :hover {
-        background: #e3fff0;
-      }
+$activeColor: #e3fff0;
+
+.list {
+  max-height: 500px;
+  overflow-y: scroll;
+  padding-top: 0;
+  padding-bottom: 0;
+  
+  :global {
+    .img-thumbnail {
+      border-radius: 0;
+      padding: 0;
+    }
+
+    .active {
+      background-color: $activeColor;
+    }
+  }
+
+  .friend {
+    max-height: 77px;
+    line-height: 77px;
+    cursor: pointer;
+
+    &:hover, &:active {
+      background-color: $activeColor;
+    }
+
+    &:focus {
+      border: none;
+      outline: none;
+    }
+
+    .fullName {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .iconCheck {
+      text-align: center;
     }
   }
 }
