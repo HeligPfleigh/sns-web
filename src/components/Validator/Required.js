@@ -1,4 +1,5 @@
 import isArray from 'lodash/isArray';
+import isFunction from 'lodash/isFunction';
 import Message from './Helper/Message';
 
 const validate = (value, params = [false]) => {
@@ -19,4 +20,9 @@ const validate = (value, params = [false]) => {
   return String(value).trim().length > 0;
 };
 
-export default (attribute, message = 'The ${ attribute } is required.', params = [false]) => value => validate(value, params) ? undefined : Message(message, { attribute });
+const Required = (attribute, message = 'The ${ attribute } is required.', params = [false]) => value => validate(value, params) ? undefined : Message(message, { attribute });
+
+Required.Unless = (attribute, message = 'The ${ attribute } is required.', fnCallback) => () => validate(isFunction(fnCallback) && fnCallback(), [false]) ? undefined : Message(message, { attribute });
+
+export default Required;
+

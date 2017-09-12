@@ -383,7 +383,6 @@ export default compose(
             query: loadBuildingQuery,
             variables: {
               buildingId: ownProps.buildingId,
-              limit: 1000, // FIXME: paging
             },
           });
           data = update(data, {
@@ -400,7 +399,6 @@ export default compose(
             query: loadBuildingQuery,
             variables: {
               buildingId: ownProps.buildingId,
-              limit: 1000, // FIXME: paging
             },
             data,
           });

@@ -195,7 +195,6 @@ class Documents extends Component {
           page={documents.pageInfo.page}
           limit={documents.pageInfo.limit}
           onChange={onChangePage}
-          className="pull-right"
         /> }
       </Col>
     );
