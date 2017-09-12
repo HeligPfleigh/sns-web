@@ -7,6 +7,7 @@ import { compose, graphql } from 'react-apollo';
 import DateTime from 'react-datetime';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
+import throttle from 'lodash/throttle';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import {
   Grid,
@@ -39,6 +40,17 @@ class BuildingService extends Component {
       unitSelect: !isEmpty(apartments) && apartments[0],
       feeType: (props.query && props.query.feeType) || null,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { unitSelect } = this.state;
+    if (!isEmpty(nextProps.apartments) && isEmpty(unitSelect)) {
+      const { apartments } = nextProps;
+      this.setState(prevState => ({
+        ...prevState,
+        unitSelect: apartments && apartments[0],
+      }));
+    }
   }
 
   dateChange = (val) => {
@@ -263,14 +275,11 @@ export default compose(
     }),
     props: ({ data }) => {
       const { fetchMore } = data;
-
-      const loadMoreRows = (variables) => {
-        fetchMore({
-          variables,
-          fetchPolicy: 'network-only',
-          updateQuery: (_, { fetchMoreResult }) => fetchMoreResult,
-        });
-      };
+      const loadMoreRows = throttle(variables => fetchMore({
+        variables,
+        fetchPolicy: 'network-only',
+        updateQuery: (_, { fetchMoreResult }) => fetchMoreResult,
+      }), 300);
       return {
         loadMoreRows,
         fees: data.feesOfApartment || [],
