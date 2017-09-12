@@ -1,5 +1,5 @@
-mutation deleteAnnouncementMutation ($_id: String!, $buildingId: String!) {
-    deleteAnnouncement (_id: $_id, buildingId: $buildingId) {
+mutation deleteAnnouncementMutation ($_id: String!) {
+    deleteAnnouncement (_id: $_id) {
         _id
     }
 }
