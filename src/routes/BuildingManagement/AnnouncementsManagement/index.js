@@ -258,14 +258,12 @@ export default compose(
       deleteAnnouncement: idDeleteAnnouncement => mutate({
         variables: {
           _id: idDeleteAnnouncement,
-          buildingId: ownProps.buildingId,
         },
         optimisticResponse: {
           __typename: 'Mutation',
           deleteAnnouncement: {
             __typename: 'Announcement',
             _id: idDeleteAnnouncement,
-            buildingId: ownProps.buildingId,
           },
         },
         update: (store, { data: { deleteAnnouncement } }) => {
@@ -303,7 +301,7 @@ export default compose(
   }),
   graphql(editAnnouncementMutation, {
     props: ({ mutate }) => ({
-      editAnnouncement: (idEditAnnouncement, message, description, privacy, apartments, date) => mutate({
+      editAnnouncement: (idEditAnnouncement, message, description, privacy, apartments) => mutate({
         variables: {
           input: {
             _id: idEditAnnouncement,

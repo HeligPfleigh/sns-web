@@ -67,7 +67,7 @@ class NavRight extends Component {
                 <span>Quản lý</span>
                 <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem> }
-              <MenuItem title="Trang thông báo dành cho bạn" eventKey="1" onClick={() => {}}>
+              <MenuItem title="Trang thông báo dành cho bạn" eventKey="1" onClick={() => this.navEventHandler('/announcements')}>
                 <span>Thông báo</span>
                 <i className="fa fa-chevron-right pull-right" aria-hidden="true" ></i>
               </MenuItem>
