@@ -362,6 +362,7 @@ const EditEventForm = reduxForm({
 
 const mapStateToProps = state => ({
   currentValues: formValueSelector('EditEvent')(state, ...fields),
+  user: state.user,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -32,6 +32,9 @@ export default class Privacy extends Component {
    */
   onSelect(privacySelected, event) {
     event.preventDefault();
+    if (this.props.disabled) {
+      return false;
+    }
 
     if ([PUBLIC, FRIEND, ONLY_ME, ONLY_ADMIN_BUILDING].indexOf(privacySelected) === -1) {
       privacySelected = PUBLIC;
@@ -54,6 +57,7 @@ export default class Privacy extends Component {
    *
    */
   render() {
+    const { disabled } = this.props;
     const privacies = {
       PUBLIC: {
         icon: <i className="fa fa-globe" aria-hidden="true"></i>,
@@ -107,6 +111,7 @@ Privacy.propTypes = {
   FRIEND: PropTypes.bool.isRequired,
   ONLY_ME: PropTypes.bool.isRequired,
   ADMIN_BUILDING: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
 };
 
 Privacy.defaultProps = {
@@ -117,5 +122,6 @@ Privacy.defaultProps = {
   FRIEND: true,
   ONLY_ME: true,
   ADMIN_BUILDING: false,
+  disabled: false,
 };
 
