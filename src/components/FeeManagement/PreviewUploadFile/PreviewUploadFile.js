@@ -141,7 +141,7 @@ class PreviewUpload extends React.Component {
     return (
       <Modal show={show} onHide={closeModal} backdrop="static" className={s.previewFees}>
         <Modal.Header>
-          <Modal.Title>{`Bạn đang tải tập lên tập tin ${type.name}`}</Modal.Title>
+          <Modal.Title>{`Bạn đang tải lên tập tin ${type.name}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {showMessage ? this.renderMessage() : this.renderPrevieFees(hasError)}
