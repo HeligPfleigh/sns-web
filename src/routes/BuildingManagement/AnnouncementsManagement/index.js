@@ -119,6 +119,7 @@ class AnnouncementsManagement extends Component {
       currentPage,
       showDeleteAnnouncement,
       showEditAnnouncement,
+      idEditAnnouncement,
     } = this.state;
     const {
       buildingId,
@@ -197,12 +198,14 @@ class AnnouncementsManagement extends Component {
           closeModal={this.closeModal}
           clickModal={this.onClickDeleteModal}
         />
-        <EditAnnouncementModal
-          show={showEditAnnouncement}
-          closeModal={this.closeModal}
-          clickModal={this.onClickEditModal}
-          buildingId={buildingId}
-        />
+        {idEditAnnouncement &&
+          <EditAnnouncementModal
+            show={showEditAnnouncement}
+            closeModal={this.closeModal}
+            clickModal={this.onClickEditModal}
+            buildingId={buildingId}
+          />
+        }
       </Grid>
     );
   }

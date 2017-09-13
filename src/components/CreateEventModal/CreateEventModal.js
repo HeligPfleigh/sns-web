@@ -364,7 +364,7 @@ class CreateEventModal extends Component {
                     editorState={editorState}
                     onChange={this.onChangeMessage}
                     placeholder="Mô tả sự kiện"
-                    ref={editor => this.editor = editor}
+                    ref={(editor) => { this.editor = editor; }}
                     onFocus={() => this.setState({ hasFocusEditor: true })}
                     onBlur={() => this.setState({ hasFocusEditor: false })}
                     spellCheck
