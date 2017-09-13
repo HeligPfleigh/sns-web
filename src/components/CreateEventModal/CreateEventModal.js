@@ -78,20 +78,14 @@ const compositeDecorator = new CompositeDecorator([{
 
 class CreateEventModal extends Component {
 
-  constructor(...args) {
-    super(...args);
+  constructor(props, ...args) {
+    super(props, ...args);
 
     this.state = this.initState();
-  }
 
-  componentWillReceiveProps(nextProps) {
-    const { user: { buildings } } = nextProps;
+    const { user: { buildings } } = props;
     if (Array.isArray(buildings)) {
-      const building = buildings[0]._id || undefined;
-      this.setState({
-        building,
-      });
-      this.building = building;
+      this.building = buildings[0]._id || undefined;
     }
   }
 

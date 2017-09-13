@@ -1,0 +1,9 @@
+mutation DeleteResidentInBuildingMutation ($input: DeleteResidentInBuildingInput!) {
+  deleteResidentInBuilding(input: $input) {
+    ...ResidentInBuildingView
+  }
+}
+
+fragment ResidentInBuildingView on User {
+  _id
+}

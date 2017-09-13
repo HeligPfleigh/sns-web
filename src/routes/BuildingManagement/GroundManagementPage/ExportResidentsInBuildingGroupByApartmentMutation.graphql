@@ -1,0 +1,5 @@
+mutation ExportResidentsInBuildingGroupByApartmentMutation ($building: String!, $filters: SearchByResidentsInBuildingGroupByApartment) {
+  exportResidentsInBuildingGroupByApartment(building: $building, filters: $filters) {
+    file
+  }
+}

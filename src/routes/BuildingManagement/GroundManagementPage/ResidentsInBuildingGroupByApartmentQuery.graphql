@@ -1,5 +1,5 @@
-query ResidentsInApartmentBuildingQuery($building: String!, $filters: SearchByResidentsInApartmentBuilding, $page: Int, $limit: Int) {
-  residentsInApartmentBuilding(building: $building, filters: $filters, page: $page, limit: $limit) {
+query ResidentsInBuildingGroupByApartmentQuery($building: String!, $filters: SearchByResidentsInBuildingGroupByApartment, $page: Int, $limit: Int) {
+  residentsInBuildingGroupByApartment(building: $building, filters: $filters, page: $page, limit: $limit) {
     pageInfo {
       page
       total

@@ -1,13 +1,13 @@
 import EventList from './EventList/EventList';
 import EventMenu from './EventMenu/EventMenu';
 import EventDetail from './EventDetail/EventDetail';
-import InviteToEventModal from './InviteToEventModal/InviteToEventModal';
+import InviteFriendToEventModal from './InviteToEventModal/InviteFriendToEventModal';
+import InviteResidentToEventModal from './InviteToEventModal/InviteResidentToEventModal';
 
 export {
   EventList,
   EventMenu,
   EventDetail,
-  InviteToEventModal,
+  InviteFriendToEventModal,
+  InviteResidentToEventModal,
 };
-
-export default EventList;

@@ -19,9 +19,9 @@ import Pagination from '../../../components/Pagination';
 import Validator from '../../../components/Validator';
 import history from '../../../core/history';
 import InputField from './InputField';
-import ResidentsInApartmentBuildingQuery from './ResidentsInApartmentBuildingQuery.graphql';
-import DeleteResidentInApartmentBuildingMutation from './DeleteResidentInApartmentBuildingMutation.graphql';
-import ExportResidentsInApartmentBuildingMutation from './ExportResidentsInApartmentBuildingMutation.graphql';
+import ResidentsInBuildingGroupByApartmentQuery from './ResidentsInBuildingGroupByApartmentQuery.graphql';
+import DeleteResidentInBuildingMutation from './DeleteResidentInBuildingMutation.graphql';
+import ExportResidentsInBuildingGroupByApartmentMutation from './ExportResidentsInBuildingGroupByApartmentMutation.graphql';
 import DeleteResidentModal from './DeleteResident';
 import Menu from '../Menu/Menu';
 import s from './GroundManagement.scss';
@@ -39,16 +39,25 @@ class GroundManagement extends Component {
   }
 
   onBlurFilterInputs = (event, nextValue) => {
-    if (this.hasFilterSubmitted && isString(nextValue) && String(nextValue).trim().length === 0) {
-      const { fields, currentValues } = this.props;
-      const hasSubmitFiltering = [];
-      forEach(currentValues, (value, field) => {
-        if (isString(value) || String(value).length === 0) {
-          hasSubmitFiltering.push(field);
-        }
-      });
-      this.hasFilterSubmitted = !(fields.length === hasSubmitFiltering.length);
-      this.onChangePage(1);
+    if (isString(nextValue)) {
+      const len = String(nextValue).trim().length;
+      if (this.hasFilterSubmitted && len === 0) {
+        const { fields, currentValues } = this.props;
+
+        // Determine whether all fields in filter form have empty yet
+        const automateQueryWithEmptyFilter = [];
+        forEach(currentValues, (value, field) => {
+          if (isString(value) || String(value).trim().length === 0) {
+            automateQueryWithEmptyFilter.push(field);
+          }
+        });
+
+        // Reset flag for filter button
+        this.hasFilterSubmitted = !(fields.length === automateQueryWithEmptyFilter.length);
+
+        // Navigate to first page
+        return this.onChangePage(1);
+      }
     }
   }
 
@@ -89,7 +98,7 @@ class GroundManagement extends Component {
         filters: this.hasFilterSubmitted ? this.getAllFilterInputs() : {},
       });
 
-      const { data: { exportResidentsInApartmentBuilding: { file } } } = r;
+      const { data: { exportResidentsInBuildingGroupByApartment: { file } } } = r;
       if (isUndefined(file) || isNull(file)) {
         this.onErrorWhenDeleteResident('Không thể tạo được đường dẫn để tạo tập tin.');
         return;
@@ -162,13 +171,13 @@ class GroundManagement extends Component {
   datatable() {
     const {
       data: {
-        residentsInApartmentBuilding,
+        residentsInBuildingGroupByApartment,
       },
     } = this.props;
 
     const data = [];
-    if (isObject(residentsInApartmentBuilding) && Array.isArray(residentsInApartmentBuilding.edges)) {
-      residentsInApartmentBuilding.edges.forEach((rows) => {
+    if (isObject(residentsInBuildingGroupByApartment) && Array.isArray(residentsInBuildingGroupByApartment.edges)) {
+      residentsInBuildingGroupByApartment.edges.forEach((rows) => {
         const children = [];
         if (Array.isArray(rows.residents)) {
           rows.residents.forEach((resident) => {
@@ -212,7 +221,7 @@ class GroundManagement extends Component {
       user,
       data: {
         loading,
-        residentsInApartmentBuilding,
+        residentsInBuildingGroupByApartment,
       },
       handleSubmit,
       pristine,
@@ -289,7 +298,7 @@ class GroundManagement extends Component {
                   <Col xs={12} className={s.stats}>
                     <Row>
                       <Col className="pull-left" xs={8}>
-                        <i className="fa fa-bar-chart" aria-hidden="true"></i> Tòa nhà hiện có {residentsInApartmentBuilding.stats.numberOfApartments} căn hộ và {residentsInApartmentBuilding.stats.numberOfResidents} cư dân.
+                        <i className="fa fa-bar-chart" aria-hidden="true"></i> Tòa nhà hiện có {residentsInBuildingGroupByApartment.stats.numberOfApartments} căn hộ và {residentsInBuildingGroupByApartment.stats.numberOfResidents} cư dân.
                       </Col>
                       <Col className="pull-right" xs={4}>
                         <a onClick={this.onExportToExcel(buildingId)} title="Tải xuống với định dạng excel"><i className="fa fa-file-excel-o" aria-hidden="true"></i></a>
@@ -311,9 +320,9 @@ class GroundManagement extends Component {
                   </Col>
                   <Col xs={12} className="pull-right">
                     <Pagination
-                      total={residentsInApartmentBuilding.pageInfo.total}
-                      page={residentsInApartmentBuilding.pageInfo.page}
-                      limit={residentsInApartmentBuilding.pageInfo.limit}
+                      total={residentsInBuildingGroupByApartment.pageInfo.total}
+                      page={residentsInBuildingGroupByApartment.pageInfo.page}
+                      limit={residentsInBuildingGroupByApartment.pageInfo.limit}
                       onChange={this.onChangePage}
                     />
                   </Col>
@@ -333,12 +342,12 @@ GroundManagement.propTypes = {
   buildingId: PropTypes.string.isRequired,
   onChangePage: PropTypes.func.isRequired,
   data: PropTypes.shape({
-    loading: PropTypes.bool.isRequired,
-    residentsInApartmentBuilding: PropTypes.shape({
+    loading: PropTypes.bool,
+    residentsInBuildingGroupByApartment: PropTypes.shape({
       pageInfo: PropTypes.object,
       stats: PropTypes.object,
       edges: PropTypes.array,
-    }).isRequired,
+    }),
   }).isRequired,
   currentValues: PropTypes.object,
   fields: PropTypes.array,
@@ -348,7 +357,7 @@ GroundManagement.propTypes = {
 
 GroundManagement.defaultProps = {
   data: {
-    residentsInApartmentBuilding: {
+    residentsInBuildingGroupByApartment: {
       pageInfo: {
         page: 1,
       },
@@ -374,7 +383,7 @@ const GroundManagementForm = reduxForm({
   enableReinitialize: true,
 })(compose(
   withStyles(s),
-  graphql(ResidentsInApartmentBuildingQuery, {
+  graphql(ResidentsInBuildingGroupByApartmentQuery, {
     options: props => ({
       variables: {
         building: props.buildingId,
@@ -383,7 +392,7 @@ const GroundManagementForm = reduxForm({
     }),
     props: ({ data }) => {
       const onChangePage = ({ page, filters }) => data.fetchMore({
-        query: ResidentsInApartmentBuildingQuery,
+        query: ResidentsInBuildingGroupByApartmentQuery,
         variables: {
           ...data.variables,
           filters,
@@ -400,7 +409,7 @@ const GroundManagementForm = reduxForm({
       };
     },
   }),
-  graphql(DeleteResidentInApartmentBuildingMutation, {
+  graphql(DeleteResidentInBuildingMutation, {
     props: ({ mutate }) => ({
       onDeleteResident: input => mutate({
         variables: {
@@ -408,22 +417,22 @@ const GroundManagementForm = reduxForm({
         },
         optimisticResponse: {
           __typename: 'Mutation',
-          deleteResidentInApartmentBuilding: {
+          deleteResidentInBuilding: {
             __typename: 'User',
             _id: input.resident,
           },
         },
         updateQueries: {
-          ResidentsInApartmentBuildingQuery: (previousResult) => {
-            const { residentsInApartmentBuilding } = previousResult;
-            const apartmentPos = residentsInApartmentBuilding.edges.findIndex(item => item._id === input.apartment);
-            const { residents } = residentsInApartmentBuilding.edges[apartmentPos];
+          ResidentsInBuildingGroupByApartmentQuery: (previousResult) => {
+            const { residentsInBuildingGroupByApartment } = previousResult;
+            const apartmentPos = residentsInBuildingGroupByApartment.edges.findIndex(item => item._id === input.apartment);
+            const { residents } = residentsInBuildingGroupByApartment.edges[apartmentPos];
             let residentIndex;
             if (Array.isArray(residents) && residents.length > 0) {
               residentIndex = residents.findIndex(item => item._id === input.resident);
             }
             return update(previousResult, {
-              residentsInApartmentBuilding: {
+              residentsInBuildingGroupByApartment: {
                 edges: {
                   [apartmentPos]: {
                     residents: {
@@ -438,7 +447,7 @@ const GroundManagementForm = reduxForm({
       }),
     }),
   }),
-  graphql(ExportResidentsInApartmentBuildingMutation, {
+  graphql(ExportResidentsInBuildingGroupByApartmentMutation, {
     props: ({ mutate }) => ({
       onExportToExcel: variables => mutate({
         variables,
