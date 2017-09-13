@@ -10,7 +10,8 @@ import {
   ControlLabel,
   FormGroup,
   Clearfix,
- } from 'react-bootstrap';
+} from 'react-bootstrap';
+import isEmpty from 'lodash/isEmpty';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
@@ -123,9 +124,16 @@ class CreateEventModal extends Component {
   onSubmit = async () => {
     const { privacy, photos, nameEvent, location, start, end } = this.state;
     const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (photos.length === 0) {
+    if (isEmpty(photos)) {
       this.setState({
         validateDescriptionText: 'Vui lòng chọn ảnh sự kiện',
+      });
+      return;
+    }
+
+    if (isEmpty(nameEvent)) {
+      this.setState({
+        validateDescriptionText: 'Vui lòng nhập tên sự kiện',
       });
       return;
     }
@@ -133,6 +141,13 @@ class CreateEventModal extends Component {
     if (nameEvent.length <= 10) {
       this.setState({
         validateDescriptionText: 'Tên sự kiện quá ngắn',
+      });
+      return;
+    }
+
+    if (isEmpty(location)) {
+      this.setState({
+        validateDescriptionText: 'Vui lòng nhập địa điểm tổ chức',
       });
       return;
     }
@@ -147,6 +162,13 @@ class CreateEventModal extends Component {
     if (start.toDate() > end.toDate()) {
       this.setState({
         validateDescriptionText: 'Thời gian kết thúc cần lớn hơn thời gian bắt đầu',
+      });
+      return;
+    }
+
+    if (isEmpty(message)) {
+      this.setState({
+        validateDescriptionText: 'Vui lòng nhập mô tả cho sự kiện',
       });
       return;
     }
