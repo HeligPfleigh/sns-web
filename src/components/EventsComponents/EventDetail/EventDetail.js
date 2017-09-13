@@ -43,15 +43,6 @@ class EventDetail extends Component {
   constructor(props, ...args) {
     super(props, ...args);
     this.initState(props);
-    this.onJoinClick = this.onJoinClick.bind(this);
-    this.onCanJoinClick = this.onCanJoinClick.bind(this);
-    this.onCantJoinClick = this.onCantJoinClick.bind(this);
-    this.onDropDown = this.onDropDown.bind(this);
-    this.onInterestClick = this.onInterestClick.bind(this);
-    this.showEditEventModal = this.showEditEventModal.bind(this);
-    this.hideEditEventModal = this.hideEditEventModal.bind(this);
-    this.canUpdateEvent = this.canUpdateEvent.bind(this);
-    this.canDeleteEvent = this.canDeleteEvent.bind(this);
 
     this.canUpdateEventId = setInterval(() => {
       this.setState({
@@ -77,24 +68,24 @@ class EventDetail extends Component {
     clearInterval(this.canDeleteEventId);
   }
 
-  async onInterestClick(e) {
+  onInterestClick = async (e) => {
     e.preventDefault();
     this.props.interestEvent(this.props.event._id);
   }
 
-  async onJoinClick(e) {
+  onJoinClick = async (e) => {
     e.preventDefault();
     const { event, user } = this.props;
     await this.props.joinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
   }
 
-  async onCanJoinClick(e) {
+  onCanJoinClick = async (e) => {
     e.preventDefault();
     const { event, user } = this.props;
     await this.props.canJoinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
   }
 
-  async onCantJoinClick(e) {
+  onCantJoinClick = async (e) => {
     e.preventDefault();
     const { event, user } = this.props;
     await this.props.cantJoinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
@@ -109,12 +100,12 @@ class EventDetail extends Component {
     }
   }
 
-  canUpdateEvent() {
+  canUpdateEvent = () => {
     const { event } = this.props;
     return event.isAuthor && Validator.Date.isValid(event.start) && Validator.Date.withMoment(event.start) > Validator.Date.now();
   }
 
-  canDeleteEvent() {
+  canDeleteEvent = () => {
     const { event } = this.props;
     const now = Validator.Date.now();
     return event.isAuthor &&
@@ -130,7 +121,7 @@ class EventDetail extends Component {
     });
   }
 
-  initState() {
+  initState = () => {
     this.state = {
       showEditFormModal: false,
       canUpdateEvent: false,
@@ -138,7 +129,7 @@ class EventDetail extends Component {
     };
   }
 
-  hideEditEventModal() {
+  hideEditEventModal = () => {
     this.setState({
       showEditFormModal: false,
     });
