@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { generate as idRandom } from 'shortid';
-import { Panel, Table } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import { graphql, compose } from 'react-apollo';
 import s from './BuildingInformationTab.scss';
 import getBOMList from './getBOMList.graphql';
-
+import Link from '../../../components/Link';
 
 function getAddress({
   basisPoint,
@@ -48,7 +48,7 @@ class BuildingInformationTab extends React.Component {
                       <tr key={idRandom()} className={s.textMuted}>
                         <td style={{ minWidth: 50 }}><span>{`${gender}:   `}</span></td>
                         <td style={{ minWidth: 250 }}><span className={s.textName}>{`${BOM.profile.fullName}`}</span></td>
-                        <td><a href={`http://sns.mttjsc.com/user/${BOM._id}`}>Profile Link</a></td>
+                        <td><Link to={`/user/${BOM._id}`} style={{ color: 'blue' }}>Profile Link</Link></td>
                       </tr>
                     );
                   })
