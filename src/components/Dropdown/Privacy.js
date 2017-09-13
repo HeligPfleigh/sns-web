@@ -29,6 +29,18 @@ export default class Privacy extends Component {
 
   /**
    *
+   * @param {*} nextProps
+   */
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.disabled && !(nextProps.value === this.props.value)) {
+      this.setState({
+        privacySelected: nextProps.value,
+      });
+    }
+  }
+
+  /**
+   *
    */
   onSelect(privacySelected, event) {
     event.preventDefault();
@@ -57,7 +69,6 @@ export default class Privacy extends Component {
    *
    */
   render() {
-    const { disabled } = this.props;
     const privacies = {
       PUBLIC: {
         icon: <i className="fa fa-globe" aria-hidden="true"></i>,

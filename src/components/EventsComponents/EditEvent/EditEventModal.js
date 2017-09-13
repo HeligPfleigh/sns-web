@@ -25,19 +25,25 @@ import { Privacy } from '../../Dropdown';
 import Validator from '../../Validator';
 import { SingleUploadFile } from '../../ApolloUpload';
 import * as ReduxFormFields from './FormFields';
+import { PUBLIC } from '../../../constants';
 import s from './EditEvent.scss';
 
 class EditEventModal extends Component {
   constructor(props, ...args) {
     super(props, ...args);
 
+    const { initialValues, user: { buildings } } = props;
+
     this.state = {
-      photo: isArray(props.initialValues.photos) && head(props.initialValues.photos),
-      privacy: props.initialValues.privacy,
-      showEndTime: !isUndefined(props.initialValues.end),
+      photo: isArray(initialValues.photos) && head(initialValues.photos),
+      showEndTime: !isUndefined(initialValues.end),
       formFields: {},
       validationState: {},
     };
+
+    if (Array.isArray(buildings)) {
+      this.building = buildings[0]._id || undefined;
+    }
 
     this.onUploadSuccess = this.onUploadSuccess.bind(this);
     this.onUploadClick = this.onUploadClick.bind(this);
@@ -62,10 +68,6 @@ class EditEventModal extends Component {
   }
 
   onPrivacySelected(privacy) {
-    this.setState({
-      privacy,
-    });
-
     this.props.change('privacy', privacy);
   }
 
@@ -79,6 +81,7 @@ class EditEventModal extends Component {
       end,
       message,
       invites,
+      building,
     }) {
     return this.props.onUpdate(_id, {
       privacy,
@@ -89,6 +92,7 @@ class EditEventModal extends Component {
       end,
       message,
       invites,
+      building: building ? this.building : undefined,
     })
     .then(() => this.props.onHide())
     .catch(() => this.props.onHide());
@@ -98,6 +102,11 @@ class EditEventModal extends Component {
     this.props.onDelete(this.props.initialValues._id).then(() => {
       history.push('/events');
     });
+  }
+
+  onBuldingEventChange = (event) => {
+    const { currentValues } = this.props;
+    this.onPrivacySelected(event.target.checked ? PUBLIC : currentValues.privacy);
   }
 
   showEndTime(event) {
@@ -299,6 +308,20 @@ class EditEventModal extends Component {
                 </Col>
               </FormGroup>
 
+              <FormGroup validationState={this.state.validationState.buildingEvent}>
+                <Col sm={9} smOffset={3}>
+                  <Field
+                    type="checkbox"
+                    name="building"
+                    component={ReduxFormFields.CheckboxField}
+                    ref={input => this.state.formFields.building = input}
+                    withRef
+                    onClick={this.onBuldingEventChange}
+                    inline
+                  >Sự kiện của tòa nhà</Field>
+                </Col>
+              </FormGroup>
+
             </Col>
             <Clearfix />
           </Modal.Body>
@@ -306,7 +329,7 @@ class EditEventModal extends Component {
             <ButtonToolbar>
               <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Hủy sự kiện</Button>
               <ButtonToolbar className="pull-right">
-                <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
+                <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={currentValues.privacy} disabled={!!currentValues.building} />
                 <Field
                   type="input"
                   name="privacy"
@@ -331,6 +354,12 @@ EditEventModal.propTypes = {
   canDelete: PropTypes.bool.isRequired,
   onUpdate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  currentValues: PropTypes.object,
+  change: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    isAdmin: PropTypes.bool,
+    buildings: PropTypes.array,
+  }).isRequired,
 };
 
 EditEventModal.defaultProps = {
@@ -338,6 +367,11 @@ EditEventModal.defaultProps = {
   canUpdate: false,
   canDelete: false,
   onHide: () => undefined,
+  currentValues: {},
+  user: {
+    isAdmin: false,
+    buildings: [],
+  },
 };
 
 const fields = [
@@ -348,6 +382,7 @@ const fields = [
   'location',
   'message',
   'privacy',
+  'building',
 ];
 
 const EditEventForm = reduxForm({

@@ -7,7 +7,6 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import * as _ from 'lodash';
 import Loading from '../../../components/Loading';
-import getFriendsQuery from '../../ChatSideBar/getFriendsQuery.graphql';
 import inviteResidentsJoinEvent from './inviteResidentsJoinEvent.graphql';
 import joinEvent from './joinEvent.graphql';
 import canJoinEvent from './canJoinEvent.graphql';
@@ -18,7 +17,8 @@ import fetchEventDetails from './fetchEventDetails.graphql';
 import {
   EventMenu,
   EventDetail,
-  InviteToEventModal,
+  InviteFriendToEventModal,
+  InviteResidentToEventModal,
 } from '../../../components/EventsComponents';
 import interestEvent from '../../../components/EventsComponents/EventList/interestEvent.graphql';
 import s from './EventDetailPage.scss';
@@ -27,10 +27,6 @@ class EventDetailPage extends Component {
   state= {
     loading: false,
     showModalInvite: false,
-  }
-
-  onCreateEvent = () => {
-
   }
 
   onOpenInviteModal = () => {
@@ -53,11 +49,41 @@ class EventDetailPage extends Component {
     }
   }
 
+  invitationEventModal = ({
+    building,
+    ignoreFriends,
+    invitedFriends,
+    user,
+  }) => {
+    if (building) {
+      return (<InviteResidentToEventModal
+        show={this.state.showModalInvite}
+        ignoreFriends={ignoreFriends}
+        invitedFriends={invitedFriends}
+        building={building}
+        closeModal={this.closeModal}
+        sendInvitation={this.onSendInviteClicked}
+        user={user}
+      />);
+    }
+    return (<InviteFriendToEventModal
+      show={this.state.showModalInvite}
+      ignoreFriends={ignoreFriends}
+      invitedFriends={invitedFriends}
+      closeModal={this.closeModal}
+      sendInvitation={this.onSendInviteClicked}
+      user={user}
+    />);
+  }
+
   render() {
-    const { data: {
-      loading,
-      event,
-    }, friends } = this.props;
+    const {
+      data: {
+        loading,
+        event,
+      },
+      user,
+    } = this.props;
 
     // Show loading
     if (loading) {
@@ -65,45 +91,37 @@ class EventDetailPage extends Component {
     }
 
     // Hide all invited users.
-    const joiners = [];
-    _.concat(event.joins, event.can_joins, event.cant_joins).forEach(u => joiners.push(u._id));
-    const validFriends = friends.filter(f => joiners.indexOf(f._id) === -1);
-
+    const ignoreFriends = [];
+    _.concat(event.joins, event.can_joins, event.cant_joins).forEach(u => ignoreFriends.push(u._id));
     return (
-      <div>
-        <InviteToEventModal
-          show={this.state.showModalInvite}
-          friends={validFriends}
-          invites={event ? event.invites : []}
-          closeModal={this.closeModal}
-          onSendInviteClicked={this.onSendInviteClicked}
-        />
-        <Grid>
-          <Loading show={loading} full>Đang tải ...</Loading>
-          <Row className={s.containerTop30}>
-            <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
-              <Col md={3} smHidden xsHidden>
-                <EventMenu
-                  onCreateEvent={this.onCreateEvent}
-                />
-              </Col>
-            </MediaQuery>
-            <Col md={9} sm={12} xs={12}>
-              <EventDetail
-                onOpenInviteModal={this.onOpenInviteModal}
-                event={event}
-                user={this.props.user}
-                joinEvent={this.props.joinEvent}
-                canJoinEvent={this.props.canJoinEvent}
-                cantJoinEvent={this.props.cantJoinEvent}
-                deleteEvent={this.props.deleteEvent}
-                editEvent={this.props.editEvent}
-                interestEvent={this.props.interestEvent}
-              />
+      <Grid>
+        {this.invitationEventModal({
+          building: event.building ? event.building._id : undefined,
+          invitedFriends: Array.isArray(event.invites) ? event.invites : [],
+          user,
+        })}
+        <Loading show={loading} full>Đang tải ...</Loading>
+        <Row className={s.containerTop30}>
+          <MediaQuery minDeviceWidth={992} values={{ deviceWidth: 1600 }}>
+            <Col md={3} smHidden xsHidden>
+              <EventMenu />
             </Col>
-          </Row>
-        </Grid>
-      </div>
+          </MediaQuery>
+          <Col md={9} sm={12} xs={12}>
+            <EventDetail
+              onOpenInviteModal={this.onOpenInviteModal}
+              event={event}
+              user={this.props.user}
+              joinEvent={this.props.joinEvent}
+              canJoinEvent={this.props.canJoinEvent}
+              cantJoinEvent={this.props.cantJoinEvent}
+              deleteEvent={this.props.deleteEvent}
+              editEvent={this.props.editEvent}
+              interestEvent={this.props.interestEvent}
+            />
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }
@@ -118,9 +136,8 @@ EventDetailPage.propTypes = {
       cant_joins: PropTypes.array,
       invites: PropTypes.array,
     }),
-    loading: PropTypes.bool.isRequired,
+    loading: PropTypes.bool,
   }).isRequired,
-  friends: PropTypes.array.isRequired,
   inviteResidentsJoinEvent: PropTypes.func.isRequired,
   joinEvent: PropTypes.func.isRequired,
   canJoinEvent: PropTypes.func.isRequired,
@@ -145,15 +162,6 @@ export default compose(
     props: ({ data }) => ({
       data,
     }),
-  }),
-  graphql(getFriendsQuery, {
-    props: ({ data }) => {
-      const { me } = data;
-      const friends = me ? me.friends : [];
-      return {
-        friends,
-      };
-    },
   }),
   graphql(deleteEvent, {
     props: ({ mutate }) => ({

@@ -1,0 +1,16 @@
+query getFriendsQuery{
+  me {
+    _id
+    friends {
+      _id
+      profile {
+        picture
+        fullName
+        lastName
+        firstName
+        gender
+      }
+      chatId
+    }
+  }
+}
