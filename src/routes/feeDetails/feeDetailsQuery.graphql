@@ -17,5 +17,6 @@ query feeDetailsQuery($feeId: String!) {
     }
     total
     status
+    lastRemind
   }
 }
