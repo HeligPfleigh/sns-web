@@ -5,7 +5,7 @@
   float: left;
   margin-bottom: 30px;
   padding: 20px 15px;
-  min-height: 240px;
+  min-height: 270px;
   background-color: #f7f6f6;
 
   a:hover {
@@ -57,12 +57,16 @@
       }
 
       h3 {
-        display: block;
         color: #4c4c4c;
         font-size: 13px;
         font-weight: bold;
         margin: 0px;
         margin-top: 5px;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-wrap: break-word;
       }
 
       i {
