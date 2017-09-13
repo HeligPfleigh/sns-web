@@ -1,12 +1,28 @@
 query MyBuildingQueries(
   $userId: String!,
-  $annouceLimit: Int,
   $building: String!,
   $limit: Int
 ) {
+  building(_id: $building) {
+    _id
+    name
+    addressString
+  }
+
+  getBOMList (buildingId: $building){
+    _id
+    profile {
+      fullName
+      picture
+      firstName
+      lastName
+      gender
+    }
+  }
+
   resident(_id: $userId) {
     _id
-    announcements(limit: $annouceLimit) {
+    announcements(limit: $limit) {
       edges {
         _id
         message
