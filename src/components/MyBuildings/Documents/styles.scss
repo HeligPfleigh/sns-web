@@ -6,6 +6,7 @@
   padding: 20px 15px;
   min-height: 240px;
   background-color: #f7f6f6;
+  min-height: 240px;
 
   a:hover {
     text-decoration: none;
@@ -43,18 +44,23 @@
       list-style: none;
       padding-top: 5px;
       padding-bottom: 5px;
+      min-height: 48px;
 
       &:hover {
         background-color: #EBEBEB;
       }
 
       h3 {
-        display: block;
         color: #4c4c4c;
         font-size: 13px;
         font-weight: bold;
         margin: 0px;
         margin-top: 5px;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-wrap: break-word;
       }
 
       i {
