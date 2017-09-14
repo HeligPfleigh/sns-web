@@ -307,7 +307,7 @@ export default compose(
     },
   }),
   graphql(createFAQMutation, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       createFAQ: input => mutate({
         variables: {
           input,
