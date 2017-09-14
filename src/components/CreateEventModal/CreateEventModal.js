@@ -9,11 +9,7 @@ import {
   FormGroup,
   Clearfix,
   Checkbox,
-<<<<<<< HEAD
- } from 'react-bootstrap';
-=======
 } from 'react-bootstrap';
->>>>>>> FixFrontEnd
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
@@ -444,7 +440,6 @@ CreateEventModal.propTypes = {
     isAdmin: PropTypes.bool,
     buildings: PropTypes.array,
   }).isRequired,
-<<<<<<< HEAD
 };
 
 CreateEventModal.defaultProps = {
@@ -454,17 +449,6 @@ CreateEventModal.defaultProps = {
   },
 };
 
-=======
-};
-
-CreateEventModal.defaultProps = {
-  user: {
-    isAdmin: false,
-    buildings: [],
-  },
-};
-
->>>>>>> FixFrontEnd
 CreateEventModal.fragments = {
   event: gql`
     fragment EventView on Event{
