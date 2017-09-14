@@ -244,7 +244,7 @@ export default compose(
     },
   }),
   graphql(createDocumentMutation, {
-    props: ({ ownProps, mutate }) => ({
+    props: ({ mutate }) => ({
       createDocument: input => mutate({
         variables: {
           input,
@@ -265,29 +265,17 @@ export default compose(
             },
           },
         },
-        update: (store, { data: { createDocument } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: documentsListQuery,
-            variables: {
-              building: ownProps.building._id,
-            },
-          });
-          data = update(data, {
-            documents: {
-              edges: {
-                $unshift: [createDocument],
+        updateQueries: {
+          documentsListQuery: (previousResult, { mutationResult }) => {
+            const document = mutationResult.data.createDocument;
+            return update(previousResult, {
+              documents: {
+                edges: {
+                  $unshift: [document],
+                },
               },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: documentsListQuery,
-            variables: {
-              building: ownProps.building._id,
-            },
-            data,
-          });
+            });
+          },
         },
       }),
     }),

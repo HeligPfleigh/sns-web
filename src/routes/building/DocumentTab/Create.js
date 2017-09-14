@@ -4,6 +4,7 @@ import {
   Modal,
   Button,
   Col,
+  Alert,
   ControlLabel,
   FormGroup,
   Clearfix,
@@ -25,6 +26,7 @@ class CreateDocumentModal extends Component {
     super(props, ...args);
 
     this.state = {
+      errorMessage: null,
       validationState: {},
       showModal: props.show,
     };
@@ -75,13 +77,19 @@ class CreateDocumentModal extends Component {
     });
   }
 
-  resetForm() {
-    const { dispatch, reset, form } = this.props;
-    dispatch(reset(form));
-  }
-
   onHide() {
     this.props.onHide({});
+  }
+
+  onModalError = (errorMessage) => {
+    this.setState({
+      errorMessage,
+    });
+  }
+
+  resetForm = () => {
+    const { dispatch, reset, form } = this.props;
+    dispatch(reset(form));
   }
 
   render() {
@@ -94,14 +102,25 @@ class CreateDocumentModal extends Component {
       currentValues,
       canCreate,
     } = this.props;
+
+    const allowedFormats = ['doc', 'docx', 'ppt', 'pptx', 'pdf', 'xls', 'xlsx'];
+
     return (
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static">
-        <form name={form} noValidate onSubmit={handleSubmit(this.onCreate)}>
+        <form name={form} noValidate onSubmit={handleSubmit(this.onCreate)} autoComplete="off">
           <Modal.Header closeButton={!submitting}>
             <Modal.Title>Tạo biểu mẫu</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Col className="form-horizontal" xs={12}>
+
+              {
+                this.state.errorMessage && (
+                  <Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: false })}>
+                    { this.state.errorMessage }
+                  </Alert>
+                )
+              }
 
               <FormGroup validationState={this.state.validationState.name}>
                 <ControlLabel className="col-sm-3">Tên biểu mẫu</ControlLabel>
@@ -125,10 +144,13 @@ class CreateDocumentModal extends Component {
                     <i className="fa fa-upload" aria-hidden="true"></i>
                     <strong> Tải lên</strong>
                     <SingleUploadFile
+                      // eslint-disable-next-line
                       inputRef={input => this.uploadRef = input}
                       onSuccess={this.onUploadSuccess}
+                      onError={this.onModalError}
                       className="hide"
-                      accept="application/msword,application/vnd.ms-excel,application/vnd.ms-powerpoint,text/plain, application/pdf,image/*,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      allowedFormats={allowedFormats}
+                      accept={`.${allowedFormats.join(', .')}`}
                     />
                   </Button>
                   <Field
@@ -164,11 +186,20 @@ CreateDocumentModal.propTypes = {
     _id: PropTypes.string,
     isAdmin: PropTypes.bool,
   }).isRequired,
+  reset: PropTypes.any,
+  form: PropTypes.string,
+  change: PropTypes.func,
   onHide: PropTypes.func.isRequired,
   canCreate: PropTypes.bool.isRequired,
   onCreate: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.any,
+  pristine: PropTypes.any,
+  submitting: PropTypes.any,
+  invalid: PropTypes.any,
+  currentValues: PropTypes.any,
 };
 
 CreateDocumentModal.defaultProps = {
@@ -196,8 +227,4 @@ const mapStateToProps = state => ({
   currentValues: formValueSelector('CreateDocument')(state, ...fields),
 });
 
-const mapDispatchToProps = dispatch => ({
-
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(CreateDocumentForm);
+export default connect(mapStateToProps)(CreateDocumentForm);

@@ -48,11 +48,21 @@ class DocumentItem extends Component {
       <div className={s.titleEllipsis} title={data.name}>
         <i className="fa fa-caret-right" aria-hidden="true"></i> {data.name}
       </div>
-      {(canUpdate || canDelete) && (<ButtonToolbar className="pull-right">
-        <a className={classNames('btn btn-default btn-xs', s.btnDownload)} onClick={this.onDownload(data.file)} title={data.file}>(<i className="fa fa-download" aria-hidden="true"></i> Tải xuống)</a>
-        <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall" type="button"><i className="fa fa-edit" aria-hidden="true"></i> Sửa</Button>
-        <Button bsStyle="danger" onClick={this.onDelete} bsSize="xsmall" type="button"><i className="fa fa-trash" aria-hidden="true"></i> Xóa</Button>
-      </ButtonToolbar>)}
+      <ButtonToolbar className="pull-right">
+        <a className={classNames('btn btn-default btn-xs', s.btnDownload)} onClick={this.onDownload(data.file)} title={data.file}>
+          (<i className="fa fa-download" aria-hidden="true"></i> Tải xuống)
+        </a>
+        {canUpdate && (
+          <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall">
+            <i className="fa fa-edit" aria-hidden="true"></i> Sửa
+          </Button>
+        )}
+        {canDelete && (
+          <Button bsStyle="danger" onClick={this.onDelete} bsSize="xsmall">
+            <i className="fa fa-trash" aria-hidden="true"></i> Xóa
+          </Button>
+        )}
+      </ButtonToolbar>
       <Clearfix />
     </ListGroupItem>);
   }
