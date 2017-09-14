@@ -12,11 +12,11 @@ import {
  } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
-import { reduxForm, Field, formValueSelector } from 'redux-form';
+import { reduxForm, Field, formValueSelector, reset as resetReduxForm } from 'redux-form';
 import isArray from 'lodash/isArray';
 import head from 'lodash/head';
 import isUndefined from 'lodash/isUndefined';
-import isFunction from 'lodash/isFunction';
+// import isFunction from 'lodash/isFunction';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
@@ -55,7 +55,8 @@ class EditEventModal extends Component {
     this.validationState = this.validationState.bind(this);
   }
 
-  onUploadSuccess({ uploadSingleFile }) {
+
+  onUploadSuccess = ({ uploadSingleFile }) => {
     this.setState({
       photo: uploadSingleFile.file.url,
     });
@@ -71,7 +72,7 @@ class EditEventModal extends Component {
     this.props.change('privacy', privacy);
   }
 
-  onUpdate({
+  onUpdate = ({
       _id,
       privacy,
       photos,
@@ -82,23 +83,21 @@ class EditEventModal extends Component {
       message,
       invites,
       building,
-    }) {
-    return this.props.onUpdate(_id, {
-      privacy,
-      photos,
-      name,
-      location,
-      start,
-      end,
-      message,
-      invites,
-      building: building ? this.building : undefined,
-    })
+  }) => this.props.onUpdate(_id, {
+    privacy,
+    photos,
+    name,
+    location,
+    start,
+    end,
+    message,
+    invites,
+    building: building ? this.building : undefined,
+  })
     .then(() => this.props.onHide())
-    .catch(() => this.props.onHide());
-  }
+    .catch(() => this.props.onHide())
 
-  onDelete() {
+  onDelete = () => {
     this.props.onDelete(this.props.initialValues._id).then(() => {
       history.push('/events');
     });
@@ -117,7 +116,7 @@ class EditEventModal extends Component {
     });
   }
 
-  hideEndTime(event) {
+  hideEndTime = (event) => {
     event.preventDefault();
 
     this.setState({
@@ -125,6 +124,7 @@ class EditEventModal extends Component {
     });
   }
 
+  // eslint-disable-next-line
   validationState(fieldName) {
     return () => null;
     // return () => {
@@ -146,6 +146,11 @@ class EditEventModal extends Component {
     // };
   }
 
+  hideModal = () => {
+    this.props.resetForm();
+    this.props.onHide();
+  }
+
   render() {
     const {
       handleSubmit,
@@ -154,7 +159,6 @@ class EditEventModal extends Component {
       invalid,
       form,
       currentValues,
-      initialValues,
       canUpdate,
       canDelete,
     } = this.props;
@@ -179,7 +183,7 @@ class EditEventModal extends Component {
                         <i className="fa fa-camera" aria-hidden="true"></i>
                         <strong>  Đăng hình</strong>
                         <SingleUploadFile
-                          inputRef={input => this.uploadRef = input}
+                          inputRef={(input) => { this.uploadRef = input; }}
                           onSuccess={this.onUploadSuccess}
                           className="hide"
                         />
@@ -210,7 +214,7 @@ class EditEventModal extends Component {
                     name="name"
                     component={ReduxFormFields.InputField}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                    ref={input => this.state.formFields.name = input}
+                    ref={(input) => { this.state.formFields.name = input; }}
                     withRef
                     onChange={this.validationState('name')}
                   />
@@ -225,7 +229,7 @@ class EditEventModal extends Component {
                     name="location"
                     component={ReduxFormFields.InputField}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                    ref={input => this.state.formFields.location = input}
+                    ref={(input) => { this.state.formFields.location = input; }}
                     withRef
                     onChange={this.validationState('location')}
                   />
@@ -249,7 +253,7 @@ class EditEventModal extends Component {
                       Validator.Required(null, 'Bạn phải nhập dữ liệu'),
                       (value, values) => Validator.Date.isBefore(null, `Thời gian bắt đầu phải trước ${Validator.Date.withMoment(values.end).format('DD/MM/YYYY HH:mm')}`, values.end)(value),
                     ]}
-                    ref={input => this.state.formFields.start = input}
+                    ref={(input) => { this.state.formFields.start = input; }}
                     withRef
                     onChange={this.validationState('start')}
                   />
@@ -280,7 +284,7 @@ class EditEventModal extends Component {
                       Validator.Required(null, 'Bạn phải nhập dữ liệu'),
                       (value, values) => Validator.Date.isAfter(null, `Thời gian kết thúc phải sau ${Validator.Date.withMoment(values.start).format('DD/MM/YYYY HH:mm')}`, values.start)(value),
                     ]}
-                    ref={input => this.state.formFields.end = input}
+                    ref={(input) => { this.state.formFields.end = input; }}
                     withRef
                     onChange={this.validationState('end')}
                   />
@@ -301,7 +305,7 @@ class EditEventModal extends Component {
                     component={ReduxFormFields.EditorField}
                     className={s.editor}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                    ref={input => this.state.formFields.message = input}
+                    ref={(input) => { this.state.formFields.message = input; }}
                     withRef
                     onChange={this.validationState('message')}
                   />
@@ -314,6 +318,7 @@ class EditEventModal extends Component {
                     type="checkbox"
                     name="building"
                     component={ReduxFormFields.CheckboxField}
+                    // eslint-disable-next-line
                     ref={input => this.state.formFields.building = input}
                     withRef
                     onClick={this.onBuldingEventChange}
@@ -329,13 +334,20 @@ class EditEventModal extends Component {
             <ButtonToolbar>
               <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Hủy sự kiện</Button>
               <ButtonToolbar className="pull-right">
-                <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={currentValues.privacy} disabled={!!currentValues.building} />
+                <Privacy
+                  className={s.btnPrivacies}
+                  onSelect={this.onPrivacySelected}
+                  value={currentValues.privacy}
+                  disabled={!!currentValues.building}
+                  // eslint-disable-next-line
+                  ref={privacy => this.privacyRef = privacy}
+                />
                 <Field
                   type="input"
                   name="privacy"
                   component={ReduxFormFields.HiddenField}
                 />
-                <Button onClick={this.props.onHide} disabled={submitting}>Đóng cửa sổ</Button>
+                <Button onClick={this.hideModal} disabled={submitting}>Đóng cửa sổ</Button>
                 <Button type="submit" bsStyle="primary" disabled={!canUpdate || pristine || submitting || invalid}>Sửa</Button>
               </ButtonToolbar>
             </ButtonToolbar>
@@ -345,6 +357,7 @@ class EditEventModal extends Component {
     );
   }
 }
+
 
 EditEventModal.propTypes = {
   onHide: PropTypes.func.isRequired,
@@ -356,10 +369,16 @@ EditEventModal.propTypes = {
   onDelete: PropTypes.func.isRequired,
   currentValues: PropTypes.object,
   change: PropTypes.func.isRequired,
+  resetForm: PropTypes.func.isRequired,
   user: PropTypes.shape({
     isAdmin: PropTypes.bool,
     buildings: PropTypes.array,
   }).isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  invalid: PropTypes.any.isRequired,
+  form: PropTypes.string,
 };
 
 EditEventModal.defaultProps = {
@@ -401,7 +420,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-
+  resetForm: () => dispatch(resetReduxForm('EditEvent')),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditEventForm);

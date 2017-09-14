@@ -2,12 +2,14 @@
   background: #283E4a;
   width: 100%;
   display: inline-block;
+
 }
 
 @media (min-width: 992px) and (max-width: 4000px) {
   .boxHeader {
     margin: 0 auto;
     width: 76%;
+    
   }
 }
 

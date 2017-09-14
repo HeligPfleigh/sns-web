@@ -29,8 +29,7 @@ class Announcement extends Component {
                 user={user}
                 parentPath={`/management/${buildingId}`}
                 pageKey="announcements_management>create_announcement"
-              />
-              }
+              /> }
             </Col>
           </MediaQuery>
           <Col md={9} sm={12} xs={12}>

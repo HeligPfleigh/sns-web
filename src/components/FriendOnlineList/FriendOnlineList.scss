@@ -20,9 +20,13 @@
     
     li {
       padding: 6px;
-
+      font-size:13px;
+      
+      a {
+       color: #4c4c4c; 
+      }
       &:hover {
-        background: #428bca none repeat scroll 0 0;
+        background: #eee none repeat scroll 0 0;
         color: #fff;
         cursor:pointer;
       }
@@ -35,6 +39,9 @@
         margin-left: 47px;
         margin-top: 0;
         line-height: 34px;
+        span { 
+          color: #aaa;
+         }
       }
 
       .chatImg img {

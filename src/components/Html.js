@@ -60,18 +60,20 @@ class Html extends Component {
                 position: relative;
                 display: inline-block;
                 margin: auto;
-                padding: 10px 0 0 30px;
-                width: 90%;
+                padding: 10px 0 0 15px;
+                width: 305px;
+            }
+            .marginTop {
+             margin-top: 10px ;
             }
             .react-autosuggest__input {
                 width: 100%;
                 height: 33px;
-                padding: 10px 20px;
-                font-family: Helvetica, sans-serif;
+                padding: 5px 15px;
                 font-weight: 300;
-                font-size: 16px;
+                font-size: 14px;
                 border: 1px solid #aaa;
-                border-radius: 4px;
+                border-radius: 3px;
                 background-color: #e1e9ee;
             }
             .react-autosuggest__input--focused {
@@ -86,8 +88,7 @@ class Html extends Component {
                 width: 94%;
                 border: 1px solid #aaa;
                 background-color: #fff;
-                font-family: Helvetica, sans-serif;font-weight: 300;
-                font-size: 16px;border-bottom-left-radius: 4px;border-bottom-right-radius: 4px;
+                font-size: 14px;border-bottom-left-radius: 4px;border-bottom-right-radius: 4px;
                 z-index: 2;
             }
             .react-autosuggest__suggestions-list {

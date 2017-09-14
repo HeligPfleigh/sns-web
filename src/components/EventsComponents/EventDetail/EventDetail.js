@@ -42,11 +42,19 @@ class EventDetail extends Component {
 
   constructor(props, ...args) {
     super(props, ...args);
-    this.state = {
-      showEditFormModal: false,
-      canUpdateEvent: false,
-      canDeleteEvent: false,
-    };
+
+    this.state = this.initState();
+
+    // this.canUpdateEventId = setInterval(() => {
+    //   this.setState({
+    //     canUpdateEvent: this.canUpdateEvent(),
+    //   });
+    // }, 5000);
+    // this.canDeleteEventId = setInterval(() => {
+    //   this.setState({
+    //     canDeleteEvent: this.canDeleteEvent(),
+    //   });
+    // }, 5000);
   }
 
   componentWillMount() {
@@ -118,6 +126,12 @@ class EventDetail extends Component {
       showEditFormModal: true,
     });
   }
+
+  initState = () => ({
+    showEditFormModal: false,
+    canUpdateEvent: false,
+    canDeleteEvent: false,
+  })
 
   hideEditEventModal = () => {
     this.setState({
@@ -278,12 +292,12 @@ EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
   onOpenInviteModal: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
-  joinEvent: PropTypes.func.isRequired,
-  canJoinEvent: PropTypes.func.isRequired,
-  cantJoinEvent: PropTypes.func.isRequired,
-  deleteEvent: PropTypes.func.isRequired,
   editEvent: PropTypes.func.isRequired,
-  interestEvent: PropTypes.func.isRequired,
+  deleteEvent: PropTypes.func.isRequired,
+  // joinEvent: PropTypes.func.isRequired,
+  // canJoinEvent: PropTypes.func.isRequired,
+  // cantJoinEvent: PropTypes.func.isRequired,
+  // interestEvent: PropTypes.func.isRequired,
 };
 
 export default compose(

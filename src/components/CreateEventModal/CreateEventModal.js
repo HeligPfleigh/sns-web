@@ -9,7 +9,11 @@ import {
   FormGroup,
   Clearfix,
   Checkbox,
+<<<<<<< HEAD
  } from 'react-bootstrap';
+=======
+} from 'react-bootstrap';
+>>>>>>> FixFrontEnd
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
@@ -115,9 +119,16 @@ class CreateEventModal extends Component {
   onSubmit = async () => {
     const { privacy, photos, nameEvent, location, start, end, building } = this.state;
     const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
-    if (photos.length === 0) {
+    if (isEmpty(photos)) {
       this.setState({
         validateDescriptionText: 'Vui lòng chọn ảnh sự kiện',
+      });
+      return;
+    }
+
+    if (isEmpty(nameEvent)) {
+      this.setState({
+        validateDescriptionText: 'Vui lòng nhập tên sự kiện',
       });
       return;
     }
@@ -125,6 +136,13 @@ class CreateEventModal extends Component {
     if (nameEvent.length <= 10) {
       this.setState({
         validateDescriptionText: 'Tên sự kiện quá ngắn',
+      });
+      return;
+    }
+
+    if (isEmpty(location)) {
+      this.setState({
+        validateDescriptionText: 'Vui lòng nhập địa điểm tổ chức',
       });
       return;
     }
@@ -139,6 +157,13 @@ class CreateEventModal extends Component {
     if (start.toDate() > end.toDate()) {
       this.setState({
         validateDescriptionText: 'Thời gian kết thúc cần lớn hơn thời gian bắt đầu',
+      });
+      return;
+    }
+
+    if (isEmpty(message)) {
+      this.setState({
+        validateDescriptionText: 'Vui lòng nhập mô tả cho sự kiện',
       });
       return;
     }
@@ -375,7 +400,7 @@ class CreateEventModal extends Component {
                     editorState={editorState}
                     onChange={this.onChangeMessage}
                     placeholder="Mô tả sự kiện"
-                    ref={editor => this.editor = editor}
+                    ref={(editor) => { this.editor = editor; }}
                     onFocus={() => this.setState({ hasFocusEditor: true })}
                     onBlur={() => this.setState({ hasFocusEditor: false })}
                     spellCheck
@@ -395,7 +420,14 @@ class CreateEventModal extends Component {
           <Clearfix />
         </Modal.Body>
         <Modal.Footer>
-          <Privacy ref={privacy => this.privacyRef = privacy} className={s.btnPrivacies} onSelect={this.onSelectPrivary} value={privacy} disabled={!isEmpty(building)} />
+          <Privacy
+            className={s.btnPrivacies}
+            onSelect={this.onSelectPrivary}
+            value={privacy}
+            disabled={!isEmpty(building)}
+            // eslint-disable-next-line
+            ref={privacy => this.privacyRef = privacy}
+          />
           <Button onClick={this.props.closeModal}>Hủy bỏ</Button>
           <Button bsStyle="primary" onClick={this.onSubmit}>Đăng bài</Button>
         </Modal.Footer>
@@ -412,6 +444,7 @@ CreateEventModal.propTypes = {
     isAdmin: PropTypes.bool,
     buildings: PropTypes.array,
   }).isRequired,
+<<<<<<< HEAD
 };
 
 CreateEventModal.defaultProps = {
@@ -421,6 +454,17 @@ CreateEventModal.defaultProps = {
   },
 };
 
+=======
+};
+
+CreateEventModal.defaultProps = {
+  user: {
+    isAdmin: false,
+    buildings: [],
+  },
+};
+
+>>>>>>> FixFrontEnd
 CreateEventModal.fragments = {
   event: gql`
     fragment EventView on Event{
