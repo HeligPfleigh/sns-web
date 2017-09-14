@@ -21,23 +21,25 @@ class Annoucements extends Component {
   render() {
     const { isNew, announcements } = this.props;
 
+    let titleContent = 'Các thông báo khác ';
+    if (isNew) {
+      titleContent = 'Thông báo mới nhất ';
+    }
+
     // className={classNames(s.red)}
 
     return (
       <div className={classNames(s.boxContent, isNew ? s.bgOrange : '')}>
-        { isNew && <h2 className={classNames(s.title)}>Thông báo mới nhất</h2> }
-        {
-          !isNew && <h2 className={classNames(s.title)}>
-            Các thông báo khác <a
-              href="#"
-              className={classNames(s.link)}
-              onClick={this.goAnnoucePage}
-            >{'Xem thêm >>'}</a>
-          </h2>
-        }
+        <h2 className={classNames(s.title)}>
+          {titleContent} <a
+            href="#"
+            className={classNames(s.link)}
+            onClick={this.goAnnoucePage}
+          >{'Xem thêm >>'}</a>
+        </h2>
         <ul className={classNames(s.listItem, s.thongBao)}>
           { (announcements || []).map(item => (
-            <li key={Math.random()}>
+            <li key={Math.random()} title={item.message}>
               <a href="#" onClick={evt => this.goDetail(evt, item._id)}>
                 <i className={classNames('fa fa-bell-o')}></i>
                 <h3>{item.message}</h3>

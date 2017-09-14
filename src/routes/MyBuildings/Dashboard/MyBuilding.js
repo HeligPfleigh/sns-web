@@ -11,6 +11,7 @@ import Banner from '../../../components/MyBuildings/Banner';
 import Documents from '../../../components/MyBuildings/Documents';
 import BuildingServices from '../../../components/MyBuildings/Services';
 import Annoucements from '../../../components/MyBuildings/Annoucements';
+import BuildingInfo from '../../../components/MyBuildings/BuildingInfo';
 import myBuildingQueries from './graphql/MyBuildingQueries.graphql';
 import s from './MyBuilding.scss';
 
@@ -19,6 +20,8 @@ class MyBuilding extends Component {
   render() {
     const {
       loading,
+      admins,
+      building,
       listFAQ,
       documents,
       buildingId,
@@ -29,9 +32,6 @@ class MyBuilding extends Component {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
 
-    const newAnnouceList = announcements.slice(0, 4);
-    const oldAnnouceList = announcements.slice(4);
-
     return (
       <Grid className={classNames(s.containerTop30)}>
         <Col md={12} className={classNames(s.container)}>
@@ -39,10 +39,10 @@ class MyBuilding extends Component {
           <div className={classNames(s.mainContent)}>
             <Row>
               <Col md={6} sm={6} xs={12}>
-                <Annoucements announcements={newAnnouceList} isNew />
+                <Annoucements announcements={announcements} isNew />
               </Col>
               <Col md={6} sm={6} xs={12}>
-                <Annoucements announcements={oldAnnouceList} />
+                <BuildingInfo buildingInfo={building} admins={admins} />
               </Col>
             </Row>
             <BuildingServices buildingId={buildingId} />
@@ -62,6 +62,8 @@ class MyBuilding extends Component {
 }
 
 MyBuilding.propTypes = {
+  building: PropTypes.object,
+  admins: PropTypes.array,
   listFAQ: PropTypes.array,
   documents: PropTypes.array,
   announcements: PropTypes.array,
@@ -80,12 +82,13 @@ export default compose(
         limit: 4,
         building: ownProps.buildingId,
         userId: ownProps.user.id,
-        annouceLimit: 8,
       },
     }),
     props: ({ data }) => {
       const {
         loading,
+        building,
+        getBOMList,
         resident: me,
         FAQs: listFAQ,
         documents: docs,
@@ -98,6 +101,8 @@ export default compose(
 
       return {
         loading,
+        building,
+        admins: getBOMList,
         announcements,
         documents: docs && docs.edges,
         listFAQ: listFAQ && listFAQ.edges,

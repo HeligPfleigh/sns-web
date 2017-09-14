@@ -29,9 +29,24 @@ export default class Privacy extends Component {
 
   /**
    *
+   * @param {*} nextProps
+   */
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.disabled && !(nextProps.value === this.props.value)) {
+      this.setState({
+        privacySelected: nextProps.value,
+      });
+    }
+  }
+
+  /**
+   *
    */
   onSelect(privacySelected, event) {
     event.preventDefault();
+    if (this.props.disabled) {
+      return false;
+    }
 
     if ([PUBLIC, FRIEND, ONLY_ME, ONLY_ADMIN_BUILDING].indexOf(privacySelected) === -1) {
       privacySelected = PUBLIC;
@@ -107,6 +122,7 @@ Privacy.propTypes = {
   FRIEND: PropTypes.bool.isRequired,
   ONLY_ME: PropTypes.bool.isRequired,
   ADMIN_BUILDING: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
 };
 
 Privacy.defaultProps = {
@@ -117,5 +133,6 @@ Privacy.defaultProps = {
   FRIEND: true,
   ONLY_ME: true,
   ADMIN_BUILDING: false,
+  disabled: false,
 };
 
