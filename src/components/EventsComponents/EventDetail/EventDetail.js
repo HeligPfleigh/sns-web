@@ -42,7 +42,8 @@ class EventDetail extends Component {
 
   constructor(props, ...args) {
     super(props, ...args);
-    this.initState(props);
+
+    this.state = this.initState();
 
     this.canUpdateEventId = setInterval(() => {
       this.setState({
@@ -70,33 +71,34 @@ class EventDetail extends Component {
 
   onInterestClick = async (e) => {
     e.preventDefault();
-    this.props.interestEvent(this.props.event._id);
+    const { interestEvent, event } = this.props;
+    await interestEvent(event._id);
   }
 
   onJoinClick = async (e) => {
     e.preventDefault();
-    const { event, user } = this.props;
-    await this.props.joinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
+    const { event, user, joinEvent } = this.props;
+    await joinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
   }
 
   onCanJoinClick = async (e) => {
     e.preventDefault();
-    const { event, user } = this.props;
-    await this.props.canJoinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
+    const { event, user, canJoinEvent } = this.props;
+    await canJoinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
   }
 
   onCantJoinClick = async (e) => {
     e.preventDefault();
-    const { event, user } = this.props;
-    await this.props.cantJoinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
+    const { event, user, cantJoinEvent } = this.props;
+    await cantJoinEvent(event._id, event.invites.filter(item => !(item._id === user.id)), event.joins.map(item => item));
   }
 
-  onDropDown = async (eventKey, event) => {
-    event.preventDefault();
+  onDropDown = async (eventKey, e) => {
+    e.preventDefault();
     if (eventKey === 'DELETE_EVENT') {
-      this.props.deleteEvent(this.props.event._id).then(() => {
-        history.push('/events');
-      });
+      const { deleteEvent, event } = this.props;
+      await deleteEvent(event._id);
+      history.push('/events');
     }
   }
 
@@ -110,8 +112,8 @@ class EventDetail extends Component {
     const now = Validator.Date.now();
     return event.isAuthor &&
       (
-        (Validator.Date.isValid(event.start) && (Validator.Date.withMoment(event.start) > now)) ||
-        (Validator.Date.isValid(event.end) && (Validator.Date.withMoment(event.end) < now))
+        (Validator.Date.isValid(event.start) && (Validator.Date.withMoment(event.start) > now))
+        // || (Validator.Date.isValid(event.end) && (Validator.Date.withMoment(event.end) < now))
       );
   }
 
@@ -121,13 +123,11 @@ class EventDetail extends Component {
     });
   }
 
-  initState = () => {
-    this.state = {
-      showEditFormModal: false,
-      canUpdateEvent: false,
-      canDeleteEvent: false,
-    };
-  }
+  initState = () => ({
+    showEditFormModal: false,
+    canUpdateEvent: false,
+    canDeleteEvent: false,
+  })
 
   hideEditEventModal = () => {
     this.setState({
@@ -288,12 +288,12 @@ EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
   onOpenInviteModal: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
-  joinEvent: PropTypes.func.isRequired,
-  canJoinEvent: PropTypes.func.isRequired,
-  cantJoinEvent: PropTypes.func.isRequired,
-  deleteEvent: PropTypes.func.isRequired,
   editEvent: PropTypes.func.isRequired,
-  interestEvent: PropTypes.func.isRequired,
+  deleteEvent: PropTypes.func.isRequired,
+  // joinEvent: PropTypes.func.isRequired,
+  // canJoinEvent: PropTypes.func.isRequired,
+  // cantJoinEvent: PropTypes.func.isRequired,
+  // interestEvent: PropTypes.func.isRequired,
 };
 
 export default compose(

@@ -1,9 +1,0 @@
-mutation DeleteResidentInApartmentBuildingMutation ($input: DeleteResidentInApartmentBuildingInput!) {
-  deleteResidentInApartmentBuilding(input: $input) {
-    ...ResidentInApartmentBuildingView
-  }
-}
-
-fragment ResidentInApartmentBuildingView on User {
-  _id
-}

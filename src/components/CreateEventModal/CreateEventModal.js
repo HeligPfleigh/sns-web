@@ -4,19 +4,19 @@ import {
   Modal,
   Button,
   Image,
-  Dropdown,
-  MenuItem,
   Col,
   ControlLabel,
   FormGroup,
   Clearfix,
+  Checkbox,
 } from 'react-bootstrap';
-import isEmpty from 'lodash/isEmpty';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import moment from 'moment';
 import gql from 'graphql-tag';
 import DateTime from 'react-datetime';
+import { connect } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 import Draft, {
   Editor,
   EditorState,
@@ -24,26 +24,18 @@ import Draft, {
   convertToRaw,
 } from 'draft-js';
 import classNames from 'classnames';
-import { generate as idRandom } from 'shortid';
 import history from '../../core/history';
 import uploadImage from '../../utils/uploadImage';
+import { Privacy } from '../Dropdown';
 import {
   HANDLE_REGEX,
   HASHTAG_REGEX,
   PUBLIC,
-  FRIEND,
-  ONLY_ME,
 } from '../../constants';
 import InputWithValidation from './InputWithValidation';
 import HandleSpan from '../Common/Editor/HandleSpan';
 import HashtagSpan from '../Common/Editor/HashtagSpan';
 import s from './CreateEventModal.scss';
-
-const PRIVARY_TEXT = {
-  ONLY_ME: 'Chỉ mình tôi',
-  PUBLIC: 'Công khai',
-  FRIEND: 'Bạn bè',
-};
 
 const CustomToggle = ({ onClick, children }) => (
   <Button onClick={onClick}>
@@ -85,18 +77,17 @@ const compositeDecorator = new CompositeDecorator([{
 }]);
 
 class CreateEventModal extends Component {
-  state = {
-    editorState: EditorState.createEmpty(compositeDecorator),
-    nameEvent: '',
-    validationNameEventText: '',
-    photos: '',
-    start: moment(),
-    end: moment(),
-    location: '',
-    privacy: PUBLIC,
-    validateDescriptionText: '',
-    hasFocusEditor: false,
-  };
+
+  constructor(props, ...args) {
+    super(props, ...args);
+
+    this.state = this.initState();
+
+    const { user: { buildings } } = props;
+    if (Array.isArray(buildings)) {
+      this.building = buildings[0]._id || undefined;
+    }
+  }
 
   onEventNameChange = (value) => {
     this.setState({
@@ -122,7 +113,7 @@ class CreateEventModal extends Component {
   }
 
   onSubmit = async () => {
-    const { privacy, photos, nameEvent, location, start, end } = this.state;
+    const { privacy, photos, nameEvent, location, start, end, building } = this.state;
     const message = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     if (isEmpty(photos)) {
       this.setState({
@@ -180,7 +171,7 @@ class CreateEventModal extends Component {
       return;
     }
 
-    const res = await this.props.createNewEvent({
+    const { data: { createNewEvent } } = await this.props.createNewEvent({
       privacy,
       photos: [photos],
       name: nameEvent,
@@ -188,21 +179,14 @@ class CreateEventModal extends Component {
       start: start.toDate(),
       end: end.toDate(),
       message,
+      building,
     });
+
+    this.setState(this.initState());
     this.props.closeModal();
-    this.setState({
-      editorState: EditorState.createEmpty(compositeDecorator),
-      nameEvent: '',
-      validationNameEventText: '',
-      photos: '',
-      start: moment(),
-      end: moment(),
-      location: '',
-      privacy: PUBLIC,
-      validateDescriptionText: '',
-    });
-    history.push(`/events/${res.data.createNewEvent._id}`);
+    history.push(`/events/${createNewEvent._id}`);
   }
+
   onDescriptionChange = (e) => {
     if (this.state.description.length <= 10) {
       this.setState({
@@ -223,6 +207,31 @@ class CreateEventModal extends Component {
       ...prevState,
       editorState,
     }));
+  }
+
+  onBuldingEventChange = (event) => {
+    const { privacy } = this.state;
+    this.setState({
+      building: event.target.checked ? this.building : null,
+      privacy: event.target.checked ? PUBLIC : privacy,
+    });
+  }
+
+  initState = () => {
+    const now = moment();
+    return ({
+      editorState: EditorState.createEmpty(compositeDecorator),
+      nameEvent: '',
+      validationNameEventText: '',
+      photos: '',
+      start: now,
+      end: now.clone().add(3, 'hours'),
+      location: '',
+      privacy: PUBLIC,
+      validateDescriptionText: '',
+      hasFocusEditor: false,
+      building: null,
+    });
   }
 
   uploadImages = async (file) => {
@@ -266,9 +275,10 @@ class CreateEventModal extends Component {
   }
 
   render() {
-    const { editorState } = this.state;
+    const { editorState, building, privacy } = this.state;
+    const { user: { isAdmin } } = this.props;
     return (
-      <Modal show={this.props.show} onHide={this.props.closeModal}>
+      <Modal show={this.props.show} onHide={this.props.closeModal} backdrop="static" keyboard={false}>
         <Modal.Header closeButton>
           <Modal.Title>Tạo sự kiện</Modal.Title>
         </Modal.Header>
@@ -396,27 +406,24 @@ class CreateEventModal extends Component {
               </Col>
             </FormGroup>
 
+            {isAdmin && (<FormGroup>
+              <Col sm={9} smOffset={3}>
+                <Checkbox onChange={this.onBuldingEventChange} inline>Sự kiện của tòa nhà</Checkbox>
+              </Col>
+            </FormGroup>)}
+
           </Col>
           <Clearfix />
         </Modal.Body>
         <Modal.Footer>
-          <Dropdown
-            className={s.setPrivaryBtn}
-            style={{ marginRight: '5px' }}
-            id={idRandom()}
-            pullRight
-          >
-            <CustomToggle bsRole="toggle">
-              <span title={PRIVARY_TEXT[this.state.privacy]}>
-                {PRIVARY_TEXT[this.state.privacy]} <i className="fa fa-caret-down" aria-hidden="true"></i>
-              </span>
-            </CustomToggle>
-            <Dropdown.Menu onSelect={this.onSelectPrivary}>
-              <MenuItem eventKey={PUBLIC}>Công khai</MenuItem>
-              <MenuItem eventKey={FRIEND}>Bạn bè</MenuItem>
-              <MenuItem eventKey={ONLY_ME}>Chỉ mình tôi</MenuItem>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Privacy
+            className={s.btnPrivacies}
+            onSelect={this.onSelectPrivary}
+            value={privacy}
+            disabled={!isEmpty(building)}
+            // eslint-disable-next-line
+            ref={privacy => this.privacyRef = privacy}
+          />
           <Button onClick={this.props.closeModal}>Hủy bỏ</Button>
           <Button bsStyle="primary" onClick={this.onSubmit}>Đăng bài</Button>
         </Modal.Footer>
@@ -429,7 +436,19 @@ CreateEventModal.propTypes = {
   show: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
   createNewEvent: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    isAdmin: PropTypes.bool,
+    buildings: PropTypes.array,
+  }).isRequired,
 };
+
+CreateEventModal.defaultProps = {
+  user: {
+    isAdmin: false,
+    buildings: [],
+  },
+};
+
 CreateEventModal.fragments = {
   event: gql`
     fragment EventView on Event{
@@ -465,6 +484,9 @@ CreateEventModal.mutation = {
 
 export default compose(
   withStyles(s),
+  connect(state => ({
+    user: state.user,
+  })),
   graphql(CreateEventModal.mutation.createNewEvent, {
     props: ({ mutate }) => ({
       createNewEvent: input => mutate({
@@ -472,4 +494,4 @@ export default compose(
       }),
     }),
   }),
-)((CreateEventModal));
+)(CreateEventModal);
