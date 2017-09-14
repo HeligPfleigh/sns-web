@@ -57,16 +57,20 @@ class EventDetail extends Component {
     }, 5000);
   }
 
-  componentWillReceiveProps() {
+  componentWillMount() {
     this.setState({
       canUpdateEvent: this.canUpdateEvent(),
       canDeleteEvent: this.canDeleteEvent(),
     });
   }
 
-  componentWillUnmount() {
-    clearInterval(this.canUpdateEventId);
-    clearInterval(this.canDeleteEventId);
+  componentWillReceiveProps() {
+    setTimeout(() => {
+      this.setState({
+        canUpdateEvent: this.canUpdateEvent(),
+        canDeleteEvent: this.canDeleteEvent(),
+      });
+    }, 500);
   }
 
   onInterestClick = async (e) => {
