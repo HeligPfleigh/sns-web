@@ -34,7 +34,7 @@
       .panel-heading {
         padding-top: 0;
         padding-bottom: 0;
-        
+
         .panel-title {
           border: none;
         }
@@ -77,7 +77,7 @@
         .panel-title {
           font-size: 14px;
           font-weight: 500;
-        }        
+        }
       }
 
       .panel-body {
@@ -123,5 +123,15 @@
 .editor {
   padding: 8px;
   border: solid 1px #dedede;
-  min-height: 200px;
+  min-height: 300px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+/***** Mobile Style *****/
+@media (max-width: 992px) {
+  .editor {
+    min-height: 260px;
+    max-height: 260px;
+  }
 }
