@@ -1,0 +1,21 @@
+query ResidentsInBuildingQuery($building: String!, $page: Int, $limit: Int) {
+  residentsInBuilding(building: $building, page: $page, limit: $limit) {
+    pageInfo {
+      page
+      total
+      limit
+      hasNextPage
+    }
+    edges {
+      user {
+        _id
+        username
+        profile {
+          fullName
+          picture
+          gender
+        }
+      }
+    }
+  }
+}

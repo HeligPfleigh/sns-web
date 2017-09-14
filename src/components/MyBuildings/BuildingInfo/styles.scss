@@ -1,0 +1,65 @@
+/* start css building info */
+
+.boxContent {
+  width: 100%;
+  float: left;
+  margin-bottom: 30px;
+  padding: 20px 15px;
+  min-height: 270px;
+  background-color: #f7f6f6;
+
+  a:hover {
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4c4c4c;
+    float: left;
+    width: 100%;
+    text-align: left;
+    margin: 0px;
+    margin-bottom: 20px;
+  }
+
+  .buildingInfo {
+    width: 100%;
+
+    h3 {
+      width: 100%;
+      font-size: 16px;
+    }
+  }
+
+  .admins {
+    width: 100%;
+
+    strong {
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .listItem {
+      width: 100%;
+      float: left;
+      margin: 0px;
+      padding: 0px;
+
+      li {
+        width: 100%;
+        float: left;
+        list-style: none;
+        padding: 3px 15px 0px;
+
+        a {
+          color: #4c4c4c;
+        }
+      }
+    }
+  }
+
+}
+
+/* end css building info */

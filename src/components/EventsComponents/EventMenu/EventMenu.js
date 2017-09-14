@@ -64,10 +64,6 @@ class EventMenu extends Component {
           </i>
           <span className={s.eventTitle}>Sự Kiện</span>
         </span>
-        { /* <MenuVertical
-          menus={menus}
-          onItemSelected={(idx) => { this.onMenuSelected(idx); }}
-        /> */}
         <Button
           onClick={this.onCreateEvent}
           className={s.btnCreateEvent}
@@ -80,10 +76,6 @@ class EventMenu extends Component {
     );
   }
 }
-
-EventMenu.propTypes = {
-  onCreateEvent: PropTypes.func,
-};
 
 export default compose(
   withStyles(s),

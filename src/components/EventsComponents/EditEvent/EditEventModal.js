@@ -25,19 +25,34 @@ import { Privacy } from '../../Dropdown';
 import Validator from '../../Validator';
 import { SingleUploadFile } from '../../ApolloUpload';
 import * as ReduxFormFields from './FormFields';
+import { PUBLIC } from '../../../constants';
 import s from './EditEvent.scss';
 
 class EditEventModal extends Component {
   constructor(props, ...args) {
     super(props, ...args);
 
+    const { initialValues, user: { buildings } } = props;
+
     this.state = {
-      photo: isArray(props.initialValues.photos) && head(props.initialValues.photos),
-      privacy: props.initialValues.privacy,
-      showEndTime: !isUndefined(props.initialValues.end),
+      photo: isArray(initialValues.photos) && head(initialValues.photos),
+      showEndTime: !isUndefined(initialValues.end),
       formFields: {},
       validationState: {},
     };
+
+    if (Array.isArray(buildings)) {
+      this.building = buildings[0]._id || undefined;
+    }
+
+    this.onUploadSuccess = this.onUploadSuccess.bind(this);
+    this.onUploadClick = this.onUploadClick.bind(this);
+    this.showEndTime = this.showEndTime.bind(this);
+    this.hideEndTime = this.hideEndTime.bind(this);
+    this.onPrivacySelected = this.onPrivacySelected.bind(this);
+    this.onUpdate = this.onUpdate.bind(this);
+    this.onDelete = this.onDelete.bind(this);
+    this.validationState = this.validationState.bind(this);
   }
 
 
@@ -53,11 +68,7 @@ class EditEventModal extends Component {
     this.uploadRef.click();
   }
 
-  onPrivacySelected = (privacy) => {
-    this.setState({
-      privacy,
-    });
-
+  onPrivacySelected(privacy) {
     this.props.change('privacy', privacy);
   }
 
@@ -71,20 +82,20 @@ class EditEventModal extends Component {
       end,
       message,
       invites,
-  }) => {
-    this.props.onUpdate(_id, {
-      privacy,
-      photos,
-      name,
-      location,
-      start,
-      end,
-      message,
-      invites,
-    })
+      building,
+  }) => this.props.onUpdate(_id, {
+    privacy,
+    photos,
+    name,
+    location,
+    start,
+    end,
+    message,
+    invites,
+    building: building ? this.building : undefined,
+  })
     .then(() => this.props.onHide())
-    .catch(() => this.props.onHide());
-  }
+    .catch(() => this.props.onHide())
 
   onDelete = () => {
     this.props.onDelete(this.props.initialValues._id).then(() => {
@@ -92,7 +103,12 @@ class EditEventModal extends Component {
     });
   }
 
-  showEndTime = (event) => {
+  onBuldingEventChange = (event) => {
+    const { currentValues } = this.props;
+    this.onPrivacySelected(event.target.checked ? PUBLIC : currentValues.privacy);
+  }
+
+  showEndTime(event) {
     event.preventDefault();
 
     this.setState({
@@ -108,6 +124,7 @@ class EditEventModal extends Component {
     });
   }
 
+  // eslint-disable-next-line
   validationState(fieldName) {
     return () => null;
     // return () => {
@@ -142,7 +159,6 @@ class EditEventModal extends Component {
       invalid,
       form,
       currentValues,
-      initialValues,
       canUpdate,
       canDelete,
     } = this.props;
@@ -296,6 +312,21 @@ class EditEventModal extends Component {
                 </Col>
               </FormGroup>
 
+              <FormGroup validationState={this.state.validationState.buildingEvent}>
+                <Col sm={9} smOffset={3}>
+                  <Field
+                    type="checkbox"
+                    name="building"
+                    component={ReduxFormFields.CheckboxField}
+                    // eslint-disable-next-line
+                    ref={input => this.state.formFields.building = input}
+                    withRef
+                    onClick={this.onBuldingEventChange}
+                    inline
+                  >Sự kiện của tòa nhà</Field>
+                </Col>
+              </FormGroup>
+
             </Col>
             <Clearfix />
           </Modal.Body>
@@ -303,7 +334,14 @@ class EditEventModal extends Component {
             <ButtonToolbar>
               <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Hủy sự kiện</Button>
               <ButtonToolbar className="pull-right">
-                <Privacy ref={(privacy) => { this.privacyRef = privacy; }} className={s.btnPrivacies} onSelect={this.onPrivacySelected} value={this.state.privacy} />
+                <Privacy
+                  className={s.btnPrivacies}
+                  onSelect={this.onPrivacySelected}
+                  value={currentValues.privacy}
+                  disabled={!!currentValues.building}
+                  // eslint-disable-next-line
+                  ref={privacy => this.privacyRef = privacy}
+                />
                 <Field
                   type="input"
                   name="privacy"
@@ -320,6 +358,7 @@ class EditEventModal extends Component {
   }
 }
 
+
 EditEventModal.propTypes = {
   onHide: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
@@ -328,7 +367,18 @@ EditEventModal.propTypes = {
   canDelete: PropTypes.bool.isRequired,
   onUpdate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  currentValues: PropTypes.object,
+  change: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    isAdmin: PropTypes.bool,
+    buildings: PropTypes.array,
+  }).isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  invalid: PropTypes.any.isRequired,
+  form: PropTypes.string,
 };
 
 EditEventModal.defaultProps = {
@@ -336,6 +386,11 @@ EditEventModal.defaultProps = {
   canUpdate: false,
   canDelete: false,
   onHide: () => undefined,
+  currentValues: {},
+  user: {
+    isAdmin: false,
+    buildings: [],
+  },
 };
 
 const fields = [
@@ -346,6 +401,7 @@ const fields = [
   'location',
   'message',
   'privacy',
+  'building',
 ];
 
 const EditEventForm = reduxForm({
@@ -360,6 +416,7 @@ const EditEventForm = reduxForm({
 
 const mapStateToProps = state => ({
   currentValues: formValueSelector('EditEvent')(state, ...fields),
+  user: state.user,
 });
 
 const mapDispatchToProps = dispatch => ({
