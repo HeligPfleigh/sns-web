@@ -328,29 +328,17 @@ export default compose(
             },
           },
         },
-        update: (store, { data: { createFAQ } }) => {
-          // Read the data from our cache for this query.
-          let data = store.readQuery({
-            query: FAQsListQuery,
-            variables: {
-              building: ownProps.building._id,
-            },
-          });
-          data = update(data, {
-            FAQs: {
-              edges: {
-                $unshift: [createFAQ],
+        updateQueries: {
+          FAQsListQuery: (previousResult, { mutationResult }) => {
+            const faq = mutationResult.data.createFAQ;
+            return update(previousResult, {
+              FAQs: {
+                edges: {
+                  $unshift: [faq],
+                },
               },
-            },
-          });
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: FAQsListQuery,
-            variables: {
-              building: ownProps.building._id,
-            },
-            data,
-          });
+            });
+          },
         },
       }),
     }),

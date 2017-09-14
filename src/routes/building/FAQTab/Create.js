@@ -8,11 +8,10 @@ import {
   FormGroup,
   Clearfix,
   ButtonToolbar,
- } from 'react-bootstrap';
+} from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
-import { reduxForm, Field, formValueSelector } from 'redux-form';
-import { connect } from 'react-redux';
+import { reduxForm, Field } from 'redux-form';
 
 import Validator from '../../../components/Validator';
 import * as ReduxFormFields from '../../../components/ReduxForm';
@@ -59,13 +58,14 @@ class CreateFAQModal extends Component {
     });
   }
 
+  onHide() {
+    this.resetForm();
+    this.props.onHide({});
+  }
+
   resetForm() {
     const { dispatch, reset, form } = this.props;
     dispatch(reset(form));
-  }
-
-  onHide() {
-    this.props.onHide({});
   }
 
   render() {
@@ -75,12 +75,11 @@ class CreateFAQModal extends Component {
       submitting,
       invalid,
       form,
-      currentValues,
       canCreate,
     } = this.props;
     return (
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static">
-        <form name={form} noValidate onSubmit={handleSubmit(this.onCreate)}>
+        <form name={form} noValidate onSubmit={handleSubmit(this.onCreate)} autoComplete="off">
           <Modal.Header closeButton={!submitting}>
             <Modal.Title>Tạo mới câu hỏi thường gặp</Modal.Title>
           </Modal.Header>
@@ -130,6 +129,7 @@ class CreateFAQModal extends Component {
 }
 
 CreateFAQModal.propTypes = {
+  form: PropTypes.string,
   building: PropTypes.shape({
     _id: PropTypes.string,
     isAdmin: PropTypes.bool,
@@ -139,6 +139,12 @@ CreateFAQModal.propTypes = {
   onCreate: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
+  dispatch: PropTypes.any,
+  reset: PropTypes.any,
+  invalid: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  pristine: PropTypes.bool.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
 };
 
 CreateFAQModal.defaultProps = {
@@ -162,12 +168,4 @@ const CreateFAQForm = reduxForm({
   withStyles(s),
 )(CreateFAQModal));
 
-const mapStateToProps = state => ({
-  currentValues: formValueSelector('CreateFAQ')(state, ...fields),
-});
-
-const mapDispatchToProps = dispatch => ({
-
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(CreateFAQForm);
+export default CreateFAQForm;
