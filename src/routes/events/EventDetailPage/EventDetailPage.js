@@ -91,13 +91,14 @@ class EventDetailPage extends Component {
     }
 
     // Hide all invited users.
-    const ignoreFriends = [];
+    const ignoreFriends = [user.id];
     _.concat(event.joins, event.can_joins, event.cant_joins).forEach(u => ignoreFriends.push(u._id));
     return (
       <Grid>
         {this.invitationEventModal({
           building: event.building ? event.building._id : undefined,
           invitedFriends: Array.isArray(event.invites) ? event.invites : [],
+          ignoreFriends,
           user,
         })}
         <Loading show={loading} full>Đang tải ...</Loading>
