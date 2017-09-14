@@ -13,10 +13,11 @@ import {
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
-import * as _ from 'lodash';
+import noop from 'lodash/noop';
 import classnames from 'classnames';
 import moment from 'moment';
 
+import history from '../../core/history';
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
 import Icon from '../Icon';
 import TimeAgo from '../TimeAgo';
@@ -136,7 +137,7 @@ class Feed extends Component {
     } = this.props;
     const IS_POST_TYPE_STATUS = type === POST_TYPE_STATUS;
     const IS_POST_TYPE_EVENT = type === POST_TYPE_EVENT;
-    const isInterested = (IS_POST_TYPE_EVENT && _.isArray(event.interests) && event.interests.filter(u => u._id === userInfo._id).length > 0) || this.state.isInterested;
+    const isInterested = (IS_POST_TYPE_EVENT && Array.isArray(event.interests) && event.interests.filter(u => u._id === userInfo._id).length > 0) || this.state.isInterested;
 
     return (
       <Post>
@@ -267,7 +268,7 @@ class Feed extends Component {
               </div>
             </Col>
             <Col md={10} xs={8} className={s.description}>
-              <div className={s.name}><span className={s.maxWith}>{event.name}</span></div>
+              <div className={s.name}><span className={s.maxWith} onClick={() => history.push(`/events/${event._id}`)}>{event.name}</span></div>
               <div className={s.location}>
                 <div className={s.maxWith}>
                   <span className="time">{moment(event.start).format('h:mm A')}</span>
@@ -395,11 +396,11 @@ Feed.defaultProps = {
   },
   userInfo: {},
   sharingPostModalOpenned: false,
-  onSelectRightEvent: _.noop,
-  editPostEvent: _.noop,
-  loadMoreComments: _.noop,
-  createNewComment: _.noop,
-  sharingPostEvent: _.noop,
+  onSelectRightEvent: noop,
+  editPostEvent: noop,
+  loadMoreComments: noop,
+  createNewComment: noop,
+  sharingPostEvent: noop,
 };
 
 /**
@@ -434,6 +435,7 @@ const commentFragment = gql`fragment CommentView on Comment {
 `;
 
 const eventFragment = gql`fragment EventDetails on Event {
+    _id
     name
     location
     start

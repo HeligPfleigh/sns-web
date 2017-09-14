@@ -57,6 +57,9 @@ class EventDetailPage extends Component {
     user,
   }) => {
     if (building) {
+      if (!user.isAdmin) {
+        return null;
+      }
       return (<InviteResidentToEventModal
         show={this.state.showModalInvite}
         ignoreFriends={ignoreFriends}

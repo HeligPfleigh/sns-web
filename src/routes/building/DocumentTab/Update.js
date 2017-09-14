@@ -77,12 +77,8 @@ class UpdateDocumentModal extends Component {
     });
   }
 
-  resetForm() {
-    const { dispatch, reset, form } = this.props;
-    dispatch(reset(form));
-  }
-
   onHide() {
+    this.resetForm();
     this.props.onHide({});
   }
 
@@ -102,6 +98,11 @@ class UpdateDocumentModal extends Component {
       this.props.onError('Có lỗi xảy ra trong quá trình xóa biểu mẫu');
       this.onHide();
     });
+  }
+
+  resetForm() {
+    const { dispatch, reset, form } = this.props;
+    dispatch(reset(form));
   }
 
   render() {
@@ -192,6 +193,10 @@ UpdateDocumentModal.propTypes = {
   canDelete: PropTypes.bool.isRequired,
   onUpdate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  change: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  form: PropTypes.string.isRequired,
 };
 
 UpdateDocumentModal.defaultProps = {
