@@ -36,39 +36,21 @@ class GroundManagement extends Component {
     };
 
     this.hasSubmitFiltering = false;
-  }
-
-  onBlurFilterInputs = (event, nextValue) => {
-    if (isString(nextValue)) {
-      const len = String(nextValue).trim().length;
-      if (this.hasFilterSubmitted && len === 0) {
-        const { fields, currentValues } = this.props;
-
-        // Determine whether all fields in filter form have empty yet
-        const automateQueryWithEmptyFilter = [];
-        forEach(currentValues, (value, field) => {
-          if (isString(value) || String(value).trim().length === 0) {
-            automateQueryWithEmptyFilter.push(field);
-          }
-        });
-
-        // Reset flag for filter button
-        this.hasFilterSubmitted = !(fields.length === automateQueryWithEmptyFilter.length);
-
-        // Navigate to first page
-        return this.onChangePage(1);
-      }
-    }
+    this.prevValues = {};
   }
 
   onChangePage = page => this.props.onChangePage({
     page,
-    filters: this.hasFilterSubmitted ? this.getAllFilterInputs() : {},
+    filters: this.getAllFilterInputs(),
   })
 
   onSubmitFilter = () => {
     this.hasFilterSubmitted = true;
-    return this.onChangePage(1);
+    const { initialize, currentValues } = this.props;
+    this.prevValues = currentValues;
+    return this.onChangePage(1).then(() => {
+      initialize(currentValues);
+    });
   }
 
   onDeleteResident = ({ resident, apartment, building }) => this.props.onDeleteResident({
@@ -95,7 +77,7 @@ class GroundManagement extends Component {
     try {
       const r = await this.props.onExportToExcel({
         building,
-        filters: this.hasFilterSubmitted ? this.getAllFilterInputs() : {},
+        filters: this.getAllFilterInputs(),
       });
 
       const { data: { exportResidentsInBuildingGroupByApartment: { file } } } = r;
@@ -111,10 +93,14 @@ class GroundManagement extends Component {
   }
 
   getAllFilterInputs() {
-    const { currentValues } = this.props;
+    if (!this.hasFilterSubmitted) {
+      return {};
+    }
+
+    const { filterByApartment, filterByResident } = this.prevValues;
     return {
-      apartment: isString(currentValues.filterByApartment) ? String(currentValues.filterByApartment).trim() : '',
-      resident: isString(currentValues.filterByResident) ? String(currentValues.filterByResident).trim() : '',
+      apartment: isString(filterByApartment) ? String(filterByApartment).trim() : '',
+      resident: isString(filterByResident) ? String(filterByResident).trim() : '',
     };
   }
 
@@ -271,7 +257,6 @@ class GroundManagement extends Component {
                             component={InputField}
                             placeholder="Tên hoặc số căn hộ"
                             validate={[Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', () => !isString(currentValues.filterByResident) || String(currentValues.filterByResident).trim().length === 0)]}
-                            onBlur={this.onBlurFilterInputs}
                           />
                         </FormGroup>
                       </Col>
@@ -283,7 +268,6 @@ class GroundManagement extends Component {
                             component={InputField}
                             placeholder="Tên của cư dân"
                             validate={[Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', () => !isString(currentValues.filterByApartment) || String(currentValues.filterByApartment).trim().length === 0)]}
-                            onBlur={this.onBlurFilterInputs}
                           />
                         </FormGroup>
                       </Col>
@@ -350,9 +334,11 @@ GroundManagement.propTypes = {
     }),
   }).isRequired,
   currentValues: PropTypes.object,
-  fields: PropTypes.array,
+  fields: PropTypes.array.isRequired,
   onDeleteResident: PropTypes.func.isRequired,
   onExportToExcel: PropTypes.func.isRequired,
+  form: PropTypes.string.isRequired,
+  initialize: PropTypes.func.isRequired,
 };
 
 GroundManagement.defaultProps = {
@@ -381,6 +367,7 @@ const GroundManagementForm = reduxForm({
   touchOnChange: true,
   touchOnBlur: true,
   enableReinitialize: true,
+  keepDirtyOnReinitialize: true,
 })(compose(
   withStyles(s),
   graphql(ResidentsInBuildingGroupByApartmentQuery, {
