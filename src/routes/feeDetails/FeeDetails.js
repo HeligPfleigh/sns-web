@@ -257,7 +257,14 @@ class FeeDetails extends Component {
                       <div className={s.pullLeft}>&nbsp;</div>
                       <div className={s.pullRight}>
                         {!isStatusUpdate && (fee.status === UNPAID) &&
-                          <button disabled={submitting || this.state.hasReminded} type="button" onClick={this.onReminderToPayFee(fee._id, fee.apartment.id, fee.building.id)} className="btn btn-warning">Nhắc nhở đóng phí</button>
+                          <button
+                            disabled={submitting || this.state.hasReminded || (fee.lastRemind && ((new Date().getTime() - new Date(fee.lastRemind).getTime()) / 86400000) < 3)}
+                            type="button"
+                            onClick={this.onReminderToPayFee(fee._id, fee.apartment.id, fee.building.id)}
+                            className="btn btn-warning"
+                          >
+                            Nhắc nhở đóng phí
+                          </button>
                         }
                       </div>
                     </li>

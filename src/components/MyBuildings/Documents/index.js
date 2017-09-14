@@ -26,10 +26,11 @@ class Documents extends Component {
         <ul className={classNames(s.listItem)}>
           {
             (documents || []).map(doc => (
-              <li key={Math.random()}>
+              <li key={Math.random()} title={doc.name || ''}>
                 <i className={classNames('fa fa-file-pdf-o')}></i>
+                <h3>{doc.name}</h3>
                 <h3>
-                  {doc.name} (<a className="text-info" href={doc.file} title={doc.file}>
+                  (<a className="text-info" href={doc.file} title={doc.file}>
                     <span className="fa fa-download" aria-hidden="true"></span>
                     Tải xuống
                   </a>)

@@ -288,12 +288,12 @@ EventDetail.propTypes = {
   event: PropTypes.object.isRequired,
   onOpenInviteModal: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
-  joinEvent: PropTypes.func.isRequired,
-  canJoinEvent: PropTypes.func.isRequired,
-  cantJoinEvent: PropTypes.func.isRequired,
-  deleteEvent: PropTypes.func.isRequired,
   editEvent: PropTypes.func.isRequired,
-  interestEvent: PropTypes.func.isRequired,
+  deleteEvent: PropTypes.func.isRequired,
+  // joinEvent: PropTypes.func.isRequired,
+  // canJoinEvent: PropTypes.func.isRequired,
+  // cantJoinEvent: PropTypes.func.isRequired,
+  // interestEvent: PropTypes.func.isRequired,
 };
 
 export default compose(

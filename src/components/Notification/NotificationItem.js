@@ -22,6 +22,7 @@ import {
   INTEREST_EVENT,
   NEW_FEE_APARTMENT,
   NEW_ANNOUNCEMENT,
+  REMIND_FEE,
 } from '../../constants';
 import TimeAgoWraper from '../TimeAgo';
 import s from './NotificationItem.scss';
@@ -58,10 +59,11 @@ const collectionNotifyMessages = {
   [INTEREST_EVENT]: () => ' vừa quan tâm sự kiện bạn tạo',
   [NEW_FEE_APARTMENT]: () => '',
   [NEW_ANNOUNCEMENT]: () => '',
+  [REMIND_FEE]: () => '',
 };
 
 export const getNotifyContent = (currentUser, author, type, actors, data) => {
-  if (type === NEW_FEE_APARTMENT) {
+  if (type === NEW_FEE_APARTMENT || type === REMIND_FEE) {
     return data.text;
   } else if (actors && actors.length > 0) {
     const {
@@ -123,6 +125,10 @@ class NotificationItem extends Component {
     }
 
     if (NEW_FEE_APARTMENT === type) {
+      history.push(`/apartment/${data.apartment}/service_fee`);
+    }
+
+    if (REMIND_FEE === type) {
       history.push(`/apartment/${data.apartment}/service_fee`);
     }
 

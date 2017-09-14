@@ -54,7 +54,7 @@ class FAQs extends Component {
         <ul className={classNames(s.listItem)}>
           {
             (listFAQ || []).map(faq => (
-              <li key={Math.random()}>
+              <li key={Math.random()} title={faq.name}>
                 <a href="#" onClick={evt => this.viewFAQ(evt, faq)}>
                   <i className={classNames('fa fa-comment')}></i>
                   <h3>{faq.name}</h3>
