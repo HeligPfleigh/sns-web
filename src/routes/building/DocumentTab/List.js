@@ -221,6 +221,7 @@ export default compose(
   graphql(documentsListQuery, {
     options: props => ({
       variables: {
+        limit: 15,
         building: props.building._id,
       },
     }),
