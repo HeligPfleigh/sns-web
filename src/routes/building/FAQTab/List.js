@@ -9,10 +9,11 @@ import {
   Alert,
   Panel,
   Tooltip,
-  Accordion,
+  PanelGroup,
   Pagination,
   OverlayTrigger,
-  Col } from 'react-bootstrap';
+  Col,
+} from 'react-bootstrap';
 
 import Loading from '../../../components/Loading';
 import FAQsListQuery from './FAQsListQuery.graphql';
@@ -38,14 +39,13 @@ class FAQs extends Component {
       onUpdateInitialValues: {},
       onDeleteInitialValues: {},
       hideCreateInitialValues: true,
-      showFAQ: '',
+      faqActivated: undefined,
     };
 
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onCreate = this.onCreate.bind(this);
     this.onError = this.onError.bind(this);
-    this.onFAQSelected = this.onFAQSelected.bind(this);
     this.onHideUpdateFAQModal = this.onHideUpdateFAQModal.bind(this);
     this.onHideDeleteFAQModal = this.onHideDeleteFAQModal.bind(this);
     this.onHideCreateleteFAQModal = this.onHideCreateleteFAQModal.bind(this);
@@ -66,12 +66,6 @@ class FAQs extends Component {
   onHideDeleteFAQModal(onDeleteInitialValues = {}) {
     this.setState({
       onDeleteInitialValues,
-    });
-  }
-
-  onFAQSelected(FAQSelected) {
-    this.setState({
-      FAQSelected,
     });
   }
 
@@ -98,6 +92,13 @@ class FAQs extends Component {
   onError(errorMessage) {
     this.setState({
       errorMessage,
+    });
+  }
+
+  onCollapse = (toggle, faqActivated, event) => {
+    event.preventDefault();
+    this.setState({
+      faqActivated: toggle ? faqActivated : undefined,
     });
   }
 
@@ -138,28 +139,34 @@ class FAQs extends Component {
       return this.renderNoRecordsFound();
     }
 
+    const { faqActivated } = this.state;
+
     return (
-      <Accordion>
-        { edges.map(row => (
-          <Panel
-            header={<div><i className="fa fa-caret-right" aria-hidden="true"></i> {row.name} </div>}
-            eventKey={row._id}
-            key={row._id}
-            className={classNames({ individual: true })}
-            onSelect={this.onFAQSelected}
-          >
-            <FAQ
-              data={row}
-              onUpdate={this.onUpdate}
-              onDelete={this.onDelete}
-              onError={this.onError}
-              canUpdate={isAdmin}
-              canDelete={isAdmin}
-              selected={row._id === this.state.FAQSelected}
-            />
-          </Panel>
-        ))}
-      </Accordion>
+      <PanelGroup accordion defaultActiveKey={faqActivated} >
+        { edges.map((row) => {
+          const hasSelected = row._id === faqActivated;
+          const onCollapse = this.onCollapse.bind(this, !hasSelected);
+
+          return (
+            <Panel
+              header={<div>{hasSelected ? <i className="fa fa-caret-down" aria-hidden="true"></i> : <i className="fa fa-caret-right" aria-hidden="true"></i>} {row.name} </div>}
+              eventKey={row._id}
+              key={row._id}
+              className="individual"
+              onSelect={onCollapse}
+            >
+              <FAQ
+                data={row}
+                onUpdate={this.onUpdate}
+                onDelete={this.onDelete}
+                onError={this.onError}
+                canUpdate={isAdmin}
+                canDelete={isAdmin}
+              />
+            </Panel>
+          );
+        })}
+      </PanelGroup>
     );
   }
 
