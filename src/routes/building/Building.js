@@ -179,7 +179,7 @@ class Building extends Component {
                 </NavItem>
                 <NavItem title="Câu hỏi thơờng gặp" eventKey={FAQ_TAB}>
                   <i className="fa fa-question-circle" aria-hidden="true"></i>
-                  Hỏi - đáp
+                  Câu hỏi thường gặp
                 </NavItem>
                 { building && building.isAdmin && <NavItem
                   title="Truy cập trang quản lý của tòa nhà"

@@ -4,9 +4,8 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
 import isUndefined from 'lodash/isUndefined';
 import isNull from 'lodash/isNull';
-import classNames from 'classnames';
 
-import { ButtonToolbar, Button } from 'react-bootstrap';
+import { ButtonToolbar, Button, Col, Row } from 'react-bootstrap';
 import { DraftToHTML } from '../../../components/Editor';
 import s from './FAQ.scss';
 
@@ -65,15 +64,15 @@ class FAQItem extends Component {
   }
 
   render() {
-    const { data, canDelete, canUpdate, selected } = this.props;
+    const { data, canDelete, canUpdate } = this.props;
     return (
-      <div className={classNames({ hide: !selected })} >
-        <div dangerouslySetInnerHTML={{ __html: DraftToHTML(data.message) }} />
+      <Col xs={12}>
+        <Row dangerouslySetInnerHTML={{ __html: DraftToHTML(data.message) }} />
         {(canUpdate || canDelete) && (<ButtonToolbar className="pull-right">
           <Button bsStyle="primary" onClick={this.onUpdate} bsSize="xsmall" type="button"><i className="fa fa-edit" aria-hidden="true"></i> Sửa</Button>
           <Button bsStyle="danger" onClick={this.onDelete} bsSize="xsmall" type="button"><i className="fa fa-trash" aria-hidden="true"></i> Xóa</Button>
         </ButtonToolbar>)}
-      </div>
+      </Col>
     );
   }
 }
@@ -89,7 +88,6 @@ FAQItem.propTypes = {
   canUpdate: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   onError: PropTypes.func.isRequired,
-  selected: PropTypes.bool.isRequired,
 };
 
 FAQItem.defaultProps = {
