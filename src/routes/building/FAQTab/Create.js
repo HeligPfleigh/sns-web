@@ -129,7 +129,6 @@ class CreateFAQModal extends Component {
 }
 
 CreateFAQModal.propTypes = {
-  form: PropTypes.string,
   building: PropTypes.shape({
     _id: PropTypes.string,
     isAdmin: PropTypes.bool,
@@ -139,12 +138,13 @@ CreateFAQModal.propTypes = {
   onCreate: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
-  dispatch: PropTypes.any,
-  reset: PropTypes.any,
   invalid: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
   pristine: PropTypes.bool.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  form: PropTypes.string.isRequired,
 };
 
 CreateFAQModal.defaultProps = {

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import {
   MenuItem,
   Dropdown,
+  Button,
+  ButtonGroup,
 } from 'react-bootstrap';
 
 import {
@@ -98,6 +100,10 @@ export default class Privacy extends Component {
     const selectedLabel = privacies[selectedKey].label;
     const selectedIcon = privacies[selectedKey].icon;
     delete privacies[selectedKey];
+
+    if (this.props.disabled) {
+      return (<ButtonGroup className={this.props.className}><Button type="button">{selectedIcon} {selectedLabel} <span className="caret"></span></Button></ButtonGroup>);
+    }
 
     return (
       <Dropdown id={this.props.id} className={this.props.className}>

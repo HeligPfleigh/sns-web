@@ -75,13 +75,14 @@ class CreateDocumentModal extends Component {
     });
   }
 
+  onHide() {
+    this.resetForm();
+    this.props.onHide({});
+  }
+
   resetForm() {
     const { dispatch, reset, form } = this.props;
     dispatch(reset(form));
-  }
-
-  onHide() {
-    this.props.onHide({});
   }
 
   render() {
@@ -169,6 +170,9 @@ CreateDocumentModal.propTypes = {
   onCreate: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
+  reset: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  form: PropTypes.string.isRequired,
 };
 
 CreateDocumentModal.defaultProps = {
