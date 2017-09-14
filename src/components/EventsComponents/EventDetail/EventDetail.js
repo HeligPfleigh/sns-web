@@ -42,31 +42,27 @@ class EventDetail extends Component {
 
   constructor(props, ...args) {
     super(props, ...args);
-
-    this.state = this.initState();
-
-    this.canUpdateEventId = setInterval(() => {
-      this.setState({
-        canUpdateEvent: this.canUpdateEvent(),
-      });
-    }, 5000);
-    this.canDeleteEventId = setInterval(() => {
-      this.setState({
-        canDeleteEvent: this.canDeleteEvent(),
-      });
-    }, 5000);
+    this.state = {
+      showEditFormModal: false,
+      canUpdateEvent: false,
+      canDeleteEvent: false,
+    };
   }
 
-  componentWillReceiveProps() {
+  componentWillMount() {
     this.setState({
       canUpdateEvent: this.canUpdateEvent(),
       canDeleteEvent: this.canDeleteEvent(),
     });
   }
 
-  componentWillUnmount() {
-    clearInterval(this.canUpdateEventId);
-    clearInterval(this.canDeleteEventId);
+  componentWillReceiveProps() {
+    setTimeout(() => {
+      this.setState({
+        canUpdateEvent: this.canUpdateEvent(),
+        canDeleteEvent: this.canDeleteEvent(),
+      });
+    }, 500);
   }
 
   onInterestClick = async (e) => {
@@ -122,12 +118,6 @@ class EventDetail extends Component {
       showEditFormModal: true,
     });
   }
-
-  initState = () => ({
-    showEditFormModal: false,
-    canUpdateEvent: false,
-    canDeleteEvent: false,
-  })
 
   hideEditEventModal = () => {
     this.setState({
