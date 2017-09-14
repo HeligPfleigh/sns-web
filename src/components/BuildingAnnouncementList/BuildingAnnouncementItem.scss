@@ -19,6 +19,13 @@
     overflow-wrap: break-word;
     margin-top: 8px;
     display: table-cell;
+    strong {
+      max-width: 500px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+    }
     small {
       color: #888888;
     }
@@ -29,6 +36,11 @@
     margin-top: 8px;
   }
   @media (max-width: 992px) {
+    .buildingAnnouncementInfo {
+      strong {
+        max-width: 150px;
+      }
+    }
     .buildingAnnouncementButtons {
       text-align: left;
       float: none;
