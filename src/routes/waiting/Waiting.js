@@ -29,12 +29,14 @@ class Waiting extends Component {
   }
 
   render() {
+    const { query, title, message } = this.props;
     return (
-      <div style={{ marginTop: '15%', textAlign: 'center' }}>
-        <h1 className="text-danger">{this.props.title}</h1>
-        <h3 className="text-warning">Tài khoản đang chờ xác thực!</h3>
-        { // eslint-disable-next-line
-          <p className="text-success">"Hệ thống sẽ tự động gửi thông báo đến bạn khi quá trình xác thực thông tin."</p>
+      <div style={{ marginTop: '12%', textAlign: 'center' }}>
+        <h1 className="text-danger">{title}</h1>
+        <h3 className="text-warning">{message}</h3>
+        {
+          query && query.type && (query.type === 'approval') &&
+          <p className="text-success">{'Hệ thống sẽ tự động gửi thông báo đến bạn khi quá trình xác thực thông tin.'}</p>
         }
         <br />
         <h2 className="text-info">Xin quý khách vui lòng quay lại sau. Cảm ơn!</h2>
@@ -45,7 +47,9 @@ class Waiting extends Component {
 }
 
 Waiting.propTypes = {
+  query: PropTypes.any,
   title: PropTypes.string,
+  message: PropTypes.string,
   removeStateUser: PropTypes.func,
 };
 
