@@ -22,7 +22,7 @@ import Menu from '../../Menu/Menu';
 import FeeList from './FeeList';
 import Loading from '../../../../components/Loading';
 import s from './styles.scss';
-import feesReportPageQuery from './queries/feesReportPageQuery.graphql';
+import feesReportPageQuery from '../graphql/FeesReportPageQuery.graphql';
 
 const limit = 10;
 class ReportPage extends Component {

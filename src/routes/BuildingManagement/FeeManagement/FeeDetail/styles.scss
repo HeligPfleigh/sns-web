@@ -3,18 +3,23 @@
   .fee {
     background-color: #fff;
     padding: 25px 25px;
+
     ul {
       list-style: none;
       padding: 0px;
+
       li {
         display: flow-root;
         margin-bottom: 15px;
+
         .pullLeft {
           float: left;
           min-width: 115px;
         }
+
         .pullRight {
           display: inline-block;
+
           .saveUpdate {
             background-color: #263E49;
             border: 0px;
@@ -27,6 +32,7 @@
             font-weight: 400;
             width: 100px;
           }
+
           .cancelUpdate {
             border: 0px;
             border-radius:4px;
@@ -36,43 +42,55 @@
             font-weight: 400;
             width: 75px;
           }
+
           .edit {
             color: #365899;
             display: none;
-            margin-left: 10px; 
-          }          
+            margin-left: 10px;
+          }
         }
+
         i {
           color:#FF6347;
           font-size: 20px;
-          margin-left: 5px; 
+          margin-left: 5px;
         }
+
         span {
           display: inline-block;
         }
+
         &:hover {
           .pullRight {
             .edit {
               color: #365899;
               display: inline-block;
-              margin-left: 10px; 
+              margin-left: 10px;
             }
           }
         }
       }
     }
+
     .header {
       margin-bottom: 40px;
       display: flow-root;
+
       i {
         font-size: 25px;
-        margin-right: 10px; 
       }
+
       .mainPage {
         font-weight: bold;
       }
+
       span {
-        padding-top: 3px; 
+        padding-top: 3px;
+      }
+
+      ol {
+        padding: 8px 1px 0px;
+        background-color: #fff;
       }
     }
   }

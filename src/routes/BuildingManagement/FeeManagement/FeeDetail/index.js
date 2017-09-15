@@ -7,19 +7,22 @@ import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import moment from 'moment';
-import { loadFee } from '../../reducers/fees';
-import feeDetailsQuery from './feeDetailsQuery.graphql';
-import updateFeeDetailMutation from './updateFeeDetailMutation.graphql';
-import Loading from '../../components/Loading';
-import Menu from '../BuildingManagement/Menu/Menu';
-import { PAID, UNPAID } from '../../constants';
+
+import Menu from '../../Menu/Menu';
+import history from '../../../../core/history';
+import { loadFee } from '../../../../reducers/fees';
+import { PAID, UNPAID } from '../../../../constants';
+import Loading from '../../../../components/Loading';
+import feeDetailsQuery from '../graphql/FeeDetailsQuery.graphql';
+import updateFeeDetailMutation from '../graphql/UpdateFeeDetailMutation.graphql';
 import {
   required,
   minLength4,
   maxLength9,
-} from '../../utils/validator';
-import reminderToPayFeeMutation from './ReminderToPayFeeMutation';
-import s from './FeeDetails.scss';
+} from '../../../../utils/validator';
+
+import reminderToPayFeeMutation from '../graphql/ReminderToPayFeeMutation';
+import s from './styles.scss';
 
 
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
@@ -116,6 +119,15 @@ class FeeDetails extends Component {
     this.closeFeeUpdate();
   }
 
+  goBack = (evt) => {
+    if (evt) evt.preventDefault();
+    const { data: { fee } } = this.props;
+    if (fee && fee.building) {
+      const { building } = fee;
+      history.push(`/management/${building.id}/fee_dashboard`);
+    }
+  }
+
   render() {
     const {
       data: {
@@ -146,10 +158,21 @@ class FeeDetails extends Component {
             { !loading && fee &&
               <Col md={9} sm={12} xs={12} className={s.fee}>
                 <div className={s.header}>
-                  <i className="fa fa-money" aria-hidden="true"></i>
-                  <span className={s.mainPage}>Quản lý chi phí / </span>
-                  <span>Báo cáo / </span>
-                  <span>Phòng { fee.apartment && fee.apartment.name }</span>
+                  <ol className="breadcrumb">
+                    <li>
+                      <a href="#" onClick={this.goBack}>
+                        <i className="fa fa-money" aria-hidden="true"></i>
+                        &nbsp;
+                        Quản lý chi phí
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#" onClick={this.goBack}>
+                        Báo cáo
+                      </a>
+                    </li>
+                    <li className="active">Phòng { fee.apartment && fee.apartment.name }</li>
+                  </ol>
                 </div>
                 <div>
                   <ul>
