@@ -3,9 +3,7 @@ import Layout from '../../components/Layout';
 import { checkAuthAdmin } from '../../utils/role';
 
 export default {
-
   path: '/management',
-
   async action({ store }) {
     const redirect = checkAuthAdmin(store);
     if (redirect) return redirect;
@@ -159,6 +157,38 @@ export default {
           </Layout>,
         };
       },
+    }, {
+      path: '/:buildingId/settings',
+      children: [
+        {
+          path: '/',
+          async action({ params }) {
+            const GeneralSetting = await require.ensure(
+              [],
+              require => require('./SettingManagement').GeneralSetting,
+              'BuildingSetting.General',
+            );
+            return {
+              title: 'SNS - Cài đặt chung cho tòa nhà',
+              component: <Layout><GeneralSetting buildingId={params.buildingId} /></Layout>,
+            };
+          },
+        },
+        {
+          path: '/fee',
+          async action({ params }) {
+            const FeeSetting = await require.ensure(
+              [],
+              require => require('./SettingManagement/index').FeeSetting,
+              'BuildingSetting.Fee',
+            );
+            return {
+              title: 'SNS - Cài đặt cho Phí - Hóa đơn của tòa nhà',
+              component: <Layout><FeeSetting buildingId={params.buildingId} /></Layout>,
+            };
+          },
+        },
+      ],
     },
   ],
 };

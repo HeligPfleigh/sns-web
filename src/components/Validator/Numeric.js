@@ -1,5 +1,4 @@
 import isArray from 'lodash/isArray';
-import isNumber from 'lodash/isNumber';
 import Message from './Helper/Message';
 
 const validate = (value) => {
@@ -7,7 +6,13 @@ const validate = (value) => {
     return value.every(val => validate(val));
   }
 
-  return isNumber(value);
+  try {
+    value = parseFloat(value, 10);
+  } catch (e) {
+    return false;
+  }
+
+  return !isNaN(value);
 };
 
 export default (attribute, message = 'The ${ attribute } must be a number.') => value => validate(value) ? undefined : Message(message, { attribute });

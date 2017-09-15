@@ -57,6 +57,16 @@ const menus = [{
     key: 'create_announcement',
     url: '/create_announcement',
   }],
+}, {
+  icon: 'fa fa-cog',
+  text: 'Cài đặt',
+  key: 'settings.general',
+  // url: '/settings',
+  children: [{
+    text: 'Phí - Hóa Đơn',
+    key: 'settings.fee',
+    url: '/settings/fee',
+  }],
 }];
 
 class Menu extends Component {
