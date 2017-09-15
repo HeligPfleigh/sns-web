@@ -60,6 +60,32 @@ const fetchAPI = async (url, data) => {
 })
 class Login extends Component {
 
+  navigation = (user) => {
+    const { removeStateUser } = this.props;
+
+    if (isEmpty(user.buildings)) {
+      if (user.id) {
+        removeStateUser();
+        history.push('/waiting?type=approval');
+      } else {
+        history.push('/register');
+      }
+    } else if (isEmpty(user.email)) {
+      removeStateUser();
+      // eslint-disable-next-line
+      alert('Tài khoản không tồn tại');
+      history.push('/login');
+    } else if (user.email && !user.email.verified) {
+      removeStateUser();
+      history.push('/waiting?type=email');
+    } else if (user.isActive === 0) {
+      removeStateUser();
+      history.push('/waiting?type=not-active');
+    } else {
+      history.push('/');
+    }
+  };
+
   loginAction = (values) => {
     const { username, password } = values;
     if (username.trim() === '') {
@@ -75,19 +101,7 @@ class Login extends Component {
         try {
           const user = await fetchAPI('/auth/login', { username, password });
           this.props.loginSuccess(user);
-          if (isEmpty(user.buildings)) {
-            if (user.id) {
-              this.props.removeStateUser();
-              history.push('/waiting');
-            } else {
-              history.push('/register');
-            }
-          } else if (user.isActive === 0) {
-            this.props.removeStateUser();
-            history.push('/waiting');
-          } else {
-            history.push('/');
-          }
+          return this.navigation(user);
         } catch (error) {
           throw new Error(error);
         }
@@ -111,19 +125,7 @@ class Login extends Component {
           try {
             const user = await fetchAPI('/auth/facebook', { access_token });
             this.props.loginSuccess(user);
-            if (isEmpty(user.buildings)) {
-              if (user.id) {
-                this.props.removeStateUser();
-                history.push('/waiting');
-              } else {
-                history.push('/register');
-              }
-            } else if (user.isActive === 0) {
-              this.props.removeStateUser();
-              history.push('/waiting');
-            } else {
-              history.push('/');
-            }
+            return this.navigation(user);
           } catch (error) {
             alert('Đăng nhập thất bại.');
           }
@@ -205,6 +207,7 @@ Login.propTypes = {
   submitting: PropTypes.bool,
   handleSubmit: PropTypes.func,
   removeStateUser: PropTypes.func,
+  loginSuccess: PropTypes.func,
 };
 
 export default reduxForm({
