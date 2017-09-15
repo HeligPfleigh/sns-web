@@ -29,6 +29,7 @@ query feesReportPageQuery(
       year
       totals
       status
+      lastRemind
       type {
         name
       }
@@ -62,6 +63,7 @@ query feesReportPageQuery(
         }
         total
         status
+        lastRemind
       }
     }
   }

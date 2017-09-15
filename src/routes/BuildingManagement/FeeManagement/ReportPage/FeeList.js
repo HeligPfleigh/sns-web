@@ -119,12 +119,17 @@ class FeeList extends Component {
     if (data && data.status === PAID) {
       return null;
     }
+    let isDisabled = this.state.reminders.includes(data._id);
 
-    const isDisabled = this.state.reminders.includes(data._id);
-    return (<a
+    if (!isDisabled && data.lastRemind) {
+      isDisabled = ((new Date().getTime() - new Date(data.lastRemind).getTime()) / 86400000) < 3;
+    }
+    return (<button
+      className={s.btnRemind}
+      disabled={isDisabled}
       onClick={this.onReminderToPayFee(data, isDisabled)}
     ><i title="Nhắc nhở việc đóng phí" aria-hidden="true" className={classNames('fa fa-bell', { disabledReminderToPayFee: isDisabled })}></i>
-    </a>);
+    </button>);
   }
 
   doNothing = (evt) => {
