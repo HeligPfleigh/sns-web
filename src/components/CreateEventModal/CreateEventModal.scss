@@ -71,10 +71,11 @@ a {
 }
 
 .editor {
+  overflow-y: scroll;
   padding: 8px;
   border: solid 1px #dedede;
   min-height: 200px;
-  height: auto;
+  max-height: 200px;
 }
 
 .errorText{

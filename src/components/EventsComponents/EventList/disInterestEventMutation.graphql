@@ -1,0 +1,56 @@
+mutation disInterestEventMutation($eventId: String!) {
+  disInterestEvent(eventId: $eventId) {
+    _id
+    privacy
+    author {
+       _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    building {
+      _id
+      name
+    }
+    photos
+    name
+    location
+    start
+    end
+    message
+    invites {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    joins {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    interests {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    createdAt
+    updatedAt
+    isAuthor
+    isInterest
+  }
+}

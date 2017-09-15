@@ -21,6 +21,7 @@ import {
   InviteResidentToEventModal,
 } from '../../../components/EventsComponents';
 import interestEvent from '../../../components/EventsComponents/EventList/interestEvent.graphql';
+import disInterestEventMutation from '../../../components/EventsComponents/EventList/disInterestEventMutation.graphql';
 import s from './EventDetailPage.scss';
 
 class EventDetailPage extends Component {
@@ -119,6 +120,7 @@ class EventDetailPage extends Component {
               deleteEvent={this.props.deleteEvent}
               editEvent={this.props.editEvent}
               interestEvent={this.props.interestEvent}
+              disInterestEvent={this.props.disInterestEvent}
             />
           </Col>
         </Row>
@@ -146,6 +148,7 @@ EventDetailPage.propTypes = {
   deleteEvent: PropTypes.func.isRequired,
   editEvent: PropTypes.func.isRequired,
   interestEvent: PropTypes.func.isRequired,
+  disInterestEvent: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -261,6 +264,15 @@ export default compose(
   graphql(interestEvent, {
     props: ({ mutate }) => ({
       interestEvent: eventId => mutate({
+        variables: {
+          eventId,
+        },
+      }),
+    }),
+  }),
+  graphql(disInterestEventMutation, {
+    props: ({ mutate }) => ({
+      disInterestEvent: eventId => mutate({
         variables: {
           eventId,
         },
