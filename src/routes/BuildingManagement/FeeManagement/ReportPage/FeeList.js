@@ -7,7 +7,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
 import classNames from 'classnames';
 
-import reminderToPayFeeMutation from '../../../feeDetails/ReminderToPayFeeMutation';
+import reminderToPayFeeMutation from '../graphql/ReminderToPayFeeMutation';
 
 import history from '../../../../core/history';
 import { PAID } from '../../../../constants';
@@ -62,7 +62,7 @@ class FeeList extends Component {
   );
 
   handleClick = (data) => {
-    history.push(`/fee/${data._id}`);
+    history.push(`/management/fee_detail/${data._id}`);
   }
 
   handlePageSelect = (pageNum) => {

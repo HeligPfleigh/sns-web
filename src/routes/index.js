@@ -24,7 +24,6 @@ export default {
     require('./search').default,
     require('./events').default,
     require('./buildingAnnouncementPage').default,
-    require('./feeDetails').default,
     require('./BuildingManagement').default,
     require('./MyBuildings').default,
     require('./Apartment').default,

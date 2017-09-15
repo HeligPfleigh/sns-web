@@ -67,7 +67,7 @@ export default {
       async action({ params }) {
         const ChangeInfoPage = await require.ensure(
           [],
-          require => require('./ResidentManagement/ChangeInfoPage/index').default,
+          require => require('./ResidentManagement/ChangeInfoPage').default,
           'ChangeInfoPage',
         );
         return {
@@ -80,12 +80,25 @@ export default {
       async action({ params }) {
         const ReportPage = await require.ensure(
           [],
-          require => require('./FeeManagement/ReportPage/index').default,
+          require => require('./FeeManagement/ReportPage').default,
           'ReportPage',
         );
         return {
           title: 'SNS - Ban quản lý tòa nhà',
           component: <Layout><ReportPage buildingId={params.buildingId} /></Layout>,
+        };
+      },
+    }, {
+      path: '/fee_detail/:feeId',
+      async action({ params }) {
+        const FeeDetails = await require.ensure(
+          [],
+          require => require('./FeeManagement/FeeDetail').default,
+          'feedetails',
+        );
+        return {
+          title: 'SNS - Ban quản lý tòa nhà - Chi tiết về phí dịch vụ',
+          component: <Layout><FeeDetails feeId={params.feeId} /></Layout>,
         };
       },
     }, {
@@ -106,7 +119,7 @@ export default {
       async action({ params }) {
         const AnnouncementPage = await require.ensure(
           [],
-          require => require('./FeeManagement/AnnouncementPage/index').default,
+          require => require('./FeeManagement/AnnouncementPage').default,
           'AnnouncementPage',
         );
         return {
