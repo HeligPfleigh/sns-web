@@ -391,7 +391,11 @@ class CreateEventModal extends Component {
             <FormGroup>
               <ControlLabel className="col-sm-3">Miêu tả</ControlLabel>
               <Col sm={9}>
-                <div className={classNames('form-control', s.editor, { focus: this.state.hasFocusEditor })} onClick={() => this.editor.focus()}>
+                <div
+                  style={{ height: 'auto' }}
+                  onClick={() => this.editor.focus()}
+                  className={classNames('form-control', s.editor, { focus: this.state.hasFocusEditor })}
+                >
                   <Editor
                     editorState={editorState}
                     onChange={this.onChangeMessage}
