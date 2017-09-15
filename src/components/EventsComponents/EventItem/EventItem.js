@@ -23,6 +23,11 @@ class EventItem extends Component {
     this.props.interestEvent(event._id, newInterest);
   }
 
+  onDisInterestClicked = () => {
+    const { event } = this.props;
+    this.props.disInterestEvent(event._id);
+  }
+
   render() {
     const { event, user } = this.props;
     const start = new Date(event.start);
@@ -88,28 +93,27 @@ class EventItem extends Component {
                 }}
                 className={s.care}
               >{`${event.interests.length} Người quan tâm`}</p>
-              <div className={s.wrapperButtonRight}>
-                {
-                  !event.isInterest && user.id !== event.author._id ?
-                    <Button
-                      className={s.BtnCare}
-                      onClick={this.onInterestClicked}
-                    >
-                      <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
-                      Quan tâm
-                    </Button> :
-                    <Button
-                      disabled
-                      className={s.BtnCare}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        height: 33,
-                      }}
-                    />
-                }
-
-              </div>
+              { user.id !== event.author._id &&
+                <div className={s.wrapperButtonRight}>
+                  {
+                    !event.isInterest ?
+                      <Button
+                        className={s.BtnCare}
+                        onClick={this.onInterestClicked}
+                      >
+                        <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                        Quan tâm
+                      </Button> :
+                      <Button
+                        className={s.BtnCare}
+                        onClick={this.onDisInterestClicked}
+                      >
+                        <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                        Hủy quan tâm
+                      </Button>
+                  }
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -121,6 +125,7 @@ class EventItem extends Component {
 EventItem.propTypes = {
   event: PropTypes.object.isRequired,
   interestEvent: PropTypes.func.isRequired,
+  disInterestEvent: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
 

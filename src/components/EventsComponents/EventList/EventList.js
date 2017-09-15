@@ -15,6 +15,7 @@ import s from './EventList.scss';
 import EventItem from '../EventItem/EventItem';
 import Loading from '../../../components/Loading';
 import interestEvent from './interestEvent.graphql';
+import disInterestEventMutation from './disInterestEventMutation.graphql';
 
 class EventList extends Component {
   constructor(props) {
@@ -65,6 +66,7 @@ class EventList extends Component {
                 event={event}
                 user={user}
                 interestEvent={this.props.interestEvent}
+                disInterestEvent={this.props.disInterestEvent}
               />) }
             </InfiniteScroll>
           </Col>
@@ -80,6 +82,7 @@ EventList.propTypes = {
   }).isRequired,
   loadMoreRows: PropTypes.func.isRequired,
   interestEvent: PropTypes.func.isRequired,
+  disInterestEvent: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -129,6 +132,15 @@ export default compose(
   graphql(interestEvent, {
     props: ({ mutate }) => ({
       interestEvent: eventId => mutate({
+        variables: {
+          eventId,
+        },
+      }),
+    }),
+  }),
+  graphql(disInterestEventMutation, {
+    props: ({ mutate }) => ({
+      disInterestEvent: eventId => mutate({
         variables: {
           eventId,
         },

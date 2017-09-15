@@ -73,10 +73,15 @@ class EventDetail extends Component {
     }, 500);
   }
 
-  onInterestClick = async (e) => {
+  onInterestClicked = async (e) => {
     e.preventDefault();
     const { interestEvent, event } = this.props;
     await interestEvent(event._id);
+  }
+
+  onDisInterestClicked = async () => {
+    const { disInterestEvent, event } = this.props;
+    await disInterestEvent(event._id);
   }
 
   onJoinClick = async (e) => {
@@ -178,11 +183,25 @@ class EventDetail extends Component {
 
     if (ignore) {
       const isInterested = isArray(event.interests) && event.interests.filter(u => u._id === user.id).length > 0;
-      return (<div className={s.actionsButton}>
-        <Button onClick={this.onInterestClick} disabled={isInterested}>
-          <Glyphicon glyph="star" /> <span>Quan tâm</span>
-        </Button>
-      </div>);
+      return (
+        <div className={s.actionsButton}>
+          {
+            !isInterested ?
+              <Button
+                onClick={this.onInterestClicked}
+              >
+                <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                Quan tâm
+              </Button> :
+              <Button
+                onClick={this.onDisInterestClicked}
+              >
+                <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                Hủy quan tâm
+              </Button>
+          }
+        </div>
+      );
     }
 
     return (<div className={s.actionsButton}>
@@ -297,7 +316,8 @@ EventDetail.propTypes = {
   // joinEvent: PropTypes.func.isRequired,
   // canJoinEvent: PropTypes.func.isRequired,
   // cantJoinEvent: PropTypes.func.isRequired,
-  // interestEvent: PropTypes.func.isRequired,
+  interestEvent: PropTypes.func.isRequired,
+  disInterestEvent: PropTypes.func.isRequired,
 };
 
 export default compose(
