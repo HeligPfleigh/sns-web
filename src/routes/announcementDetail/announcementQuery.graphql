@@ -1,4 +1,4 @@
-query announcementQuery($announcementId: String!, $userId: String!, $limit: Int) {
+query announcementQuery($announcementId: String!, $userId: String!, $cursor: String, $limit: Int) {
   announcement(_id: $announcementId) {
     _id
     message
@@ -7,7 +7,7 @@ query announcementQuery($announcementId: String!, $userId: String!, $limit: Int)
   }
   resident(_id: $userId) {
     _id
-    announcements (cursor: $announcementId, limit: $limit) {
+    announcements (announcementId: $announcementId, cursor: $cursor, limit: $limit) {
       pageInfo {
         endCursor
         hasNextPage

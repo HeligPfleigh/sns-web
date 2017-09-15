@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import update from 'immutability-helper';
+import throttle from 'lodash/throttle';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { Grid, Row, Col } from 'react-bootstrap';
+import InfiniteScroll from 'react-infinite-scroller';
+import { generate as idRandom } from 'shortid';
 import announcementQuery from './announcementQuery.graphql';
 import {
   BuildingAnnouncementItem,
@@ -19,10 +23,13 @@ class AnnouncementDetail extends Component {
         announcement,
         resident,
       },
+      loadMoreRows,
     } = this.props;
     let announcements = null;
+    let hasNextPage = false;
     if (resident) {
       announcements = resident.announcements;
+      hasNextPage = resident.announcements.pageInfo.hasNextPage;
     }
     return (
       <Grid>
@@ -45,17 +52,23 @@ class AnnouncementDetail extends Component {
               <div>
                 <span>Thông báo khác</span>
               </div>
-              <ul className={s.announcementList}>
-                {
-                  !loading && announcements && announcements.edges.map(a => (
-                    <BuildingAnnouncementItem
-                      key={a._id}
-                      data={a}
-                      message={a.message}
-                    />
-                  ))
-                }
-              </ul>
+              <InfiniteScroll
+                loadMore={loadMoreRows}
+                hasMore={hasNextPage}
+                loader={<div className="loader">Loading ...</div>}
+              >
+                <ul className={s.announcementList}>
+                  {
+                    !loading && announcements && announcements.edges.map(a => (
+                      <BuildingAnnouncementItem
+                        key={idRandom()}
+                        data={a}
+                        message={a.message}
+                      />
+                    ))
+                  }
+                </ul>
+              </InfiniteScroll>
             </div>
           </Col>
         </Row>
@@ -66,6 +79,7 @@ class AnnouncementDetail extends Component {
 
 AnnouncementDetail.propTypes = {
   data: PropTypes.shape({}).isRequired,
+  loadMoreRows: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -78,10 +92,38 @@ export default compose(
       variables: {
         announcementId: props.announcementId,
         userId: props.user.id,
-        limit: 4,
         cursor: null,
+        limit: 5,
       },
       fetchPolicy: 'network-only',
     }),
+    props: ({ data }) => {
+      const { fetchMore } = data;
+      const loadMoreRows = throttle(() => fetchMore({
+        variables: {
+          cursor: data.resident.announcements.pageInfo.endCursor,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newEdges = fetchMoreResult.resident.announcements.edges;
+          const pageInfo = fetchMoreResult.resident.announcements.pageInfo;
+          return update(previousResult, {
+            resident: {
+              announcements: {
+                edges: {
+                  $push: newEdges,
+                },
+                pageInfo: {
+                  $set: pageInfo,
+                },
+              },
+            },
+          });
+        },
+      }), 300);
+      return {
+        data,
+        loadMoreRows,
+      };
+    },
   }),
 )(AnnouncementDetail);
