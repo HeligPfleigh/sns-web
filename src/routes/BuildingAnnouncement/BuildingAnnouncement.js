@@ -14,14 +14,16 @@ class BuildingAnnouncement extends Component {
   render() {
     const { data: { loading, resident } } = this.props;
     let announcements = null;
+    let buildingId = null;
     if (resident) {
       announcements = resident.announcements;
+      buildingId = resident.building._id;
     }
     return (
       <div>
         {loading && <h3 style={{ textAlign: 'center' }}>Đang tải dữ liệu</h3>}
         {!loading && announcements && announcements.edges.length > 0 &&
-          <BuildingAnnouncementList>
+          <BuildingAnnouncementList buildingId={buildingId}>
             <BuildingAnnouncementHeader />
             {
               announcements.edges.map((a) => {
