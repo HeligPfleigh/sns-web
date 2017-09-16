@@ -16,6 +16,9 @@ import {
 import s from './AnnouncementDetail.scss';
 
 class AnnouncementDetail extends Component {
+
+  backAnnouncementsManagement = () => history.back()
+
   render() {
     const {
       data: {
@@ -24,6 +27,7 @@ class AnnouncementDetail extends Component {
         resident,
       },
       loadMoreRows,
+      user,
     } = this.props;
     let announcements = null;
     let hasNextPage = false;
@@ -36,6 +40,12 @@ class AnnouncementDetail extends Component {
         {loading && <h3>Đang tải dữ liệu....</h3>}
         <Row>
           <Col md={8} sm={12} xs={12} className={s.container}>
+            { user && user.isAdmin &&
+              <div onClick={this.backAnnouncementsManagement}>
+                <i className="fa fa-chevron-left" aria-hidden="true"></i>
+                <h4 className={s.buttonBack}>Quay lại trang</h4>
+              </div>
+            }
             {!loading && announcement &&
               <div className={s.announcement}>
                 <div className={s.announcementTitle}>
@@ -80,6 +90,7 @@ class AnnouncementDetail extends Component {
 AnnouncementDetail.propTypes = {
   data: PropTypes.shape({}).isRequired,
   loadMoreRows: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 export default compose(
