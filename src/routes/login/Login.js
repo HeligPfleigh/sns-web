@@ -182,7 +182,7 @@ class Login extends Component {
           <a className="pull-right" href="#">Quên mật khẩu?</a>
         </div>
         <div className="clearfix" />
-        <div>
+        <div className={s['btn-links']}>
           <a
             href="#"
             onClick={this.fbLoginAction}
@@ -190,12 +190,14 @@ class Login extends Component {
           >
             <i className="fa fa-facebook"></i> Facebook
           </a>
-          <a className={`btn ${s.btn_link_login} ${s.btn_link_login_twitter}`} href="#">
-            <i className="fa fa-twitter"></i> Twitter
-          </a>
-          <a className={`btn ${s.btn_link_login} ${s.btn_link_login_google_plus}`} href="#">
-            <i className="fa fa-google-plus"></i> Google Plus
-          </a>
+          { /*
+              <a className={`btn ${s.btn_link_login} ${s.btn_link_login_twitter}`} href="#">
+                <i className="fa fa-twitter"></i> Twitter
+              </a>
+              <a className={`btn ${s.btn_link_login} ${s.btn_link_login_google_plus}`} href="#">
+                <i className="fa fa-google-plus"></i> Google Plus
+              </a>
+             */ }
         </div>
       </section>
     );

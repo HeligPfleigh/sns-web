@@ -160,7 +160,7 @@ class Navigation extends Component {
             <CustomToggle bsRole="toggle" refs="child">
               <Link title="Nhóm" className={s.link} to="#">
                 <i className="fa fa-users"></i>
-                {isMobile ? '' : <span>Nhóm</span>}
+                {isMobile ? '' : <span>Lời mời kết bạn</span>}
               </Link>
             </CustomToggle>
 

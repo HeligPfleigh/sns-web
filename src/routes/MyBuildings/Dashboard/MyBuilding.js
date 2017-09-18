@@ -45,7 +45,7 @@ class MyBuilding extends Component {
                 <BuildingInfo buildingInfo={building} admins={admins} />
               </Col>
             </Row>
-            <BuildingServices buildingId={buildingId} />
+            { /* <BuildingServices buildingId={buildingId} /> */ }
             <Row>
               <Col md={6} sm={6} xs={12}>
                 { listFAQ && <FAQs buildingId={buildingId} listFAQ={listFAQ} /> }

@@ -73,10 +73,14 @@ body {
   }
 }
 
+.btn-links {
+  padding: 5px 35px;
+}
+
 .btn_link_login {
   display: inline-block;
   height: 40px;
-  margin: 5px;
+  width: 100%;
   padding: 10px 10px 0;
   background: #19b9e7;
   font-size: 16px;
