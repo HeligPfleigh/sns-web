@@ -23,21 +23,8 @@ class FeeSetting extends Component {
   constructor(...args) {
     super(...args);
 
-    const recommendedDatePayFee = [{
-      label: 'Vui lòng chọn ...',
-    }];
-    for (let key = 1; key <= 28; key++) {
-      recommendedDatePayFee.push({
-        value: key,
-        label: `Vào ngày ${key <= 10 ? `mùng ${key}` : key} hàng tháng`,
-      });
-    }
-
     this.state = {
       formFields: {},
-      options: {
-        recommendedDatePayFee,
-      },
       message: undefined,
     };
   }
@@ -48,15 +35,13 @@ class FeeSetting extends Component {
   }
 
   onSubmitForm = ({
-    recommendedDatePayFee,
-    automatedDateReminder,
+    automatedReminderAfterHowDays,
     timeLimitationBetween2FeeNotifications,
   }) => {
     const { save } = this.props;
 
     return save({
-      recommendedDatePayFee,
-      automatedDateReminder,
+      automatedReminderAfterHowDays,
       timeLimitationBetween2FeeNotifications,
     })
     .then(() => {
@@ -116,60 +101,54 @@ class FeeSetting extends Component {
             <Col xs={12}>
               {message && <Alert bsStyle={error ? 'danger' : 'success'}>{message}</Alert>}
               <form className="form-horizontal" name={form} noValidate onSubmit={handleSubmit(this.onSubmitForm)}>
-                <FormGroup controlId="recommendedDatePayFee">
-                  <ControlLabel className="col-sm-5">Ngày quy định nộp phí</ControlLabel>
-                  <Col sm={4}>
-                    <Field
-                      type="select"
-                      name="recommendedDatePayFee"
-                      component={ReduxFormFields.SelectField}
-                      validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                      ref={input => this.state.formFields.recommendedDatePayFee = input}
-                      withRef
-                      options={this.state.options.recommendedDatePayFee}
-                    />
-                  </Col>
-                </FormGroup>
 
-                <FormGroup controlId="automatedDateReminder">
+                <FormGroup controlId="automatedReminderAfterHowDays">
                   <ControlLabel className="col-sm-5">Tự động gửi thông báo sau</ControlLabel>
-                  <Col sm={4}>
-                    <InputGroup>
-                      <Field
-                        type="number"
-                        name="automatedDateReminder"
-                        component={ReduxFormFields.InputField}
-                        validate={[
-                          Validator.Required(null, 'Bạn phải nhập dữ liệu'),
-                          Validator.Int(null, 'Bạn phải nhập số tự nhiên'),
-                          Validator.Min.Num(null, 'Giá trị phải lớn hơn 0', 1),
-                        ]}
-                        ref={input => this.state.formFields.automatedDateReminder = input}
-                        withRef
-                      />
-                      <InputGroup.Addon>ngày</InputGroup.Addon>
-                    </InputGroup>
+                  <Col sm={7}>
+                    <Row>
+                      <Col sm={4}>
+                        <Field
+                          type="number"
+                          name="automatedReminderAfterHowDays"
+                          component={ReduxFormFields.InputField}
+                          validate={[
+                            Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                            Validator.Int(null, 'Bạn phải nhập số tự nhiên'),
+                            Validator.Min.Num(null, 'Giá trị phải lớn hơn 0', 1),
+                          ]}
+                          ref={input => this.state.formFields.automatedReminderAfterHowDays = input}
+                          withRef
+                        />
+                      </Col>
+                      <Col sm={8}>
+                        <InputGroup.Addon className={s.inputAddon}>ngày quá hạn nộp phí</InputGroup.Addon>
+                      </Col>
+                    </Row>
                   </Col>
                 </FormGroup>
 
                 <FormGroup controlId="timeLimitationBetween2FeeNotifications">
                   <ControlLabel className="col-sm-5">Giới hạn giữa hai lần liên tiếp gửi thông báo phí</ControlLabel>
-                  <Col sm={4}>
-                    <InputGroup>
-                      <Field
-                        type="number"
-                        name="timeLimitationBetween2FeeNotifications"
-                        component={ReduxFormFields.InputField}
-                        validate={[
-                          Validator.Required(null, 'Bạn phải nhập dữ liệu'),
-                          Validator.Int(null, 'Bạn phải nhập số tự nhiên'),
-                          Validator.Min.Num(null, 'Giá trị phải lớn hơn 0', 1),
-                        ]}
-                        ref={input => this.state.formFields.timeLimitationBetween2FeeNotifications = input}
-                        withRef
-                      />
-                      <InputGroup.Addon>ngày</InputGroup.Addon>
-                    </InputGroup>
+                  <Col sm={7}>
+                    <Row>
+                      <Col sm={4}>
+                        <Field
+                          type="number"
+                          name="timeLimitationBetween2FeeNotifications"
+                          component={ReduxFormFields.InputField}
+                          validate={[
+                            Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                            Validator.Int(null, 'Bạn phải nhập số tự nhiên'),
+                            Validator.Min.Num(null, 'Giá trị phải lớn hơn 0', 1),
+                          ]}
+                          ref={input => this.state.formFields.timeLimitationBetween2FeeNotifications = input}
+                          withRef
+                        />
+                      </Col>
+                      <Col sm={8}>
+                        <InputGroup.Addon className={s.inputAddon}>ngày</InputGroup.Addon>
+                      </Col>
+                    </Row>
                   </Col>
                 </FormGroup>
 
@@ -212,8 +191,7 @@ FeeSetting.propTypes = {
 };
 
 const fields = [
-  'recommendedDatePayFee',
-  'automatedDateReminder',
+  'automatedReminderAfterHowDays',
   'timeLimitationBetween2FeeNotifications',
 ];
 

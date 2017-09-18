@@ -33,6 +33,7 @@ query feesReportPageQuery(
         name
       }
       apartment {
+        id: _id
         number
         name
         owner {
@@ -43,6 +44,7 @@ query feesReportPageQuery(
         }
       }
       building {
+        id: _id
         name
         display
         isAdmin

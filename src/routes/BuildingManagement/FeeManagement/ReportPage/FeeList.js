@@ -6,9 +6,10 @@ import { Pagination, Clearfix } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { compose } from 'react-apollo';
 import classNames from 'classnames';
+import { connect } from 'react-redux';
 
 import reminderToPayFeeMutation from '../../../feeDetails/ReminderToPayFeeMutation';
-
+import { openAlertGlobal } from '../../../../reducers/alert';
 import history from '../../../../core/history';
 import { PAID } from '../../../../constants';
 import { convertStatus } from '../../../../utils/fee.util';
@@ -33,7 +34,7 @@ class FeeList extends Component {
         return;
       }
 
-      this.props.reminderToPayFeeMutation({
+      return this.props.reminderToPayFeeMutation({
         _id: data._id,
         building: data.building.id,
         apartment: data.apartment.id,
@@ -41,6 +42,12 @@ class FeeList extends Component {
         const { reminders } = this.state;
         reminders.push(data._id);
         this.setState({ reminders });
+      }).catch(({ graphQLErrors }) => {
+        this.props.openAlertGlobal({
+          message: graphQLErrors.shift().message,
+          open: true,
+          autoHideDuration: 2000,
+        });
       });
     };
   }
@@ -119,7 +126,6 @@ class FeeList extends Component {
     if (data && data.status === PAID) {
       return null;
     }
-
     const isDisabled = this.state.reminders.includes(data._id);
     return (<a
       onClick={this.onReminderToPayFee(data, isDisabled)}
@@ -210,9 +216,13 @@ FeeList.propTypes = {
   changePage: PropTypes.func.isRequired,
   dataSource: PropTypes.array.isRequired,
   reminderToPayFeeMutation: PropTypes.func.isRequired,
+  openAlertGlobal: PropTypes.func.isRequired,
 };
 
 export default compose(
   withStyles(s),
+  connect(null, {
+    openAlertGlobal,
+  }),
   reminderToPayFeeMutation,
 )(FeeList);
