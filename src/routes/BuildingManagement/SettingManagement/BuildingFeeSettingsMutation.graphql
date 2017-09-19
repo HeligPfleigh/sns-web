@@ -1,0 +1,8 @@
+mutation BuildingFeeSettingsMutation ($building: String!, $input: BuildingSettingsInput!) {
+  saveBuildingSettings(building: $building, input: $input) {
+    fee {
+      automatedReminderAfterHowDays
+      timeLimitationBetween2FeeNotifications
+    }
+  }
+}

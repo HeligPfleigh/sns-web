@@ -1,0 +1,8 @@
+query BuildingFeeSettingsQuery($building: String!) {
+  getBuildingSettings(building: $building) {
+    fee {
+      automatedReminderAfterHowDays
+      timeLimitationBetween2FeeNotifications
+    }
+  }
+}

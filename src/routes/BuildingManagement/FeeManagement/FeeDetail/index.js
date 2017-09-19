@@ -281,7 +281,7 @@ class FeeDetails extends Component {
                       <div className={s.pullRight}>
                         {!isStatusUpdate && (fee.status === UNPAID) &&
                           <button
-                            disabled={submitting || this.state.hasReminded || (fee.lastRemind && ((new Date().getTime() - new Date(fee.lastRemind).getTime()) / 86400000) < 3)}
+                            disabled={submitting || this.state.hasReminded || fee.disableReminderToPayFee}
                             type="button"
                             onClick={this.onReminderToPayFee(fee._id, fee.apartment.id, fee.building.id)}
                             className="btn btn-warning"
