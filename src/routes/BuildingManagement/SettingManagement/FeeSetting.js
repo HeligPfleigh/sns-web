@@ -24,9 +24,10 @@ class FeeSetting extends Component {
     super(...args);
 
     this.state = {
-      formFields: {},
       message: undefined,
     };
+
+    this.formFields = {};
   }
 
   onResetForm = () => {
@@ -116,7 +117,7 @@ class FeeSetting extends Component {
                             Validator.Int(null, 'Bạn phải nhập số tự nhiên'),
                             Validator.Min.Num(null, 'Giá trị phải lớn hơn 0', 1),
                           ]}
-                          ref={input => this.state.formFields.automatedReminderAfterHowDays = input}
+                          ref={input => this.formFields.automatedReminderAfterHowDays = input}
                           withRef
                         />
                       </Col>
@@ -141,7 +142,7 @@ class FeeSetting extends Component {
                             Validator.Int(null, 'Bạn phải nhập số tự nhiên'),
                             Validator.Min.Num(null, 'Giá trị phải lớn hơn 0', 1),
                           ]}
-                          ref={input => this.state.formFields.timeLimitationBetween2FeeNotifications = input}
+                          ref={input => this.formFields.timeLimitationBetween2FeeNotifications = input}
                           withRef
                         />
                       </Col>

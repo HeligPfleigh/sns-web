@@ -1,0 +1,5 @@
+mutation AddNewResidentInBuildingMutation ($input: CreateUserInput!) {
+  createUser(input: $input) {
+    ...Author
+  }
+}

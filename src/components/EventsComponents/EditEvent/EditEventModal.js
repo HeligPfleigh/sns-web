@@ -37,9 +37,10 @@ class EditEventModal extends Component {
     this.state = {
       photo: isArray(initialValues.photos) && head(initialValues.photos),
       showEndTime: !isUndefined(initialValues.end),
-      formFields: {},
       validationState: {},
     };
+
+    this.formFields = {};
 
     if (Array.isArray(buildings)) {
       this.building = buildings[0]._id || undefined;
@@ -130,7 +131,7 @@ class EditEventModal extends Component {
     return () => null;
     // return () => {
     //   try {
-    //     const fieldComponent = this.state.formFields[fieldName];
+    //     const fieldComponent = this.formFields[fieldName];
     //     if (isUndefined(fieldComponent)) {
     //       return false;
     //     }
@@ -216,7 +217,7 @@ class EditEventModal extends Component {
                     name="name"
                     component={ReduxFormFields.InputField}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                    ref={(input) => { this.state.formFields.name = input; }}
+                    ref={(input) => { this.formFields.name = input; }}
                     withRef
                     onChange={this.validationState('name')}
                   />
@@ -231,7 +232,7 @@ class EditEventModal extends Component {
                     name="location"
                     component={ReduxFormFields.InputField}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                    ref={(input) => { this.state.formFields.location = input; }}
+                    ref={(input) => { this.formFields.location = input; }}
                     withRef
                     onChange={this.validationState('location')}
                   />
@@ -255,7 +256,7 @@ class EditEventModal extends Component {
                       Validator.Required(null, 'Bạn phải nhập dữ liệu'),
                       (value, values) => Validator.Date.isBefore(null, `Thời gian bắt đầu phải trước ${Validator.Date.withMoment(values.end).format('DD/MM/YYYY HH:mm')}`, values.end)(value),
                     ]}
-                    ref={(input) => { this.state.formFields.start = input; }}
+                    ref={(input) => { this.formFields.start = input; }}
                     withRef
                     onChange={this.validationState('start')}
                   />
@@ -286,7 +287,7 @@ class EditEventModal extends Component {
                       Validator.Required(null, 'Bạn phải nhập dữ liệu'),
                       (value, values) => Validator.Date.isAfter(null, `Thời gian kết thúc phải sau ${Validator.Date.withMoment(values.start).format('DD/MM/YYYY HH:mm')}`, values.start)(value),
                     ]}
-                    ref={(input) => { this.state.formFields.end = input; }}
+                    ref={(input) => { this.formFields.end = input; }}
                     withRef
                     onChange={this.validationState('end')}
                   />
@@ -307,7 +308,7 @@ class EditEventModal extends Component {
                     component={ReduxFormFields.EditorField}
                     className={s.editor}
                     validate={[Validator.Required(null, 'Bạn phải nhập dữ liệu')]}
-                    ref={(input) => { this.state.formFields.message = input; }}
+                    ref={(input) => { this.formFields.message = input; }}
                     withRef
                     onChange={this.validationState('message')}
                   />
@@ -321,7 +322,7 @@ class EditEventModal extends Component {
                     name="building"
                     component={ReduxFormFields.CheckboxField}
                     // eslint-disable-next-line
-                    ref={input => this.state.formFields.building = input}
+                    ref={input => this.formFields.building = input}
                     withRef
                     onClick={this.onBuldingEventChange}
                     inline
