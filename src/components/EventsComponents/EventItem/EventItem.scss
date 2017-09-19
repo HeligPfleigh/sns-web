@@ -6,6 +6,7 @@
 }
 
 .photo {
+  cursor: pointer;
   height: 200px;
   width: 100%;
   display: inline-block;
@@ -16,6 +17,7 @@
 }
 
 .calendar{
+  cursor: pointer;
   width: 75px;
   float: left;
   text-align: center;
@@ -43,13 +45,14 @@
 }
 
 .location{
-
+  cursor: pointer;
 }
 
 .care{
-
+  cursor: pointer;
 }
 .title{
+  cursor: pointer;
   font-family: inherit;
   font-weight: 500;
   line-height: 1.1;

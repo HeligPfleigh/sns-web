@@ -16,6 +16,7 @@ import {
   CAN_JOIN_EVENT,
   CANT_JOIN_EVENT,
   EVENT_DELETED,
+  EVENT_CANCELLED,
   ACCEPTED_JOIN_BUILDING,
   REJECTED_JOIN_BUILDING,
   SHARING_POST,
@@ -55,6 +56,7 @@ const collectionNotifyMessages = {
   [CAN_JOIN_EVENT]: () => ' có thể tham gia sự kiện của bạn',
   [CANT_JOIN_EVENT]: () => ' không thể tham gia sự kiện của bạn',
   [EVENT_DELETED]: () => ' đã xóa sự kiện',
+  [EVENT_CANCELLED]: () => ' đã hủy sự kiện',
   [ACCEPTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã được chấp nhận tham gia vào tòa nhà' : ' được chấp nhận tham gia vào tòa nhà'),
   [REJECTED_JOIN_BUILDING]: itsme => (itsme ? 'Bạn đã bị từ chối tham gia vào tòa nhà' : ' bị từ chối tham gia vào tòa nhà'),
   [INTEREST_EVENT]: () => ' vừa quan tâm sự kiện bạn tạo',
@@ -144,7 +146,7 @@ class NotificationItem extends Component {
 
     // redirect to PostDetail Page
     if (subject) {
-      if ([EVENT_INVITE, CAN_JOIN_EVENT, CANT_JOIN_EVENT].indexOf(type) > -1) {
+      if ([EVENT_INVITE, CAN_JOIN_EVENT, CANT_JOIN_EVENT, EVENT_CANCELLED].indexOf(type) > -1) {
         history.push(`/events/${subject._id}`);
       } else {
         history.push(`/post/${subject._id}`);

@@ -22,4 +22,5 @@ fragment EventView on Event {
   start
   end
   message
+  isCancelled
 }
