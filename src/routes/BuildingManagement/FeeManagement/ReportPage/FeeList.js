@@ -8,7 +8,7 @@ import { compose } from 'react-apollo';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 
-import reminderToPayFeeMutation from '../../../feeDetails/ReminderToPayFeeMutation';
+import reminderToPayFeeMutation from '../graphql/ReminderToPayFeeMutation';
 import { openAlertGlobal } from '../../../../reducers/alert';
 import history from '../../../../core/history';
 import { PAID } from '../../../../constants';
