@@ -1,5 +1,5 @@
-mutation disInterestEventMutation($eventId: String!) {
-  disInterestEvent(eventId: $eventId) {
+mutation cancelEventMutation($eventId: String!){
+  cancelEvent(eventId: $eventId){
     _id
     privacy
     author {
@@ -51,7 +51,5 @@ mutation disInterestEventMutation($eventId: String!) {
     }
     createdAt
     updatedAt
-    isAuthor
-    isInterest
   }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'react-apollo';
+import { connect } from 'react-redux';
 import {
   Row,
   Col,
@@ -19,6 +20,8 @@ import Validator from '../../Validator';
 import Divider from '../../Divider';
 import history from '../../../core/history';
 import EditEventModal from '../EditEvent';
+import CancelEventModal from '../CancelEvent';
+import { openAlertGlobal } from '../../../reducers/alert';
 import s from './EventDetail.scss';
 
 const PRIVARY_TEXT = {
@@ -111,6 +114,33 @@ class EventDetail extends Component {
     }
   }
 
+  cancelEvent = (eventId) => {
+    const { openAlertGlobalAction } = this.props;
+
+    this.setState({
+      showEditFormModal: false,
+      showCancelEvent: false,
+    });
+
+    this.props
+    .cancelEvent(eventId)
+    .then(() => {
+      openAlertGlobalAction({
+        message: 'Bạn đã hủy sự kiện thành công và bạn không thể chỉnh sửa chi tiết của sự kiện này.',
+        open: true,
+        autoHideDuration: 0,
+      });
+    }).catch((error) => {
+      console.log('there was an error sending the query', error);
+    });
+  }
+
+  deleteEvent = async (eventId) => {
+    this.props.deleteEvent(eventId).then(() => {
+      history.push('/events');
+    });
+  }
+
   canUpdateEvent = () => {
     const { event } = this.props;
     return event.isAuthor && Validator.Date.isValid(event.start) && Validator.Date.withMoment(event.start) > Validator.Date.now();
@@ -132,8 +162,15 @@ class EventDetail extends Component {
     });
   }
 
+  showCancelEventModal= () => {
+    this.setState({
+      showCancelEvent: true,
+    });
+  }
+
   initState = () => ({
     showEditFormModal: false,
+    showCancelEvent: false,
     canUpdateEvent: false,
     canDeleteEvent: false,
   })
@@ -141,6 +178,12 @@ class EventDetail extends Component {
   hideEditEventModal = () => {
     this.setState({
       showEditFormModal: false,
+    });
+  }
+
+  hideCancelEventModal = () => {
+    this.setState({
+      showCancelEvent: false,
     });
   }
 
@@ -153,15 +196,15 @@ class EventDetail extends Component {
     if (isAuthor) {
       return (<div className={s.actionsButton}>
         <span>
-          <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft}>
+          <Button onClick={this.props.onOpenInviteModal} className={s.btnLeft} disabled={event.isCancelled}>
             <i className="fa fa-envelope-o" aria-hidden="true"></i>
             <span>Mời</span>
           </Button>
-          <Button className={s.btnMiddle}>
+          <Button className={s.btnMiddle} disabled={event.isCancelled}>
             <i className="fa fa-picture-o" aria-hidden="true"></i>
             <span>Thêm ảnh bìa</span>
           </Button>
-          <Button className={s.btnMiddle} onClick={this.showEditEventModal} disabled={!this.state.canUpdateEvent}>
+          <Button className={s.btnMiddle} onClick={this.showEditEventModal} disabled={!this.state.canUpdateEvent || event.isCancelled}>
             <i className="fa fa-pencil" aria-hidden="true"></i>
             <span>Chỉnh sửa</span>
           </Button>
@@ -174,7 +217,7 @@ class EventDetail extends Component {
               <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
             </CustomToggle>
             <Dropdown.Menu onSelect={this.onDropDown}>
-              <MenuItem eventKey="DELETE_EVENT" disabled={!this.state.canDeleteEvent}>Xóa sự kiện</MenuItem>
+              <MenuItem eventKey="DELETE_EVENT" disabled={!this.state.canDeleteEvent || event.isCancelled}>Xóa sự kiện</MenuItem>
             </Dropdown.Menu>
           </Dropdown>
         </span>
@@ -189,6 +232,7 @@ class EventDetail extends Component {
             !isInterested ?
               <Button
                 onClick={this.onInterestClicked}
+                disabled={event.isCancelled}
               >
                 <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
                 Quan tâm
@@ -205,13 +249,13 @@ class EventDetail extends Component {
     }
 
     return (<div className={s.actionsButton}>
-      <Button onClick={this.onJoinClick} className={s.btnLeft} disabled={isJoined}>
+      <Button onClick={this.onJoinClick} className={s.btnLeft} disabled={isJoined || event.isCancelled}>
         <Glyphicon glyph="ok" /> <span>Tham gia</span>
       </Button>
-      <Button onClick={this.onCanJoinClick} className={s.btnMiddle} disabled={isCanJoined}>
+      <Button onClick={this.onCanJoinClick} className={s.btnMiddle} disabled={isCanJoined || event.isCancelled}>
         <Glyphicon glyph="bookmark" /> <span>Có thể</span>
       </Button>
-      <Button onClick={this.onCantJoinClick} className={s.btnRight} disabled={isCantJoined}>
+      <Button onClick={this.onCantJoinClick} className={s.btnRight} disabled={isCantJoined || event.isCancelled}>
         <Glyphicon glyph="remove" /> <span>Không tham gia</span>
       </Button>
     </div>);
@@ -227,10 +271,18 @@ class EventDetail extends Component {
           show={this.state.showEditFormModal}
           onHide={this.hideEditEventModal}
           onUpdate={this.props.editEvent}
-          onDelete={this.props.deleteEvent}
+          showCancelEventModal={this.showCancelEventModal}
           canUpdate={this.state.canUpdateEvent}
           canDelete={this.state.canDeleteEvent}
           initialValues={eventData}
+          isHideModalBehindBackdrop={this.state.showCancelEvent}
+        />
+        <CancelEventModal
+          eventId={eventData._id}
+          show={this.state.showCancelEvent}
+          closeModal={this.hideCancelEventModal}
+          onDelete={this.deleteEvent}
+          onCancel={this.cancelEvent}
         />
         {
           eventData &&
@@ -251,11 +303,11 @@ class EventDetail extends Component {
             <Col md={12}>
               <Divider className={s.divider} />
               <div className={s.timeLocationLayout}>
-                <p>
+                <p className={(eventData.isCancelled ? s.cancelledEvent : '')}>
                   <i className="fa fa-clock-o" aria-hidden="true"></i>
                   {`${eventData.start.calendar()} - ${eventData.end.calendar()}`}
                 </p>
-                <p>
+                <p className={(eventData.isCancelled ? s.cancelledEvent : '')}>
                   <i className="fa fa-map-marker" aria-hidden="true"></i>
                   {` ${eventData.location}`}
                 </p>
@@ -285,6 +337,7 @@ class EventDetail extends Component {
                     <Button
                       onClick={this.props.onOpenInviteModal}
                       className={s.btnInvite}
+                      disabled={eventData.isCancelled}
                     >
                       <i className="fa fa-envelope-o" aria-hidden="true"></i>
                       <span>Mời</span>
@@ -313,13 +366,19 @@ EventDetail.propTypes = {
   user: PropTypes.object.isRequired,
   editEvent: PropTypes.func.isRequired,
   deleteEvent: PropTypes.func.isRequired,
+  cancelEvent: PropTypes.func.isRequired,
   // joinEvent: PropTypes.func.isRequired,
   // canJoinEvent: PropTypes.func.isRequired,
   // cantJoinEvent: PropTypes.func.isRequired,
   interestEvent: PropTypes.func.isRequired,
   disInterestEvent: PropTypes.func.isRequired,
+  openAlertGlobalAction: PropTypes.func.isRequired,
 };
 
 export default compose(
   withStyles(s),
+  connect(
+    null,
+    { openAlertGlobalAction: openAlertGlobal },
+  ),
 )(EventDetail);

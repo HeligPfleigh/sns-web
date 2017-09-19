@@ -21,6 +21,7 @@ mutation deleteEvent($eventId: String!){
     start
     end
     message
+    isCancelled
     invites {
       _id
       username

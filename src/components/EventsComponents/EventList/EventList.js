@@ -107,6 +107,7 @@ const listEventQuerys = gql`query ($limit: Int, $cursor: String){
       start
       end
       message
+      isCancelled
       isInterest
       interests {
         _id

@@ -14,14 +14,15 @@ import cantJoinEvent from './cantJoinEvent.graphql';
 import deleteEvent from './deleteEvent.graphql';
 import editEventMutation from './editEventMutation.graphql';
 import fetchEventDetails from './fetchEventDetails.graphql';
+import cancelEventMutation from './cancelEventMutation.graphql';
+import interestEvent from '../../../components/EventsComponents/EventList/interestEvent.graphql';
+import disInterestEventMutation from '../../../components/EventsComponents/EventList/disInterestEventMutation.graphql';
 import {
   EventMenu,
   EventDetail,
   InviteFriendToEventModal,
   InviteResidentToEventModal,
 } from '../../../components/EventsComponents';
-import interestEvent from '../../../components/EventsComponents/EventList/interestEvent.graphql';
-import disInterestEventMutation from '../../../components/EventsComponents/EventList/disInterestEventMutation.graphql';
 import s from './EventDetailPage.scss';
 
 class EventDetailPage extends Component {
@@ -121,6 +122,7 @@ class EventDetailPage extends Component {
               editEvent={this.props.editEvent}
               interestEvent={this.props.interestEvent}
               disInterestEvent={this.props.disInterestEvent}
+              cancelEvent={this.props.cancelEvent}
             />
           </Col>
         </Row>
@@ -150,6 +152,7 @@ EventDetailPage.propTypes = {
   interestEvent: PropTypes.func.isRequired,
   disInterestEvent: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
+  cancelEvent: PropTypes.func.isRequired,
 };
 
 export default compose(
@@ -273,6 +276,15 @@ export default compose(
   graphql(disInterestEventMutation, {
     props: ({ mutate }) => ({
       disInterestEvent: eventId => mutate({
+        variables: {
+          eventId,
+        },
+      }),
+    }),
+  }),
+  graphql(cancelEventMutation, {
+    props: ({ mutate }) => ({
+      cancelEvent: eventId => mutate({
         variables: {
           eventId,
         },
