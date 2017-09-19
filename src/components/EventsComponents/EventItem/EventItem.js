@@ -43,9 +43,6 @@ class EventItem extends Component {
           <div className={s.photo}>
             <Image
               src={event.photos[0]}
-              style={{
-                cursor: 'pointer',
-              }}
               responsive
               onClick={async () => {
                 history.push(`/events/${event._id}`);
@@ -55,9 +52,6 @@ class EventItem extends Component {
           <div className={s.bottom}>
             <div
               className={s.calendar}
-              style={{
-                cursor: 'pointer',
-              }}
               onClick={async () => {
                 history.push(`/events/${event._id}`);
               }}
@@ -65,56 +59,58 @@ class EventItem extends Component {
               <p className={s.month}>{`THÁNG ${start.getMonth() + 1}`}</p>
               <h5 className={s.day}>{start.getDate()}</h5>
             </div>
-            <div className={s.contentSmall}>
-              <p
-                style={{
-                  cursor: 'pointer',
-                }}
-                onClick={async () => {
-                  history.push(`/events/${event._id}`);
-                }}
-                className={s.title}
-              >{event.name}</p>
-              <p
-                style={{
-                  cursor: 'pointer',
-                }}
-                onClick={async () => {
-                  history.push(`/events/${event._id}`);
-                }}
-                className={s.location}
-              >{event.location}</p>
-              <p
-                style={{
-                  cursor: 'pointer',
-                }}
-                onClick={async () => {
-                  history.push(`/events/${event._id}`);
-                }}
-                className={s.care}
-              >{`${event.interests.length} Người quan tâm`}</p>
-              { user.id !== event.author._id &&
-                <div className={s.wrapperButtonRight}>
-                  {
-                    !event.isInterest ?
-                      <Button
-                        className={s.BtnCare}
-                        onClick={this.onInterestClicked}
-                      >
-                        <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
-                        Quan tâm
-                      </Button> :
-                      <Button
-                        className={s.BtnCare}
-                        onClick={this.onDisInterestClicked}
-                      >
-                        <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
-                        Hủy quan tâm
-                      </Button>
-                  }
-                </div>
-              }
-            </div>
+            { !event.isCancelled ?
+              <div className={s.contentSmall}>
+                <p
+                  onClick={async () => {
+                    history.push(`/events/${event._id}`);
+                  }}
+                  className={s.title}
+                >{event.name}</p>
+                <p
+                  onClick={async () => {
+                    history.push(`/events/${event._id}`);
+                  }}
+                  className={s.location}
+                >{event.location}</p>
+                <p
+                  onClick={async () => {
+                    history.push(`/events/${event._id}`);
+                  }}
+                  className={s.care}
+                >{`${event.interests.length} Người quan tâm`}</p>
+                { user.id !== event.author._id &&
+                  <div className={s.wrapperButtonRight}>
+                    {
+                      !event.isInterest ?
+                        <Button
+                          className={s.BtnCare}
+                          onClick={this.onInterestClicked}
+                        >
+                          <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                          Quan tâm
+                        </Button> :
+                        <Button
+                          className={s.BtnCare}
+                          onClick={this.onDisInterestClicked}
+                        >
+                          <i className="fa fa-star" aria-hidden="true" style={{ marginRight: 5 }}></i>
+                          Hủy quan tâm
+                        </Button>
+                    }
+                  </div>
+                }
+              </div> :
+              <div className={s.contentSmall}>
+                <p
+                  onClick={async () => {
+                    history.push(`/events/${event._id}`);
+                  }}
+                  className={s.title}
+                >{event.name}</p>
+                <p>Đã hủy sự kiện</p>
+              </div>
+            }
           </div>
         </div>
       </Col>

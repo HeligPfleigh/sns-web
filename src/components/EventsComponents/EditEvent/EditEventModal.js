@@ -45,14 +45,14 @@ class EditEventModal extends Component {
       this.building = buildings[0]._id || undefined;
     }
 
-    this.onUploadSuccess = this.onUploadSuccess.bind(this);
-    this.onUploadClick = this.onUploadClick.bind(this);
-    this.showEndTime = this.showEndTime.bind(this);
-    this.hideEndTime = this.hideEndTime.bind(this);
-    this.onPrivacySelected = this.onPrivacySelected.bind(this);
-    this.onUpdate = this.onUpdate.bind(this);
-    this.onDelete = this.onDelete.bind(this);
-    this.validationState = this.validationState.bind(this);
+    // this.onUploadSuccess = this.onUploadSuccess.bind(this);
+    // this.onUploadClick = this.onUploadClick.bind(this);
+    // this.showEndTime = this.showEndTime.bind(this);
+    // this.hideEndTime = this.hideEndTime.bind(this);
+    // this.onPrivacySelected = this.onPrivacySelected.bind(this);
+    // this.onUpdate = this.onUpdate.bind(this);
+    // this.onDelete = this.onDelete.bind(this);
+    // this.validationState = this.validationState.bind(this);
   }
 
 
@@ -64,11 +64,11 @@ class EditEventModal extends Component {
     this.props.change('photos', [uploadSingleFile.file.url]);
   }
 
-  onUploadClick() {
+  onUploadClick = () => {
     this.uploadRef.click();
   }
 
-  onPrivacySelected(privacy) {
+  onPrivacySelected = (privacy) => {
     this.props.change('privacy', privacy);
   }
 
@@ -97,10 +97,11 @@ class EditEventModal extends Component {
     .then(() => this.props.onHide())
     .catch(() => this.props.onHide())
 
-  onDelete = () => {
-    this.props.onDelete(this.props.initialValues._id).then(() => {
-      history.push('/events');
-    });
+  onCancelEvent = () => {
+    // this.props.onDelete(this.props.initialValues._id).then(() => {
+    //   history.push('/events');
+    // });
+    this.props.showCancelEventModal();
   }
 
   onBuldingEventChange = (event) => {
@@ -108,7 +109,7 @@ class EditEventModal extends Component {
     this.onPrivacySelected(event.target.checked ? PUBLIC : currentValues.privacy);
   }
 
-  showEndTime(event) {
+  showEndTime = (event) => {
     event.preventDefault();
 
     this.setState({
@@ -125,7 +126,7 @@ class EditEventModal extends Component {
   }
 
   // eslint-disable-next-line
-  validationState(fieldName) {
+  validationState = (fieldName) => {
     return () => null;
     // return () => {
     //   try {
@@ -161,9 +162,10 @@ class EditEventModal extends Component {
       currentValues,
       canUpdate,
       canDelete,
+      isHideModalBehindBackdrop,
     } = this.props;
     return (
-      <Modal show={this.props.show} onHide={this.props.onHide} backdrop="static">
+      <Modal show={this.props.show} onHide={this.props.onHide} backdrop="static" style={{ zIndex: isHideModalBehindBackdrop ? 1039 : 1040 }}>
         <form name={form} noValidate onSubmit={handleSubmit(this.onUpdate)}>
           <Modal.Header closeButton={!submitting}>
             <Modal.Title>Sửa sự kiện</Modal.Title>
@@ -332,7 +334,7 @@ class EditEventModal extends Component {
           </Modal.Body>
           <Modal.Footer>
             <ButtonToolbar>
-              <Button onClick={this.onDelete} className="btn-danger" disabled={!canDelete || submitting}>Hủy sự kiện</Button>
+              <Button onClick={this.onCancelEvent} className="btn-danger" disabled={!canDelete || submitting}>Hủy sự kiện</Button>
               <ButtonToolbar className="pull-right">
                 <Privacy
                   className={s.btnPrivacies}
@@ -366,7 +368,8 @@ EditEventModal.propTypes = {
   canUpdate: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   onUpdate: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  // onDelete: PropTypes.func.isRequired,
+  showCancelEventModal: PropTypes.func.isRequired,
   currentValues: PropTypes.object,
   change: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
@@ -379,6 +382,7 @@ EditEventModal.propTypes = {
   submitting: PropTypes.bool.isRequired,
   invalid: PropTypes.any.isRequired,
   form: PropTypes.string,
+  isHideModalBehindBackdrop: PropTypes.bool,
 };
 
 EditEventModal.defaultProps = {
