@@ -135,6 +135,12 @@ class EventDetail extends Component {
     });
   }
 
+  deleteEvent = async (eventId) => {
+    this.props.deleteEvent(eventId).then(() => {
+      history.push('/events');
+    });
+  }
+
   canUpdateEvent = () => {
     const { event } = this.props;
     return event.isAuthor && Validator.Date.isValid(event.start) && Validator.Date.withMoment(event.start) > Validator.Date.now();
@@ -275,7 +281,7 @@ class EventDetail extends Component {
           eventId={eventData._id}
           show={this.state.showCancelEvent}
           closeModal={this.hideCancelEventModal}
-          onDelete={this.props.deleteEvent}
+          onDelete={this.deleteEvent}
           onCancel={this.cancelEvent}
         />
         {

@@ -1,43 +1,31 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button, FormGroup, Radio } from 'react-bootstrap';
-import history from '../../../core/history';
 
 class CancelEventModal extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      isCancelEvent: false,
-      isDeleteEvent: false,
+      selectedOption: 'cancelEvent',
     };
   }
 
-  onCancelEvent = () => {
+  handleOptionChange = (changeEvent) => {
     this.setState({
-      isCancelEvent: true,
-      isDeleteEvent: false,
-    });
-  }
-
-  onDeleteEvent = () => {
-    this.setState({
-      isCancelEvent: false,
-      isDeleteEvent: true,
+      selectedOption: changeEvent.target.value,
     });
   }
 
   clickModal = (evt) => {
     evt.preventDefault();
-    const { isCancelEvent, isDeleteEvent } = this.state;
+    const { selectedOption } = this.state;
     const { eventId } = this.props;
-    if (isCancelEvent) {
+    if (selectedOption === 'cancelEvent') {
       this.props.onCancel(eventId);
     }
-    if (isDeleteEvent) {
-      this.props.onDelete(eventId).then(() => {
-        history.push('/events');
-      });
+    if (selectedOption === 'deleteEvent') {
+      this.props.onDelete(eventId);
     }
   }
 
@@ -46,6 +34,7 @@ class CancelEventModal extends Component {
       show,
       closeModal,
     } = this.props;
+    const { selectedOption } = this.state;
     return (
       <Modal show={show} onHide={closeModal}>
         <form>
@@ -54,11 +43,21 @@ class CancelEventModal extends Component {
           </Modal.Header>
           <Modal.Body>
             <FormGroup>
-              <Radio name="radioGroup" onClick={this.onCancelEvent}>
+              <Radio
+                name="radioGroup"
+                value="cancelEvent"
+                checked={selectedOption === 'cancelEvent'}
+                onChange={this.handleOptionChange}
+              >
                 <span style={{ fontWeight: 'bold' }}>Hủy sự kiện</span>
                 <p>Khách sẽ được thông báo rằng sự kiện này đã bị hủy. Bạn sẽ không thể sửa đổi sự kiện này</p>
               </Radio>
-              <Radio name="radioGroup" onClick={this.onDeleteEvent}>
+              <Radio
+                name="radioGroup"
+                value="deleteEvent"
+                checked={selectedOption === 'deleteEvent'}
+                onChange={this.handleOptionChange}
+              >
                 <span style={{ fontWeight: 'bold' }}>Xóa sự kiện</span>
                 <p>Khách sẽ được thông báo rằng sự kiện này đã bị hủy và mọi nội dung đăng lên sẽ bị xóa.</p>
               </Radio>
