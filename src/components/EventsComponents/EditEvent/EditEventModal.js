@@ -254,8 +254,13 @@ class EditEventModal extends Component {
                     }}
                     validate={[
                       Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                      (value) => {
+                        const now = Validator.Date.withMoment().add(1, 'minutes');
+                        return Validator.Date.isAfter(null, `Thời gian bắt đầu phải sau ${now.format('DD/MM/YYYY HH:mm')}`, now)(value);
+                      },
                       (value, values) => Validator.Date.isBefore(null, `Thời gian bắt đầu phải trước ${Validator.Date.withMoment(values.end).format('DD/MM/YYYY HH:mm')}`, values.end)(value),
                     ]}
+                    isValidDate={startOfDay => startOfDay.isAfter(Validator.Date.withMoment().subtract(1, 'day'))}
                     ref={(input) => { this.formFields.start = input; }}
                     withRef
                     onChange={this.validationState('start')}
@@ -285,8 +290,13 @@ class EditEventModal extends Component {
                     }}
                     validate={[
                       Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                      (value) => {
+                        const now = Validator.Date.withMoment().add(1, 'minutes');
+                        return Validator.Date.isAfter(null, `Thời gian kết thúc phải sau ${now.format('DD/MM/YYYY HH:mm')}`, now)(value);
+                      },
                       (value, values) => Validator.Date.isAfter(null, `Thời gian kết thúc phải sau ${Validator.Date.withMoment(values.start).format('DD/MM/YYYY HH:mm')}`, values.start)(value),
                     ]}
+                    isValidDate={startOfDay => startOfDay.isAfter(Validator.Date.withMoment().subtract(1, 'day'))}
                     ref={(input) => { this.formFields.end = input; }}
                     withRef
                     onChange={this.validationState('end')}
