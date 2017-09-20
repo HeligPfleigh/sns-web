@@ -71,6 +71,23 @@ body {
     padding: 0;
     margin: 0;
   }
+
+  :global .btn-primary {
+    color: #fff;
+    background: #283e4a;
+    border-color: #283e4a;
+    &:hover {
+        background: #3E5B6B;
+        border-color: #3E5B6B;
+    }
+  }
+  :global .btn-default {
+    color: #fff;
+    background: #bbb;
+    &:hover {
+        background: #ccc;
+    }
+  }
 }
 
 .btn-links {

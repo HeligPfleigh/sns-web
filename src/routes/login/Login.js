@@ -15,8 +15,10 @@ import { Field, reduxForm, SubmissionError } from 'redux-form';
 import isEmpty from 'lodash/isEmpty';
 
 import history from '../../core/history';
+import { openAlertGlobal } from '../../reducers/alert';
 import { required, normalLength } from '../../utils/validator';
 import loginSuccess, { remove } from '../../actions/user';
+import Alert from '../../components/Alert';
 import s from './Login.scss';
 
 const renderField = ({ className, input, placeholder, type, addOn, meta: { touched, error } }) => (
@@ -56,6 +58,7 @@ const fetchAPI = async (url, data) => {
 
 @connect(null, {
   loginSuccess,
+  openAlertGlobal,
   removeStateUser: remove,
 })
 class Login extends Component {
@@ -115,8 +118,15 @@ class Login extends Component {
     }
   }
 
+  alertModal = message => this.props.openAlertGlobal({
+    message,
+    open: true,
+    autoHideDuration: 0,
+  })
+
   fbLoginAction = (evt) => {
-    evt.preventDefault();
+    if (evt) evt.preventDefault();
+
     const { FB } = window;
     if (FB) {
       FB.login(async (res) => {
@@ -127,15 +137,20 @@ class Login extends Component {
             this.props.loginSuccess(user);
             return this.navigation(user);
           } catch (error) {
-            alert('Đăng nhập thất bại.');
+            this.alertModal('Đăng nhập thất bại.');
           }
         } else {
-          alert('User cancelled login or did not fully authorize.');
+          this.alertModal('User cancelled login or did not fully authorize.');
         }
       });
     } else {
-      alert('Please import FB sdk after call api');
+      this.alertModal('Please import FB sdk after call api');
     }
+  }
+
+  goForgotPasswordPage = (evt) => {
+    if (evt) evt.preventDefault();
+    history.push('/forgot-password');
   }
 
   render() {
@@ -179,7 +194,9 @@ class Login extends Component {
           <a className="pull-left" href="#" onClick={() => history.push('/register')}>
             <strong>Đăng kí</strong>
           </a>
-          <a className="pull-right" href="#">Quên mật khẩu?</a>
+          <a className="pull-right" href="#" onClick={this.goForgotPasswordPage}>
+            Quên mật khẩu?
+          </a>
         </div>
         <div className="clearfix" />
         <div className={s['btn-links']}>
@@ -199,6 +216,7 @@ class Login extends Component {
               </a>
              */ }
         </div>
+        <Alert />
       </section>
     );
   }
@@ -210,6 +228,7 @@ Login.propTypes = {
   handleSubmit: PropTypes.func,
   removeStateUser: PropTypes.func,
   loginSuccess: PropTypes.func,
+  openAlertGlobal: PropTypes.func,
 };
 
 export default reduxForm({
