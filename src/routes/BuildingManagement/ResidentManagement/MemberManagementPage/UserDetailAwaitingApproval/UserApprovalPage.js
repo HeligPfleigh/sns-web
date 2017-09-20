@@ -174,7 +174,7 @@ class UserApprovalPage extends Component {
                       <label htmlFor="email">Email</label>
                     </div>
                     <div className={s.pullRight}>
-                      <span>{ user.emails && user.emails.address }</span>
+                      <span>{ user.email && user.email.address }</span>
                     </div>
                   </li>
                   <li>

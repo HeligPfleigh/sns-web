@@ -171,7 +171,7 @@ class Register extends Component {
 
     const data = {
       ...account,
-      emails: {
+      email: {
         address: emailVal,
       },
       phone: {

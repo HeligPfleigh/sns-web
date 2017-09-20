@@ -5,7 +5,7 @@ query userApprovalPageQuery($requestId: String!) {
     status
     user {
       _id
-      emails {
+      email {
         address
         verified
       }
