@@ -498,7 +498,7 @@ Feed.fragments = {
       status
       user {
         _id
-        emails {
+        email {
           address
           verified
         }
