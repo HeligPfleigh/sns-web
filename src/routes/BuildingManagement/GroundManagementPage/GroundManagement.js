@@ -214,7 +214,6 @@ class GroundManagement extends Component {
       submitting,
       invalid,
       form,
-      currentValues,
      } = this.props;
 
      // Show loading
@@ -256,7 +255,9 @@ class GroundManagement extends Component {
                             name="filterByApartment"
                             component={InputField}
                             placeholder="Tên hoặc số căn hộ"
-                            validate={[Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', () => !isString(currentValues.filterByResident) || String(currentValues.filterByResident).trim().length === 0)]}
+                            validate={[
+                              Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', 'filterByResident'),
+                            ]}
                           />
                         </FormGroup>
                       </Col>
@@ -267,7 +268,9 @@ class GroundManagement extends Component {
                             name="filterByResident"
                             component={InputField}
                             placeholder="Tên của cư dân"
-                            validate={[Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', () => !isString(currentValues.filterByApartment) || String(currentValues.filterByApartment).trim().length === 0)]}
+                            validate={[
+                              Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', 'filterByApartment'),
+                            ]}
                           />
                         </FormGroup>
                       </Col>

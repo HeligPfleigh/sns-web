@@ -67,8 +67,9 @@ class AddNewResidentModal extends Component {
   }
 
   render() {
-    const { form, handleSubmit, currentValues, submitting, pristine, invalid } = this.props;
+    const { form, handleSubmit, submitting, pristine, invalid } = this.props;
     const { message, error } = this.state;
+
     return (
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static">
         <Modal.Header closeButton={!this.state.submitting}>
@@ -87,8 +88,6 @@ class AddNewResidentModal extends Component {
                   Validator.Required(null, 'Bạn phải nhập dữ liệu'),
                   Validator.AlphaDash(null, 'Giá trị chỉ có thể chứa chữ cái, số và dấu gạch ngang'),
                 ]}
-                ref={input => this.formFields.username = input}
-                withRef
               />
             </FormGroup>
 
@@ -103,8 +102,6 @@ class AddNewResidentModal extends Component {
                     validate={[
                       Validator.Alpha(null, 'Giá trị chỉ có thể chứa chữ cái'),
                     ]}
-                    ref={input => this.formFields.firstName = input}
-                    withRef
                   />
                 </FormGroup>
               </Col>
@@ -118,14 +115,38 @@ class AddNewResidentModal extends Component {
                     validate={[
                       Validator.Alpha(null, 'Giá trị chỉ có thể chứa chữ cái'),
                     ]}
-                    ref={input => this.formFields.lastName = input}
-                    withRef
                   />
                 </FormGroup>
               </Col>
             </Row>
 
             <Row>
+              <Col xs={6}>
+                <FormGroup controlId="phone">
+                  <ControlLabel>Số điện thoại</ControlLabel>
+                  <Field
+                    type="text"
+                    name="phone"
+                    component={ReduxFormFields.InputField}
+                    validate={[
+                      Validator((...args) => {
+                        let isUndefined = Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', 'email')(...args);
+                        if (isUndefined) {
+                          isUndefined = Validator.Required(null, 'Bạn phải nhập dữ liệu')(...args);
+                          if (!isUndefined) {
+                            isUndefined = Validator.Int(null, 'Bạn phải nhập số')(...args);
+                            if (!isUndefined) {
+                              return Validator.Min.Str(null, 'Số điện thoại ít nhất phải có 10 số', 10)(...args);
+                            }
+                          }
+                        }
+                        return isUndefined;
+                      }),
+                    ]}
+                  />
+                </FormGroup>
+              </Col>
+
               <Col xs={6}>
                 <FormGroup controlId="email">
                   <ControlLabel>Địa chỉ email</ControlLabel>
@@ -134,31 +155,84 @@ class AddNewResidentModal extends Component {
                     name="email"
                     component={ReduxFormFields.InputField}
                     validate={[
-                      Validator.Required(null, 'Bạn phải nhập dữ liệu'),
-                      Validator.Email(null, 'Địa chỉ email không đúng định dạng'),
+                      Validator((...args) => {
+                        let isUndefined = Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', 'phone')(...args);
+                        if (isUndefined) {
+                          isUndefined = Validator.Required(null, 'Bạn phải nhập dữ liệu')(...args);
+                          if (!isUndefined) {
+                            return Validator.Email(null, 'Email chưa đúng định dạng')(...args);
+                          }
+                        }
+                        return isUndefined;
+                      }),
                     ]}
-                    ref={input => this.formFields.email = input}
-                    withRef
-                  />
-                </FormGroup>
-              </Col>
-              <Col xs={6}>
-                <FormGroup controlId="phone">
-                  <ControlLabel>Số điện thoại</ControlLabel>
-                  <Field
-                    type="tel"
-                    name="phone"
-                    component={ReduxFormFields.InputField}
-                    validate={[
-                      Validator.Required(null, 'Bạn phải nhập dữ liệu'),
-                      Validator.Alpha(null, 'Giá trị chỉ có thể chứa chữ cái, số và dấu gạch ngang'),
-                    ]}
-                    ref={input => this.formFields.phone = input}
-                    withRef
                   />
                 </FormGroup>
               </Col>
             </Row>
+
+            <Row>
+              <Col xs={6}>
+                <FormGroup controlId="gender">
+                  <ControlLabel>Giới tính</ControlLabel>
+                  <Field
+                    type="select"
+                    name="gender"
+                    component={ReduxFormFields.SelectField}
+                    validate={[
+                      Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                    ]}
+                    options={[
+                      {
+                        label: 'Vui lòng chọn ...',
+                      },
+                      {
+                        value: 'male',
+                        label: 'Nam',
+                      },
+                      {
+                        value: 'female',
+                        label: 'Nữ',
+                      },
+                    ]}
+                  />
+                </FormGroup>
+              </Col>
+
+              <Col xs={6}>
+                <FormGroup controlId="dob">
+                  <ControlLabel>Ngày sinh</ControlLabel>
+                  <Field
+                    type="text"
+                    name="dob"
+                    component={ReduxFormFields.DateTimeField}
+                    validate={[
+                      Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                    ]}
+                    disableOnClickOutside
+                    closeOnTab
+                    closeOnSelect
+                    inputProps={{
+                      readOnly: true,
+                    }}
+                    timeFormat={false}
+                    isValidDate={current => current.isBefore(Validator.Date.withMoment().startOf('day'))}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+
+            <FormGroup controlId="address">
+              <ControlLabel>Địa chỉ</ControlLabel>
+              <Field
+                type="textarea"
+                name="address"
+                component={ReduxFormFields.TextareaField}
+                validate={[
+                  Validator.Required(null, 'Bạn phải nhập dữ liệu'),
+                ]}
+              />
+            </FormGroup>
 
           </form>
           <Clearfix />
@@ -189,7 +263,6 @@ AddNewResidentModal.propTypes = {
   pristine: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
   invalid: PropTypes.bool.isRequired,
-  currentValues: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
 };
@@ -208,6 +281,8 @@ const fields = [
   'gender',
   'dob',
   'address',
+  'email',
+  'phone',
 ];
 
 const AddNewResidentForm = reduxForm({

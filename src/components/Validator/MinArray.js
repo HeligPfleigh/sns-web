@@ -2,7 +2,7 @@ import isArray from 'lodash/isArray';
 import isNumber from 'lodash/isNumber';
 import Message from './Helper/Message';
 
-export const isMin = (value, min) => {
+const validate = (value, min) => {
   try {
     min = parseInt(min, 10);
   } catch (e) {
@@ -11,4 +11,8 @@ export const isMin = (value, min) => {
 
   return isArray(value) && isNumber(min) && (value.length >= min);
 };
-export default (attribute, message = 'The ${ attribute } may not have at least ${ min } items.', min) => value => isMin(value, min) ? undefined : Message(message, { attribute, min });
+
+const MinArray = (attribute, message = 'The ${ attribute } may not have at least ${ min } items.', min) => value => (validate(value, min) ? undefined : Message(message, { attribute, min }));
+MinArray.validate = validate;
+
+export default MinArray;
