@@ -164,7 +164,10 @@ class Register extends Component {
 
     const account = {
       username,
-      password: passwordVal,
+      password: {
+        code: '',
+        value: passwordVal,
+      },
     };
 
     const { initialValues } = this.props;
@@ -235,7 +238,7 @@ class Register extends Component {
   }
 
   render() {
-    const { saved, buildings } = this.state;
+    const { saved, buildings, showModal } = this.state;
     const { apartments, handleSubmit, pristine, reset, submitting, valid, error } = this.props;
 
     const titleStyles = {
@@ -255,16 +258,18 @@ class Register extends Component {
     };
     return (
       <div>
-        <Modal
-          title={<strong>Tiến trình đăng kí</strong>}
-          show={this.state.showModal}
+        { showModal && <Modal
+          show={showModal}
           onHide={this.closeModal}
           style={{ top: '25%' }}
           backdrop="static"
+          title={
+            <strong>Tiến trình đăng kí</strong>
+          }
           buttons={
             <span>
-              { !saved && error && <Button className="btn btn-danger" onClick={this.closeModal}>Đóng cửa sổ</Button> }
-              { saved && <Button className="btn btn-success" onClick={this.toLogin}>Đến trang Đăng nhập</Button> }
+              { !saved && error && <Button bsStyle="danger" onClick={this.closeModal}>Đóng cửa sổ</Button> }
+              { saved && <Button bsStyle="success" onClick={this.toLogin}>Đến trang Đăng nhập</Button> }
             </span>
           }
         >
@@ -290,7 +295,7 @@ class Register extends Component {
             <strong>Bạn vui lòng kiểm tra mail</strong><br />
             <strong>Và thực hiện kích hoạt tài khoản theo hướng dẫn</strong><br />
           </div> }
-        </Modal>
+        </Modal> }
         <section className={`container ${s.login_form}`}>
           <div className="text-center" style={titleStyles}>
             <h3>Đăng kí tài khoản</h3>
@@ -402,7 +407,7 @@ class Register extends Component {
               component={InputField}
               type="text"
               placeholder="(*) Địa chỉ email của bạn"
-              validate={[required, normalLength, email]}
+              validate={[required, email]}
             />
 
             <Field
@@ -419,14 +424,14 @@ class Register extends Component {
                   <strong>(*) Trường bắt buộc</strong>
                 </div>
                 <div className="pull-right">
-                  { pristine && <a className="btn-lg btn btn-danger" href="#" onClick={this.toLogin}>Hủy đăng kí</a> }
-                  { !pristine && <button type="button" className="btn-lg btn btn-danger" disabled={pristine || submitting} onClick={reset}>
+                  { pristine && <Button bsStyle="danger" bsSize="large" onClick={this.toLogin}>Hủy đăng kí</Button> }
+                  { !pristine && <Button bsStyle="danger" bsSize="large" disabled={pristine || submitting} onClick={reset}>
                     <i className="fa fa-refresh"></i> Nhập lại
-                  </button> }
+                  </Button> }
                   &nbsp;&nbsp;
-                  <button type="submit" className="btn-lg btn btn-primary" disabled={!valid || pristine || submitting}>
+                  <Button type="submit" bsStyle="primary" bsSize="large" disabled={!valid || pristine || submitting}>
                     <i className="fa fa-paper-plane"></i> Đăng ký
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
