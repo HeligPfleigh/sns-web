@@ -126,7 +126,7 @@ class FeeList extends Component {
     if (data && data.status === PAID) {
       return null;
     }
-    const isDisabled = this.state.reminders.includes(data._id);
+    const isDisabled = data.disableReminderToPayFee || this.state.reminders.includes(data._id);
     return (<a
       onClick={this.onReminderToPayFee(data, isDisabled)}
     ><i title="Nhắc nhở việc đóng phí" aria-hidden="true" className={classNames('fa fa-bell', { disabledReminderToPayFee: isDisabled })}></i>

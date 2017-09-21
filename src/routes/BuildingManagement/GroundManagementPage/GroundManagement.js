@@ -6,7 +6,6 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup, ButtonGroup, Alert } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import isString from 'lodash/isString';
-import forEach from 'lodash/forEach';
 import isObject from 'lodash/isObject';
 import isUndefined from 'lodash/isUndefined';
 import isNull from 'lodash/isNull';
@@ -21,8 +20,10 @@ import history from '../../../core/history';
 import InputField from './InputField';
 import ResidentsInBuildingGroupByApartmentQuery from './ResidentsInBuildingGroupByApartmentQuery.graphql';
 import DeleteResidentInBuildingMutation from './DeleteResidentInBuildingMutation.graphql';
+import AddNewResidentInBuildingMutation from './AddNewResidentInBuildingMutation.graphql';
 import ExportResidentsInBuildingGroupByApartmentMutation from './ExportResidentsInBuildingGroupByApartmentMutation.graphql';
 import DeleteResidentModal from './DeleteResident';
+import AddNewResidentModal from './AddNewResident';
 import Menu from '../Menu/Menu';
 import s from './GroundManagement.scss';
 
@@ -32,6 +33,7 @@ class GroundManagement extends Component {
 
     this.state = {
       deleteResidentValues: {},
+      addNewResidentValues: {},
       errorMessage: null,
     };
 
@@ -59,9 +61,21 @@ class GroundManagement extends Component {
     building,
   })
 
+  onAddNewResident = ({ resident, apartment, building }) => this.props.onAddNewResident({
+    resident,
+    apartment,
+    building,
+  })
+
   onHideDeleteResidentModal = () => {
     this.setState({
       deleteResidentValues: {},
+    });
+  }
+
+  onHideAddNewResidentModal = () => {
+    this.setState({
+      addNewResidentValues: {},
     });
   }
 
@@ -104,7 +118,7 @@ class GroundManagement extends Component {
     };
   }
 
-  viewActions = rows => rows.expanded ? this.viewApartment(rows) : this.viewResident(rows)
+  viewActions = rows => (rows.expanded ? this.viewApartment(rows) : this.viewResident(rows))
 
   viewResident = data => (<Col className="text-center">
     <ButtonGroup>
@@ -115,7 +129,7 @@ class GroundManagement extends Component {
           history.push(`/user/${data._id}?tab=MY_INFO`);
         }}
         title="Xem thông tin của cư dân"
-        className="btn btn-sm btn-info"
+        className="btn btn-xs btn-info"
       ><i className="fa fa-info-circle" /></Button>
       <Button
         type="button"
@@ -130,18 +144,26 @@ class GroundManagement extends Component {
           });
         }}
         title="Loại bỏ cư dân này ra khỏi căn hộ này"
-        className="btn btn-sm btn-danger"
-      >Xóa</Button>
+        className="btn btn-xs btn-danger"
+      ><i className="fa fa-trash" /></Button>
     </ButtonGroup>
   </Col>);
 
-  viewApartment = () => (
-    <a
-      href="#"
+  viewApartment = data => (
+    <Button
+      type="button"
       onClick={(evt) => {
         evt.preventDefault();
+        this.setState({
+          addNewResidentValues: {
+            apartment: data._id,
+            building: this.props.buildingId,
+          },
+        });
       }}
-    >{'Thông tin căn hộ >>'}</a>
+      title="Thêm mới cư dân vào căn hộ"
+      className="btn btn-xs"
+    ><i className="fa fa-user-plus" /></Button>
     );
 
   tableColumns = () => [{
@@ -194,7 +216,6 @@ class GroundManagement extends Component {
       rowKey="rowKey"
       data={data}
       expandIconAsCell
-      expandRowByClick
       columns={this.tableColumns()}
       emptyText="Hiện tại không có dữ liệu."
       className={s.datatable}
@@ -220,6 +241,8 @@ class GroundManagement extends Component {
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
+
+    const { deleteResidentValues, addNewResidentValues, errorMessage } = this.state;
 
     return (
       <Grid>
@@ -288,7 +311,7 @@ class GroundManagement extends Component {
                         <i className="fa fa-bar-chart" aria-hidden="true"></i> Tòa nhà hiện có {residentsInBuildingGroupByApartment.stats.numberOfApartments} căn hộ và {residentsInBuildingGroupByApartment.stats.numberOfResidents} cư dân.
                       </Col>
                       <Col className="pull-right" xs={4}>
-                        <a onClick={this.onExportToExcel(buildingId)} title="Tải xuống với định dạng excel"><i className="fa fa-file-excel-o" aria-hidden="true"></i></a>
+                        <span onClick={this.onExportToExcel(buildingId)} title="Tải xuống với định dạng excel"><i className="fa fa-file-excel-o" aria-hidden="true"></i></span>
                       </Col>
                     </Row>
                   </Col>
@@ -297,11 +320,17 @@ class GroundManagement extends Component {
                     <DeleteResidentModal
                       onDelete={this.onDeleteResident}
                       onError={this.onErrorWhenDeleteResident}
-                      initialValues={this.state.deleteResidentValues}
+                      initialValues={deleteResidentValues}
                       onHide={this.onHideDeleteResidentModal}
                     />
-                    {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: null })}>
-                      { this.state.errorMessage }
+                    <AddNewResidentModal
+                      onAddNew={this.onDeleteResident}
+                      onError={this.onErrorWhenDeleteResident}
+                      initialValues={addNewResidentValues}
+                      onHide={this.onHideAddNewResidentModal}
+                    />
+                    {errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: null })}>
+                      { errorMessage }
                     </Alert>)}
                     {this.datatable()}
                   </Col>
@@ -337,11 +366,15 @@ GroundManagement.propTypes = {
     }),
   }).isRequired,
   currentValues: PropTypes.object,
-  fields: PropTypes.array.isRequired,
   onDeleteResident: PropTypes.func.isRequired,
   onExportToExcel: PropTypes.func.isRequired,
   form: PropTypes.string.isRequired,
   initialize: PropTypes.func.isRequired,
+  onAddNewResident: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  invalid: PropTypes.bool.isRequired,
 };
 
 GroundManagement.defaultProps = {
@@ -432,6 +465,44 @@ const GroundManagementForm = reduxForm({
                 },
               },
             });
+          },
+        },
+      }),
+    }),
+  }),
+  graphql(AddNewResidentInBuildingMutation, {
+    props: ({ mutate }) => ({
+      onAddNewResident: input => mutate({
+        variables: {
+          input,
+        },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          deleteResidentInBuilding: {
+            __typename: 'Author',
+            _id: input.resident,
+          },
+        },
+        updateQueries: {
+          ResidentsInBuildingGroupByApartmentQuery: (previousResult) => {
+            // const { residentsInBuildingGroupByApartment } = previousResult;
+            // const apartmentPos = residentsInBuildingGroupByApartment.edges.findIndex(item => item._id === input.apartment);
+            // const { residents } = residentsInBuildingGroupByApartment.edges[apartmentPos];
+            // let residentIndex;
+            // if (Array.isArray(residents) && residents.length > 0) {
+            //   residentIndex = residents.findIndex(item => item._id === input.resident);
+            // }
+            // return update(previousResult, {
+            //   residentsInBuildingGroupByApartment: {
+            //     edges: {
+            //       [apartmentPos]: {
+            //         residents: {
+            //           $splice: [[residentIndex, 1]],
+            //         },
+            //       },
+            //     },
+            //   },
+            // });
           },
         },
       }),
