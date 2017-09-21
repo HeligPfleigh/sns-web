@@ -33,6 +33,7 @@
     "embed-video": "^2.0.0",
     "express": "^4.14.1",
     "express-jwt": "^5.1.0",
+    "faker": "^4.1.0",
     "fastclick": "^1.0.6",
     "filereader": "^0.10.3",
     "firebase": "^3.7.5",

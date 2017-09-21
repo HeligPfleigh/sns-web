@@ -9,8 +9,8 @@ import isString from 'lodash/isString';
 import isObject from 'lodash/isObject';
 import isUndefined from 'lodash/isUndefined';
 import isNull from 'lodash/isNull';
-import update from 'immutability-helper';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
+import faker from 'faker';
 import Table from 'rc-table';
 import Loading from '../../../components/Loading';
 import DownloadFile from '../../../components/Common/DownloadFile';
@@ -22,6 +22,7 @@ import ResidentsInBuildingGroupByApartmentQuery from './ResidentsInBuildingGroup
 import DeleteResidentInBuildingMutation from './DeleteResidentInBuildingMutation.graphql';
 import AddNewResidentInBuildingMutation from './AddNewResidentInBuildingMutation.graphql';
 import ExportResidentsInBuildingGroupByApartmentMutation from './ExportResidentsInBuildingGroupByApartmentMutation.graphql';
+import ExistingUserQuery from './ExistingUserQuery.graphql';
 import DeleteResidentModal from './DeleteResident';
 import AddNewResidentModal from './AddNewResident';
 import Menu from '../Menu/Menu';
@@ -39,6 +40,7 @@ class GroundManagement extends Component {
 
     this.hasSubmitFiltering = false;
     this.prevValues = {};
+    this.apartmentSelected = {};
   }
 
   onChangePage = page => this.props.onChangePage({
@@ -54,18 +56,6 @@ class GroundManagement extends Component {
       initialize(currentValues);
     });
   }
-
-  onDeleteResident = ({ resident, apartment, building }) => this.props.onDeleteResident({
-    resident,
-    apartment,
-    building,
-  })
-
-  onAddNewResident = ({ resident, apartment, building }) => this.props.onAddNewResident({
-    resident,
-    apartment,
-    building,
-  })
 
   onHideDeleteResidentModal = () => {
     this.setState({
@@ -105,6 +95,10 @@ class GroundManagement extends Component {
       this.onErrorWhenDeleteResident('Có lỗi trong quá trình tải tập tin.');
     }
   }
+
+  onDeleteResident = data => this.props.onDeleteResident(data).then(() => this.props.data.refetch())
+
+  onAddNewResident = data => this.props.onAddNewResident(data).then(() => this.props.data.refetch())
 
   getAllFilterInputs() {
     if (!this.hasFilterSubmitted) {
@@ -154,10 +148,13 @@ class GroundManagement extends Component {
       type="button"
       onClick={(evt) => {
         evt.preventDefault();
+        this.apartmentSelected = data;
         this.setState({
           addNewResidentValues: {
             apartment: data._id,
             building: this.props.buildingId,
+            password: faker.internet.password(),
+            usageUsernameAsPhoneNumber: true,
           },
         });
       }}
@@ -235,13 +232,14 @@ class GroundManagement extends Component {
       submitting,
       invalid,
       form,
+      onExistingUser,
      } = this.props;
 
      // Show loading
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
-
+    console.log(this.props.data.variables);
     const { deleteResidentValues, addNewResidentValues, errorMessage } = this.state;
 
     return (
@@ -318,16 +316,17 @@ class GroundManagement extends Component {
 
                   <Col xs={12}>
                     <DeleteResidentModal
-                      onDelete={this.onDeleteResident}
+                      onSubmit={this.onDeleteResident}
                       onError={this.onErrorWhenDeleteResident}
-                      initialValues={deleteResidentValues}
                       onHide={this.onHideDeleteResidentModal}
+                      initialValues={deleteResidentValues}
                     />
                     <AddNewResidentModal
-                      onAddNew={this.onDeleteResident}
-                      onError={this.onErrorWhenDeleteResident}
-                      initialValues={addNewResidentValues}
+                      onSubmit={this.onAddNewResident}
                       onHide={this.onHideAddNewResidentModal}
+                      initialValues={addNewResidentValues}
+                      apartment={this.apartmentSelected}
+                      onExistingUser={onExistingUser}
                     />
                     {errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: null })}>
                       { errorMessage }
@@ -364,6 +363,7 @@ GroundManagement.propTypes = {
       stats: PropTypes.object,
       edges: PropTypes.array,
     }),
+    refetch: PropTypes.func.isRequired,
   }).isRequired,
   currentValues: PropTypes.object,
   onDeleteResident: PropTypes.func.isRequired,
@@ -375,6 +375,7 @@ GroundManagement.propTypes = {
   pristine: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
   invalid: PropTypes.bool.isRequired,
+  onExistingUser: PropTypes.func.isRequired,
 };
 
 GroundManagement.defaultProps = {
@@ -426,9 +427,25 @@ const GroundManagementForm = reduxForm({
         }),
       });
 
+      const onExistingUser = async (input) => {
+        try {
+          const r = await data.fetchMore({
+            query: ExistingUserQuery,
+            variables: {
+              query: input,
+            },
+            updateQuery: () => undefined,
+          });
+          return r;
+        } catch (e) {
+          return false;
+        }
+      };
+
       return {
         data,
         onChangePage,
+        onExistingUser,
       };
     },
   }),
@@ -438,72 +455,14 @@ const GroundManagementForm = reduxForm({
         variables: {
           input,
         },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          deleteResidentInBuilding: {
-            __typename: 'User',
-            _id: input.resident,
-          },
-        },
-        updateQueries: {
-          ResidentsInBuildingGroupByApartmentQuery: (previousResult) => {
-            const { residentsInBuildingGroupByApartment } = previousResult;
-            const apartmentPos = residentsInBuildingGroupByApartment.edges.findIndex(item => item._id === input.apartment);
-            const { residents } = residentsInBuildingGroupByApartment.edges[apartmentPos];
-            let residentIndex;
-            if (Array.isArray(residents) && residents.length > 0) {
-              residentIndex = residents.findIndex(item => item._id === input.resident);
-            }
-            return update(previousResult, {
-              residentsInBuildingGroupByApartment: {
-                edges: {
-                  [apartmentPos]: {
-                    residents: {
-                      $splice: [[residentIndex, 1]],
-                    },
-                  },
-                },
-              },
-            });
-          },
-        },
       }),
     }),
   }),
   graphql(AddNewResidentInBuildingMutation, {
     props: ({ mutate }) => ({
-      onAddNewResident: input => mutate({
+      onAddNewResident: user => mutate({
         variables: {
-          input,
-        },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          deleteResidentInBuilding: {
-            __typename: 'Author',
-            _id: input.resident,
-          },
-        },
-        updateQueries: {
-          ResidentsInBuildingGroupByApartmentQuery: (previousResult) => {
-            // const { residentsInBuildingGroupByApartment } = previousResult;
-            // const apartmentPos = residentsInBuildingGroupByApartment.edges.findIndex(item => item._id === input.apartment);
-            // const { residents } = residentsInBuildingGroupByApartment.edges[apartmentPos];
-            // let residentIndex;
-            // if (Array.isArray(residents) && residents.length > 0) {
-            //   residentIndex = residents.findIndex(item => item._id === input.resident);
-            // }
-            // return update(previousResult, {
-            //   residentsInBuildingGroupByApartment: {
-            //     edges: {
-            //       [apartmentPos]: {
-            //         residents: {
-            //           $splice: [[residentIndex, 1]],
-            //         },
-            //       },
-            //     },
-            //   },
-            // });
-          },
+          user,
         },
       }),
     }),

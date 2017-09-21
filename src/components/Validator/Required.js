@@ -21,7 +21,7 @@ const validate = (value, params = [false]) => {
 
 const Required = (attribute, message = 'The ${ attribute } is required.', params = [false]) => value => (validate(value, params) ? undefined : Message(message, { attribute }));
 Required.validate = validate;
-Required.Unless = (attribute, message = 'The ${ attribute } is required.', other) => (value, currentValues) => (currentValues.hasOwnProperty(other) || validate(value) || validate(currentValues[other]) ? undefined : Message(message, { attribute }));
+Required.Unless = (attribute, message = 'The ${ attribute } is required.', other) => (value, currentValues) => (validate(currentValues[other]) ? undefined : (validate(value) ? undefined : Message(message, { attribute })));
 
 export default Required;
 

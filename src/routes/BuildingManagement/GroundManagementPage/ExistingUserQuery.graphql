@@ -1,0 +1,3 @@
+query checkExistUserQuery ($query: String) {
+  checkExistUser(query: $query)
+}

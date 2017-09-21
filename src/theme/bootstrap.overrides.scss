@@ -24,6 +24,10 @@ button, input[type=button], .btn {
   }
 }
 
+.input-group-addon {
+  border-radius: 0;
+}
+
 .panel, .modal-content, .nav-pills>li>a {
   border-radius: 1px;
 }
