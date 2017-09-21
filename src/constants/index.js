@@ -114,3 +114,8 @@ export const SHARE_FRIEND = 'SHARE_FRIEND';
 // Fee
 export const PAID = 'PAID';
 export const UNPAID = 'UNPAID';
+
+// Friend Status
+export const STRANGER = 'STRANGER';
+export const FRIEND_REQUESTED = 'FRIEND_REQUESTED';
+export const RESPOND_TO_FRIEND_REQUEST = 'RESPOND_TO_FRIEND_REQUEST';

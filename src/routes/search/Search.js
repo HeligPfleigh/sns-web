@@ -6,6 +6,7 @@ import { generate as idRandom } from 'shortid';
 import { Grid, Row, Col } from 'react-bootstrap';
 import searchPageQuery from './searchPageQuery.graphql';
 import sendFriendRequestMutation from '../FriendSuggestions/sendFriendRequestMutation.graphql';
+import cancelFriendRequestedMutation from './cancelFriendRequestedMutation.graphql';
 import SearchItem from './SearchItem';
 import s from './Search.scss';
 
@@ -26,7 +27,8 @@ class Search extends Component {
                     <SearchItem
                       key={idRandom()}
                       dataUser={item}
-                      handleFriendAction={this.props.sendFriendRequest}
+                      sendFriendRequest={this.props.sendFriendRequest}
+                      cancelFriendRequested={this.props.cancelFriendRequested}
                     />
                 ))}
               </div>
@@ -44,6 +46,7 @@ Search.propTypes = {
   }),
   query: PropTypes.object,
   sendFriendRequest: PropTypes.func.isRequired,
+  cancelFriendRequested: PropTypes.func.isRequired,
 };
 
 Search.defaultProps = {
@@ -64,6 +67,13 @@ export default compose(
   graphql(sendFriendRequestMutation, {
     props: ({ mutate }) => ({
       sendFriendRequest: _id => mutate({
+        variables: { _id },
+      }),
+    }),
+  }),
+  graphql(cancelFriendRequestedMutation, {
+    props: ({ mutate }) => ({
+      cancelFriendRequested: _id => mutate({
         variables: { _id },
       }),
     }),
