@@ -1,0 +1,12 @@
+query searchPageQuery ($keyword: String!, $numberOfFriends: Int) {
+  search (keyword: $keyword, numberOfFriends: $numberOfFriends ){
+    _id
+    profile {
+      picture
+      firstName
+      lastName
+    }
+    isFriend
+    mutualFriends
+  }
+}

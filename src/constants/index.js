@@ -92,6 +92,7 @@ export const BUILDING_MEMBER_STATUS = [PENDING, ACCEPTED, REJECTED];
 export const PUBLIC = 'PUBLIC';
 export const PRIVATE = 'PRIVATE';
 export const FRIEND = 'FRIEND';
+export const UNFRIEND = 'UNFRIEND';
 export const ONLY_ME = 'ONLY_ME';
 export const ONLY_ADMIN_BUILDING = 'ONLY_ADMIN_BUILDING';
 export const POST_PRIVACY = [PUBLIC, FRIEND, ONLY_ME, ONLY_ADMIN_BUILDING];

@@ -2,50 +2,35 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
 import { generate as idRandom } from 'shortid';
 import { Grid, Row, Col } from 'react-bootstrap';
-import Link from '../../components/Link';
+import searchPageQuery from './searchPageQuery.graphql';
+import sendFriendRequestMutation from '../FriendSuggestions/sendFriendRequestMutation.graphql';
+import SearchItem from './SearchItem';
 import s from './Search.scss';
-
-
-const searchPageQuery = gql`query searchPageQuery ($keyword: String!, $numberOfFriends: Int) {
-  search (keyword: $keyword, numberOfFriends: $numberOfFriends ){
-    _id
-    profile {
-      picture
-      firstName
-      lastName
-    }
-  }
-}`;
 
 class Search extends Component {
   render() {
-    const { data: { search } } = this.props;
+    const { data: { search }, query } = this.props;
     return (
       <Grid>
         <Row className={s.top20}>
           <Col md={8} sm={12} xs={12}>
-            <div className={s.friendsList}>
-              {
-                search && search.length > 0 && search.map(item => (
-                  <div key={idRandom()} className={s.friendsContent}>
-                    <Link to={`/user/${item._id}`} style={{ textDecoration: 'none' }}>
-                      <img className={s.friendsAvatar} src={item.profile.picture} />
-                      <span className={s.friendsName}>
-                        {item.profile.firstName} {item.profile.lastName}
-                      </span>
-                    </Link>
-                  </div>
-              ))}
-              {
-                search && search.length === 0 &&
-                <div className={s.friendsContent}>
-                  Không tìm thấy kết quả
+            { search &&
+              <div className={s.friendsList}>
+                <div className={s.friendsListTitle}>
+                  Có { search.length } kết quả cho { query.keyword }
                 </div>
-              }
-            </div>
+                {
+                  search.length > 0 && search.map(item => (
+                    <SearchItem
+                      key={idRandom()}
+                      dataUser={item}
+                      handleFriendAction={this.props.sendFriendRequest}
+                    />
+                ))}
+              </div>
+            }
           </Col>
         </Row>
       </Grid>
@@ -57,6 +42,8 @@ Search.propTypes = {
   data: PropTypes.shape({
     search: PropTypes.array,
   }),
+  query: PropTypes.object,
+  sendFriendRequest: PropTypes.func.isRequired,
 };
 
 Search.defaultProps = {
@@ -72,6 +59,13 @@ export default compose(
       variables: {
         keyword: props.query.keyword,
       },
+    }),
+  }),
+  graphql(sendFriendRequestMutation, {
+    props: ({ mutate }) => ({
+      sendFriendRequest: _id => mutate({
+        variables: { _id },
+      }),
     }),
   }),
 )(Search);
