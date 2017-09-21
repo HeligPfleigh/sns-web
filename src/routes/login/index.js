@@ -9,7 +9,7 @@
 
 import React from 'react';
 
-const title = 'Log In';
+const title = 'Đăng nhập';
 
 export default {
 
