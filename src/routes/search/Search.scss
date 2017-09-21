@@ -1,31 +1,53 @@
 .top20 {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .friendsList {
-    display: block;
-    border: 1px solid #aaa;
-    background-color: #fff;
-    font-family: Helvetica, sans-serif;    
-    border-radius: 4px;
-    .friendsContent {
-        display: flex;
-        align-items: center;
-        background-repeat: no-repeat;
-        cursor: pointer;
-        padding: 10px 20px;
-        border-top: 1px solid #ddd;
-        .friendsAvatar {
-            width: 70px;
-            height: 70px;
-        }
-        .friendsName {
-            font-weight: bold;
-            font-size: 15px;
-            margin-left: 15px;
-            line-height: 45px;
-        }
-    }
+  display: block;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  font-family: Helvetica, sans-serif;    
+  border-radius: 4px;
+}
+
+.friendsListTitle {
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.friendsContent {
+  display: flow-root;
+  align-items: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-top: 1px solid #ddd;
+}
+
+.friendsAvatar {
+  border-radius: 50%; 
+  float: left;
+  width: 70px;
+  height: 70px;
+}
+
+.friendsName {
+  display: block;
+  font-weight: bold;
+  font-size: 15px;
+  margin-left: 15px;
+  margin-top: 15px;
+}
+
+.mutualFriends {
+  margin-left: 15px;
+  color: #999999;
+}
+
+.buttons {
+  float: right;
+  margin-top: 15px;
 }
 
 @media (max-width: 992px) {
