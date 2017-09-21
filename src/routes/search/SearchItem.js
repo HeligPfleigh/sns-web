@@ -5,10 +5,13 @@ import { compose } from 'react-apollo';
 import { generate as idRandom } from 'shortid';
 import { ButtonGroup, Button, Dropdown, MenuItem } from 'react-bootstrap';
 import Link from '../../components/Link';
-// import {
-//   FRIEND,
-//   UNFRIEND,
-// } from '../../constants';
+import {
+  FRIEND,
+  STRANGER,
+  FRIEND_REQUESTED,
+  RESPOND_TO_FRIEND_REQUEST,
+  UNFRIEND,
+} from '../../constants';
 import s from './Search.scss';
 
 const CustomToggle = ({ onClick, children }) => (
@@ -23,25 +26,23 @@ CustomToggle.propTypes = {
 };
 
 class SearchItem extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      friendRequested: false,
-    };
+
+  onDropDown = (eventKey, e) => {
+    e.preventDefault();
+    const { dataUser, cancelFriendRequested } = this.props;
+    if (eventKey === 'CANCEL_FRIEND_REQUESTED') {
+      cancelFriendRequested(dataUser._id);
+    }
   }
 
-  onCLick = (evt) => {
+  addFriend = (evt) => {
     evt.preventDefault();
-    const { dataUser, handleFriendAction } = this.props;
-    this.setState({
-      friendRequested: true,
-    });
-    handleFriendAction(dataUser._id);
+    const { dataUser, sendFriendRequest } = this.props;
+    sendFriendRequest(dataUser._id);
   }
 
   render() {
     const { dataUser } = this.props;
-    const { friendRequested } = this.state;
     return (
       <div key={idRandom()} className={s.friendsContent}>
         <Link to={`/user/${dataUser._id}`} style={{ textDecoration: 'none' }}>
@@ -53,7 +54,7 @@ class SearchItem extends Component {
             <small className={s.mutualFriends}>{ dataUser.mutualFriends } bạn chung</small>
           </div>
         </Link>
-        { dataUser.isFriend ?
+        { dataUser.friendStatus === FRIEND &&
           <ButtonGroup className={s.buttons}>
             <Dropdown
               id={idRandom()}
@@ -74,22 +75,17 @@ class SearchItem extends Component {
                 <i className="fa fa-caret-down" aria-hidden="true"></i>
               </CustomToggle>
               <Dropdown.Menu onSelect={this.onDropDown}>
-                <MenuItem eventKey="" >Gửi tin nhắn</MenuItem>
+                <MenuItem eventKey="SEND_MESSAGE" >Gửi tin nhắn</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
-          </ButtonGroup> :
+          </ButtonGroup>
+        }
+        { dataUser.friendStatus === STRANGER &&
           <ButtonGroup className={s.buttons}>
-            {
-              !friendRequested ?
-                <Button onClick={this.onCLick}>
-                  <i className="fa fa-user-plus" aria-hidden="true" style={{ marginRight: '5px' }}></i>
-                  Thêm bạn
-                </Button> :
-                <Button>
-                  <i className="fa fa-user-plus" aria-hidden="true" style={{ marginRight: '5px' }}></i>
-                  Đã gửi yêu cầu
-                </Button>
-            }
+            <Button onClick={this.addFriend}>
+              <i className="fa fa-user-plus" aria-hidden="true" style={{ marginRight: '5px' }}></i>
+              Thêm bạn
+            </Button>
             <Dropdown
               id={idRandom()}
             >
@@ -98,10 +94,47 @@ class SearchItem extends Component {
                 <i className="fa fa-caret-down" aria-hidden="true"></i>
               </CustomToggle>
               <Dropdown.Menu onSelect={this.onDropDown}>
-                <MenuItem eventKey="" >Gửi tin nhắn</MenuItem>
-                { friendRequested &&
-                  <MenuItem eventKey="" >Hủy yêu cầu</MenuItem>
-                }
+                <MenuItem eventKey="SEND_MESSAGE" >Gửi tin nhắn</MenuItem>
+              </Dropdown.Menu>
+            </Dropdown>
+          </ButtonGroup>
+        }
+        { dataUser.friendStatus === FRIEND_REQUESTED &&
+          <ButtonGroup className={s.buttons}>
+            <Button disabled >
+              <i className="fa fa-user-plus" aria-hidden="true" style={{ marginRight: '5px' }}></i>
+              Đã gửi yêu cầu
+            </Button>
+            <Dropdown
+              id={idRandom()}
+            >
+              <CustomToggle bsRole="toggle">
+                <i className="fa fa-ellipsis-h" aria-hidden="true" style={{ marginRight: '5px' }}></i>
+                <i className="fa fa-caret-down" aria-hidden="true"></i>
+              </CustomToggle>
+              <Dropdown.Menu onSelect={this.onDropDown}>
+                <MenuItem eventKey="SEND_MESSAGE" >Gửi tin nhắn</MenuItem>
+                <MenuItem eventKey="CANCEL_FRIEND_REQUESTED" >Hủy yêu cầu</MenuItem>
+              </Dropdown.Menu>
+            </Dropdown>
+          </ButtonGroup>
+        }
+        { dataUser.friendStatus === RESPOND_TO_FRIEND_REQUEST &&
+          <ButtonGroup className={s.buttons}>
+            <Button>
+              <i className="fa fa-user-plus" aria-hidden="true" style={{ marginRight: '5px' }}></i>
+              Xác nhận
+            </Button>
+            <Dropdown
+              id={idRandom()}
+            >
+              <CustomToggle bsRole="toggle">
+                <i className="fa fa-ellipsis-h" aria-hidden="true" style={{ marginRight: '5px' }}></i>
+                <i className="fa fa-caret-down" aria-hidden="true"></i>
+              </CustomToggle>
+              <Dropdown.Menu onSelect={this.onDropDown}>
+                <MenuItem eventKey="SEND_MESSAGE" >Gửi tin nhắn</MenuItem>
+                <MenuItem eventKey="REJECTED" >Từ chối</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
           </ButtonGroup>
@@ -113,7 +146,8 @@ class SearchItem extends Component {
 
 SearchItem.propTypes = {
   dataUser: PropTypes.object,
-  handleFriendAction: PropTypes.func,
+  sendFriendRequest: PropTypes.func,
+  cancelFriendRequested: PropTypes.func,
 };
 
 export default compose(
