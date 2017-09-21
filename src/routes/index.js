@@ -15,6 +15,7 @@ export default {
     require('./login').default,
     require('./register').default,
     require('./active').default,
+    require('./forgot_password').default,
     require('./about').default,
     require('./privacy').default,
     require('./notifications').default,
