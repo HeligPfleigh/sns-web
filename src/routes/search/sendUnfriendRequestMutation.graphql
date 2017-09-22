@@ -1,0 +1,12 @@
+mutation sendUnfriendRequestMutation ($_id: String!) {
+  sendUnfriendRequest(_id: $_id) {
+    _id
+    profile {
+      picture
+      firstName
+      lastName
+    }
+    mutualFriends
+    friendStatus
+  }
+}
