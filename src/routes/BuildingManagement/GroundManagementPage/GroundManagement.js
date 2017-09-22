@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup, ButtonGroup, Alert } from 'react-bootstrap';
+import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup, Alert } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import isString from 'lodash/isString';
 import isObject from 'lodash/isObject';
@@ -29,8 +29,8 @@ import Menu from '../Menu/Menu';
 import s from './GroundManagement.scss';
 
 class GroundManagement extends Component {
-  constructor(...args) {
-    super(...args);
+  constructor(props, ...args) {
+    super(props, ...args);
 
     this.state = {
       deleteResidentValues: {},
@@ -41,12 +41,15 @@ class GroundManagement extends Component {
     this.hasSubmitFiltering = false;
     this.prevValues = {};
     this.apartmentSelected = {};
+    this.currentPage = props.data.variables.page || 1;
   }
 
   onChangePage = page => this.props.onChangePage({
     page,
     filters: this.getAllFilterInputs(),
-  })
+  }).then(() => {
+    this.currentPage = page;
+  });
 
   onSubmitFilter = () => {
     this.hasFilterSubmitted = true;
@@ -96,9 +99,9 @@ class GroundManagement extends Component {
     }
   }
 
-  onDeleteResident = data => this.props.onDeleteResident(data).then(() => this.props.data.refetch())
+  onDeleteResident = data => this.props.onDeleteResident(data).then(() => this.onChangePage(this.currentPage))
 
-  onAddNewResident = data => this.props.onAddNewResident(data).then(() => this.props.data.refetch())
+  onAddNewResident = data => this.props.onAddNewResident(data).then(() => this.onChangePage(this.currentPage))
 
   getAllFilterInputs() {
     if (!this.hasFilterSubmitted) {
@@ -112,38 +115,34 @@ class GroundManagement extends Component {
     };
   }
 
-  viewActions = rows => (rows.expanded ? this.viewApartment(rows) : this.viewResident(rows))
+  viewResident = rows => (rows.expanded ? rows.numberOfResidentsByApartmentGrouped : <a
+    onClick={(evt) => {
+      evt.preventDefault();
+      history.push(`/user/${rows._id}?tab=MY_INFO`);
+    }}
+  >{rows.residentName}</a>)
 
-  viewResident = data => (<Col className="text-center">
-    <ButtonGroup>
-      <Button
-        type="button"
-        onClick={(evt) => {
-          evt.preventDefault();
-          history.push(`/user/${data._id}?tab=MY_INFO`);
-        }}
-        title="Xem thông tin của cư dân"
-        className="btn btn-xs btn-info"
-      ><i className="fa fa-info-circle" /></Button>
-      <Button
-        type="button"
-        onClick={(evt) => {
-          evt.preventDefault();
-          this.setState({
-            deleteResidentValues: {
-              resident: data._id,
-              apartment: data.apartment,
-              building: data.building,
-            },
-          });
-        }}
-        title="Loại bỏ cư dân này ra khỏi căn hộ này"
-        className="btn btn-xs btn-danger"
-      ><i className="fa fa-trash" /></Button>
-    </ButtonGroup>
+  viewActions = rows => (rows.expanded ? this.viewApartmentAction(rows) : this.viewResidentAction(rows))
+
+  viewResidentAction = data => (<Col className="text-center">
+    <Button
+      type="button"
+      onClick={(evt) => {
+        evt.preventDefault();
+        this.setState({
+          deleteResidentValues: {
+            resident: data._id,
+            apartment: data.apartment,
+            building: data.building,
+          },
+        });
+      }}
+      title="Loại bỏ cư dân này ra khỏi căn hộ này"
+      className="btn btn-xs btn-danger"
+    ><i className="fa fa-trash" /></Button>
   </Col>);
 
-  viewApartment = data => (
+  viewApartmentAction = data => (
     <Button
       type="button"
       onClick={(evt) => {
@@ -166,7 +165,7 @@ class GroundManagement extends Component {
   tableColumns = () => [{
     title: 'Căn hộ', dataIndex: 'apartmentName', key: 'apartmentName', className: 'apartmentName',
   }, {
-    title: 'Cư dân', dataIndex: 'residentName', key: 'residentName', className: 'residentName',
+    title: 'Cư dân', dataIndex: '', key: 'residentName', className: 'residentName', render: this.viewResident,
   }, {
     title: 'Vai trò', dataIndex: 'residentRole', key: 'residentRole', className: 'residentRole',
   }, {
@@ -191,7 +190,7 @@ class GroundManagement extends Component {
               apartment: rows._id,
               building: rows.building,
               rowKey: `${rows._id}-${resident._id}`,
-              residentName: (isObject(resident.profile) && resident.profile.fullName) || resident.name,
+              residentName: (isObject(resident.profile) && resident.profile.fullName) || resident.username,
               residentRole: resident._id === rows.owner ? 'Chủ hộ' : 'Người thuê nhà',
               expanded: false,
             });
@@ -202,7 +201,7 @@ class GroundManagement extends Component {
           _id: rows._id,
           rowKey: rows._id,
           apartmentName: rows.name,
-          residentName: `Có tổng số ${children.length} cư dân`,
+          numberOfResidentsByApartmentGrouped: `Có tổng số ${children.length} cư dân`,
           expanded: true,
           children,
         });
@@ -239,7 +238,7 @@ class GroundManagement extends Component {
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
-    console.log(this.props.data.variables);
+
     const { deleteResidentValues, addNewResidentValues, errorMessage } = this.state;
 
     return (
@@ -364,6 +363,7 @@ GroundManagement.propTypes = {
       edges: PropTypes.array,
     }),
     refetch: PropTypes.func.isRequired,
+    variables: PropTypes.object.isRequired,
   }).isRequired,
   currentValues: PropTypes.object,
   onDeleteResident: PropTypes.func.isRequired,
@@ -422,9 +422,7 @@ const GroundManagementForm = reduxForm({
           filters,
           page,
         },
-        updateQuery: (previousResult, { fetchMoreResult }) => ({
-          ...fetchMoreResult,
-        }),
+        updateQuery: (previousResult, { fetchMoreResult }) => fetchMoreResult,
       });
 
       const onExistingUser = async (input) => {

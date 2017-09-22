@@ -16,9 +16,10 @@ import { compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import throttle from 'lodash/throttle';
 import toString from 'lodash/toString';
-import { reduxForm, Field, formValueSelector, SubmissionError } from 'redux-form';
+import { reduxForm, Field, formValueSelector } from 'redux-form';
 import * as ReduxFormFields from '../../../components/ReduxForm';
 import Validator from '../../../components/Validator';
+import Loading from '../../../components/Loading';
 
 class AddNewResidentModal extends Component {
   constructor(props, ...args) {
@@ -26,6 +27,8 @@ class AddNewResidentModal extends Component {
 
     this.state = {
       showModal: false,
+      hasError: false,
+      message: undefined,
     };
   }
 
@@ -68,13 +71,17 @@ class AddNewResidentModal extends Component {
       value: values.password,
     },
   })
-  .then(() => {
-    this.onHide();
+  .then(async () => {
+    await this.setState({
+      hasError: false,
+      message: 'Đã thêm mới thành công một cư dân vào căn hộ này.',
+    });
     this.onResetForm();
   })
-  .catch(() => {
-    throw new SubmissionError({
-      _error: 'Có lỗi xảy ra trong quá trình thực hiện hành động này.',
+  .catch(async () => {
+    await this.setState({
+      hasError: true,
+      message: 'Có lỗi xảy ra trong quá trình thực hiện hành động này.',
     });
   })
 
@@ -84,16 +91,17 @@ class AddNewResidentModal extends Component {
   }
 
   render() {
-    const { form, handleSubmit, submitting, pristine, invalid, apartment, currentValues, error } = this.props;
-
+    const { form, handleSubmit, submitting, pristine, invalid, apartment, currentValues } = this.props;
+    const { hasError, message } = this.state;
     return (
       <Modal show={this.state.showModal} onHide={this.onHide} backdrop="static" keyboard={false}>
+        <Loading show={submitting} full className="addNewResidentLoading">Đang thêm mới ...</Loading>
         <Modal.Header closeButton={!submitting}>
           <Modal.Title>Tạo mới cư dân cho căn hộ {apartment.apartmentName}</Modal.Title>
         </Modal.Header>
         <form name={form} noValidate onSubmit={handleSubmit(this.onSubmitForm)}>
           <Modal.Body>
-            {error && <Alert bsStyle={error ? 'danger' : 'success'}>{error}</Alert>}
+            {message && <Alert bsStyle={hasError ? 'danger' : 'success'}>{message}</Alert>}
 
             <Row>
               <Col xs={6}>
@@ -241,7 +249,7 @@ class AddNewResidentModal extends Component {
               />
             </FormGroup>
 
-            <HelpBlock bsClass="help-block text-warning">(*) Bắt buộc phải nhập dữ liệu</HelpBlock>
+            <HelpBlock>(*) <span className="text-danger">Bắt buộc phải nhập dữ liệu</span></HelpBlock>
 
             <Clearfix />
           </Modal.Body>
@@ -275,7 +283,6 @@ AddNewResidentModal.propTypes = {
   apartment: PropTypes.object.isRequired,
   change: PropTypes.func.isRequired,
   onExistingUser: PropTypes.func.isRequired,
-  error: PropTypes.string,
 };
 
 AddNewResidentModal.defaultProps = {

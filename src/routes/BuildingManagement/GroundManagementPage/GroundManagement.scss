@@ -1,6 +1,12 @@
 @global-import 'rc-table/dist/rc-table.min.css';
 @global-import 'react-select/dist/react-select.css';
 
+:global {
+  .addNewResidentLoading {
+    opacity: 0.5;
+  }
+}
+
 .containerTop30 {
   margin-top: 30px;
 }
