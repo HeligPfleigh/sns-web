@@ -1,0 +1,12 @@
+mutation rejectFriendOnSearchPageMutation ($_id: String!) {
+  rejectFriend(_id: $_id) {
+    _id
+    profile {
+      picture
+      firstName
+      lastName
+    }
+    mutualFriends
+    friendStatus
+  }
+}
