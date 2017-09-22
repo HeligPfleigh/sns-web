@@ -31,26 +31,26 @@ class SearchItem extends Component {
     e.preventDefault();
     const { dataUser, cancelFriendRequested, sendUnfriendRequest, rejectFriendAction } = this.props;
     if (eventKey === 'CANCEL_FRIEND_REQUESTED') {
-      cancelFriendRequested(dataUser._id);
+      cancelFriendRequested(dataUser._id, dataUser);
     }
     if (eventKey === 'UNFRIEND') {
-      sendUnfriendRequest(dataUser._id);
+      sendUnfriendRequest(dataUser._id, dataUser);
     }
     if (eventKey === 'REJECTED') {
-      rejectFriendAction(dataUser._id);
-    } 
+      rejectFriendAction(dataUser._id, dataUser);
+    }
   }
 
   onAcceptClick = (evt) => {
     evt.preventDefault();
     const { dataUser, acceptFriendAction } = this.props;
-    acceptFriendAction(dataUser._id);
+    acceptFriendAction(dataUser._id, dataUser);
   }
 
   addFriend = (evt) => {
     evt.preventDefault();
     const { dataUser, sendFriendRequest } = this.props;
-    sendFriendRequest(dataUser._id);
+    sendFriendRequest(dataUser._id, dataUser);
   }
 
   render() {

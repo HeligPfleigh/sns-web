@@ -85,36 +85,111 @@ export default compose(
   }),
   graphql(sendFriendRequestMutation, {
     props: ({ mutate }) => ({
-      sendFriendRequest: _id => mutate({
-        variables: { _id },
+      sendFriendRequest: (friendId, friend) => mutate({
+        variables: { _id: friendId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          sendFriendRequest: {
+            __typename: 'User',
+            _id: friendId,
+            profile: {
+              __typename: 'Profile',
+              picture: friend.profile.picture,
+              firstName: friend.profile.firstName,
+              lastName: friend.profile.lastName,
+            },
+            mutualFriends: friend.mutualFriends,
+            friendStatus: friend.friendStatus,
+          },
+        },
       }),
     }),
   }),
   graphql(cancelFriendRequestedMutation, {
     props: ({ mutate }) => ({
-      cancelFriendRequested: _id => mutate({
-        variables: { _id },
+      cancelFriendRequested: (friendId, friend) => mutate({
+        variables: { _id: friendId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          cancelFriendRequested: {
+            __typename: 'User',
+            _id: friendId,
+            profile: {
+              __typename: 'Profile',
+              picture: friend.profile.picture,
+              firstName: friend.profile.firstName,
+              lastName: friend.profile.lastName,
+            },
+            mutualFriends: friend.mutualFriends,
+            friendStatus: friend.friendStatus,
+          },
+        },
       }),
     }),
   }),
   graphql(sendUnfriendRequestMutation, {
     props: ({ mutate }) => ({
-      sendUnfriendRequest: _id => mutate({
-        variables: { _id },
+      sendUnfriendRequest: (friendId, friend) => mutate({
+        variables: { _id: friendId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          sendUnfriendRequest: {
+            __typename: 'User',
+            _id: friendId,
+            profile: {
+              __typename: 'Profile',
+              picture: friend.profile.picture,
+              firstName: friend.profile.firstName,
+              lastName: friend.profile.lastName,
+            },
+            mutualFriends: friend.mutualFriends,
+            friendStatus: friend.friendStatus,
+          },
+        },
       }),
     }),
   }),
   graphql(acceptFriendOnSearchPageMutation, {
     props: ({ mutate }) => ({
-      acceptFriendAction: _id => mutate({
-        variables: { _id },
+      acceptFriendAction: (friendId, friend) => mutate({
+        variables: { _id: friendId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          acceptFriend: {
+            __typename: 'User',
+            _id: friendId,
+            profile: {
+              __typename: 'Profile',
+              picture: friend.profile.picture,
+              firstName: friend.profile.firstName,
+              lastName: friend.profile.lastName,
+            },
+            mutualFriends: friend.mutualFriends,
+            friendStatus: friend.friendStatus,
+          },
+        },
       }),
     }),
   }),
   graphql(rejectFriendOnSearchPageMutation, {
     props: ({ mutate }) => ({
-      rejectFriendAction: _id => mutate({
-        variables: { _id },
+      rejectFriendAction: (friendId, friend) => mutate({
+        variables: { _id: friendId },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          rejectFriend: {
+            __typename: 'User',
+            _id: friendId,
+            profile: {
+              __typename: 'Profile',
+              picture: friend.profile.picture,
+              firstName: friend.profile.firstName,
+              lastName: friend.profile.lastName,
+            },
+            mutualFriends: friend.mutualFriends,
+            friendStatus: friend.friendStatus,
+          },
+        },
       }),
     }),
   }),
