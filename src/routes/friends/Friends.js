@@ -4,6 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import update from 'immutability-helper';
+import { generate as idRandom } from 'shortid';
 import { Grid, Row, Col } from 'react-bootstrap';
 import Loading from '../../components/Loading';
 import Label from '../../components/Friend/Label';
@@ -60,7 +61,6 @@ class Friends extends Component {
       acceptFriendAction,
       rejectFriendAction,
     } = this.props;
-
     return (
       <Grid>
         <Loading show={loading} full />
@@ -75,7 +75,7 @@ class Friends extends Component {
                 {
                   me.friendRequests.map(friend =>
                     <FriendActionItem
-                      key={friend._id}
+                      key={idRandom()}
                       friend={friend}
                       handleAcceptFriendAction={acceptFriendAction}
                       handleRejectFriendAction={rejectFriendAction}

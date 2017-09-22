@@ -10,7 +10,7 @@ import {
   STRANGER,
   FRIEND_REQUESTED,
   RESPOND_TO_FRIEND_REQUEST,
-  UNFRIEND,
+  REJECTED_FRIEND,
 } from '../../constants';
 import s from './Search.scss';
 
@@ -29,16 +29,28 @@ class SearchItem extends Component {
 
   onDropDown = (eventKey, e) => {
     e.preventDefault();
-    const { dataUser, cancelFriendRequested } = this.props;
+    const { dataUser, cancelFriendRequested, sendUnfriendRequest, rejectFriendAction } = this.props;
     if (eventKey === 'CANCEL_FRIEND_REQUESTED') {
-      cancelFriendRequested(dataUser._id);
+      cancelFriendRequested(dataUser._id, dataUser);
     }
+    if (eventKey === 'UNFRIEND') {
+      sendUnfriendRequest(dataUser._id, dataUser);
+    }
+    if (eventKey === 'REJECTED') {
+      rejectFriendAction(dataUser._id, dataUser);
+    }
+  }
+
+  onAcceptClick = (evt) => {
+    evt.preventDefault();
+    const { dataUser, acceptFriendAction } = this.props;
+    acceptFriendAction(dataUser._id, dataUser);
   }
 
   addFriend = (evt) => {
     evt.preventDefault();
     const { dataUser, sendFriendRequest } = this.props;
-    sendFriendRequest(dataUser._id);
+    sendFriendRequest(dataUser._id, dataUser);
   }
 
   render() {
@@ -64,7 +76,7 @@ class SearchItem extends Component {
                 Bạn bè
               </CustomToggle>
               <Dropdown.Menu onSelect={this.onDropDown}>
-                <MenuItem eventKey="" >Hủy bạn bè</MenuItem>
+                <MenuItem eventKey="UNFRIEND" >Hủy bạn bè</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
             <Dropdown
@@ -121,7 +133,7 @@ class SearchItem extends Component {
         }
         { dataUser.friendStatus === RESPOND_TO_FRIEND_REQUEST &&
           <ButtonGroup className={s.buttons}>
-            <Button>
+            <Button onClick={this.onAcceptClick}>
               <i className="fa fa-user-plus" aria-hidden="true" style={{ marginRight: '5px' }}></i>
               Xác nhận
             </Button>
@@ -134,11 +146,12 @@ class SearchItem extends Component {
               </CustomToggle>
               <Dropdown.Menu onSelect={this.onDropDown}>
                 <MenuItem eventKey="SEND_MESSAGE" >Gửi tin nhắn</MenuItem>
-                <MenuItem eventKey="REJECTED" >Từ chối</MenuItem>
+                <MenuItem eventKey="REJECTED" >Từ chối kết bạn</MenuItem>
               </Dropdown.Menu>
             </Dropdown>
           </ButtonGroup>
         }
+        { dataUser.friendStatus === REJECTED_FRIEND && <div></div>}
       </div>
     );
   }
@@ -148,6 +161,9 @@ SearchItem.propTypes = {
   dataUser: PropTypes.object,
   sendFriendRequest: PropTypes.func,
   cancelFriendRequested: PropTypes.func,
+  sendUnfriendRequest: PropTypes.func,
+  acceptFriendAction: PropTypes.func,
+  rejectFriendAction: PropTypes.func,
 };
 
 export default compose(
