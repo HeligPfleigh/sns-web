@@ -18,8 +18,8 @@ export default class ReduxFormDateTimeField extends Component {
     input.onChange(dateSelected);
 
     // Fix bug: When the attribute named closeOnSelect has defined, the datetime picker popup always hidden.
-    if (closeOnSelect) {
-      // this.datetimeRef.closeCalendar();
+    if (closeOnSelect && this.datetimeRef.state.open) {
+      this.datetimeRef.closeCalendar();
     }
   }
 

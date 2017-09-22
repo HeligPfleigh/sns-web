@@ -5,6 +5,7 @@ import HiddenField from './HiddenField';
 import CheckboxField from './CheckboxField';
 import SelectField from './SelectField';
 import MultiSelectField from './MultiSelectField';
+import TextareaField from './TextareaField';
 
 export {
   InputField,
@@ -14,4 +15,5 @@ export {
   CheckboxField,
   SelectField,
   MultiSelectField,
+  TextareaField,
 };

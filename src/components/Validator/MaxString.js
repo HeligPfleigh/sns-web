@@ -1,15 +1,18 @@
-import isString from 'lodash/isString';
 import isNumber from 'lodash/isNumber';
 import Message from './Helper/Message';
 
-export const isMax = (value, max) => {
+const validate = (value, max) => {
   try {
     max = parseInt(max, 10);
+    value = String(value);
   } catch (e) {
     return false;
   }
 
-  return isString(value) && isNumber(max) && (String(value).trim().length <= max);
+  return isNumber(max) && (value.length <= max);
 };
 
-export default (attribute, message = 'The ${ attribute } may not be greater than ${ max } characters.', max) => value => isMax(value, max) ? undefined : Message(message, { attribute, max });
+const MaxString = (attribute, message = 'The ${ attribute } may not be greater than ${ max } characters.', max) => value => (validate(value, max) ? undefined : Message(message, { attribute, max }));
+MaxString.validate = validate;
+
+export default MaxString;

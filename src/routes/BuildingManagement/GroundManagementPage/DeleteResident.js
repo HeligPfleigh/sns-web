@@ -18,7 +18,7 @@ class DeleteResidentModal extends Component {
     };
 
     this.onHide = this.onHide.bind(this);
-    this.onDelete = this.onDelete.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
     this.resetForm = this.resetForm.bind(this);
   }
 
@@ -32,11 +32,11 @@ class DeleteResidentModal extends Component {
     this.props.onHide();
   }
 
-  onDelete() {
+  onSubmit() {
     this.setState({
       submitting: true,
     });
-    this.props.onDelete({
+    this.props.onSubmit({
       resident: this.props.initialValues.resident,
       apartment: this.props.initialValues.apartment,
       building: this.props.initialValues.building,
@@ -71,7 +71,7 @@ class DeleteResidentModal extends Component {
           <ButtonToolbar>
             <ButtonToolbar className="pull-right">
               <Button onClick={this.onHide} disabled={this.state.submitting}>Không</Button>
-              <Button type="submit" bsStyle="danger" disabled={this.state.submitting} onClick={this.onDelete}>Tiếp tục</Button>
+              <Button type="submit" bsStyle="danger" disabled={this.state.submitting} onClick={this.onSubmit}>Tiếp tục</Button>
             </ButtonToolbar>
           </ButtonToolbar>
         </Modal.Footer>
@@ -87,7 +87,7 @@ DeleteResidentModal.propTypes = {
     building: PropTypes.string,
   }).isRequired,
   onHide: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
 };
 

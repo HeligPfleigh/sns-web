@@ -3,15 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup, ButtonGroup, Alert } from 'react-bootstrap';
+import { Grid, Row, Col, Clearfix, ControlLabel, Button, FormGroup, Alert } from 'react-bootstrap';
 import MediaQuery from 'react-responsive';
 import isString from 'lodash/isString';
-import forEach from 'lodash/forEach';
 import isObject from 'lodash/isObject';
 import isUndefined from 'lodash/isUndefined';
 import isNull from 'lodash/isNull';
-import update from 'immutability-helper';
 import { reduxForm, Field, formValueSelector } from 'redux-form';
+import faker from 'faker';
 import Table from 'rc-table';
 import Loading from '../../../components/Loading';
 import DownloadFile from '../../../components/Common/DownloadFile';
@@ -21,28 +20,36 @@ import history from '../../../core/history';
 import InputField from './InputField';
 import ResidentsInBuildingGroupByApartmentQuery from './ResidentsInBuildingGroupByApartmentQuery.graphql';
 import DeleteResidentInBuildingMutation from './DeleteResidentInBuildingMutation.graphql';
+import AddNewResidentInBuildingMutation from './AddNewResidentInBuildingMutation.graphql';
 import ExportResidentsInBuildingGroupByApartmentMutation from './ExportResidentsInBuildingGroupByApartmentMutation.graphql';
+import ExistingUserQuery from './ExistingUserQuery.graphql';
 import DeleteResidentModal from './DeleteResident';
+import AddNewResidentModal from './AddNewResident';
 import Menu from '../Menu/Menu';
 import s from './GroundManagement.scss';
 
 class GroundManagement extends Component {
-  constructor(...args) {
-    super(...args);
+  constructor(props, ...args) {
+    super(props, ...args);
 
     this.state = {
       deleteResidentValues: {},
+      addNewResidentValues: {},
       errorMessage: null,
     };
 
     this.hasSubmitFiltering = false;
     this.prevValues = {};
+    this.apartmentSelected = {};
+    this.currentPage = props.data.variables.page || 1;
   }
 
   onChangePage = page => this.props.onChangePage({
     page,
     filters: this.getAllFilterInputs(),
-  })
+  }).then(() => {
+    this.currentPage = page;
+  });
 
   onSubmitFilter = () => {
     this.hasFilterSubmitted = true;
@@ -53,15 +60,15 @@ class GroundManagement extends Component {
     });
   }
 
-  onDeleteResident = ({ resident, apartment, building }) => this.props.onDeleteResident({
-    resident,
-    apartment,
-    building,
-  })
-
   onHideDeleteResidentModal = () => {
     this.setState({
       deleteResidentValues: {},
+    });
+  }
+
+  onHideAddNewResidentModal = () => {
+    this.setState({
+      addNewResidentValues: {},
     });
   }
 
@@ -92,6 +99,10 @@ class GroundManagement extends Component {
     }
   }
 
+  onDeleteResident = data => this.props.onDeleteResident(data).then(() => this.onChangePage(this.currentPage))
+
+  onAddNewResident = data => this.props.onAddNewResident(data).then(() => this.onChangePage(this.currentPage))
+
   getAllFilterInputs() {
     if (!this.hasFilterSubmitted) {
       return {};
@@ -104,50 +115,57 @@ class GroundManagement extends Component {
     };
   }
 
-  viewActions = rows => rows.expanded ? this.viewApartment(rows) : this.viewResident(rows)
+  viewResident = rows => (rows.expanded ? rows.numberOfResidentsByApartmentGrouped : <a
+    onClick={(evt) => {
+      evt.preventDefault();
+      history.push(`/user/${rows._id}?tab=MY_INFO`);
+    }}
+  >{rows.residentName}</a>)
 
-  viewResident = data => (<Col className="text-center">
-    <ButtonGroup>
-      <Button
-        type="button"
-        onClick={(evt) => {
-          evt.preventDefault();
-          history.push(`/user/${data._id}?tab=MY_INFO`);
-        }}
-        title="Xem thông tin của cư dân"
-        className="btn btn-sm btn-info"
-      ><i className="fa fa-info-circle" /></Button>
-      <Button
-        type="button"
-        onClick={(evt) => {
-          evt.preventDefault();
-          this.setState({
-            deleteResidentValues: {
-              resident: data._id,
-              apartment: data.apartment,
-              building: data.building,
-            },
-          });
-        }}
-        title="Loại bỏ cư dân này ra khỏi căn hộ này"
-        className="btn btn-sm btn-danger"
-      >Xóa</Button>
-    </ButtonGroup>
-  </Col>);
+  viewActions = rows => (rows.expanded ? this.viewApartmentAction(rows) : this.viewResidentAction(rows))
 
-  viewApartment = () => (
-    <a
-      href="#"
+  viewResidentAction = data => (<Col className="text-center">
+    <Button
+      type="button"
       onClick={(evt) => {
         evt.preventDefault();
+        this.setState({
+          deleteResidentValues: {
+            resident: data._id,
+            apartment: data.apartment,
+            building: data.building,
+          },
+        });
       }}
-    >{'Thông tin căn hộ >>'}</a>
+      title="Loại bỏ cư dân này ra khỏi căn hộ này"
+      className="btn btn-xs btn-danger"
+    ><i className="fa fa-trash" /></Button>
+  </Col>);
+
+  viewApartmentAction = data => (
+    <Button
+      type="button"
+      onClick={(evt) => {
+        evt.preventDefault();
+        this.apartmentSelected = data;
+        this.setState({
+          addNewResidentValues: {
+            apartment: data._id,
+            building: this.props.buildingId,
+            password: faker.internet.password(),
+            usageUsernameAsPhoneNumber: true,
+          },
+        });
+      }}
+      title="Thêm mới cư dân vào căn hộ"
+      className="btn btn-xs"
+    ><i className="fa fa-user-plus" /></Button>
     );
 
   tableColumns = () => [{
     title: 'Căn hộ', dataIndex: 'apartmentName', key: 'apartmentName', className: 'apartmentName',
   }, {
-    title: 'Cư dân', dataIndex: 'residentName', key: 'residentName', className: 'residentName',
+    title: 'Cư dân', dataIndex: '', key: 'residentName', className: 'residentName', render: this.viewResident,
   }, {
     title: 'Vai trò', dataIndex: 'residentRole', key: 'residentRole', className: 'residentRole',
   }, {
@@ -172,7 +190,7 @@ class GroundManagement extends Component {
               apartment: rows._id,
               building: rows.building,
               rowKey: `${rows._id}-${resident._id}`,
-              residentName: (isObject(resident.profile) && resident.profile.fullName) || resident.name,
+              residentName: (isObject(resident.profile) && resident.profile.fullName) || resident.username,
               residentRole: resident._id === rows.owner ? 'Chủ hộ' : 'Người thuê nhà',
               expanded: false,
             });
@@ -183,7 +201,7 @@ class GroundManagement extends Component {
           _id: rows._id,
           rowKey: rows._id,
           apartmentName: rows.name,
-          residentName: `Có tổng số ${children.length} cư dân`,
+          numberOfResidentsByApartmentGrouped: `Có tổng số ${children.length} cư dân`,
           expanded: true,
           children,
         });
@@ -194,7 +212,6 @@ class GroundManagement extends Component {
       rowKey="rowKey"
       data={data}
       expandIconAsCell
-      expandRowByClick
       columns={this.tableColumns()}
       emptyText="Hiện tại không có dữ liệu."
       className={s.datatable}
@@ -214,13 +231,15 @@ class GroundManagement extends Component {
       submitting,
       invalid,
       form,
-      currentValues,
+      onExistingUser,
      } = this.props;
 
      // Show loading
     if (loading) {
       return <Loading show={loading} full>Đang tải ...</Loading>;
     }
+
+    const { deleteResidentValues, addNewResidentValues, errorMessage } = this.state;
 
     return (
       <Grid>
@@ -256,7 +275,9 @@ class GroundManagement extends Component {
                             name="filterByApartment"
                             component={InputField}
                             placeholder="Tên hoặc số căn hộ"
-                            validate={[Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', () => !isString(currentValues.filterByResident) || String(currentValues.filterByResident).trim().length === 0)]}
+                            validate={[
+                              Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', 'filterByResident'),
+                            ]}
                           />
                         </FormGroup>
                       </Col>
@@ -267,7 +288,9 @@ class GroundManagement extends Component {
                             name="filterByResident"
                             component={InputField}
                             placeholder="Tên của cư dân"
-                            validate={[Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', () => !isString(currentValues.filterByApartment) || String(currentValues.filterByApartment).trim().length === 0)]}
+                            validate={[
+                              Validator.Required.Unless(null, 'Bạn phải nhập dữ liệu', 'filterByApartment'),
+                            ]}
                           />
                         </FormGroup>
                       </Col>
@@ -285,20 +308,27 @@ class GroundManagement extends Component {
                         <i className="fa fa-bar-chart" aria-hidden="true"></i> Tòa nhà hiện có {residentsInBuildingGroupByApartment.stats.numberOfApartments} căn hộ và {residentsInBuildingGroupByApartment.stats.numberOfResidents} cư dân.
                       </Col>
                       <Col className="pull-right" xs={4}>
-                        <a onClick={this.onExportToExcel(buildingId)} title="Tải xuống với định dạng excel"><i className="fa fa-file-excel-o" aria-hidden="true"></i></a>
+                        <span onClick={this.onExportToExcel(buildingId)} title="Tải xuống với định dạng excel"><i className="fa fa-file-excel-o" aria-hidden="true"></i></span>
                       </Col>
                     </Row>
                   </Col>
 
                   <Col xs={12}>
                     <DeleteResidentModal
-                      onDelete={this.onDeleteResident}
+                      onSubmit={this.onDeleteResident}
                       onError={this.onErrorWhenDeleteResident}
-                      initialValues={this.state.deleteResidentValues}
                       onHide={this.onHideDeleteResidentModal}
+                      initialValues={deleteResidentValues}
                     />
-                    {this.state.errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: null })}>
-                      { this.state.errorMessage }
+                    <AddNewResidentModal
+                      onSubmit={this.onAddNewResident}
+                      onHide={this.onHideAddNewResidentModal}
+                      initialValues={addNewResidentValues}
+                      apartment={this.apartmentSelected}
+                      onExistingUser={onExistingUser}
+                    />
+                    {errorMessage && (<Alert bsStyle="danger" onDismiss={() => this.setState({ errorMessage: null })}>
+                      { errorMessage }
                     </Alert>)}
                     {this.datatable()}
                   </Col>
@@ -332,13 +362,20 @@ GroundManagement.propTypes = {
       stats: PropTypes.object,
       edges: PropTypes.array,
     }),
+    refetch: PropTypes.func.isRequired,
+    variables: PropTypes.object.isRequired,
   }).isRequired,
   currentValues: PropTypes.object,
-  fields: PropTypes.array.isRequired,
   onDeleteResident: PropTypes.func.isRequired,
   onExportToExcel: PropTypes.func.isRequired,
   form: PropTypes.string.isRequired,
   initialize: PropTypes.func.isRequired,
+  onAddNewResident: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  pristine: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  invalid: PropTypes.bool.isRequired,
+  onExistingUser: PropTypes.func.isRequired,
 };
 
 GroundManagement.defaultProps = {
@@ -385,14 +422,28 @@ const GroundManagementForm = reduxForm({
           filters,
           page,
         },
-        updateQuery: (previousResult, { fetchMoreResult }) => ({
-          ...fetchMoreResult,
-        }),
+        updateQuery: (previousResult, { fetchMoreResult }) => fetchMoreResult,
       });
+
+      const onExistingUser = async (input) => {
+        try {
+          const r = await data.fetchMore({
+            query: ExistingUserQuery,
+            variables: {
+              query: input,
+            },
+            updateQuery: () => undefined,
+          });
+          return r;
+        } catch (e) {
+          return false;
+        }
+      };
 
       return {
         data,
         onChangePage,
+        onExistingUser,
       };
     },
   }),
@@ -402,34 +453,14 @@ const GroundManagementForm = reduxForm({
         variables: {
           input,
         },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          deleteResidentInBuilding: {
-            __typename: 'User',
-            _id: input.resident,
-          },
-        },
-        updateQueries: {
-          ResidentsInBuildingGroupByApartmentQuery: (previousResult) => {
-            const { residentsInBuildingGroupByApartment } = previousResult;
-            const apartmentPos = residentsInBuildingGroupByApartment.edges.findIndex(item => item._id === input.apartment);
-            const { residents } = residentsInBuildingGroupByApartment.edges[apartmentPos];
-            let residentIndex;
-            if (Array.isArray(residents) && residents.length > 0) {
-              residentIndex = residents.findIndex(item => item._id === input.resident);
-            }
-            return update(previousResult, {
-              residentsInBuildingGroupByApartment: {
-                edges: {
-                  [apartmentPos]: {
-                    residents: {
-                      $splice: [[residentIndex, 1]],
-                    },
-                  },
-                },
-              },
-            });
-          },
+      }),
+    }),
+  }),
+  graphql(AddNewResidentInBuildingMutation, {
+    props: ({ mutate }) => ({
+      onAddNewResident: user => mutate({
+        variables: {
+          user,
         },
       }),
     }),

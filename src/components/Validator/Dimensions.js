@@ -1,4 +1,4 @@
-import { isImage } from './Image';
+import Img from './Image';
 import Message from './Helper/Message';
 
 const validateImage = (file, width, height) => {
@@ -18,7 +18,7 @@ const validate = (files, [width, height]) => {
   const list = [];
   for (let i = 0; i < files.length; i++) {
     // if file is not an image, reject.
-    if (!isImage(files[i].name)) {
+    if (!Img.validate(files[i].name)) {
       return false;
     }
 

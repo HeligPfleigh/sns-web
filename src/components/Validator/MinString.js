@@ -1,15 +1,17 @@
-import isString from 'lodash/isArray';
 import isNumber from 'lodash/isNumber';
 import Message from './Helper/Message';
 
-export const isMin = (value, min) => {
+const validate = (value, min) => {
   try {
     min = parseInt(min, 10);
+    value = String(value);
   } catch (e) {
     return false;
   }
-
-  return isString(value) && isNumber(min) && (String(value).trim().length >= min);
+  return isNumber(min) && (value.length >= min);
 };
 
-export default (attribute, message = 'The ${ attribute } may not be at least ${ min } characters.', min) => value => isMin(value, min) ? undefined : Message(message, { attribute, min });
+const MinString = (attribute, message = 'The ${ attribute } may not be at least ${ min } characters.', min) => value => (validate(value, min) ? undefined : Message(message, { attribute, min }));
+MinString.validate = validate;
+
+export default MinString;

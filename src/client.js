@@ -14,6 +14,7 @@ import queryString from 'query-string';
 import update from 'immutability-helper';
 import { createPath } from 'history/PathUtils';
 import moment from 'moment';
+import faker from 'faker';
 
 import history from './core/history';
 import App from './components/App';
@@ -24,8 +25,10 @@ import createApolloClient from './core/createApolloClient';
 import chat from './core/chat';
 import { setRuntimeVariable } from './actions/runtime';
 
-moment.locale('vi');
-moment.updateLocale('vi', {
+const defaultLocale = 'vi';
+faker.locale = defaultLocale;
+moment.locale(defaultLocale);
+moment.updateLocale(defaultLocale, {
   monthsShort: 'T01_T02_T03_T04_T05_T06_T07_T08_T09_T10_T11_T12'.split('_'),
 });
 

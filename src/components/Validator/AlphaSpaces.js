@@ -15,4 +15,4 @@ const validate = (value, locale = null) => {
   return (alphaSpaces[locale] || alphaSpaces.en).test(value);
 };
 
-export default (attribute, message = 'The ${ attribute } may only contain letters and space.', locale = null) => value => validate(value, locale) ? undefined : Message(message, { attribute });
+export default (attribute, message = 'The ${ attribute } may only contain letters and space.', locale = null) => value => (validate(value, locale) ? undefined : Message(message, { attribute }));

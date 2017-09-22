@@ -1,3 +1,4 @@
+import isFunction from 'lodash/isFunction';
 import Alpha from './Alpha';
 import AlphaDash from './AlphaDash';
 import AlphaNumeric from './AlphaNumeric';
@@ -29,37 +30,43 @@ import * as Size from './Size';
 import Url from './Url';
 import UUID from './UUID';
 
-const Validator = {
-  Alpha,
-  AlphaDash,
-  AlphaNumeric,
-  AlphaSpaces,
-  Ascii,
-  Base64,
-  Between,
-  Contains,
-  Date,
-  Decimal,
-  Digits,
-  Dimensions,
-  Email,
-  Equals,
-  Hexadecimal,
-  HexColor,
-  Image,
-  In,
-  Int,
-  IP,
-  Max,
-  Min,
-  MongoId,
-  NotIn,
-  Numeric,
-  Regex,
-  Required,
-  Size,
-  Url,
-  UUID,
+const Validator = (callback) => {
+  if (!isFunction(callback)) {
+    return undefined;
+  }
+
+  return (...args) => callback.call(Validator, ...args);
 };
+
+Validator.Alpha = Alpha;
+Validator.AlphaDash = AlphaDash;
+Validator.AlphaNumeric = AlphaNumeric;
+Validator.AlphaSpaces = AlphaSpaces;
+Validator.Ascii = Ascii;
+Validator.Base64 = Base64;
+Validator.Between = Between;
+Validator.Contains = Contains;
+Validator.Date = Date;
+Validator.Decimal = Decimal;
+Validator.Digits = Digits;
+Validator.Dimensions = Dimensions;
+Validator.Email = Email;
+Validator.Equals = Equals;
+Validator.Hexadecimal = Hexadecimal;
+Validator.HexColor = HexColor;
+Validator.Image = Image;
+Validator.In = In;
+Validator.Int = Int;
+Validator.IP = IP;
+Validator.Max = Max;
+Validator.Min = Min;
+Validator.MongoId = MongoId;
+Validator.NotIn = NotIn;
+Validator.Numeric = Numeric;
+Validator.Regex = Regex;
+Validator.Required = Required;
+Validator.Size = Size;
+Validator.Url = Url;
+Validator.UUID = UUID;
 
 export default Validator;
