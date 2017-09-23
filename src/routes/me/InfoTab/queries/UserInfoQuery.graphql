@@ -1,0 +1,18 @@
+query UserInfoQuery {
+  me {
+    _id
+    email {
+      address
+    }
+    profile {
+      firstName
+      lastName
+      gender
+      dob
+      address
+    }
+    phone {
+      number
+    }
+  }
+}
