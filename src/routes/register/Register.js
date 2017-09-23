@@ -17,13 +17,13 @@ import { remove } from '../../actions/user';
 import { InputField, DateTimeField, SelectField } from '../../components/FormFields';
 import Modal from '../../components/Modal';
 import {
+  isEmail,
   required,
-  email,
-  password,
+  isMobilePhone,
+  checkPassword,
   comparePassword,
   normalLength,
   maxLength15,
-  phoneNumber,
   hasWhiteSpace,
   hasSpecialChart,
   chartFirstRequired,
@@ -325,7 +325,7 @@ class Register extends Component {
               component={InputField}
               type="password"
               placeholder="(*) Mật khẩu"
-              validate={[required, normalLength, password]}
+              validate={[required, normalLength, checkPassword]}
             />
 
             <Field
@@ -333,7 +333,7 @@ class Register extends Component {
               component={InputField}
               type="password"
               placeholder="(*) Nhập lại mật khẩu"
-              validate={[required, normalLength, password, this.compareValue]}
+              validate={[required, normalLength, checkPassword, this.compareValue]}
             />
 
             <hr />
@@ -407,7 +407,7 @@ class Register extends Component {
               component={InputField}
               type="text"
               placeholder="(*) Địa chỉ email của bạn"
-              validate={[required, email]}
+              validate={[required, isEmail]}
             />
 
             <Field
@@ -415,7 +415,7 @@ class Register extends Component {
               component={InputField}
               type="text"
               placeholder="(*) Số điện thoại của bạn"
-              validate={[required, phoneNumber]}
+              validate={[required, isMobilePhone]}
             />
 
             <div className="form-group">
