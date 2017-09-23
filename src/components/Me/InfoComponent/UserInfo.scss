@@ -1,0 +1,28 @@
+.container {
+  clear: both;
+  padding: 20px 15px;
+  margin-top: -5px;
+  margin-bottom: 100px;
+  background-color: #fff;
+
+  .profile{
+    margin: 0px;
+    padding: 10px 20px;
+    width: auto;
+
+    .profileInfo {
+      margin-bottom: 15px;
+    }
+
+    i {
+      color: #4c4c4c;
+      width: 40px;
+      font-size: 24px;
+      display: inline-block;
+    }
+
+    .profileRight {
+      margin-top: 7px;
+    }
+  }
+}

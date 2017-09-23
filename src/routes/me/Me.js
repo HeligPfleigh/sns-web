@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
 import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
@@ -19,64 +18,8 @@ import FeedList from './FeedList';
 import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import s from './Me.scss';
 import Loading from '../../components/Loading';
-
-const profilePageQuery = gql`query profilePageQuery ($_id: String!, $cursor: String) {
-  resident(_id: $_id) {
-    _id
-    posts (cursor: $cursor) {
-      pageInfo {
-        endCursor
-        hasNextPage
-        total
-        limit
-      }
-      edges {
-        ...PostView
-      }
-    }
-  }
-  me {
-    _id
-    username
-    profile {
-      picture
-      firstName
-      lastName
-      gender
-    }
-    friends {
-      _id
-      fullName
-      profile {
-        picture
-        firstName
-        lastName
-        gender
-      }
-    }
-  }
-}
-${Feed.fragments.post}
-`;
-
-const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: String!, $cursor: String) {
-  resident(_id: $_id) {
-    _id
-    posts (cursor: $cursor) {
-      pageInfo {
-        endCursor
-        hasNextPage
-        total
-        limit
-      }
-      edges {
-        ...PostView
-      }
-    }
-  }
-}
-${Feed.fragments.post}
-`;
+import profilePageQuery from '../../graphqls/queries/UserPageQueries/ProfilePageQuery.graphql';
+import morePostsProfilePageQuery from '../../graphqls/queries/UserPageQueries/MorePostsProfilePageQuery.graphql';
 
 class Me extends Component {
 

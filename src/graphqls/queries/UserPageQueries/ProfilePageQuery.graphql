@@ -1,0 +1,51 @@
+#import "../../fragments/PostView.graphql"
+
+query profilePageQuery($_id: String!, $cursor: String) {
+  resident(_id: $_id) {
+    _id
+    isFriend
+    posts (cursor: $cursor) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        total
+        limit
+      }
+      edges {
+        ...PostView
+      }
+    }
+    email {
+      address
+    }
+    profile {
+      firstName
+      lastName
+      gender
+      dob
+      address
+      picture
+    }
+    phone {
+      number
+    }
+  }
+  me {
+    _id
+    username
+    profile {
+      firstName
+      lastName
+      picture
+    }
+    friends {
+      _id
+      fullName
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+  }
+}

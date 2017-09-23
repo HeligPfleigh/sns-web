@@ -1,0 +1,87 @@
+
+#import "./CommentView.graphql"
+#import "./EventDetailView.graphql"
+
+fragment PostView on Post {
+  _id
+  message
+  type
+  user {
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
+  }
+  sharing {
+    _id
+    message
+    type
+    author {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    user {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    }
+    building {
+      _id
+      name
+    }
+    privacy
+    createdAt
+  }
+  author {
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
+  }
+  building {
+    _id
+    name
+  }
+  totalLikes
+  totalComments
+  isLiked
+  createdAt
+  privacy
+  photos
+  comments (limit: 2) {
+    _id
+    message
+    user {
+      _id
+      username
+      profile {
+        picture
+        firstName
+        lastName
+      }
+    },
+    parent
+    reply {
+      ...CommentView
+    },
+    updatedAt
+  }
+  event {
+    ...EventDetailView
+  }
+}
