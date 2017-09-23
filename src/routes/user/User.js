@@ -4,90 +4,23 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Image } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
 import throttle from 'lodash/throttle';
 import InfiniteScroll from 'react-infinite-scroller';
+
+import s from './User.scss';
 import Tab from '../../components/Me/TabComponent/Tab';
-import Info from '../../components/Me/InfoComponent/Info';
+import UserInfo from '../../components/Me/InfoComponent/UserInfo';
 import NewPost from '../../components/NewPost';
 import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList from '../me/FeedList';
 import { Feed } from '../../components/Feed';
-import { PUBLIC, FRIEND, MY_TIME_LINE, MY_INFO } from '../../constants';
-import s from './User.scss';
+import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import Loading from '../../components/Loading';
-
-const profilePageQuery = gql`query profilePageQuery($_id: String!, $cursor: String) {
-  resident(_id: $_id) {
-    _id
-    isFriend
-    posts (cursor: $cursor) {
-      pageInfo {
-        endCursor
-        hasNextPage
-        total
-        limit
-      }
-      edges {
-        ...PostView
-      }
-    }
-    profile {
-      picture
-      firstName
-      lastName
-      gender
-    }
-  }
-  me {
-    _id
-    username
-    profile {
-      picture
-      firstName
-      lastName
-    }
-    friends {
-      _id
-      fullName
-      profile {
-        picture
-        firstName
-        lastName
-      }
-    }
-  }
-}
-${Feed.fragments.post}`;
-
-const morePostsProfilePageQuery = gql`query morePostsProfilePageQuery ($_id: String!, $cursor: String) {
-  resident(_id: $_id) {
-    _id
-    isFriend
-    posts (cursor: $cursor) {
-      pageInfo {
-        endCursor
-        hasNextPage
-        total
-        limit
-      }
-      edges {
-        ...PostView
-      }
-    }
-    profile {
-      picture
-      firstName
-      lastName
-      gender
-    }
-  }
-}
-${Feed.fragments.post}
-`;
+import profilePageQuery from '../../graphqls/queries/UserPageQueries/ProfilePageQuery.graphql';
+import morePostsProfilePageQuery from '../../graphqls/queries/UserPageQueries/MorePostsProfilePageQuery.graphql';
 
 class User extends Component {
 
@@ -188,7 +121,7 @@ class User extends Component {
                   </InfiniteScroll>
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile && <Info profile={profile} isMe={false} />}
+                  {profile && <UserInfo userInfo={resident} />}
                 </div>
               </Grid>
             </div>
