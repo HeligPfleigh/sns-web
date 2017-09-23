@@ -1,0 +1,15 @@
+fragment CommentView on Comment {
+  _id,
+  message
+  user {
+    _id
+    username
+    profile {
+      picture
+      firstName
+      lastName
+    }
+  },
+  parent
+  updatedAt
+}
