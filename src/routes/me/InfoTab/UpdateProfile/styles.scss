@@ -1,24 +1,25 @@
-@import '../../../components/variables.css';
-
 .profile{
   margin: 0px;
-  padding: 0px;
+  padding: 10px 20px;
   width: auto;
+
   .profileInfo {
     margin-bottom: 15px;
   }
+
   i {
     color: #4c4c4c;
     width: 40px;
     font-size: 24px;
     display: inline-block;
   }
+
   .profileRight {
     margin-top: 7px;
   }
 }
+
 .buttonAccept {
-  background-color: #263E49;
   border: 0px;
   border-radius:4px;
   padding: 10px 15px;
@@ -28,7 +29,9 @@
   font-size: 14px;
   font-weight: 400;
   width: 150px;
+  background-color: #263E49;
 }
+
 .buttonCancel {
   border: 0px;
   border-radius:4px;
@@ -37,11 +40,19 @@
   font-size: 14px;
   font-weight: 400;
   width: 75px;
+  background-color: #ccc;
 }
-form>div>div>div>div>span {
-  border: none;
-  font-weight: bold;
-  color: #700;
-  flex: 1;
-  padding: 5px 8px;
+
+.btnGroup {
+  padding: 0px;
+  margin-top: 15px;
+
+  i {
+    padding-right: 5px;
+  }
+}
+
+.loading {
+  z-index: 999;
+  position: absolute;
 }
