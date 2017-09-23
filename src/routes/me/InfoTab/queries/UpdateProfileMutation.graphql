@@ -1,0 +1,20 @@
+mutation updateUserProfile ($input: UpdateUserInputRequest!) {
+  updateUserProfile (input: $input) {
+    user {
+      _id
+      email {
+        address
+      }
+      profile {
+        firstName
+        lastName
+        gender
+        dob
+        address
+      }
+      phone {
+        number
+      }
+    }
+  }
+}

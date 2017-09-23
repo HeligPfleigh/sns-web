@@ -65,7 +65,7 @@ export const comparePassword = (pattern, value) => (
 );
 
 // Check email
-export const email = value => (
+export const isEmail = value => (
   value && !validator.isEmail(value)
     ? 'Email không hợp lệ'
     : undefined
@@ -78,14 +78,14 @@ export const alphaNumeric = value => (
 );
 
 // phone validate
-export const phoneNumber = value => (
+export const isMobilePhone = value => (
   value && !validator.isMobilePhone(value, 'vi-VN')
     ? 'Số điện thoại không hợp lệ'
     : undefined
 );
 
 // password validate
-export const password = value => (
+export const checkPassword = value => (
   value && (!(/\d/.test(value)) || !(/[A-Z]/.test(value)))
     ? 'Mật khẩu phải chứa kí tự in hoa và chữ số'
     : undefined

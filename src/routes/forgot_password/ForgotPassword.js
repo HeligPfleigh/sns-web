@@ -19,7 +19,7 @@ import { Row, Button } from 'react-bootstrap';
 
 import history from '../../core/history';
 import createApolloClient from '../../core/createApolloClient';
-import { required, email } from '../../utils/validator';
+import { required, isEmail } from '../../utils/validator';
 import Modal from '../../components/Modal';
 import s from './styles.scss';
 
@@ -90,7 +90,7 @@ class ForgotPassword extends Component {
     const submitProccess = async () => {
       if (!isEmpty(username) && !await checkExistUser(username)) {
         throw Object({
-          username: 'Địa chỉ mail không đã tồn tại',
+          username: 'Địa chỉ mail không tồn tại',
         });
       }
 
@@ -157,7 +157,7 @@ class ForgotPassword extends Component {
             className="form-control"
             component={renderField}
             addOn={<span className={classNames('fa fa-envelope', s.addon)}></span>}
-            validate={[required, email]}
+            validate={[required, isEmail]}
           />
 
           <Button

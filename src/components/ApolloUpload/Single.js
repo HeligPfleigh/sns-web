@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import isEmpty from 'lodash/isEmpty';
-import includes from 'lodash/includes';
 
 import uploadFileValidator from '../../utils/valid.upload.file';
 

@@ -1,124 +1,67 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withApollo } from 'react-apollo';
-import ProfileReduxForm from './ProfileReduxForm';
-import updateProfileMutation from './updateProfileMutation.graphql';
+import classNames from 'classnames';
+import { Grid, Row, Col, Button } from 'react-bootstrap';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
+import UpdateProfile from './UpdateProfile';
+import ChangePassword from './ChangePassword';
+import s from './InfoTab.scss';
 
 class InfoTab extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      firstName: props.profile.firstName,
-      lastName: props.profile.lastName,
-      gender: props.profile.gender,
+      isPassUpdate: false,
       isInfoUpdate: false,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  updateView = () => {
     this.setState({
-      firstName: nextProps.profile.firstName,
-      lastName: nextProps.profile.lastName,
-      gender: nextProps.profile.gender,
+      isInfoUpdate: !this.state.isInfoUpdate,
     });
   }
 
-  openInfoUpdate = () => {
+  changeViewMode = () => {
     this.setState({
-      isInfoUpdate: true,
+      isPassUpdate: !this.state.isPassUpdate,
     });
-  }
-
-  closeInfoUpdate = () => {
-    this.setState({
-      isInfoUpdate: false,
-    });
-  }
-
-  submit = (values) => {
-    // print the form values to the console
-    // evt.preventDefault();
-    const {
-      userId,
-      queryData,
-      paramData,
-    } = this.props;
-    const {
-      firstName,
-      lastName,
-      gender,
-    } = values;
-    this.props.client.mutate({
-      mutation: updateProfileMutation,
-      variables: {
-        input: {
-          userId,
-          profile: {
-            firstName,
-            lastName,
-            gender,
-          },
-        },
-      },
-      update: (store, { data: { updateUserProfile } }) => {
-        // Read the data from our cache for this query.
-        const data = store.readQuery({
-          query: queryData,
-          variables: paramData,
-        });
-
-        data.me.profile.firstName = updateUserProfile.user.profile.firstName;
-        data.me.profile.lastName = updateUserProfile.user.profile.lastName;
-        data.me.profile.gender = updateUserProfile.user.profile.gender;
-
-        // Write our data back to the cache.
-        store.writeQuery({
-          query: queryData,
-          variables: paramData,
-          data,
-        });
-      },
-    });
-    this.closeInfoUpdate();
   }
 
   render() {
+    const { isInfoUpdate, isPassUpdate } = this.state;
+
     return (
-      <div style={{ marginTop: '-5px', marginBottom: '100px', backgroundColor: '#fff', clear: 'both', padding: '20px 15px' }}>
-        <ProfileReduxForm
-          onSubmit={this.submit}
-          firstName={this.state.firstName}
-          lastName={this.state.lastName}
-          gender={this.state.gender}
-          isInfoUpdate={this.state.isInfoUpdate}
-          openInfoUpdate={this.openInfoUpdate}
-          closeInfoUpdate={this.closeInfoUpdate}
-        />
+      <div className={classNames(s.container)}>
+        {
+          !isPassUpdate &&
+          <UpdateProfile isInfoUpdate={isInfoUpdate} updateView={this.updateView} />
+        }
+
+        {
+          isPassUpdate && <ChangePassword updateView={this.changeViewMode} />
+        }
+        <Grid className={s.btnGroup}>
+          <Row>
+            {
+              !isInfoUpdate && !isPassUpdate &&
+              <Col smOffset={1} sm={11}>
+                <Button className={s.buttonAccept} onClick={this.updateView}>
+                  <i className="fa fa-cogs" aria-hidden="true"></i>
+                  Đổi thông tin
+                </Button>
+                <Button className={s.buttonAccept} onClick={this.changeViewMode}>
+                  <i className="fa fa-lock" aria-hidden="true"></i>
+                  Đổi mật khẩu
+                </Button>
+              </Col>
+            }
+          </Row>
+        </Grid>
       </div>
     );
   }
 }
 
-InfoTab.propTypes = {
-  userId: PropTypes.string,
-  profile: PropTypes.shape({
-    firstName: PropTypes.string,
-    lastName: PropTypes.string,
-    gender: PropTypes.string,
-  }).isRequired,
-  client: PropTypes.object.isRequired,
-  queryData: PropTypes.object.isRequired,
-  paramData: PropTypes.object.isRequired,
-};
-
-InfoTab.defaultProps = {
-  profile: {
-    firstName: '',
-    lastName: '',
-    gender: '',
-  },
-};
-
-export default withApollo(InfoTab);
-
+export default withStyles(s)(InfoTab);

@@ -21,7 +21,12 @@ import { Row, Button } from 'react-bootstrap';
 
 import history from '../../core/history';
 import createApolloClient from '../../core/createApolloClient';
-import { required, normalLength, password, comparePassword } from '../../utils/validator';
+import {
+  required,
+  normalLength,
+  checkPassword,
+  comparePassword,
+} from '../../utils/validator';
 import Modal from '../../components/Modal';
 import s from './styles.scss';
 
@@ -202,7 +207,7 @@ class RecoveryPassword extends Component {
             component={renderField}
             placeholder="(*) Mật khẩu"
             addOn={<span className={classNames('fa fa-lock', s.addon)}></span>}
-            validate={[required, normalLength, password]}
+            validate={[required, normalLength, checkPassword]}
           />
 
           <Field
@@ -212,7 +217,7 @@ class RecoveryPassword extends Component {
             component={renderField}
             placeholder="(*) Nhập lại mật khẩu"
             addOn={<span className={classNames('fa fa-lock', s.addon)}></span>}
-            validate={[required, normalLength, password, this.compareValue]}
+            validate={[required, normalLength, checkPassword, this.compareValue]}
           />
 
           <Button

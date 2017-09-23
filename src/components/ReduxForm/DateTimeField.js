@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import ReactDateTime from 'react-datetime';
 import {
   HelpBlock,
@@ -28,10 +29,30 @@ export default class ReduxFormDateTimeField extends Component {
   }
 
   render() {
-    const { input: { onChange, ...input }, meta: { touched, error, warn }, closeOnSelect, ...props } = this.props;
+    const {
+      input: {
+        onChange, name, value, ...input
+      },
+      meta: {
+        touched, error, warn,
+      }, closeOnSelect, ...props
+    } = this.props;
+
+    const inputVal = (!value || moment.isMoment(value)) ? value : moment(value);
+
     return (<div>
-      <ReactDateTime {...input} {...props} ref={this.componentRef} onChange={this.onChange} />
-      {touched && (error || warn) && <HelpBlock>{error || warn}</HelpBlock>}
+      <ReactDateTime
+        {...input}
+        {...props}
+        name={name}
+        value={inputVal}
+        ref={this.componentRef}
+        onChange={this.onChange}
+      />
+      {
+        touched && (error || warn) &&
+        <HelpBlock>{error || warn}</HelpBlock>
+      }
     </div>);
   }
 }
