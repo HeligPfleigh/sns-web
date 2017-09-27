@@ -41,6 +41,8 @@ query profilePageQuery($_id: String!, $cursor: String) {
     friends {
       _id
       fullName
+      totalFriends
+      isFriend
       profile {
         picture
         firstName
