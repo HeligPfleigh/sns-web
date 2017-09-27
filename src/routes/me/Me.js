@@ -8,16 +8,18 @@ import { graphql, compose } from 'react-apollo';
 import InfiniteScroll from 'react-infinite-scroller';
 import update from 'immutability-helper';
 import { generate as idRandom } from 'shortid';
-import CommentList from '../../components/Comments/CommentList';
-import Tab from '../../components/Me/TabComponent/Tab';
-import InfoTab from './InfoTab';
-import NewPost from '../../components/NewPost';
-import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
-import { Feed } from '../../components/Feed';
-import FeedList from './FeedList';
-import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
+
 import s from './Me.scss';
+import UserInfoTab from './InfoTab';
+import FeedList from './FeedList';
+import { Feed } from '../../components/Feed';
 import Loading from '../../components/Loading';
+import NewPost from '../../components/NewPost';
+import Tab from '../../components/Me/TabComponent/Tab';
+import FriendList from '../../components/Me/FriendsComponent/FriendList';
+import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
+import CommentList from '../../components/Comments/CommentList';
+import { PUBLIC, MY_TIME_LINE, MY_INFO, MY_FRIEND } from '../../constants';
 import profilePageQuery from '../../graphqls/queries/UserPageQueries/ProfilePageQuery.graphql';
 import morePostsProfilePageQuery from '../../graphqls/queries/UserPageQueries/MorePostsProfilePageQuery.graphql';
 
@@ -69,8 +71,16 @@ class Me extends Component {
     const numbers = 100;
 
     let tab = MY_TIME_LINE;
-    if (query.tab) {
-      tab = MY_INFO;
+    switch (query.tab) {
+      case MY_FRIEND:
+        tab = MY_FRIEND;
+        break;
+      case MY_INFO:
+        tab = MY_INFO;
+        break;
+      default:
+        tab = MY_TIME_LINE;
+        break;
     }
 
     let hasNextPage = false;
@@ -95,39 +105,37 @@ class Me extends Component {
               </div>
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive} style={{ marginTop: '-8px' }}>
-                  <div className={s.parent}>
-                    <NewPost createNewPost={createNewPost} />
-                  </div>
-                  <InfiniteScroll
-                    loadMore={this.loadMoreRows}
-                    hasMore={hasNextPage}
-                    loader={<div className="loader">Loading ...</div>}
-                  >
-                    <FeedList
-                      feeds={resident.posts.edges}
-                      userInfo={me}
-                      loadMoreComments={loadMoreComments}
-                      createNewComment={createNewComment}
-                      deletePost={deletePost}
-                      editPost={editPost}
-                      sharingPost={sharingPost}
-                      updatePost={this.updatePostInList}
-                    />
-                  </InfiniteScroll>
-
-                </div>
-                <div className={tab === MY_INFO ? s.active : s.inactive}>
-                  {profile &&
-                    <InfoTab
-                      userId={me._id}
-                      profile={profile}
-                      queryData={profilePageQuery}
-                      paramData={{
-                        _id: me._id,
-                        cursor: null,
-                      }}
-                    />
+                  { tab === MY_TIME_LINE &&
+                    <span>
+                      <div className={s.parent}>
+                        <NewPost createNewPost={createNewPost} />
+                      </div>
+                      <InfiniteScroll
+                        loadMore={this.loadMoreRows}
+                        hasMore={hasNextPage}
+                        loader={<div className="loader">Loading ...</div>}
+                      >
+                        <FeedList
+                          feeds={resident.posts.edges}
+                          userInfo={me}
+                          loadMoreComments={loadMoreComments}
+                          createNewComment={createNewComment}
+                          deletePost={deletePost}
+                          editPost={editPost}
+                          sharingPost={sharingPost}
+                          updatePost={this.updatePostInList}
+                        />
+                      </InfiniteScroll>
+                    </span>
                   }
+                </div>
+
+                <div className={tab === MY_FRIEND ? s.active : s.inactive}>
+                  { tab === MY_FRIEND && <FriendList userId={me._id} /> }
+                </div>
+
+                <div className={tab === MY_INFO ? s.active : s.inactive}>
+                  { tab === MY_INFO && <UserInfoTab /> }
                 </div>
               </Grid>
             </div>

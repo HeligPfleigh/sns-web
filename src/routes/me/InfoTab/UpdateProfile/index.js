@@ -363,9 +363,7 @@ const ProfileReduxForm = reduxForm({
 
 export default compose(
   graphql(UserInfoQuery, {
-    options: {
-      fetchPolicy: 'network-only',
-    },
+    options: {},
     props: ({ data }) => {
       // initValues form
       const { me } = data;
