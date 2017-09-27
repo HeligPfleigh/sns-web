@@ -1,0 +1,52 @@
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  margin-left: 0px;
+  margin-right: 0px;
+  background: #fff;
+  padding: 20px;
+
+  a, a:hover, a:active {
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  .goBack {
+    cursor: pointer;
+
+    i {
+      color: #4c4c4c;
+      width: 40px;
+      font-size: 24px;
+      display: inline-block;
+    }
+
+    h4 {
+      display: inline-block;
+    }
+  }
+
+  .panel-title {
+    border-bottom: 1px solid #ccc;
+    ol {
+      padding: 10px 1px 0px;
+      background-color: #fff;
+
+      .breadcrumb-item {
+        i {
+          padding-right: 5px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
