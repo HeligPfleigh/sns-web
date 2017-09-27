@@ -1,0 +1,81 @@
+@import "../../../../../theme/resources.scss";
+
+.container {
+  margin-bottom: 13px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+
+  .item {
+    padding-bottom: 15px;
+    padding-top: 15px;
+    border-bottom: 1px solid #ccc;
+
+    .avarta {
+      width: 100px !important;
+      height: 100px !important;
+    }
+
+    .moreInfo {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .fullName {
+      font-weight: bold;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  .noRecordsFound {
+    padding-top: 10px;
+  }
+
+  :global .btn {
+    font-weight: 500;
+    margin-left: 5px !important;
+    border-radius: 4px;
+  }
+  :global .btn-primary {
+    color: #fff;
+    background: #283e4a;
+    &:hover {
+        background: #3E5B6B;
+    }
+  }
+  :global .btn-default {
+    color: #fff;
+    background: #bbb;
+    &:hover {
+        background: #ccc;
+    }
+  }
+}
+.userDetail {
+  .item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    .label {
+      font-weight: bold;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 0;
+
+      &:last-child {
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.loading {
+  opacity: 0.6;
+  z-index: 1024;
+  background-color: black;
+}
