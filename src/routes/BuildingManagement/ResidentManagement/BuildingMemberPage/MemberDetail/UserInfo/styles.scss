@@ -1,0 +1,62 @@
+.profile{
+  margin: 0px;
+  padding: 10px 20px;
+  width: auto;
+
+  .profileInfo {
+    margin-bottom: 15px;
+
+    div:first-child {
+      padding-left: 0px;
+    }
+
+    i {
+      color: #4c4c4c;
+      width: 30px;
+      font-size: 20px;
+      display: inline-block;
+    }
+  }
+
+  .profileRight {
+    margin-top: 0px;
+  }
+}
+
+.buttonAccept {
+  border: 0px;
+  border-radius:4px;
+  padding: 10px 15px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  width: 150px;
+  background-color: #263E49;
+}
+
+.buttonCancel {
+  border: 0px;
+  border-radius:4px;
+  padding: 10px 15px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  width: 75px;
+  margin-right: 10px;
+  background-color: #ccc;
+}
+
+.btnGroup {
+  padding: 0px;
+  margin-top: 15px;
+
+  i {
+    padding-right: 5px;
+  }
+}
+
+.loading {
+  z-index: 999;
+  position: absolute;
+}
