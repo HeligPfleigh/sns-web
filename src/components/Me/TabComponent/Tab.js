@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Tab.scss';
 import Link from '../../Link';
-import { MY_TIME_LINE, MY_INFO } from '../../../constants';
+import { MY_TIME_LINE, MY_INFO, MY_FRIEND } from '../../../constants';
 
 class Tab extends Component {
   static propTypes = {
@@ -21,6 +21,11 @@ class Tab extends Component {
           <Link to={isMe ? '/me' : `/user/${id}`} className={s.button}>
             DÒNG THỜI GIAN
             <i className="fa fa-sort-asc"></i>
+          </Link>
+        </li>
+        <li className={this.props.stateChildShow === MY_FRIEND ? s.active : ''}>
+          <Link to={isMe ? `/me?tab=${MY_FRIEND}` : `/user/${id}?tab=${MY_FRIEND}`} className={s.button}>
+            BẠN BÈ <i className="fa fa-sort-asc"></i>
           </Link>
         </li>
         <li className={this.props.stateChildShow === MY_INFO ? s.active : ''}>
