@@ -10,52 +10,56 @@ const menus = [{
   icon: 'fa fa-building',
   text: 'Quản lý mặt bằng',
   key: 'ground_management',
-  url: '/',
+  url: '/ground-management',
 }, {
   icon: 'fa fa-address-book',
   text: 'Quản lý cư dân',
   key: 'resident_management',
-  url: '/approve_member',
+  url: '/resident/approve_member/list',
   children: [{
     text: 'Phê duyệt',
     key: 'approve_member',
-    url: '/approve_member',
+    url: '/resident/approve_member/list',
+  }, {
+    text: 'Dánh sách cư dân',
+    key: 'residents',
+    url: '/resident/list',
   }, {
     text: 'Sửa đổi thông tin',
     key: 'change_info',
-    url: '/change_info',
+    // url: '/change_info',
   }],
 }, {
   icon: 'fa fa-money',
   text: 'Quản lý chi phí',
   key: 'fee_management',
-  url: '/fee_dashboard',
+  url: '/fee/list',
   children: [{
     text: 'Báo cáo',
     key: 'fee_dashboard',
-    url: '/fee_dashboard',
+    url: '/fee/list',
   }, {
     text: 'Upload',
     key: 'fee_upload',
-    url: '/fee_upload',
+    url: '/fee/upload',
   }, {
     text: 'Thông báo phí',
     key: 'fee_notications',
-    url: '/fee_notications',
+    // url: '/fee/notication',
   }],
 }, {
   icon: 'fa fa-bullhorn',
   text: 'Quản lý thông báo',
   key: 'announcements_management',
-  url: '/announcements_management',
+  url: '/announcement/list',
   children: [{
     text: 'Các thông báo',
     key: 'announcements',
-    url: '/announcements_management',
+    url: '/announcement/list',
   }, {
     text: 'Tạo thông báo',
     key: 'create_announcement',
-    url: '/create_announcement',
+    url: '/announcement/create',
   }],
 }, {
   icon: 'fa fa-cog',
