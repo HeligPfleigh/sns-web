@@ -1,0 +1,40 @@
+query UserDetailQuery($requestId: String!) {
+  requestsToJoinBuilding(_id : $requestId){
+    _id
+    type
+    status
+    user {
+      _id
+      email {
+        address
+      }
+      profile {
+        firstName
+        lastName
+        gender
+        dob
+        address
+      }
+      phone {
+        number
+      }
+    }
+    building {
+      _id
+      name
+      address {
+        basisPoint
+        province
+        district
+        ward
+        street
+      }
+    }
+    requestInformation {
+      apartments {
+        number
+        name
+      }
+    }
+  }
+}
