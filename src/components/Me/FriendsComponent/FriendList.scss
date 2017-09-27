@@ -1,0 +1,52 @@
+.container {
+  clear: both;
+  padding: 20px 15px;
+  margin-top: -5px;
+  margin-bottom: 100px;
+  background-color: #fff;
+
+  .buttonAccept {
+    border: 0px;
+    border-radius:4px;
+    padding: 10px 15px;
+    margin-right: 5px;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    width: 150px;
+    background-color: #263E49;
+  }
+
+  .buttonCancel {
+    border: 0px;
+    border-radius:4px;
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+    width: 75px;
+    background-color: #ccc;
+  }
+
+  .btnGroup {
+    padding: 0px;
+    margin-top: 15px;
+
+    i {
+      padding-right: 5px;
+    }
+  }
+
+  :global {
+    .help-block {
+      color: #a94442;
+      font-style: italic;
+    }
+  }
+}
+
+.loading {
+  z-index: 999;
+  position: absolute;
+}

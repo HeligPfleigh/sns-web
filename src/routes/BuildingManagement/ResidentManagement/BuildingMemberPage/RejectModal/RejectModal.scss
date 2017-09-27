@@ -1,0 +1,14 @@
+.modal {
+  :global {
+    .help-block {
+      color: #a94442;
+      font-style: italic;
+    }
+  }
+
+  .editor {
+    padding: 8px;
+    border: solid 1px #dedede;
+    min-height: 200px;
+  }
+}

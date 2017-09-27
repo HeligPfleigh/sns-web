@@ -11,16 +11,11 @@ import {
   ButtonToolbar,
 } from 'react-bootstrap';
 
-import history from '../../../../../core/history';
-import {
-  ACCEPTED,
-  REJECTED,
-  PENDING,
-} from '../../../../../constants';
 import RejectModal from '../RejectModal';
-import s from './UserAwaitingApproval.scss';
+import history from '../../../../../core/history';
+import s from './MemberList.scss';
 
-class User extends React.Component {
+class MemberItem extends React.Component {
 
   constructor(props) {
     super(props);
@@ -37,22 +32,21 @@ class User extends React.Component {
     });
   }
 
-  approveUser = (evt) => {
-    const requestsToJoinBuildingId = this.props.edge._id;
-    this.props.onAccept(evt, requestsToJoinBuildingId);
+  userDetail = (evt) => {
+    evt.preventDefault();
+    const { _id: userId, building: { _id: buildingId } } = this.props.data;
+    history.push(`/management/${buildingId}/resident/detail/${userId}`);
   }
 
-  useDetail = (evt) => {
+  updateUserInfo = (evt) => {
     evt.preventDefault();
-    const requestsToJoinBuildingId = this.props.edge._id;
-    const { buildingId } = this.props;
-    const url = `/management/${buildingId}/resident/approve_member/${requestsToJoinBuildingId}`;
-    history.push(url);
+    const { _id: userId, building: { _id: buildingId } } = this.props.data;
+    history.push(`/management/${buildingId}/resident/change_info/${userId}`);
   }
 
   render() {
     const {
-      edge: {
+      data: {
         _id,
         user,
         status,
@@ -86,25 +80,18 @@ class User extends React.Component {
                     </i>
                   </small>
                 </div>
-                { status === PENDING && <div><small><i>Trạng thái: Đang chờ phê duyệt</i></small></div> }
-                { status === ACCEPTED && <div style={{ color: '#337ab7' }}><small><i>Trạng thái: Đã đồng ý</i></small></div> }
-                { status === REJECTED && <div style={{ color: '#d9534f' }}><small><i>Trạng thái: Không đồng ý</i></small></div> }
               </div>
 
               <ButtonToolbar>
-                <Button title="Xem thông tin của thành viên" bsStyle="primary" onClick={this.useDetail}>
+                <Button title="Cập nhật thông tin thành viên" bsStyle="primary" onClick={this.updateUserInfo}>
+                  <i className="fa fa-edit" /> Sửa
+                </Button>
+                <Button title="Xem thông tin của thành viên" bsStyle="primary" onClick={this.userDetail}>
                   <i className="fa fa-info-circle" /> Xem thông tin
                 </Button>
-                { status === PENDING &&
-                  <span>
-                    <Button title="Chấp nhận là thành viên của tòa nhà" bsStyle="primary" onClick={this.approveUser}>
-                      <i className="fa fa-check" /> Đồng ý
-                    </Button>
-                    <Button title="Không chấp nhận là thành viên của tòa nhà" bsStyle="default" onClick={this.onToggleModal}>
-                      <i className="fa fa-remove" /> Từ chối
-                    </Button>
-                  </span>
-                }
+                <Button title="Xóa thành viên ra khỏi tòa nhà" bsStyle="default" onClick={this.onToggleModal}>
+                  <i className="fa fa-trash" /> Xóa
+                </Button>
               </ButtonToolbar>
             </Col>
             <Clearfix />
@@ -114,7 +101,7 @@ class User extends React.Component {
           { this.state.errorMessage }
         </Alert>)}
         { this.state.showModal && <RejectModal
-          requestsToJoinBuildingId={_id}
+          memberId={_id}
           onReject={onCancel}
           show={this.state.showModal}
           onHide={this.onToggleModal}
@@ -124,17 +111,20 @@ class User extends React.Component {
   }
 }
 
-User.propTypes = {
-  edge: PropTypes.shape({
+MemberItem.propTypes = {
+  data: PropTypes.shape({
     _id: PropTypes.string,
     user: PropTypes.object,
     status: PropTypes.string,
     building: PropTypes.object,
     requestInformation: PropTypes.object,
   }).isRequired,
-  onAccept: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  buildingId: PropTypes.string.isRequired,
 };
 
-export default withStyles(s)(User);
+
+MemberItem.defaultProps = {
+  data: {},
+};
+
+export default withStyles(s)(MemberItem);

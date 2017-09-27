@@ -75,7 +75,7 @@ class ListUsers extends React.Component {
   )
 
   renderListUsers = () => {
-    const { data, loadMore } = this.props;
+    const { buildingId, data, loadMore } = this.props;
     const dataSource = (data && data.edges) || [];
     const hasNextPage = (data && data.pageInfo && data.pageInfo.hasNextPage) || false;
 
@@ -92,6 +92,7 @@ class ListUsers extends React.Component {
         { dataSource.map(edge => (
           <User
             edge={edge}
+            buildingId={buildingId}
             onAccept={this.acceptUser}
             onCancel={this.rejectUser}
             key={Math.random()}
@@ -116,22 +117,12 @@ class ListUsers extends React.Component {
   }
 }
 
-ListUsers.defaultProps = {
-  building: {
-    requests: {
-      edges: [],
-      pageInfo: {
-        hasNextPage: false,
-      },
-    },
-  },
-};
-
 ListUsers.propTypes = {
   data: PropTypes.shape({
     edges: PropTypes.arrayOf(PropTypes.object),
     pageInfo: PropTypes.object,
   }).isRequired,
+  buildingId: PropTypes.string.isRequired,
   loadMore: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   approvingUserToBuilding: PropTypes.func.isRequired,

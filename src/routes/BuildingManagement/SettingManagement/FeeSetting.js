@@ -219,7 +219,7 @@ export default compose(
     }),
     props: ({ data }) => ({
       data,
-      initialValues: data.loading ? {} : data.getBuildingSettings.fee,
+      initialValues: (data && data.getBuildingSettings && data.getBuildingSettings.fee) || {},
     }),
   }),
   graphql(BuildingFeeSettingsMutation, {

@@ -1,0 +1,52 @@
+@import "../../../../theme/resources.scss";
+.friend {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+
+  .friendAvatar {
+    cursor: pointer;
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      vertical-align: middle;
+    }
+  }
+
+  .friendContent {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-left: 1em;
+    @include media-breakpoint-down(sm) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .friendInfo {
+    @extend .friendContent;
+    min-width: 50%;
+
+    .friendName {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      > span:first-child {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .status {
+    @extend .friendContent;
+    i {
+      padding-right: 3px;
+    }
+  }
+}

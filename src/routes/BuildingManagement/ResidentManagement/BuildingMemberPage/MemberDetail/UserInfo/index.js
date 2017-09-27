@@ -4,6 +4,7 @@ import { compose, graphql } from 'react-apollo';
 import { Field, reduxForm, SubmissionError } from 'redux-form';
 import isEmpty from 'lodash/isEmpty';
 import moment from 'moment';
+import classNames from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Grid, Row, Col, Form, ControlLabel, Button } from 'react-bootstrap';
 
@@ -12,12 +13,13 @@ import {
   required,
   maxLength25,
   isMobilePhone,
-} from '../../../../utils/validator';
-import Loading from '../../../../components/Loading';
-import * as ReduxFormFields from '../../../../components/ReduxForm';
-import UserInfoQuery from '../queries/UserInfoQuery.graphql';
-import CheckExistUserQuery from '../queries/CheckExistUserQuery.graphql';
-import UpdateProfileMutation from '../queries/UpdateProfileMutation.graphql';
+} from '../../../../../../utils/validator';
+import history from '../../../../../../core/history';
+import Loading from '../../../../../../components/Loading';
+import * as ReduxFormFields from '../../../../../../components/ReduxForm';
+import UserDetailQuery from '../../graphql/UserDetailQuery.graphql';
+import CheckExistUserQuery from '../../graphql/CheckExistUserQuery.graphql';
+import UpdateProfileMutation from '../../graphql/UpdateProfileMutation.graphql';
 import s from './styles.scss';
 
 const defaultVal = 'chưa có thông tin.';
@@ -31,7 +33,7 @@ const minDate = moment().subtract(120, 'years');
 const maxDate = moment().subtract(16, 'years');
 
 @withStyles(s)
-class UpdateProfile extends Component {
+class UserInfo extends Component {
 
   constructor(props) {
     super(props);
@@ -71,7 +73,7 @@ class UpdateProfile extends Component {
 
     this.props.reset();
     this.props.refetch();
-    this.props.updateView();
+    history.goBack();
   }
 
   submit = (values) => {
@@ -141,7 +143,7 @@ class UpdateProfile extends Component {
     const {
       error,
       loading,
-      isInfoUpdate,
+      isUpdateInfo,
       initialValues,
       submitting,
       handleSubmit,
@@ -159,13 +161,17 @@ class UpdateProfile extends Component {
       backgroundColor: saved ? '#2BB74B' : '#E53935',
     };
 
+    const lineInfo = {
+      marginTop: isUpdateInfo ? '0px' : '3px',
+    };
+
     if (loading) {
       return (<Loading show={loading} full>Đang tải ...</Loading>);
     }
 
     return (
       <Form onSubmit={handleSubmit(this.submit)} autoComplete="off">
-        <Loading show={submitting} className={s.loading}>Đang tải ...</Loading>
+        { submitting && <Loading show={submitting} className={s.loading}>Đang tải ...</Loading> }
         {
           error && <div style={alertStyles}>
             <i className="fa fa-exclamation-circle" /> &nbsp;{error}
@@ -176,16 +182,17 @@ class UpdateProfile extends Component {
             <i className="fa fa-exclamation-circle" /> &nbsp; Đổi thông tin thành công..!
           </div>
         }
+        { isEmpty(initialValues) && <h4>Không tìm thấy thông tin</h4> }
         <Grid className={s.profile}>
-          <Row className={s.profileInfo}>
-            <Col sm={3}>
+          <Row className={classNames(s.profileInfo)}>
+            <Col sm={2}>
               <i className="fa fa-user-circle-o fa-2x" aria-hidden="true"></i>
               <ControlLabel htmlFor="lastName">
-                { isInfoUpdate ? 'Họ' : 'Họ và Tên' }
+                { isUpdateInfo ? 'Họ' : 'Họ và Tên' }
               </ControlLabel>
             </Col>
-            <Col sm={9} className={s.profileRight}>
-              {isInfoUpdate ? <Field
+            <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
+              {isUpdateInfo ? <Field
                 type="text"
                 name="lastName"
                 placeholder="Họ của bạn?"
@@ -194,13 +201,13 @@ class UpdateProfile extends Component {
               /> : `${initialValues.firstName} ${initialValues.lastName}`}
             </Col>
           </Row>
-          { isInfoUpdate &&
-            <Row className={s.profileInfo}>
-              <Col sm={3}>
+          { isUpdateInfo &&
+            <Row className={classNames(s.profileInfo)}>
+              <Col sm={2}>
                 <i className="fa fa-2x" aria-hidden="true"></i>
                 <ControlLabel htmlFor="firstName">Tên</ControlLabel>
               </Col>
-              <Col sm={9} className={s.profileRight}>
+              <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
                 <Field
                   type="text"
                   name="firstName"
@@ -211,28 +218,28 @@ class UpdateProfile extends Component {
               </Col>
             </Row>
           }
-          <Row className={s.profileInfo}>
-            <Col sm={3}>
+          <Row className={classNames(s.profileInfo)}>
+            <Col sm={2}>
               <i className="fa fa-venus-mars fa-2x" aria-hidden="true"></i>
               <ControlLabel htmlFor="gender">Giới Tính</ControlLabel>
             </Col>
-            <Col sm={9} className={s.profileRight}>
-              {isInfoUpdate &&
+            <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
+              {isUpdateInfo &&
               <Field
                 name="gender"
                 options={genderSource}
                 component={ReduxFormFields.SelectField}
               />}
-              { !isInfoUpdate && this.genderLabel(initialValues.gender) }
+              { !isUpdateInfo && this.genderLabel(initialValues.gender) }
             </Col>
           </Row>
-          <Row className={s.profileInfo}>
-            <Col sm={3}>
+          <Row className={classNames(s.profileInfo)}>
+            <Col sm={2}>
               <i className="fa fa-birthday-cake fa-2x" aria-hidden="true"></i>
               <ControlLabel htmlFor="lastName">Ngày sinh</ControlLabel>
             </Col>
-            <Col sm={9} className={s.profileRight}>
-              {isInfoUpdate ? <Field
+            <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
+              {isUpdateInfo ? <Field
                 name="dob"
                 locale="vi"
                 inputProps={{
@@ -249,13 +256,13 @@ class UpdateProfile extends Component {
               /> : moment(initialValues.dob).format('DD-MM-YYYY')}
             </Col>
           </Row>
-          <Row className={s.profileInfo}>
-            <Col sm={3}>
+          <Row className={classNames(s.profileInfo)}>
+            <Col sm={2}>
               <i className="fa fa-phone-square fa-2x" aria-hidden="true"></i>
               <ControlLabel htmlFor="phone">Số điện thoại</ControlLabel>
             </Col>
-            <Col sm={9} className={s.profileRight}>
-              {isInfoUpdate ? <Field
+            <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
+              {isUpdateInfo ? <Field
                 type="text"
                 name="phone"
                 placeholder="Số điện thoại của bạn?"
@@ -264,13 +271,13 @@ class UpdateProfile extends Component {
               /> : initialValues.phone}
             </Col>
           </Row>
-          <Row className={s.profileInfo}>
-            <Col sm={3}>
+          <Row className={classNames(s.profileInfo)}>
+            <Col sm={2}>
               <i className="fa fa-envelope fa-2x" aria-hidden="true"></i>
               <ControlLabel htmlFor="email">Email</ControlLabel>
             </Col>
-            <Col sm={9} className={s.profileRight}>
-              {isInfoUpdate ? <Field
+            <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
+              {isUpdateInfo ? <Field
                 type="text"
                 name="email"
                 placeholder="Email của bạn?"
@@ -279,13 +286,13 @@ class UpdateProfile extends Component {
               /> : initialValues.email}
             </Col>
           </Row>
-          <Row className={s.profileInfo}>
-            <Col sm={3}>
+          <Row className={classNames(s.profileInfo)}>
+            <Col sm={2}>
               <i className="fa fa-location-arrow fa-2x" aria-hidden="true"></i>
               <ControlLabel htmlFor="address">Địa chỉ</ControlLabel>
             </Col>
-            <Col sm={9} className={s.profileRight}>
-              {isInfoUpdate ? <Field
+            <Col sm={7} className={classNames(s.profileRight)} style={lineInfo}>
+              {isUpdateInfo ? <Field
                 name="address"
                 placeholder="Địa chỉ của bạn?"
                 componentClass="textarea"
@@ -295,12 +302,12 @@ class UpdateProfile extends Component {
           </Row>
           <Row>
             {
-              isInfoUpdate &&
-              <Col smOffset={3} sm={9}>
+              isUpdateInfo &&
+              <Col smOffset={3} sm={7} className="pull-right">
+                <Button className={s.buttonCancel} onClick={this.updateView}>Hủy</Button>
                 <Button type="submit" className={s.buttonAccept} disabled={submitting}>
                   Cập nhật
                 </Button>
-                <Button className={s.buttonCancel} onClick={this.updateView}>Hủy</Button>
               </Col>
             }
           </Row>
@@ -310,7 +317,7 @@ class UpdateProfile extends Component {
   }
 }
 
-UpdateProfile.propTypes = {
+UserInfo.propTypes = {
   error: PropTypes.any,
   loading: PropTypes.any,
   refetch: PropTypes.func,
@@ -318,8 +325,7 @@ UpdateProfile.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   invalid: PropTypes.bool.isRequired,
   submitting: PropTypes.bool.isRequired,
-  isInfoUpdate: PropTypes.bool.isRequired,
-  updateView: PropTypes.func.isRequired,
+  isUpdateInfo: PropTypes.bool.isRequired,
   reset: PropTypes.func.isRequired,
   updateUserProfile: PropTypes.func,
 };
@@ -359,23 +365,27 @@ const ProfileReduxForm = reduxForm({
   },
   asyncValidate,
   asyncBlurFields: ['phone', 'email'],
-})(UpdateProfile);
+})(UserInfo);
 
 export default compose(
-  graphql(UserInfoQuery, {
-    options: {},
+  graphql(UserDetailQuery, {
+    options: props => ({
+      variables: {
+        requestId: props.requestId,
+      },
+    }),
     props: ({ data }) => {
       // initValues form
-      const { me } = data;
+      const { requestsToJoinBuilding } = data;
       let initialValues = {};
 
-      if (me) {
+      if (requestsToJoinBuilding) {
         const {
           _id,
           profile,
           phone,
           email: emailVal,
-        } = me;
+        } = requestsToJoinBuilding.user;
 
         initialValues = {
           userId: _id,

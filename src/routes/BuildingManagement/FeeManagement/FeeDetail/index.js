@@ -124,7 +124,7 @@ class FeeDetails extends Component {
     const { data: { fee } } = this.props;
     if (fee && fee.building) {
       const { building } = fee;
-      history.push(`/management/${building.id}/fee_dashboard`);
+      history.push(`/management/${building.id}/fee/list`);
     }
   }
 
@@ -167,9 +167,7 @@ class FeeDetails extends Component {
                       </a>
                     </li>
                     <li>
-                      <a href="#" onClick={this.goBack}>
-                        Báo cáo
-                      </a>
+                      <a href="#" onClick={this.goBack}>Báo cáo</a>
                     </li>
                     <li className="active">Phòng { fee.apartment && fee.apartment.name }</li>
                   </ol>

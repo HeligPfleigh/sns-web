@@ -69,7 +69,8 @@ class FeeList extends Component {
   );
 
   handleClick = (data) => {
-    history.push(`/fee/${data._id}`);
+    const { _id: key, building: { id } } = data;
+    history.push(`/management/${id}/fee/detail/${key}`);
   }
 
   handlePageSelect = (pageNum) => {

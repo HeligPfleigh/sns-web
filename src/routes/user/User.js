@@ -17,8 +17,9 @@ import imageSrc from './Awesome-Art-Landscape-Wallpaper.jpg';
 import CommentList from '../../components/Comments/CommentList';
 import FeedList from '../me/FeedList';
 import { Feed } from '../../components/Feed';
-import { PUBLIC, MY_TIME_LINE, MY_INFO } from '../../constants';
 import Loading from '../../components/Loading';
+import FriendList from '../../components/Me/FriendsComponent/FriendList';
+import { PUBLIC, MY_TIME_LINE, MY_INFO, MY_FRIEND } from '../../constants';
 import profilePageQuery from '../../graphqls/queries/UserPageQueries/ProfilePageQuery.graphql';
 import morePostsProfilePageQuery from '../../graphqls/queries/UserPageQueries/MorePostsProfilePageQuery.graphql';
 
@@ -72,8 +73,16 @@ class User extends Component {
     const numbers = 100;
 
     let tab = MY_TIME_LINE;
-    if (query.tab) {
-      tab = MY_INFO;
+    switch (query.tab) {
+      case MY_FRIEND:
+        tab = MY_FRIEND;
+        break;
+      case MY_INFO:
+        tab = MY_INFO;
+        break;
+      default:
+        tab = MY_TIME_LINE;
+        break;
     }
 
     let hasNextPage = false;
@@ -98,27 +107,32 @@ class User extends Component {
               </div>
               <Grid fluid>
                 <div className={tab === MY_TIME_LINE ? s.active : s.inactive}>
-
-                  { isFriend && (<div className={s.parent}><NewPost
-                    createNewPost={createNewPost} friend={resident}
-                  /></div>) }
-
-                  <InfiniteScroll
-                    loadMore={this.loadMoreRows}
-                    hasMore={hasNextPage}
-                    loader={<div className="loader">Loading ...</div>}
-                  >
-                    <FeedList
-                      feeds={resident.posts.edges}
-                      userInfo={me}
-                      loadMoreComments={loadMoreComments}
-                      createNewComment={createNewComment}
-                      deletePost={deletePost}
-                      editPost={editPost}
-                      sharingPost={sharingPost}
-                      updatePost={this.updatePostInList}
-                    />
-                  </InfiniteScroll>
+                  {
+                    tab === MY_TIME_LINE && <span>
+                      { isFriend && (<div className={s.parent}><NewPost
+                        createNewPost={createNewPost} friend={resident}
+                      /></div>) }
+                      <InfiniteScroll
+                        loadMore={this.loadMoreRows}
+                        hasMore={hasNextPage}
+                        loader={<div className="loader">Loading ...</div>}
+                      >
+                        <FeedList
+                          feeds={resident.posts.edges}
+                          userInfo={me}
+                          loadMoreComments={loadMoreComments}
+                          createNewComment={createNewComment}
+                          deletePost={deletePost}
+                          editPost={editPost}
+                          sharingPost={sharingPost}
+                          updatePost={this.updatePostInList}
+                        />
+                      </InfiniteScroll>
+                    </span>
+                  }
+                </div>
+                <div className={tab === MY_FRIEND ? s.active : s.inactive}>
+                  { tab === MY_FRIEND && <FriendList userId={resident._id} /> }
                 </div>
                 <div className={tab === MY_INFO ? s.active : s.inactive}>
                   {profile && <UserInfo userInfo={resident} />}
