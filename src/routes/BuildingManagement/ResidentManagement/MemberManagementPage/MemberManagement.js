@@ -74,6 +74,7 @@ class MemberManagement extends Component {
               <Col md={12}>
                 { building &&
                   <ListUsersAwaitingApproval
+                    buildingId={buildingId}
                     data={building.requests || []}
                     loadMore={loadMore}
                     loading={data && data.loading}

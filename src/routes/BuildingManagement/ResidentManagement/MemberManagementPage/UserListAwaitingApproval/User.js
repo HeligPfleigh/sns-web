@@ -45,7 +45,9 @@ class User extends React.Component {
   useDetail = (evt) => {
     evt.preventDefault();
     const requestsToJoinBuildingId = this.props.edge._id;
-    history.push(`/management/user-approval/${requestsToJoinBuildingId}`);
+    const { buildingId } = this.props;
+    const url = `/management/${buildingId}/resident/approve_member/${requestsToJoinBuildingId}`;
+    history.push(url);
   }
 
   render() {
@@ -132,12 +134,7 @@ User.propTypes = {
   }).isRequired,
   onAccept: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-
-User.defaultProps = {
-  edge: {},
+  buildingId: PropTypes.string.isRequired,
 };
 
 export default withStyles(s)(User);
-
