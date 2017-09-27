@@ -1,0 +1,36 @@
+.containerTop30 {
+  margin-top: 30px;
+}
+
+.container {
+  margin-left: 0px;
+  margin-right: 0px;
+  background: #fff;
+
+  a, a:hover, a:active {
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    text-decoration-line: none;
+  }
+
+  .panel-title {
+    border-bottom: 1px solid #ccc;
+    ol {
+      padding: 20px 1px 0px;
+      background-color: #fff;
+
+      .breadcrumb-item {
+        i {
+          padding-right: 5px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .containerTop30 {
+    margin-top: 50px;
+  }
+}
