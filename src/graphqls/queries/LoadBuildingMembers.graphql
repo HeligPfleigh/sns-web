@@ -1,0 +1,21 @@
+#import "../fragments/UsersApprovalView.graphql"
+
+query LoadBuildingMembers(
+  $buildingId: String!,
+  $cursor: String,
+  $limit: Int
+) {
+  building (_id: $buildingId) {
+    _id
+    members (cursor: $cursor, limit: $limit) {
+      edges {
+        ...UsersApprovalView
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}
+

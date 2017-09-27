@@ -1,0 +1,39 @@
+fragment UsersApprovalView on RequestsToJoinBuilding {
+  _id
+  type
+  status
+  user {
+    _id
+    email {
+      address
+      verified
+    }
+    phone {
+      number
+      verified
+    }
+    profile {
+      picture
+      firstName
+      lastName
+      gender
+    }
+  }
+  building {
+    _id
+    name
+    address {
+      basisPoint
+      province
+      district
+      ward
+      street
+    }
+  }
+  requestInformation {
+    apartments {
+      _id
+      name
+    }
+  }
+}
