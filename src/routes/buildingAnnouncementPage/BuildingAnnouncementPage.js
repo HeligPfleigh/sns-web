@@ -43,6 +43,7 @@ class BuildingAnnouncementPage extends Component {
                       key={a._id}
                       data={a}
                       message={a.message}
+                      privacy="public"
                     />
                   ))
                 }

@@ -1,23 +1,38 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import update from 'immutability-helper';
-import throttle from 'lodash/throttle';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import isEmpty from 'lodash/isEmpty';
 import { Grid, Row, Col } from 'react-bootstrap';
-import InfiniteScroll from 'react-infinite-scroller';
 import { generate as idRandom } from 'shortid';
 import announcementQuery from './announcementQuery.graphql';
 import {
   BuildingAnnouncementItem,
 } from '../../components/BuildingAnnouncementList';
+
+import Loading from '../../components/Loading';
 import s from './AnnouncementDetail.scss';
+import history from '../../core/history';
 
 class AnnouncementDetail extends Component {
 
-  backAnnouncementsManagement = () => history.back()
+  backAnnouncementsManagement = () => {
+    const { query } = this.props;
+    if (!isEmpty(query)) {
+      if (query.privacy === 'public') {
+        // go to public annoucement page
+        return history.push('/announcements');
+      }
+
+      // go to management page
+      return history.push('/management/58da279f0ff5af8c8be59c36/announcement/list');
+    }
+
+    // previous history
+    return history.goBack();
+  }
 
   render() {
     const {
@@ -26,18 +41,18 @@ class AnnouncementDetail extends Component {
         announcement,
         resident,
       },
-      loadMoreRows,
       user,
+      query,
     } = this.props;
+
     let announcements = null;
-    let hasNextPage = false;
     if (resident) {
       announcements = resident.announcements;
-      hasNextPage = resident.announcements.pageInfo.hasNextPage;
     }
+
     return (
       <Grid>
-        {loading && <h3>Đang tải dữ liệu....</h3>}
+        {loading && <Loading full show={loading}>Đang tải dữ liệu....</Loading>}
         <Row>
           <Col md={8} sm={12} xs={12} className={s.container}>
             { user && user.isAdmin &&
@@ -62,23 +77,18 @@ class AnnouncementDetail extends Component {
               <div>
                 <span>Thông báo khác</span>
               </div>
-              <InfiniteScroll
-                loadMore={loadMoreRows}
-                hasMore={hasNextPage}
-                loader={<div className="loader">Loading ...</div>}
-              >
-                <ul className={s.announcementList}>
-                  {
-                    !loading && announcements && announcements.edges.map(a => (
-                      <BuildingAnnouncementItem
-                        key={idRandom()}
-                        data={a}
-                        message={a.message}
-                      />
-                    ))
-                  }
-                </ul>
-              </InfiniteScroll>
+              <ul className={s.announcementList}>
+                {
+                  !loading && announcements && announcements.edges.map(a => (
+                    <BuildingAnnouncementItem
+                      key={idRandom()}
+                      data={a}
+                      privacy={query.privacy}
+                      message={a.message}
+                    />
+                  ))
+                }
+              </ul>
             </div>
           </Col>
         </Row>
@@ -88,8 +98,8 @@ class AnnouncementDetail extends Component {
 }
 
 AnnouncementDetail.propTypes = {
+  query: PropTypes.object,
   data: PropTypes.shape({}).isRequired,
-  loadMoreRows: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
 };
 
@@ -108,33 +118,5 @@ export default compose(
       },
       fetchPolicy: 'network-only',
     }),
-    props: ({ data }) => {
-      const { fetchMore } = data;
-      const loadMoreRows = throttle(() => fetchMore({
-        variables: {
-          cursor: data.resident.announcements.pageInfo.endCursor,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newEdges = fetchMoreResult.resident.announcements.edges;
-          const pageInfo = fetchMoreResult.resident.announcements.pageInfo;
-          return update(previousResult, {
-            resident: {
-              announcements: {
-                edges: {
-                  $push: newEdges,
-                },
-                pageInfo: {
-                  $set: pageInfo,
-                },
-              },
-            },
-          });
-        },
-      }), 300);
-      return {
-        data,
-        loadMoreRows,
-      };
-    },
   }),
 )(AnnouncementDetail);

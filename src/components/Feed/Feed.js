@@ -595,7 +595,7 @@ Feed.fragments = {
       createdAt
       privacy
       photos
-      comments (limit: 2) {
+      comments (limit: 5) {
         _id
         message
         user {

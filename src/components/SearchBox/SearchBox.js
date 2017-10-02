@@ -238,6 +238,7 @@ SearchBox.defaultProps = {
 };
 SearchBox.propTypes = {
   isMobile: PropTypes.bool.isRequired,
+  client: PropTypes.any,
 };
 
-export default withStyles(s)(withApollo(SearchBox));
+export default withApollo(withStyles(s)(SearchBox));
