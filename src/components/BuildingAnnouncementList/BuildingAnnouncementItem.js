@@ -37,12 +37,17 @@ class BuildingAnnouncementItem extends Component {
         date,
       },
       message,
+      privacy,
       displayAction,
     } = this.props;
+    let url = `/announcement/${_id}`;
+    if (privacy) {
+      url = `${url}?privacy=${privacy}`;
+    }
     return (
       <li>
         <div className={s.buildingAnnouncementItem}>
-          <Link to={`/announcement/${_id}`} style={{ textDecoration: 'none' }}>
+          <Link to={url} style={{ textDecoration: 'none' }}>
             <div className={s.buildingAnnouncementIcon}>
               <i className="fa fa-bell-o" aria-hidden="true"></i>
             </div>
@@ -76,6 +81,7 @@ class BuildingAnnouncementItem extends Component {
 }
 
 BuildingAnnouncementItem.propTypes = {
+  privacy: PropTypes.string,
   data: PropTypes.object,
   message: PropTypes.string,
   onDelete: PropTypes.func,
