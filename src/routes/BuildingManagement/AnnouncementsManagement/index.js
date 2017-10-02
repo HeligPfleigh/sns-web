@@ -168,6 +168,7 @@ class AnnouncementsManagement extends Component {
                       <BuildingAnnouncementItem
                         key={a._id}
                         data={a}
+                        privacy="protected"
                         message={a.message}
                         displayAction
                         onDelete={this.deleteAnnouncementEvent}
