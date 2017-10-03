@@ -413,6 +413,7 @@ const GroundManagementForm = reduxForm({
         building: props.buildingId,
         filters: {},
       },
+      fetchPolicy: 'cache-and-network',
     }),
     props: ({ data }) => {
       const onChangePage = ({ page, filters }) => data.fetchMore({
