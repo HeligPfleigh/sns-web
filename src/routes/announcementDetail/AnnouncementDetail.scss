@@ -1,29 +1,37 @@
 .container {
   margin-top: 10px;
   background-color: #fff;
-  span {
-    font-size: 18px;
-    font-weight: bold;
-  } 
-}
+  font-size: 18px;
+  font-weight: bold;
 
-.buttonBack {
-  display: inline-block;
-  margin-left: 10px;
-}
+  .backLink {
+    margin-top: 5px;
+    border-bottom: 1px solid #e6e9ec;
 
-.announcement {
-  margin-top: 20px;
-  margin-bottom: 40px;
-}
+    i, h4 {
+      cursor: pointer;
+    }
 
-.announcementTitle {
-  margin-bottom: 10px;
-}
+    .buttonBack {
+      display: inline-block;
+      margin-left: 10px;
+    }
+  }
 
-.announcementList {
-  list-style: none;
-  padding: 0;
+
+  .announcement {
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+
+  .announcementTitle {
+    margin-bottom: 10px;
+  }
+
+  .announcementList {
+    list-style: none;
+    padding: 0;
+  }
 }
 
 @media (max-width: 992px) {
