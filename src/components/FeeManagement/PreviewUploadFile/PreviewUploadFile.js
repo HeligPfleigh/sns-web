@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Button,
   Modal,
@@ -71,9 +72,9 @@ class PreviewUpload extends React.Component {
       });
     } catch (e) {
       this.setState({
-        message: 'Có lỗi trong quá trình cập nhật.',
-        success: false,
         error: true,
+        success: false,
+        message: 'Có lỗi trong quá trình cập nhật.',
       });
       throw e;
     }
@@ -90,7 +91,7 @@ class PreviewUpload extends React.Component {
 
     const renderError = () => (<Panel className={s.ErrorText}>
       <h5>{data.message}</h5>
-      {data.validationErrors && (<ListGroup>
+      { data.validationErrors && !data.validationErrors.error && (<ListGroup>
           {Object.keys(data.validationErrors).map(key => (<ListGroupItem key={Math.random()}>
             <div><i className="fa fa-circle-o" aria-hidden="true"></i> {`Dòng ${key}`}</div>
             <ListGroup>
@@ -122,7 +123,13 @@ class PreviewUpload extends React.Component {
                 <td key={`amount${i}`}>{`${item.total}`}</td>
                 <td key={`datetime${i}`}>{`${item.time.month}/${item.time.year}`}</td>
                 <td key={`deadline${i}`}>{moment(item.deadline).format('DD/MM/YYYY')}</td>
-                <td key={`status${i}`}>{item.paid ? <span className="text-success">Đã nộp</span> : <span className="text-danger">Chưa nộp</span>}</td>
+                <td key={`status${i}`}>
+                  {
+                    item.paid ?
+                      <span className="text-success">Đã nộp</span>
+                    : <span className="text-danger">Chưa nộp</span>
+                  }
+                </td>
               </tr>
             );
           })
@@ -138,6 +145,7 @@ class PreviewUpload extends React.Component {
     const hasError = !!data.error;
     const { error, success } = this.state;
     const showMessage = error || success;
+
     return (
       <Modal show={show} onHide={closeModal} backdrop="static" className={s.previewFees}>
         <Modal.Header>
@@ -149,8 +157,10 @@ class PreviewUpload extends React.Component {
         <Modal.Footer>
           <div className="text-center">
             <ButtonToolbar>
-              <Button type="button" onClick={this.onCancel}>{ showMessage ? 'Đóng cửa sổ' : 'Hủy bỏ' }</Button>
-              {!showMessage && <Button type="button" bsStyle="primary" onClick={this.uploadAndSave} disabled={hasError}>Đồng ý</Button>}
+              <Button onClick={this.onCancel} bsStyle="danger">
+                { (showMessage || hasError) ? 'Đóng cửa sổ' : 'Hủy bỏ' }
+              </Button>
+              { !hasError && <Button bsStyle="primary" onClick={this.uploadAndSave}>Đồng ý</Button>}
             </ButtonToolbar>
           </div>
           <Col className={s.note}>(*Ghi chú: Nếu tập tin tải lên không đúng, bạn có thể hủy và chọn lại.)</Col>
