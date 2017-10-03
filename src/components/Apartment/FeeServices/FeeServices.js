@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Col, Button, Clearfix, Alert } from 'react-bootstrap';
 import { compose } from 'react-apollo';
 import isEmpty from 'lodash/isEmpty';
