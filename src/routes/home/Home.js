@@ -144,7 +144,7 @@ export default compose(
       const { fetchMore } = data;
       const loadMoreRows = throttle(() => fetchMore({
         variables: {
-          cursor: data.feeds.pageInfo.endCursor,
+          cursor: (data.feeds && data.feeds.pageInfo && data.feeds.pageInfo.endCursor) || null,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const newEdges = fetchMoreResult.feeds.edges;
@@ -360,7 +360,7 @@ export default compose(
             message,
             user: {
               __typename: 'Author',
-              _id: user._id,
+              _id: user.id,
               username: user.username,
               profile: user.profile,
             },
