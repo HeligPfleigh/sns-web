@@ -3,35 +3,11 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { Clearfix } from 'react-bootstrap';
-import ScrollableAnchor, { configureAnchors, goToAnchor } from 'react-scrollable-anchor';
 
 import s from './CommentStyle.scss';
 import CommentItem from './CommentItem';
-import NewComment from './NewComment';
-
-configureAnchors({ offset: -160, scrollDuration: 200 });
 
 class CommentList extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      commentId: null,
-      isSubForm: false,
-    };
-    if (process.env.BROWSER) {
-      window.goToAnchor = goToAnchor;
-    }
-  }
-
-  showCommentForm = ({ _id, parent, user }) => {
-    const content = `@${user.username} - `;
-    this.setState({
-      initContent: parent ? content : '',
-      commentId: parent || _id,
-      isSubForm: !this.setState.isSubForm,
-    });
-  }
 
   hasMore = () => {
     const { totalComments, comments } = this.props;
@@ -49,40 +25,19 @@ class CommentList extends Component {
   }
 
   render() {
-    const { postId, isFocus, user, comments } = this.props;
-    const { initContent, commentId, isSubForm } = this.state;
+    const { postId, comments, createNewComment } = this.props;
 
     return (
       <div className={s.commentContent}>
         {this.hasMore() && <a title="Xem thêm" onClick={this.loadMoreComments}>
           <i className="fa fa-hand-o-right" aria-hidden="true"></i> Xem thêm
         </a>}
-        { comments && comments.map(item => (
-          <span key={item._id}>
-            <CommentItem comment={item} showCommentForm={this.showCommentForm} />
-            {item && item.reply && item.reply.map(_item => (
-              <span className={s.subComment} key={_item._id}>
-                <CommentItem comment={_item} showCommentForm={this.showCommentForm} />
-              </span>
-            ))}
-            { commentId === item._id && <ScrollableAnchor id={`#add-comment-${item._id}`}>
-              <span className={s.subComment}>
-                <NewComment
-                  initContent={initContent}
-                  commentId={commentId}
-                  isFocus={isSubForm}
-                  user={user}
-                  postId={postId}
-                  createNewComment={this.props.createNewComment}
-                />
-              </span>
-            </ScrollableAnchor> }
-          </span>
-        ))}
+        {
+          comments && comments.map(item => (
+            <CommentItem key={item._id} postId={postId} comment={item} createNewComment={createNewComment} />
+          ))
+        }
         <Clearfix />
-        <ScrollableAnchor id={`#add-comment-${postId}`}>
-          <NewComment isFocus={isFocus} user={user} postId={postId} createNewComment={this.props.createNewComment} />
-        </ScrollableAnchor>
       </div>
     );
   }
@@ -93,8 +48,6 @@ CommentList.propTypes = {
     _id: PropTypes.string.isRequired,
   })).isRequired,
   postId: PropTypes.string.isRequired,
-  isFocus: PropTypes.bool.isRequired,
-  user: PropTypes.object.isRequired,
   createNewComment: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired,
   totalComments: PropTypes.number.isRequired,
