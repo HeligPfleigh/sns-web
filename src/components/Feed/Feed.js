@@ -16,6 +16,7 @@ import { generate as idRandom } from 'shortid';
 import noop from 'lodash/noop';
 import classnames from 'classnames';
 import moment from 'moment';
+import { Link as AnchorLink, Element } from 'react-scroll';
 
 import history from '../../core/history';
 import Post, { PostHeader, PostText, PostActions, PostContent, PostPhotos } from '../Card';
@@ -24,6 +25,7 @@ import TimeAgo from '../TimeAgo';
 import Divider from '../Divider';
 import Link from '../Link';
 import SharingPost from './SharingPost';
+import NewComment from '../Comments/NewComment';
 import CommentList from '../Comments/CommentList';
 import {
   PUBLIC,
@@ -61,6 +63,8 @@ class Feed extends Component {
     super(...args);
 
     this.state = {
+      flag: false,
+      isFocus: false,
       isInterested: false,
     };
 
@@ -109,6 +113,17 @@ class Feed extends Component {
       sharingPostEvent = doNothing,
     } = this.props;
     sharingPostEvent(_id, sharing || this.props.data, eventKey || null);
+  }
+
+  onFocusCommentFrm = (evt) => {
+    if (evt && evt.preventDefault) {
+      evt.preventDefault();
+    }
+
+    this.setState({
+      isFocus: true,
+      flag: !this.state.flag,
+    });
   }
 
   render() {
@@ -254,10 +269,10 @@ class Feed extends Component {
         }
 
         {!sharing && photos && photos.length > 0 && <PostPhotos images={photos} />}
-        <PostText className={s.postStatistic}>
+        {!IS_POST_TYPE_EVENT && <div className={s.postStatistic}>
           <a href="#" onClick={doNothing}>{ totalLikes } Thích</a>
           <a href="#" onClick={doNothing}>{ totalComments } Bình luận</a>
-        </PostText>
+        </div>}
 
         { IS_POST_TYPE_EVENT && (<Row className={s.event}>
           <Col xs={12}>
@@ -296,7 +311,9 @@ class Feed extends Component {
             title="Thích"
             icons={`${isLiked ? s.likeColor : 'fa-heart-o'} fa fa-heart fa-lg`}
           />
-          <Icon onClick={doNothing} title="Bình luận" icons="fa fa-comment-o fa-lg" />
+          <AnchorLink to={`#add-comment-${_id}`} offset={-150} smooth onClick={this.onFocusCommentFrm}>
+            <i className="fa fa-comment-o fa-lg" /> Bình luận
+          </AnchorLink>
           { /* <Icon onClick={this.onSelectShareButton} title="Chia sẻ" icons="fa fa-share fa-lg" /> */ }
           <Dropdown id={idRandom()}>
             <CustomToggle bsRole="toggle">
@@ -314,7 +331,22 @@ class Feed extends Component {
 
         { !sharingPostModalOpenned && IS_POST_TYPE_STATUS && (
         <PostContent className={s.commentPanel}>
-          <CommentList comments={comments.slice().reverse() || []} isFocus={false} postId={_id} user={userInfo} totalComments={totalComments} loadMoreComments={loadMoreComments} createNewComment={createNewComment} />
+          <CommentList
+            postId={_id}
+            totalComments={totalComments}
+            loadMoreComments={loadMoreComments}
+            createNewComment={createNewComment}
+            comments={comments.slice().reverse() || []}
+          />
+          <Clearfix />
+          <Element name={`#add-comment-${_id}`}>
+            <NewComment
+              postId={_id}
+              flag={this.state.flag}
+              isFocus={this.state.isFocus}
+              createNewComment={createNewComment}
+            />
+          </Element>
         </PostContent>
         ) }
       </Post>
@@ -402,20 +434,6 @@ Feed.defaultProps = {
   createNewComment: noop,
   sharingPostEvent: noop,
 };
-
-/**
-const userFragment = gql`
-  fragment UserView on User {
-    _id,
-    username,
-    profile {
-      picture,
-      firstName,
-      lastName
-    }
-  }
-`;
-*/
 
 const commentFragment = gql`fragment CommentView on Comment {
     _id,
