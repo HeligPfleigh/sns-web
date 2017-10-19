@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-
 import Draft, {
   Editor,
   EditorState,
   CompositeDecorator,
   convertToRaw,
 } from 'draft-js';
+import { connect } from 'react-redux';
+import { Image, Col, Clearfix } from 'react-bootstrap';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
-import {
-  Image,
-  Col,
-  Clearfix,
-} from 'react-bootstrap';
-
-import { HANDLE_REGEX, HASHTAG_REGEX } from '../../../constants';
-import s from './NewComment.css';
+import s from './styles.scss';
 import HandleSpan from '../../Common/Editor/HandleSpan';
 import HashtagSpan from '../../Common/Editor/HashtagSpan';
+import { HANDLE_REGEX, HASHTAG_REGEX } from '../../../constants';
 
 /**
  * Super simple decorators for handles and hashtags, for demonstration
@@ -62,21 +57,23 @@ const compositeDecorator = new CompositeDecorator([{
   component: HashtagSpan,
 }]);
 
-/** NewPost Component */
-class NewPost extends Component {
+/** NewComment Component */
+@connect(state => ({
+  user: state.user,
+}))
+class NewComment extends Component {
 
   constructor(props) {
     super(props);
     // const { initContent } = this.props;
     this.state = {
-      editorState: EditorState.createEmpty(compositeDecorator),
       isSubmit: false,
+      editorState: EditorState.createEmpty(compositeDecorator),
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    const { isFocus } = this.props;
-    if (nextProps.isFocus !== isFocus) {
+    if (nextProps.isFocus) {
       this.editor.focus();
     }
   }
@@ -119,8 +116,9 @@ class NewPost extends Component {
   focus = () => this.editor.focus();
 
   render() {
-    const { editorState } = this.state;
     const { user } = this.props;
+    const { editorState } = this.state;
+
     return (
       <div className={s.newCommentPanel}>
         <Col className={`pull-left ${s.newCommentAvarta}`}>
@@ -147,13 +145,14 @@ class NewPost extends Component {
   }
 }
 
-NewPost.propTypes = {
+NewComment.propTypes = {
   // initContent: PropTypes.string,
+  user: PropTypes.object,
   commentId: PropTypes.string,
+  // eslint-disable-next-line
   isFocus: PropTypes.bool.isRequired,
   postId: PropTypes.string.isRequired,
-  user: PropTypes.object.isRequired,
   createNewComment: PropTypes.func.isRequired,
 };
 
-export default withStyles(s)(NewPost);
+export default withStyles(s)(NewComment);
