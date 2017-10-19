@@ -1,5 +1,3 @@
-@import "../../../theme/resources.scss";
-
 .commentPanel {
   display: flex;
   width: 100%;
@@ -12,7 +10,6 @@
     }
   }
 }
-
 
 .commentContent {
   text-decoration: none;
@@ -50,9 +47,12 @@
     display: flex;
     justify-content: flex-start;
     color: #bdbdbd;
-    a {
+    a, time {
       color: #bdbdbd;
       padding: 0 3px;
+      font-size: 11px;
+      text-decoration: none;
+      text-decoration-line: none;
       &:first-child {
         padding-left: 0px;
       }
