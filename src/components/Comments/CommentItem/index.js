@@ -1,60 +1,68 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { convertFromRaw } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
+import { Element } from 'react-scroll';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Image, Col } from 'react-bootstrap';
 
-import Link from '../../Link';
-import TimeAgo from '../../TimeAgo';
-import s from './CommentItem.scss';
+import NewComment from '../NewComment';
+import CommentItem from './Node/CommentItem';
+import s from './styles.scss';
 
-class CommentItem extends Component {
+class CommentItemWrapper extends Component {
 
-  showCommentFormHandle = (e) => {
-    e.preventDefault();
-    const { comment } = this.props;
-    this.props.showCommentForm(comment);
+  constructor(props) {
+    super(props);
+    this.state = {
+      flag: true,
+      commentId: null,
+    };
+  }
+
+  showCommentForm = ({ _id, parent, user }) => {
+    const content = `@${user.username} - `;
+    this.setState({
+      flag: !this.state.flag,
+      commentId: parent || _id,
+      initContent: parent ? content : '',
+    });
   }
 
   render() {
-    const { comment } = this.props;
-    const link = `/user/${comment.user._id}`;
+    const { postId, comment, createNewComment } = this.props;
+    const { initContent, commentId, flag } = this.state;
+
+    const cssShow = {
+      display: commentId === comment._id ? 'block' : 'none',
+    };
+
+    const offset = commentId && commentId === comment._id ? -100 : 50;
+
     return (
-      <div className={s.commentPanel}>
-        <Col className={s.commentAvarta}>
-          <Link
-            to={`/user/${comment.user._id}`}
-            title={`${comment.user.profile.firstName} ${comment.user.profile.lastName}`}
-          >
-            <Image src={comment.user.profile.picture} circle />
-          </Link>
-        </Col>
-        <Col className={s.commentContent}>
-          <Col
-            dangerouslySetInnerHTML={{
-              __html: `<p>
-                <a title="${comment.user.profile.firstName} ${comment.user.profile.lastName}" href=${link}>
-                  ${comment.user.profile.firstName} ${comment.user.profile.lastName}
-                </a></p>
-                ${stateToHTML(convertFromRaw(JSON.parse(comment.message)))}
-              `,
-            }}
+      <span>
+        <CommentItem offset={offset} comment={comment} showCommentForm={this.showCommentForm} />
+        {comment && comment.reply && comment.reply.map(_item => (
+          <span className={s.subComment} key={_item._id}>
+            <CommentItem offset={offset} comment={_item} showCommentForm={this.showCommentForm} />
+          </span>
+        ))}
+        <Element name={`#add-comment-${comment._id}`} className={s.subComment} style={cssShow}>
+          <NewComment
+            flag={flag}
+            postId={postId}
+            commentId={commentId}
+            initContent={initContent}
+            createNewComment={createNewComment}
+            isFocus={(commentId && commentId === comment._id) || false}
           />
-          <Col className={s.commentControl}>
-            <a href="#" title="Trả lời" onClick={this.showCommentFormHandle}>Trả lời</a> - <a href="#">
-              <TimeAgo time={comment.updatedAt} />
-            </a>
-          </Col>
-        </Col>
-      </div>
+        </Element>
+      </span>
     );
   }
 }
 
-CommentItem.propTypes = {
+CommentItemWrapper.propTypes = {
+  postId: PropTypes.string.isRequired,
   comment: PropTypes.object.isRequired,
-  showCommentForm: PropTypes.func.isRequired,
+  createNewComment: PropTypes.func.isRequired,
 };
 
-export default withStyles(s)(CommentItem);
+export default withStyles(s)(CommentItemWrapper);
