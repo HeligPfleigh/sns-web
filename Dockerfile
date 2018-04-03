@@ -23,4 +23,4 @@ RUN cp -a /tmp/node_modules /usr/src/app/
 
 EXPOSE 3004
 
-CMD [ "npm", "start" ]
+CMD [ "npm", "start", "--release" ]
