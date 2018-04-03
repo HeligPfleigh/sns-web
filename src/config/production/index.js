@@ -7,7 +7,7 @@ export const analytics = {
 
 };
 
-const serverIp = process.env.APP_IP || 'http://server:8081';
+const serverIp = process.env.APP_IP || 'http://backend:3005';
 const authPath = process.env.APP_AUTH_PATH || '/auth';
 
 // local run local production config

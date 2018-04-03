@@ -1,0 +1,44 @@
+
+stages:
+  - build
+  - deploy
+
+build_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME --cache-from $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+  variables:
+    DOCKER_DRIVER: overlay2
+  only:
+    - develop
+
+deploy_test:
+  stage: deploy
+  image: mttjsc/docker-rancher-compose:latest
+  script:
+    - rancher-compose --url "http://rancher.mttjsc.com:8080/" --access-key $RANCHER_ACCESS_KEY --secret-key $RANCHER_SECRET_KEY --project-name sns --file ci/rancher-dev.yml --verbose up --pull -d --force-upgrade
+    - rancher-compose --url "http://rancher.mttjsc.com:8080/" --access-key $RANCHER_ACCESS_KEY --secret-key $RANCHER_SECRET_KEY --project-name sns --file ci/rancher-dev.yml up -d --upgrade --confirm-upgrade
+  only:
+    - develop
+
+# build an image named production based on master
+tag_production_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $CI_REGISTRY_IMAGE:production
+    - docker push $CI_REGISTRY_IMAGE:production
+  variables:
+    DOCKER_DRIVER: overlay2
+  only:
+    - master
+  when: manual

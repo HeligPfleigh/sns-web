@@ -1,0 +1,14 @@
+version: '2'
+services:
+  frontend:
+    image: registry.mttjsc.com/mtt-projects/sns-client:develop
+    environment:
+      NODE_ENV: production
+      VIRTUAL_HOST: sns.mttjsc.com
+      VIRTUAL_PORT: '8080'
+      LETSENCRYPT_HOST: sns.mttjsc.com
+      LETSENCRYPT_EMAIL: cuong.nguyen@mttjsc.com
+    expose:
+      - '8080'
+    labels:
+      io.rancher.container.pull_image: always
