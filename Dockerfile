@@ -3,10 +3,6 @@ MAINTAINER SNS-DEV TEAM "linh.le@mttjsc.com"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Install yarn
-RUN curl -o- -L https://yarnpkg.com/install.sh | bash
-ENV PATH "$HOME/.yarn/bin:$PATH"
-
 # use changes to package.json to force Docker not to use the cache
 # when we change our application's nodejs dependencies:
 ADD package.json yarn.lock /tmp/
