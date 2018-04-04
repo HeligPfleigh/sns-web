@@ -6,8 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # use changes to package.json to force Docker not to use the cache
 # when we change our application's nodejs dependencies:
 ADD package.json yarn.lock /tmp/
-RUN $HOME/.yarn/bin/yarn cache clean
-RUN cd /tmp && $HOME/.yarn/bin/yarn install --pure-lockfile
+RUN cd /tmp && yarn install --frozen-lockfile
 
 # Create app directory
 RUN mkdir -p /usr/src/app
