@@ -1,4 +1,4 @@
-FROM node:6.9.5
+FROM node:8.9.3-alpine
 MAINTAINER SNS-DEV TEAM "linh.le@mttjsc.com"
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -21,6 +21,6 @@ WORKDIR /usr/src/app
 COPY ./ /usr/src/app/
 RUN cp -a /tmp/node_modules /usr/src/app/
 
-EXPOSE 3004
+EXPOSE 8080
 
-CMD [ "npm", "start:prod"]
+CMD ["yarn", "start:prod"]
