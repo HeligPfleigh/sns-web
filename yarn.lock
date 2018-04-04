@@ -3474,11 +3474,11 @@ draft-js-utils@^0.1.5:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/draft-js-utils/-/draft-js-utils-0.1.7.tgz#e2b6927ca620edf1855a4bfc1cf1d21080a70f16"
 
-draft-js@^0.10.0:
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/draft-js/-/draft-js-0.10.2.tgz#b722613cb306cfee910f9de1789f2cc3023772e7"
+draft-js@^0.10.3:
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/draft-js/-/draft-js-0.10.5.tgz#bfa9beb018fe0533dbb08d6675c371a6b08fa742"
   dependencies:
-    fbjs "^0.8.12"
+    fbjs "^0.8.15"
     immutable "~3.7.4"
     object-assign "^4.1.0"
 
@@ -4223,7 +4223,7 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "^2.0.0"
 
-fbjs@^0.8.12, fbjs@^0.8.16:
+fbjs@^0.8.15, fbjs@^0.8.16:
   version "0.8.16"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.16.tgz#5e67432f550dc41b572bf55847b8aca64e5337db"
   dependencies:
@@ -6257,6 +6257,10 @@ lodash.sortby@^4.7.0:
 lodash.tail@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/lodash.tail/-/lodash.tail-4.1.1.tgz#d2333a36d9e7717c8ad2f7cacafec7c32b444664"
+
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
 
 lodash.toplainobject@^3.0.0:
   version "3.0.0"
@@ -8382,6 +8386,13 @@ react-responsive@^1.2.7:
     hyphenate-style-name "^1.0.0"
     matchmediaquery "^0.2.1"
     prop-types "^15.5.7"
+
+react-scroll@^1.5.5:
+  version "1.7.8"
+  resolved "https://registry.yarnpkg.com/react-scroll/-/react-scroll-1.7.8.tgz#45d8bd0f3fb104a7a1c3adb358e3a742a7091409"
+  dependencies:
+    lodash.throttle "^4.1.1"
+    prop-types "^15.5.8"
 
 react-scrollable-anchor@^0.4.2:
   version "0.4.2"
