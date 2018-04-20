@@ -14,7 +14,7 @@ const authPath = process.env.APP_AUTH_PATH || '/auth';
 // const ipBrowser = process.env.BROWSER_IP || 'http://localhost:8081';
 
 // local run server production config
-const ipBrowser = process.env.BROWSER_IP || 'http://api-sns.mttjsc.com';
+const ipBrowser = process.env.BROWSER_IP || 'https://api-sns.mttjsc.com';
 
 export const server = {
   // internal url
